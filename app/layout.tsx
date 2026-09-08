@@ -8,6 +8,7 @@ const poppins = Poppins({
   display: 'swap',
 });
 export const metadata: Metadata = {
+  icons: { icon: '/favicon.svg' },
   title: {
     default: 'Framy Connect — O Seu Mundo, Num Toque.',
     template: '%s | Framy Connect',
