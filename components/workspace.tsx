@@ -79,7 +79,7 @@ const signOutHref = '/signout-with-chatgpt?return_to=/';
 const menu = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
   { id: 'profile', label: 'A minha identidade', icon: UserRound },
-  { id: 'orders', label: 'Os meus pedidos', icon: Package },
+  { id: 'orders', label: 'O meu pedido', icon: Package },
   { id: 'operations', label: 'Operações · teste', icon: Settings2 },
   { id: 'agent', label: 'Agente · teste', icon: BriefcaseBusiness },
   { id: 'finance', label: 'Financeiro · teste', icon: Wallet },
@@ -464,36 +464,38 @@ export function Workspace({ displayName }: { displayName: string }) {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
-          <Collapsible
-            className="workspace-test-tools"
-            open={testToolsOpen}
-            onOpenChange={setTestToolsOpen}
-          >
-            <CollapsibleTrigger className="workspace-test-trigger">
-              <Settings2 size={17} /> Ferramentas de teste{' '}
-              <ChevronDown size={16} />
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <p>Vistas de demonstração, sem permissões reais.</p>
-              <SidebarMenu>
-                {menu.slice(3).map((m) => (
-                  <SidebarMenuItem key={m.id}>
-                    <SidebarMenuButton
-                      className="workspace-menu-item"
-                      isActive={tab === m.id}
-                      onClick={() => {
-                        setTab(m.id);
-                        setNotice('');
-                      }}
-                    >
-                      <m.icon />
-                      <span>{m.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </CollapsibleContent>
-          </Collapsible>
+          {['operations', 'agent', 'finance', 'ceo'].includes(tab) && (
+            <Collapsible
+              className="workspace-test-tools"
+              open={testToolsOpen}
+              onOpenChange={setTestToolsOpen}
+            >
+              <CollapsibleTrigger className="workspace-test-trigger">
+                <Settings2 size={17} /> Ferramentas de teste{' '}
+                <ChevronDown size={16} />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <p>Vistas de demonstração, sem permissões reais.</p>
+                <SidebarMenu>
+                  {menu.slice(3).map((m) => (
+                    <SidebarMenuItem key={m.id}>
+                      <SidebarMenuButton
+                        className="workspace-menu-item"
+                        isActive={tab === m.id}
+                        onClick={() => {
+                          setTab(m.id);
+                          setNotice('');
+                        }}
+                      >
+                        <m.icon />
+                        <span>{m.label}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </CollapsibleContent>
+            </Collapsible>
+          )}
         </SidebarContent>
         <SidebarFooter className="p-6">
           <Link className="catalog-link" href="/produtos">
