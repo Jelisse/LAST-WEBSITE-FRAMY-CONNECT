@@ -155,11 +155,12 @@ export function Workspace({ displayName }: { displayName: string }) {
           '/operations': 'operations',
           '/cofounder': 'ceo',
           '/agent': 'agent',
+          '/finance': 'finance',
         };
         if (routeTab[window.location.pathname]) {
           setTab(routeTab[window.location.pathname]);
           setTestToolsOpen(
-            ['operations', 'ceo', 'agent'].includes(
+            ['operations', 'ceo', 'agent', 'finance'].includes(
               routeTab[window.location.pathname],
             ),
           );

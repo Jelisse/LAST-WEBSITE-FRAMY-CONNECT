@@ -1,8 +1,8 @@
+import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowUpRight,
-  UserRound,
   Eye,
   Target,
   Star,
@@ -66,10 +66,7 @@ export default async function Home() {
           <Link href="/contacto">Contacto</Link>
         </nav>
         <div className="home-nav-actions">
-          <Link className="home-account" href="/dashboard">
-            <UserRound size={17} />
-            Minha Conta
-          </Link>
+          <AccountMenu className="home-account" />
           <Link className="home-buy" href="/produtos">
             Compre agora
           </Link>

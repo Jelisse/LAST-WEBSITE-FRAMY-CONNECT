@@ -1,6 +1,7 @@
+import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight, UserRound, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, Mail, ShieldCheck } from 'lucide-react';
 export function SiteHeader() {
   return (
     <header className="site-header">
@@ -20,9 +21,7 @@ export function SiteHeader() {
         <Link href="/contacto">Contacto</Link>
       </nav>
       <div className="header-actions">
-        <Link className="account-link" href="/dashboard">
-          <UserRound size={18} /> Minha Conta
-        </Link>
+        <AccountMenu />
         <Link className="btn btn-primary" href="/produtos">
           Compre agora <ArrowUpRight size={19} />
         </Link>

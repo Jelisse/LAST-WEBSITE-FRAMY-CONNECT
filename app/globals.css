@@ -465,7 +465,7 @@ summary {
   .site-header nav {
     gap: 16px;
   }
-  .header-actions .account-link {
+  .header-actions .account-link:not(.account-menu-trigger) {
     display: none;
   }
   .hero {
@@ -2996,4 +2996,64 @@ summary {
     width: 8px;
     height: 8px;
   }
+}
+
+/* Temporary workspace navigation through Minha Conta. */
+.account-menu-trigger {
+  cursor: pointer;
+  font-family: inherit;
+}
+.home-nav-actions .account-menu-trigger {
+  padding: 9px 17px;
+  border-radius: 12px;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.account-menu-trigger:focus-visible {
+  outline: 2px solid #ef4f1c;
+  outline-offset: 4px;
+}
+.account-menu-popup {
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  padding: 8px;
+  border-radius: 16px;
+  background: #fffdfb;
+  color: #282626;
+  box-shadow: 0 16px 48px #30201624;
+}
+.account-menu-label {
+  padding: 10px 12px;
+  color: #746b65;
+  font-size: 12px;
+}
+.account-menu-option {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.account-menu-option[data-highlighted],
+.account-menu-option:hover {
+  background: #fff0e8;
+  color: #a63c16;
+}
+.account-menu-option strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+}
+.account-menu-option small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: #746b65;
+}
+
+@media (max-width: 760px) {
+  .header-actions { gap: 10px; }
+  .header-actions .btn { display: none; }
+  .header-actions .account-menu-trigger { font-size: 13px; }
 }
