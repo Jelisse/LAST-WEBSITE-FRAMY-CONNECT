@@ -72,6 +72,30 @@ assert.equal(
   ).status,
   200,
 );
+assert.equal(
+  (
+    await request('/api/workspace', {
+      action: 'update-delivery',
+      orderId,
+      version: 1,
+      deliveryCity: 'Nhamatanda',
+      deliveryAddress: 'Centro',
+    })
+  ).status,
+  200,
+);
+assert.equal(
+  (
+    await request('/api/workspace', {
+      action: 'update-delivery',
+      orderId,
+      version: 1,
+      deliveryCity: 'Maputo',
+    })
+  ).status,
+  409,
+  'Stale delivery edit rejected',
+);
 let o = (await request('/api/manager')).data.orders.find(
   (o) => o.id === orderId,
 );
@@ -138,6 +162,22 @@ for (const [s, extra] of [
 }
 const done = (await request('/api/manager')).data;
 assert.equal(done.orders.find((o) => o.id === orderId).status, 'DELIVERED');
+assert.equal(
+  done.orders.find((o) => o.id === orderId).deliveryCity,
+  'Nhamatanda',
+);
+assert.equal(
+  (
+    await request('/api/workspace', {
+      action: 'update-delivery',
+      orderId,
+      version: done.orders.find((o) => o.id === orderId).version,
+      deliveryCity: 'Beira',
+    })
+  ).status,
+  409,
+  'Delivered order address is locked',
+);
 assert.equal(
   done.movements
     .filter((m) => m.product_id === productId)

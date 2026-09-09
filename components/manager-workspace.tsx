@@ -176,7 +176,9 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
           ' ' +
           o.agent +
           ' ' +
-          (o.profile?.name ?? o.ownerId),
+          (o.profile?.name ?? o.ownerId) +
+          ' ' +
+          (o.deliveryCity ?? ''),
       ),
   );
   const inspect = (o: Order) => {
@@ -197,6 +199,8 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
         'Agente',
         'Data (UTC)',
         'Submetido (Maputo)',
+        'Local de entrega',
+        'Detalhes de entrega',
         'Progresso',
         'Tempo decorrido',
         'Prazo de referência (horas)',
@@ -210,6 +214,8 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
         o.agent,
         o.createdAt,
         submissionTime(o.createdAt),
+        o.deliveryCity ?? 'Não indicado',
+        o.deliveryAddress ?? '',
         orderProgress(o, now, progressHours).label,
         orderProgress(o, now, progressHours).elapsed,
         String(progressHours),
@@ -244,6 +250,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
           <tr>
             <th>Pedido / cliente</th>
             <th>Submetido (Maputo)</th>
+            <th>Local de entrega</th>
             <th>Progresso</th>
             <th>Estado</th>
             <th>Pagamento</th>
@@ -269,6 +276,9 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   <time dateTime={o.createdAt}>
                     {submissionTime(o.createdAt)}
                   </time>
+                </td>
+                <td>
+                  <strong>{o.deliveryCity || 'Não indicado'}</strong>
                 </td>
                 <td>
                   <span
@@ -986,6 +996,11 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                 Progresso: {orderProgress(selected, now, progressHours).label} ·
                 Referência: {progressHours} horas
               </p>
+              <p>
+                <strong>Local de entrega:</strong>{' '}
+                {selected.deliveryCity || 'A aguardar informação do cliente'}
+              </p>
+              {selected.deliveryAddress && <p>{selected.deliveryAddress}</p>}
               <p>Agente: {selected.agent || 'Por atribuir'}</p>
               <ProfileHandoff
                 key={selected.id}

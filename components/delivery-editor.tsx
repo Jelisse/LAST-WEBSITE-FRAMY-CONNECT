@@ -1,0 +1,111 @@
+'use client';
+import { useState } from 'react';
+import type { SandboxOrder } from '@/lib/domain';
+import { canEditDelivery } from '@/lib/delivery';
+export function DeliveryEditor({
+  order,
+  onSaved,
+}: {
+  order: SandboxOrder;
+  onSaved: () => Promise<void>;
+}) {
+  const [city, setCity] = useState(order.deliveryCity ?? ''),
+    [address, setAddress] = useState(order.deliveryAddress ?? ''),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState(''),
+    [notice, setNotice] = useState('');
+  const editable = canEditDelivery(order);
+  return (
+    <section className="delivery-editor" aria-labelledby="delivery-heading">
+      <h3 id="delivery-heading">Onde pretende receber o produto?</h3>
+      <p>
+        Indique a cidade ou localidade para atribuirmos o agente da sua zona.
+        Esta informação não aparece no seu perfil público.
+      </p>
+      {editable ? (
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setBusy(true);
+            setError('');
+            setNotice('');
+            try {
+              const r = await fetch('/api/workspace', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  action: 'update-delivery',
+                  orderId: order.id,
+                  version: order.version,
+                  deliveryCity: city,
+                  deliveryAddress: address,
+                }),
+              });
+              const d = (await r.json()) as { error?: string };
+              if (!r.ok) throw Error(d.error ?? 'Não foi possível guardar.');
+              await onSaved();
+              setNotice('Local de entrega guardado.');
+            } catch (e) {
+              setError(
+                e instanceof Error ? e.message : 'Não foi possível guardar.',
+              );
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          <fieldset disabled={busy}>
+            <label htmlFor="delivery-city">
+              Cidade / localidade de entrega <span>*</span>
+            </label>
+            <input
+              id="delivery-city"
+              name="deliveryCity"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              required
+              minLength={2}
+              maxLength={90}
+              list="delivery-cities"
+              placeholder="Ex.: Maputo, Matola, Beira, Nhamatanda ou Chimoio"
+              autoComplete="address-level2"
+            />
+            <datalist id="delivery-cities">
+              {['Maputo', 'Matola', 'Beira', 'Nhamatanda', 'Chimoio'].map(
+                (v) => (
+                  <option key={v} value={v} />
+                ),
+              )}
+            </datalist>
+            <label htmlFor="delivery-address">
+              Bairro, endereço ou ponto de referência <small>(opcional)</small>
+            </label>
+            <textarea
+              id="delivery-address"
+              name="deliveryAddress"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              maxLength={300}
+              rows={2}
+              placeholder="Pode indicar apenas a cidade ou acrescentar detalhes."
+              autoComplete="street-address"
+            />
+            <button className="btn btn-primary" type="submit">
+              {busy ? 'A guardar…' : 'Guardar local de entrega'}
+            </button>
+          </fieldset>
+        </form>
+      ) : (
+        <>
+          <strong>{order.deliveryCity || 'Local não indicado'}</strong>
+          {order.deliveryAddress && <p>{order.deliveryAddress}</p>}
+          <p>
+            Para alterar o local de um pedido já atribuído, contacte a equipa.
+          </p>
+        </>
+      )}
+      {error && <p role="alert">{error}</p>}
+      {notice && <p role="status">{notice}</p>}
+    </section>
+  );
+}

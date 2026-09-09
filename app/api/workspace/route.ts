@@ -1,3 +1,4 @@
+import { validateDelivery, canEditDelivery } from '@/lib/delivery';
 import { POST as manageOrder } from '@/app/api/manager/route';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { env } from 'cloudflare:workers';
@@ -101,6 +102,78 @@ export async function POST(request: Request) {
   try {
     const db = database(),
       now = new Date().toISOString();
+    if (body.action === 'update-delivery') {
+      if (
+        typeof body.orderId !== 'string' ||
+        !Number.isSafeInteger(body.version)
+      )
+        return json({ error: 'Pedido inválido.' }, 422);
+      const delivery = validateDelivery(body);
+      const row = await db
+        .prepare(
+          'SELECT data_json,version FROM sandbox_orders WHERE id=? AND owner_id=?',
+        )
+        .bind(body.orderId, user.userId)
+        .first<{ data_json: string; version: number }>();
+      if (!row) return json({ error: 'Pedido não encontrado.' }, 404);
+      if (row.version !== body.version)
+        return json(
+          { error: 'O pedido mudou. Actualize antes de guardar.' },
+          409,
+        );
+      const order = JSON.parse(row.data_json) as SandboxOrder;
+      if (!canEditDelivery(order))
+        return json(
+          {
+            error:
+              'A entrega já está em tratamento. Contacte a equipa para alterar o local.',
+          },
+          409,
+        );
+      const next = {
+        ...order,
+        ...delivery,
+        version: order.version + 1,
+        updatedAt: now,
+      };
+      const eventId = crypto.randomUUID();
+      const result = await db.batch([
+        db
+          .prepare(
+            'UPDATE sandbox_orders SET data_json=?,version=? WHERE id=? AND owner_id=? AND version=?',
+          )
+          .bind(
+            JSON.stringify(next),
+            next.version,
+            body.orderId,
+            user.userId,
+            body.version,
+          ),
+        db
+          .prepare(
+            'INSERT INTO sandbox_events(id,owner_id,order_id,action,created_at) SELECT ?,?,?,?,? WHERE changes()>0',
+          )
+          .bind(eventId, user.userId, body.orderId, 'delivery-address', now),
+        db
+          .prepare(
+            'INSERT INTO manager_audit(id,actor,action,subject,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM sandbox_events WHERE id=?)',
+          )
+          .bind(
+            crypto.randomUUID(),
+            user.userId,
+            'Local de entrega indicado',
+            body.orderId + ' · ' + delivery.deliveryCity,
+            now,
+            eventId,
+          ),
+      ]);
+      if (!result[0].meta.changes)
+        return json(
+          { error: 'O pedido mudou. Actualize antes de guardar.' },
+          409,
+        );
+      return json({ ok: true });
+    }
     if (body.action === 'activate-sandbox-plan') {
       if (!Number.isInteger(body.version) || Number(body.version) < 0)
         return json({ error: 'Versão inválida.' }, 422);

@@ -73,6 +73,7 @@ import {
   validatePlanContent,
   publicProfile,
 } from '@/lib/domain';
+import { DeliveryEditor } from './delivery-editor';
 import { usernameFromName } from '@/lib/domain';
 import { money } from '@/lib/catalog';
 import { ProductManager } from './product-manager';
@@ -402,6 +403,7 @@ export function Workspace({ displayName }: { displayName: string }) {
         <TableHeader>
           <TableRow>
             <TableHead>Pedido / produto</TableHead>
+            <TableHead>Local de entrega</TableHead>
             <TableHead>Estado</TableHead>
             <TableHead>Pagamento</TableHead>
             <TableHead>Valor de teste</TableHead>
@@ -419,6 +421,14 @@ export function Workspace({ displayName }: { displayName: string }) {
                 <small>
                   #{o.id.slice(0, 8).toUpperCase()} · {date(o.createdAt)}
                 </small>
+              </TableCell>
+              <TableCell>
+                <Button variant="ghost" onClick={() => inspect(o)}>
+                  {o.deliveryCity ||
+                    (['DELIVERED', 'CANCELLED'].includes(o.status)
+                      ? 'Não indicado'
+                      : 'Indicar local de entrega')}
+                </Button>
               </TableCell>
               <TableCell>
                 <span className="status-badge">{orderLabels[o.status]}</span>
@@ -876,7 +886,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                       </h2>
                       <p className="muted">
                         {tab === 'orders'
-                          ? 'Consulte o pagamento, a produção e a entrega. A nossa equipa actualiza cada etapa do seu pedido.'
+                          ? 'Indique o local de entrega em cada pedido e acompanhe o pagamento, a produção e a entrega.'
                           : tab === 'operations'
                             ? 'Atribua um agente e acompanhe os pedidos de teste até à entrega.'
                             : 'Abra um pedido atribuído, inicie a produção e conclua o controlo de qualidade.'}
@@ -1020,6 +1030,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                             {(
                               {
                                 created: 'Pedido criado',
+                                'delivery-address': 'Local de entrega indicado',
                                 pay: 'Pagamento simulado',
                                 assign: 'Agente atribuído',
                                 start: 'Produção iniciada',
@@ -1067,6 +1078,16 @@ export function Workspace({ displayName }: { displayName: string }) {
                 <strong>{money(selected.amount)}</strong>
               </div>
               <p>{payment(selected)}</p>
+              <DeliveryEditor
+                key={selected.id}
+                order={selected}
+                onSaved={async () => {
+                  const updated = await load();
+                  setSelected(
+                    updated.orders.find((o) => o.id === selected.id) ?? null,
+                  );
+                }}
+              />
               <p className="muted">
                 Agente: {selected.agent || 'Por atribuir'} · Controlo de
                 qualidade: {selected.qc ? 'Concluído' : 'Pendente'}
@@ -1109,6 +1130,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                         {(
                           {
                             created: 'Pedido criado',
+                            'delivery-address': 'Local de entrega indicado',
                             pay: 'Pagamento confirmado',
                             assign: 'Agente atribuído',
                             start: 'Produção iniciada',

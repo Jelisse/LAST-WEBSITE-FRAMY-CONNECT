@@ -258,6 +258,10 @@ export async function POST(request: Request) {
         );
       const order = JSON.parse(row.data_json) as SandboxOrder;
       if (step === 'assign') {
+        if (!order.deliveryCity)
+          throw Error(
+            'O cliente deve indicar o local de entrega antes de atribuir um agente.',
+          );
         const agent = await db
           .prepare(
             "SELECT data_json FROM manager_records WHERE id=? AND kind='agent'",

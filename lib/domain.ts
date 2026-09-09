@@ -266,6 +266,8 @@ export type Journal = {
   amount: number;
 };
 export type SandboxOrder = {
+  deliveryCity?: string;
+  deliveryAddress?: string;
   id: string;
   productId: string;
   productName: string;
