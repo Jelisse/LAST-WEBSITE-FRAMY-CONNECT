@@ -234,13 +234,20 @@ export function MobileProfile({
             <output className="mobile-profile-message">{message}</output>
           )}
           <footer className="mobile-profile-footer">
-            <Image
-              src="/brand/logo.svg"
-              alt="Framy Connect"
-              width={220}
-              height={100}
-              unoptimized
-            />
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visitar o site Framy Connect (abre num novo separador)"
+            >
+              <Image
+                src="/brand/logo.svg"
+                alt="Framy Connect"
+                width={220}
+                height={100}
+                unoptimized
+              />
+            </a>
             <small>Todos direitos reservados {new Date().getFullYear()}</small>
           </footer>
         </div>
