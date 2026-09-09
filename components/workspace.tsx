@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowUpRight,
-  ArrowRight,
+  ChevronDown,
   LayoutDashboard,
   UserRound,
   Package,
@@ -23,6 +23,12 @@ import {
   Globe2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CustomerOverview } from '@/components/customer-overview';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -106,7 +112,8 @@ export function Workspace({ displayName }: { displayName: string }) {
     [agent, setAgent] = useState(''),
     [proof, setProof] = useState(''),
     [checks, setChecks] = useState<boolean[]>([false, false, false, false]),
-    [chosenProduct, setChosenProduct] = useState('metal');
+    [chosenProduct, setChosenProduct] = useState('metal'),
+    [testToolsOpen, setTestToolsOpen] = useState(false);
   const pendingCreate = useRef<string | null>(null);
   const load = useCallback(async (resetProfile = false) => {
     const r = await fetch('/api/workspace', { cache: 'no-store' });
@@ -137,8 +144,10 @@ export function Workspace({ displayName }: { displayName: string }) {
           '/cofounder': 'ceo',
           '/agent': 'agent',
         };
-        if (routeTab[window.location.pathname])
+        if (routeTab[window.location.pathname]) {
           setTab(routeTab[window.location.pathname]);
+          setTestToolsOpen(['operations', 'ceo', 'agent'].includes(routeTab[window.location.pathname]));
+        }
         const product = new URLSearchParams(window.location.search).get(
           'product',
         );
@@ -399,7 +408,7 @@ export function Workspace({ displayName }: { displayName: string }) {
         </SidebarHeader>
         <SidebarContent className="px-4">
           <SidebarMenu>
-            {menu.map((m) => (
+            {menu.slice(0, 3).map((m) => (
               <SidebarMenuItem key={m.id}>
                 <SidebarMenuButton
                   className="workspace-menu-item"
@@ -415,6 +424,36 @@ export function Workspace({ displayName }: { displayName: string }) {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
+          <Collapsible
+            className="workspace-test-tools"
+            open={testToolsOpen}
+            onOpenChange={setTestToolsOpen}
+          >
+            <CollapsibleTrigger className="workspace-test-trigger">
+              <Settings2 size={17} /> Ferramentas de teste{' '}
+              <ChevronDown size={16} />
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <p>Vistas de demonstração, sem permissões reais.</p>
+              <SidebarMenu>
+                {menu.slice(3).map((m) => (
+                  <SidebarMenuItem key={m.id}>
+                    <SidebarMenuButton
+                      className="workspace-menu-item"
+                      isActive={tab === m.id}
+                      onClick={() => {
+                        setTab(m.id);
+                        setNotice('');
+                      }}
+                    >
+                      <m.icon />
+                      <span>{m.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </CollapsibleContent>
+          </Collapsible>
         </SidebarContent>
         <SidebarFooter className="p-6">
           <Link className="catalog-link" href="/produtos">
@@ -447,23 +486,26 @@ export function Workspace({ displayName }: { displayName: string }) {
             Ver website <ArrowUpRight size={16} />
           </Link>
         </header>
-        <main id="main" className="workspace-main">
+        <main
+          id="main"
+          className={`workspace-main ${['overview', 'profile', 'orders'].includes(tab) ? 'customer-main' : ''}`}
+        >
           <div className="sandbox-banner">
             <ShieldCheck size={19} />
             <span>
-              ESPAÇO DE TESTE · As operações e valores são simulados. Não são
-              efectuadas cobranças. A escolha de uma vista não concede
-              permissões reais.
+              <strong>Prévia privada</strong> · Pedidos, pagamentos e entregas
+              são simulados. Sem cobranças.
             </span>
           </div>
           <div className="workspace-title">
             <div>
               <span className="eyebrow">
-                FRAMY CONNECT / {tab === 'profile' ? 'IDENTIDADE' : 'WORKSPACE'}
+                FRAMY CONNECT /{' '}
+                {tab === 'profile' ? 'IDENTIDADE' : 'MINHA CONTA'}
               </span>
               <h1>
                 {tab === 'overview'
-                  ? 'O seu mundo começa aqui.'
+                  ? `Olá, ${displayName.trim().split(/\s+/)[0] || 'bem-vindo'}.`
                   : menu
                       .find((m) => m.id === tab)
                       ?.label.replace(' · teste', '')}
@@ -472,6 +514,7 @@ export function Workspace({ displayName }: { displayName: string }) {
             <Button
               variant="outline"
               className="control-btn"
+              aria-label="Actualizar dados"
               disabled={busy || loading}
               onClick={() => run(() => load(false), 'Dados actualizados.')}
             >
@@ -499,89 +542,12 @@ export function Workspace({ displayName }: { displayName: string }) {
           ) : (
             <>
               {tab === 'overview' && (
-                <>
-                  <div className="metric-grid">
-                    <Metric
-                      label="A minha identidade"
-                      value={data.published ? 'Publicada' : 'Rascunho'}
-                      note={
-                        data.profile
-                          ? 'O seu perfil, sempre consigo.'
-                          : 'Crie a sua primeira identidade.'
-                      }
-                    />
-                    <Metric
-                      label="Pedidos de teste"
-                      value={String(orders.length)}
-                      note="Nenhuma compra real"
-                    />
-                    <Metric
-                      label="Em produção"
-                      value={String(
-                        orders.filter((o) => o.status === 'IN_PRODUCTION')
-                          .length,
-                      )}
-                      note="Percurso de demonstração"
-                    />
-                    <Metric
-                      label="Entregues"
-                      value={String(
-                        orders.filter((o) => o.status === 'DELIVERED').length,
-                      )}
-                      note="Entregas simuladas"
-                    />
-                  </div>
-                  <div className="workspace-split">
-                    <article className="welcome-panel">
-                      <span className="eyebrow">A SUA PRÓXIMA CONEXÃO</span>
-                      <h2>
-                        Uma identidade.
-                        <br />
-                        Todas as possibilidades.
-                      </h2>
-                      <p>
-                        Comece pelo seu perfil. Escolha o que quer mostrar,
-                        guarde o rascunho e veja como os outros o vão conhecer.
-                      </p>
-                      <Button
-                        className="btn btn-primary"
-                        onClick={() => setTab('profile')}
-                      >
-                        Editar a minha identidade <ArrowUpRight />
-                      </Button>
-                    </article>
-                    <article className="panel checklist">
-                      <h3>Os primeiros passos</h3>
-                      {[
-                        [!!data.profile, 'Criar a sua identidade', 'profile'],
-                        [
-                          data.published,
-                          'Pré-visualizar e publicar',
-                          'profile',
-                        ],
-                        [orders.length > 0, 'Experimentar um pedido', 'orders'],
-                      ].map(([done, label, target], i) => (
-                        <button
-                          key={String(label)}
-                          onClick={() => setTab(String(target))}
-                        >
-                          <span className={done ? 'done' : ''}>
-                            {done ? <Check size={16} /> : i + 1}
-                          </span>
-                          <strong>{label}</strong>
-                          <ArrowRight size={17} />
-                        </button>
-                      ))}
-                    </article>
-                  </div>
-                  <div className="section-heading">
-                    <h2>Os seus pedidos mais recentes</h2>
-                    <Button variant="ghost" onClick={() => setTab('orders')}>
-                      Ver pedidos <ArrowUpRight />
-                    </Button>
-                  </div>
-                  {orderTable}
-                </>
+                <CustomerOverview
+                  data={data}
+                  displayName={displayName}
+                  onNavigate={setTab}
+                  onInspect={inspect}
+                />
               )}
               {tab === 'profile' && (
                 <div className="editor-grid">
