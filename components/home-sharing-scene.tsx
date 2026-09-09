@@ -2,14 +2,14 @@
 
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { Nfc, ScanLine, ArrowUpRight } from 'lucide-react';
+import { Nfc, ScanLine, ArrowUpRight, Globe, Camera, Zap } from 'lucide-react';
 
 const exampleProfile = '/teste_02136211';
 
 function DemoCard({ qr }: { qr?: string }) {
   return <div className="sharing-card">
     <Image src="/brand/logo.svg" alt="Framy Connect" width={160} height={73} unoptimized />
-    <span>O Seu Mundo num Toque.</span>
+    <div className="sharing-card-identity"><strong>FIRMINO CHAMBALE</strong><span>Arquitecto e Planeador Fisico</span><i /><small><img src="/social/instagram.svg" alt="" /> Instagram</small><small><Globe /> Perfil Framy Connect</small></div><span className="sharing-card-tagline">O Seu Mundo num Toque.</span>
     {qr ? <img className="sharing-qr" src={qr} alt="QR para abrir o perfil de exemplo" /> : <Nfc className="sharing-nfc" />}
   </div>;
 }
@@ -18,7 +18,7 @@ function DemoPhone({ scan, qr }: { scan?: boolean; qr?: string }) {
   return <div className={`sharing-phone${scan ? ' sharing-phone-scan' : ''}`}>
     <Image className="sharing-shell" src="/home/iphone-side-shell.png" alt="" width={896} height={1792} unoptimized />
     <div className="sharing-screen">
-      {scan ? <div className="sharing-camera"><span>Ler código QR</span><DemoCard qr={qr} /><div className="sharing-scan-frame" /><i /></div> : <Image src="/home/profile-screen.jpg" alt="Perfil Framy de Firmino Chambale" fill unoptimized sizes="260px" />}
+      {scan ? <div className="sharing-camera"><span>Ler código QR</span><DemoCard qr={qr} /><div className="sharing-scan-frame" /><div className="sharing-camera-controls"><Zap /><i /><Camera /></div></div> : <Image src="/home/profile-screen.jpg" alt="Perfil Framy de Firmino Chambale" fill unoptimized sizes="260px" />}
       <span className="home-phone-island" />
     </div>
   </div>;
@@ -41,3 +41,5 @@ export function HomeSharingScene() {
     </div>
   </section>;
 }
+
+
