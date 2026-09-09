@@ -4,6 +4,7 @@ import { env } from 'cloudflare:workers';
 import { database } from '@/lib/server-db';
 import {
   publicProfile,
+  usernameFromName,
   validateProfile,
   type SandboxOrder,
   validatePlanContent,
@@ -158,7 +159,38 @@ export async function POST(request: Request) {
     ) {
       if (!Number.isInteger(body.version) || Number(body.version) < 0)
         return json({ error: 'Versão inválida.' }, 422);
-      const profile = validateProfile(body.profile);
+      let profileInput = body.profile;
+      if (
+        body.version === 0 &&
+        profileInput &&
+        typeof profileInput === 'object' &&
+        !Array.isArray(profileInput)
+      ) {
+        const input = profileInput as Record<string, unknown>;
+        if (
+          (body.autoUsername === true || !input.username) &&
+          typeof input.name === 'string'
+        ) {
+          const base = usernameFromName(input.name);
+          let candidate = base;
+          for (
+            let i = 1;
+            base &&
+            (await db
+              .prepare('SELECT owner_id FROM profiles WHERE username=?')
+              .bind(candidate)
+              .first());
+            i++
+          ) {
+            candidate =
+              base.slice(0, 30) +
+              '_' +
+              (i < 20 ? i + 1 : crypto.randomUUID().slice(0, 8));
+          }
+          profileInput = { ...input, username: candidate };
+        }
+      }
+      const profile = validateProfile(profileInput);
       if (profile.photoUrl && body.action !== 'unpublish-profile') {
         const photo = await env.PROFILE_PHOTOS?.head(
           `profiles/${profile.photoUrl.split('/').pop()}`,

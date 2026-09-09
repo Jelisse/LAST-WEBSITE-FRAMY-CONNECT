@@ -120,6 +120,20 @@ const reserved = new Set([
   'signout-with-chatgpt',
   'callback',
 ]);
+export function usernameFromName(name: string): string {
+  const base = name
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 40)
+    .replace(/_+$/, '');
+  if (!base) return '';
+  return base.length < 3 || reserved.has(base)
+    ? `${base.slice(0, 33)}_perfil`
+    : base;
+}
 export function validateProfile(input: unknown): Profile {
   if (!input || typeof input !== 'object' || Array.isArray(input))
     throw new Error('Perfil inválido.');

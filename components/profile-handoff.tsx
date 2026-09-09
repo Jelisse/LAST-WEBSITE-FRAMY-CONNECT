@@ -16,7 +16,8 @@ export function ProfileHandoff({
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
-  const url = username ? `${origin}/${username}` : '';
+  const url =
+    username && origin ? `${origin}/${encodeURIComponent(username)}` : '';
   return (
     <section
       className={`profile-handoff ${operations ? 'operations-profile-handoff panel' : ''}`}
@@ -67,10 +68,17 @@ export function ProfileHandoff({
           </div>
         </>
       ) : (
-        <p>Guarde um nome de utilizador para gerar o link.</p>
+        <p>
+          {operations
+            ? 'O cliente ainda não criou o perfil para este pedido.'
+            : 'Guarde o perfil para gerar o link.'}
+        </p>
       )}
       {!published && username && (
-        <p>Publique o perfil para disponibilizar este link em Operações.</p>
+        <p>
+          O perfil ainda não está publicado. Aguarde a publicação antes de
+          codificar o NFC.
+        </p>
       )}
       {message && <output>{message}</output>}
     </section>

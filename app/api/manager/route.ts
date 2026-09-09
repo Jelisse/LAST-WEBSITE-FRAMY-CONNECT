@@ -20,12 +20,13 @@ export async function GET() {
       await Promise.all([
         db
           .prepare(
-            `SELECT o.owner_id,o.data_json,p.published_json FROM sandbox_orders o LEFT JOIN profiles p ON p.owner_id=o.owner_id ORDER BY o.created_at DESC`,
+            `SELECT o.owner_id,o.data_json,p.username,p.published_json FROM sandbox_orders o LEFT JOIN profiles p ON p.owner_id=o.owner_id ORDER BY o.created_at DESC`,
           )
           .all<{
             owner_id: string;
             data_json: string;
             published_json: string | null;
+            username: string | null;
           }>(),
         db
           .prepare(
@@ -47,6 +48,7 @@ export async function GET() {
       orders: orders.results.map((r) => ({
         ...JSON.parse(r.data_json),
         ownerId: r.owner_id,
+        profileUsername: r.username,
         profile: r.published_json ? JSON.parse(r.published_json) : null,
       })),
       agents: agents.results.map((r) => ({

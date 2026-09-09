@@ -73,6 +73,7 @@ import {
   validatePlanContent,
   publicProfile,
 } from '@/lib/domain';
+import { usernameFromName } from '@/lib/domain';
 import { money } from '@/lib/catalog';
 import { ProductManager } from './product-manager';
 import type { WorkspaceData } from '@/lib/profile-types';
@@ -309,7 +310,14 @@ export function Workspace({ displayName }: { displayName: string }) {
     if (!data || uploadingPhoto) return;
     await run(
       async () => {
-        await send({ action, profile, version: data.profileVersion });
+        await send({
+          action,
+          profile,
+          version: data.profileVersion,
+          autoUsername:
+            data.profileVersion === 0 &&
+            profile.username === usernameFromName(profile.name),
+        });
         await load(true);
         setDirty(false);
       },
@@ -723,6 +731,17 @@ export function Workspace({ displayName }: { displayName: string }) {
                                   setProfile({
                                     ...profile,
                                     [f.key]: e.target.value,
+                                    ...(f.key === 'name' &&
+                                    data.profileVersion === 0 &&
+                                    (!profile.username ||
+                                      profile.username ===
+                                        usernameFromName(profile.name))
+                                      ? {
+                                          username: usernameFromName(
+                                            e.target.value,
+                                          ),
+                                        }
+                                      : {}),
                                   });
                                   setDirty(true);
                                 }}

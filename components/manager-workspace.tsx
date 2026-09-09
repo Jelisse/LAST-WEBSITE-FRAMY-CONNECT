@@ -17,6 +17,7 @@ import {
   ChevronRight,
   X,
 } from 'lucide-react';
+import { ProfileHandoff } from './profile-handoff';
 import { AccountMenu } from './account-menu';
 import { ProductManager } from './product-manager';
 import { money, type Product } from '@/lib/catalog';
@@ -41,7 +42,11 @@ type Agent = {
   active: boolean;
   version: number;
 };
-type Order = SandboxOrder & { ownerId: string; profile: Profile | null };
+type Order = SandboxOrder & {
+  ownerId: string;
+  profileUsername?: string | null;
+  profile: Profile | null;
+};
 type Movement = {
   agent_id: string;
   id: string;
@@ -982,11 +987,14 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                 Referência: {progressHours} horas
               </p>
               <p>Agente: {selected.agent || 'Por atribuir'}</p>
-              {selected.profile && (
-                <Link href={'/' + selected.profile.username} target="_blank">
-                  Abrir perfil do cliente <ArrowUpRight size={15} />
-                </Link>
-              )}
+              <ProfileHandoff
+                key={selected.id}
+                username={
+                  selected.profileUsername ?? selected.profile?.username
+                }
+                published={!!selected.profile}
+                operations
+              />
               {error && (
                 <p role="alert" className="manager-error">
                   {error}
