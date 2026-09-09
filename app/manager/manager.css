@@ -1,0 +1,530 @@
+.manager-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #f7f7f8;
+  color: #272629;
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 13px;
+}
+.manager-sidebar {
+  width: 248px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 1px solid #e9e8ea;
+  padding: 30px 20px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.manager-sidebar > a img {
+  width: 150px;
+  margin: 0 12px 32px;
+}
+.manager-eyebrow {
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: 600;
+  color: #968d85;
+}
+.manager-sidebar > .manager-eyebrow {
+  padding-left: 15px;
+  margin-bottom: 16px;
+}
+.manager-sidebar nav {
+  display: grid;
+  gap: 7px;
+}
+.manager-sidebar nav button {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 12px;
+  padding: 15px 14px;
+  border-radius: 12px;
+  color: #6e6a67;
+}
+.manager-sidebar nav button svg:last-child {
+  margin-left: auto;
+}
+.manager-sidebar nav button[aria-current] {
+  background: #fff0e7;
+  color: #c94715;
+  font-weight: 600;
+}
+.manager-sidebar-bottom {
+  margin-top: auto;
+  border-top: 1px solid #ece9e6;
+  padding: 22px 12px 0;
+  display: grid;
+  gap: 5px;
+}
+.manager-sidebar-bottom small {
+  color: #8c847e;
+}
+.manager-sidebar-bottom a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+.manager-body {
+  flex: 1;
+  min-width: 0;
+}
+.manager-top {
+  height: 76px;
+  padding: 0 38px;
+  background: white;
+  border-bottom: 1px solid #e9e8ea;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.manager-top > span {
+  font-weight: 600;
+}
+.manager-top > span span {
+  font-weight: 400;
+  color: #8a827c;
+}
+.manager-main {
+  padding: 34px 38px 60px;
+  max-width: 1600px;
+  margin: auto;
+}
+.manager-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+.manager-heading h1 {
+  font-size: 34px;
+  letter-spacing: -1.2px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+.manager-heading p {
+  color: #817870;
+  margin: 0;
+  font-size: 13px;
+}
+.manager-sandbox {
+  color: #8c8178;
+  font-size: 11px;
+  margin: 18px 0 25px;
+}
+.manager-shell button {
+  cursor: pointer;
+}
+.manager-shell button:disabled,
+.manager-dialog button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.manager-primary,
+.manager-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.manager-primary {
+  background: #f4511e;
+  color: #fff;
+}
+.manager-secondary {
+  border: 1px solid #e3ded9;
+  background: white;
+  color: #554a41;
+}
+.manager-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin: 20px 0;
+}
+.manager-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.manager-toolbar select,
+.manager-toolbar input {
+  background: #fff;
+  border: 1px solid #e4e0dc;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font: inherit;
+}
+.manager-search {
+  background: white;
+  border: 1px solid #e4e0dc;
+  border-radius: 9px;
+  padding-left: 12px;
+}
+.manager-search input {
+  border: 0;
+  background: transparent;
+}
+.manager-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.manager-card {
+  background: #fff;
+  border: 1px solid #e9e7e4;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  min-width: 0;
+}
+.manager-card h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+.manager-card h3 {
+  font-size: 14px;
+  margin: 25px 0 12px;
+}
+.manager-metric {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.manager-metric > span {
+  font-size: 12px;
+  color: #7b736d;
+}
+.manager-metric > strong {
+  font-size: 25px;
+  letter-spacing: -0.8px;
+}
+.manager-metric > small {
+  color: #a2978e;
+  font-size: 10px;
+}
+.manager-attention {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0 28px;
+}
+.manager-attention button {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 15px;
+  background: #fff0e6;
+  border: 1px solid #ffe0ca;
+  border-radius: 13px;
+  padding: 20px;
+  color: #a9441c;
+}
+.manager-attention button > svg:last-child {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.manager-attention strong,
+.manager-attention small {
+  display: block;
+}
+.manager-attention small {
+  margin-top: 5px;
+  font-size: 11px;
+  color: #a57c66;
+}
+.manager-section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.manager-section-title button {
+  display: flex;
+  gap: 6px;
+  color: #c44a1c;
+}
+.manager-table-scroll {
+  overflow: auto;
+  width: 100%;
+}
+.manager-shell table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+.manager-shell th {
+  font-size: 10px;
+  font-weight: 500;
+  color: #958b82;
+  padding: 12px 14px;
+  background: #faf9f7;
+}
+.manager-shell td {
+  padding: 18px 14px;
+  border-bottom: 1px solid #f0eeeb;
+}
+.manager-shell td strong {
+  font-weight: 500;
+}
+.manager-shell td small {
+  display: block;
+  color: #93897e;
+  font-size: 10px;
+  margin-top: 6px;
+}
+.manager-shell td button {
+  color: #c44a1c;
+}
+.manager-icon {
+  border: 1px solid #e8dfd7;
+  border-radius: 9px;
+  padding: 8px;
+}
+.manager-badge {
+  display: inline-flex;
+  padding: 6px 10px;
+  background: #fff0e7;
+  color: #a54421;
+  border-radius: 7px;
+  font-size: 10px;
+}
+.manager-empty {
+  padding: 35px 10px;
+  text-align: center;
+  color: #8e8379;
+}
+.manager-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #e4dfdb;
+  margin: 25px 0;
+}
+.manager-tabs button {
+  padding: 13px 18px;
+  color: #91867b;
+  border-bottom: 2px solid transparent;
+}
+.manager-tabs button[aria-current] {
+  color: #d54b17;
+  border-color: #f4511e;
+  font-weight: 600;
+}
+.manager-activity {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.manager-activity li {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f0eeeb;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.manager-activity strong {
+  font-weight: 500;
+}
+.manager-activity span,
+.manager-activity small {
+  color: #8b8177;
+}
+.manager-muted {
+  font-size: 12px;
+  color: #8b8075;
+  line-height: 1.8;
+}
+.manager-error,
+.manager-notice {
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: #fff0e8;
+  color: #ac3218;
+}
+.manager-notice {
+  background: #edf6f0;
+  color: #326e49;
+}
+.manager-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.manager-plan-grid .manager-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.manager-plan-grid h2 {
+  margin: 0;
+}
+.manager-plan-grid p {
+  color: #8b8075;
+  line-height: 1.7;
+}
+.manager-plan-grid .manager-secondary {
+  margin-top: auto;
+}
+.manager-plan-price {
+  font-size: 30px;
+  font-weight: 600;
+  color: #322b27 !important;
+}
+.manager-plan-price small {
+  font-size: 10px;
+  font-weight: 400;
+}
+.manager-dialog {
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fffdfb;
+  padding: 28px;
+}
+.manager-dialog form fieldset {
+  border: 0;
+  display: grid;
+  gap: 14px;
+}
+.manager-dialog label,
+.manager-order-actions label {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+}
+.manager-dialog input:not([type='checkbox']),
+.manager-dialog textarea,
+.manager-dialog select {
+  width: 100%;
+  border: 1px solid #dfd8d0;
+  border-radius: 8px;
+  padding: 11px;
+  background: #fff;
+  font: inherit;
+}
+.manager-dialog .manager-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.manager-order-actions {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+.manager-shell .product-management {
+  border-radius: 16px;
+}
+.manager-shell button:focus-visible,
+.manager-shell a:focus-visible {
+  outline: 2px solid #ec4d14;
+  outline-offset: 3px;
+}
+@media (max-width: 1150px) {
+  .manager-sidebar {
+    width: 210px;
+    padding-inline: 12px;
+  }
+  .manager-main {
+    padding: 25px;
+  }
+  .manager-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .manager-plan-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 750px) {
+  .manager-shell {
+    display: block;
+  }
+  .manager-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    padding: 16px;
+  }
+  .manager-sidebar > a img {
+    width: 110px;
+    margin: 0 0 10px;
+  }
+  .manager-sidebar > .manager-eyebrow,
+  .manager-sidebar-bottom {
+    display: none;
+  }
+  .manager-sidebar nav {
+    display: flex;
+    overflow: auto;
+    gap: 4px;
+  }
+  .manager-sidebar nav button {
+    flex-shrink: 0;
+    padding: 12px;
+    font-size: 11px;
+  }
+  .manager-sidebar nav button svg {
+    display: none;
+  }
+  .manager-top {
+    height: 60px;
+    padding: 0 18px;
+    font-size: 11px;
+  }
+  .manager-main {
+    padding: 24px 16px;
+  }
+  .manager-heading h1 {
+    font-size: 27px;
+  }
+  .manager-heading {
+    align-items: start;
+  }
+  .manager-heading p {
+    font-size: 11px;
+  }
+  .manager-metrics {
+    gap: 10px;
+  }
+  .manager-metric {
+    padding: 16px;
+  }
+  .manager-metric > strong {
+    font-size: 22px;
+  }
+  .manager-attention,
+  .manager-plan-grid {
+    grid-template-columns: 1fr;
+  }
+  .manager-card {
+    padding: 18px;
+  }
+  .manager-toolbar {
+    flex-wrap: wrap;
+  }
+  .manager-activity li {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .manager-dialog {
+    width: calc(100vw - 24px);
+  }
+}

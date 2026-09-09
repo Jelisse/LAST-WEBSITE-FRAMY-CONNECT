@@ -2,22 +2,29 @@
 import { ArrowDown, ArrowUp, LockKeyhole, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { getPlan, type PlanId, type Profile } from '@/lib/domain';
+import {
+  getPlan,
+  type ManagedPlan,
+  type PlanId,
+  type Profile,
+} from '@/lib/domain';
 
 export function ProfileLinksEditor({
   profile,
   planId,
+  terms,
   disabled,
   onChange,
   onUpgrade,
 }: {
   profile: Profile;
   planId: PlanId;
+  terms?: ManagedPlan;
   disabled: boolean;
   onChange: (profile: Profile) => void;
   onUpgrade: () => void;
 }) {
-  const plan = getPlan(planId),
+  const plan = terms ?? getPlan(planId),
     links = profile.links ?? [];
   function move(index: number, delta: number) {
     const next = [...links];

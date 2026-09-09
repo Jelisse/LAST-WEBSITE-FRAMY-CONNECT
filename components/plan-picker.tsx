@@ -8,15 +8,17 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { plans, type PlanId } from '@/lib/domain';
+import { type ManagedPlan, type PlanId } from '@/lib/domain';
 
 export function PlanPicker({
+  plans,
   current,
   busy,
   error,
   onClose,
   onSelect,
 }: {
+  plans: ManagedPlan[];
   current: PlanId;
   busy: boolean;
   error: string;

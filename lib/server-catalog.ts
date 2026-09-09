@@ -11,7 +11,7 @@ export async function getProducts(): Promise<Product[]> {
   const result = await database()
     .prepare('SELECT id,data_json,version FROM product_catalog')
     .all<{ id: string; data_json: string; version: number }>();
-  return products.map((seed) => {
+  const merged = products.map((seed) => {
     const row = result.results.find((r) => r.id === seed.id);
     return row
       ? {
@@ -22,4 +22,12 @@ export async function getProducts(): Promise<Product[]> {
         }
       : seed;
   });
+  for (const row of result.results)
+    if (!products.some((p) => p.id === row.id))
+      merged.push({
+        ...JSON.parse(row.data_json),
+        id: row.id,
+        version: row.version,
+      });
+  return merged;
 }

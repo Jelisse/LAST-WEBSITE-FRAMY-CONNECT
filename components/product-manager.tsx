@@ -99,7 +99,9 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
       };
       if (!r.ok) throw new Error(d.error);
       setItems((all) =>
-        all.map((p) => (p.id === d.product.id ? d.product : p)),
+        all.some((p) => p.id === d.product.id)
+          ? all.map((p) => (p.id === d.product.id ? d.product : p))
+          : [...all, d.product],
       );
       setDraft(null);
       setNotice('Produto guardado. O site já usa os novos dados.');
@@ -116,6 +118,27 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
       aria-labelledby="product-management-title"
     >
       <header>
+        <Button
+          disabled={busy || !!draft}
+          onClick={() =>
+            edit({
+              id: crypto.randomUUID().replace(/^/, 'product-'),
+              name: 'Novo produto',
+              category: 'Cartões',
+              icon: 'card',
+              tagline: '',
+              description: '',
+              amount: 100,
+              cost: 0,
+              audience: 'Indivíduos',
+              available: false,
+              imageUrl: '/products/pvc.png',
+              version: 0,
+            })
+          }
+        >
+          Novo produto
+        </Button>
         <div>
           <h2 id="product-management-title">Gestão de produtos</h2>
           <p className="muted">

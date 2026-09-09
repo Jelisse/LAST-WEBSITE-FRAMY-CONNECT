@@ -2,7 +2,7 @@
 import { ArrowRight, ArrowUpRight, Link2, Plus, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { getPlan, orderLabels, type SandboxOrder } from '@/lib/domain';
+import { orderLabels, type SandboxOrder } from '@/lib/domain';
 import type { WorkspaceData } from '@/lib/profile-types';
 
 export function CustomerOverview({
@@ -18,7 +18,7 @@ export function CustomerOverview({
   onInspect: (order: SandboxOrder) => void;
   onUpgrade: () => void;
 }) {
-  const plan = getPlan(data.membership.planId);
+  const plan = data.membership.terms;
   const profile = data.profile;
   const links = profile?.links ?? [];
   const name = profile?.name || displayName;

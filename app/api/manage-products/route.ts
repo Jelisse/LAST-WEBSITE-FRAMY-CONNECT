@@ -37,10 +37,18 @@ export async function PUT(request: Request) {
       return json({ error: 'Pedido inválido.' }, 422);
     }
     const current = (await getProducts()).find((p) => p.id === data?.id);
-    if (!current) return json({ error: 'Produto não encontrado.' }, 404);
+    if (
+      !current &&
+      (data?.version !== 0 || !/^[a-z][a-z0-9-]{2,60}$/.test(data?.id ?? ''))
+    )
+      return json({ error: 'Produto não encontrado.' }, 404);
     let product;
     try {
-      product = validateProduct(data, current);
+      product = validateProduct(
+        data,
+        current ??
+          ({ id: data.id, icon: 'card' } as import('@/lib/catalog').Product),
+      );
     } catch (e) {
       return json(
         { error: e instanceof Error ? e.message : 'Produto inválido.' },
@@ -57,7 +65,7 @@ export async function PUT(request: Request) {
           422,
         );
     }
-    const result = await database()
+    const statement = database()
       .prepare(`INSERT INTO product_catalog (id,data_json,version,updated_by,updated_at)
       SELECT ?,?,1,?,? WHERE COALESCE((SELECT version FROM product_catalog WHERE id=?),0)=?
       ON CONFLICT(id) DO UPDATE SET data_json=excluded.data_json,version=product_catalog.version+1,updated_by=excluded.updated_by,updated_at=excluded.updated_at`)
@@ -68,9 +76,20 @@ export async function PUT(request: Request) {
         new Date().toISOString(),
         product.id,
         product.version,
-      )
-      .run();
-    if (!result.meta.changes)
+      );
+    const results = await database().batch([
+      statement,
+      database()
+        .prepare('INSERT INTO manager_audit SELECT ?,?,?,?,? WHERE changes()>0')
+        .bind(
+          crypto.randomUUID(),
+          user.userId,
+          current ? 'Produto actualizado' : 'Produto criado',
+          product.id,
+          new Date().toISOString(),
+        ),
+    ]);
+    if (!results[0].meta.changes)
       return json(
         {
           error:

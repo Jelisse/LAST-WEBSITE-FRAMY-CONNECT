@@ -26,9 +26,9 @@ const dashboards = [
     icon: UserRound,
   },
   {
-    href: '/operations',
-    label: 'Operações',
-    description: 'Produtos e gestão de pedidos',
+    href: '/manager',
+    label: 'Manager',
+    description: 'Operações, catálogo e finanças',
     icon: Settings2,
   },
   {

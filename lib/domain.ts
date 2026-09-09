@@ -45,7 +45,18 @@ export const plans = [
     description: 'Uma presença completa para a organização.',
   },
 ] as const;
-export type PlanId = (typeof plans)[number]['id'];
+export type PlanId = string;
+export type ManagedPlan = {
+  id: string;
+  name: string;
+  audience: string;
+  dollars: number;
+  links: number;
+  bio: number;
+  description: string;
+  active: boolean;
+  version: number;
+};
 export function getPlan(id: unknown) {
   const plan = plans.find((item) => item.id === id);
   if (!plan) throw new Error('Plano inválido.');
@@ -83,6 +94,8 @@ export const blankProfile: Profile = {
 const reserved = new Set([
   'api',
   'dashboard',
+  'manager',
+  'finance',
   'produtos',
   'sobre',
   'contacto',
@@ -204,7 +217,10 @@ export function validatePlanContent(
   profile: Pick<Profile, 'links' | 'bio'>,
   planId: unknown,
 ) {
-  const plan = getPlan(planId);
+  const plan =
+    typeof planId === 'object' && planId
+      ? (planId as ManagedPlan)
+      : getPlan(planId);
   if ((profile.links?.length ?? 0) > plan.links)
     throw new Error(
       `O plano ${plan.name} permite ${plan.links} links. Remova links ou escolha um plano superior.`,
@@ -246,6 +262,7 @@ export type SandboxOrder = {
   refunded: boolean;
   qc: boolean;
   agent: string;
+  agentId?: string;
   proof: string;
   version: number;
   createdAt: string;

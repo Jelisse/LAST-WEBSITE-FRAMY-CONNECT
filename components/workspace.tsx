@@ -327,10 +327,14 @@ export function Workspace({ displayName }: { displayName: string }) {
   async function selectPlan(planId: PlanId) {
     if (!data) return;
     await run(async () => {
-      validatePlanContent(profile, planId);
+      validatePlanContent(
+        profile,
+        data.plans.find((p) => p.id === planId),
+      );
       await send({
         action: 'activate-sandbox-plan',
         planId,
+        planVersion: data.plans.find((p) => p.id === planId)?.version,
         version: data.membership.version,
       });
       await load(false);
@@ -444,6 +448,7 @@ export function Workspace({ displayName }: { displayName: string }) {
     <SidebarProvider className="refined-workspace">
       {plansOpen && data && (
         <PlanPicker
+          plans={data.plans}
           current={data.membership.planId}
           busy={busy}
           error={error}
@@ -754,6 +759,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                         <ProfileLinksEditor
                           profile={profile}
                           planId={data.membership.planId}
+                          terms={data.membership.terms}
                           disabled={busy}
                           onChange={(next) => {
                             setProfile(next);

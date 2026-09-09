@@ -1,16 +1,16 @@
+import { POST as manageOrder } from '@/app/api/manager/route';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { env } from 'cloudflare:workers';
 import { database } from '@/lib/server-db';
 import {
   publicProfile,
   validateProfile,
-  transition,
   type SandboxOrder,
-  getPlan,
   validatePlanContent,
 } from '@/lib/domain';
 import { publicProduct } from '@/lib/catalog';
 import { getProducts, canManageCatalog } from '@/lib/server-catalog';
+import { getManagedPlans, membershipTerms } from '@/lib/server-plans';
 import { canManageOrders } from '@/lib/server-order-access';
 export const dynamic = 'force-dynamic';
 const json = (data: unknown, status = 200) =>
@@ -43,10 +43,14 @@ export async function GET() {
         .all(),
       db
         .prepare(
-          'SELECT plan_id,version FROM sandbox_memberships WHERE owner_id=?',
+          'SELECT plan_id,version,terms_json FROM sandbox_memberships WHERE owner_id=?',
         )
         .bind(user.userId)
-        .first<{ plan_id: string; version: number }>(),
+        .first<{
+          plan_id: string;
+          version: number;
+          terms_json: string | null;
+        }>(),
     ]);
     return json({
       products: (await getProducts()).map(publicProduct),
@@ -58,7 +62,9 @@ export async function GET() {
         ? JSON.parse(p.published_json).username
         : null,
       profileVersion: p?.version ?? 0,
+      plans: (await getManagedPlans()).filter((p) => p.active),
       membership: {
+        terms: membershipTerms(membership),
         planId: membership?.plan_id ?? 'individual',
         version: membership?.version ?? 0,
         mode: 'sandbox',
@@ -97,7 +103,17 @@ export async function POST(request: Request) {
     if (body.action === 'activate-sandbox-plan') {
       if (!Number.isInteger(body.version) || Number(body.version) < 0)
         return json({ error: 'Versão inválida.' }, 422);
-      const plan = getPlan(body.planId);
+      const plan = (await getManagedPlans()).find(
+        (p) => p.id === body.planId && p.active,
+      );
+      if (!plan) return json({ error: 'Plano indisponível.' }, 422);
+      if (body.planVersion !== plan.version)
+        return json(
+          {
+            error: 'As condições do plano mudaram. Actualize antes de aderir.',
+          },
+          409,
+        );
       const p = await db
         .prepare(
           'SELECT draft_json,published_json,version FROM profiles WHERE owner_id=?',
@@ -109,18 +125,19 @@ export async function POST(request: Request) {
           version: number;
         }>();
       // A downgrade must never discard saved or published content.
-      if (p) validatePlanContent(JSON.parse(p.draft_json), plan.id);
+      if (p) validatePlanContent(JSON.parse(p.draft_json), plan);
       if (p?.published_json)
-        validatePlanContent(JSON.parse(p.published_json), plan.id);
+        validatePlanContent(JSON.parse(p.published_json), plan);
       const result = await db
-        .prepare(`INSERT INTO sandbox_memberships (owner_id,plan_id,version,updated_at)
-        SELECT ?,?,1,? WHERE COALESCE((SELECT version FROM sandbox_memberships WHERE owner_id=?),0)=?
+        .prepare(`INSERT INTO sandbox_memberships (owner_id,plan_id,version,updated_at,terms_json)
+        SELECT ?,?,1,?,? WHERE COALESCE((SELECT version FROM sandbox_memberships WHERE owner_id=?),0)=?
         AND COALESCE((SELECT version FROM profiles WHERE owner_id=?),0)=?
-        ON CONFLICT(owner_id) DO UPDATE SET plan_id=excluded.plan_id,version=sandbox_memberships.version+1,updated_at=excluded.updated_at`)
+        ON CONFLICT(owner_id) DO UPDATE SET plan_id=excluded.plan_id,version=sandbox_memberships.version+1,updated_at=excluded.updated_at,terms_json=excluded.terms_json`)
         .bind(
           user.userId,
           plan.id,
           now,
+          JSON.stringify(plan),
           user.userId,
           body.version,
           user.userId,
@@ -154,11 +171,15 @@ export async function POST(request: Request) {
       }
       const membership = await db
         .prepare(
-          'SELECT plan_id,version FROM sandbox_memberships WHERE owner_id=?',
+          'SELECT plan_id,version,terms_json FROM sandbox_memberships WHERE owner_id=?',
         )
         .bind(user.userId)
-        .first<{ plan_id: string; version: number }>();
-      validatePlanContent(profile, membership?.plan_id ?? 'individual');
+        .first<{
+          plan_id: string;
+          version: number;
+          terms_json: string | null;
+        }>();
+      validatePlanContent(profile, membershipTerms(membership));
       const published =
         body.action === 'publish-profile'
           ? JSON.stringify(publicProfile(profile))
@@ -331,31 +352,32 @@ export async function POST(request: Request) {
         { error: 'Este pedido mudou. Actualize antes de continuar.' },
         409,
       );
-    const next = transition(JSON.parse(record.data_json), body.action, body);
-    const results = await db.batch([
-      db
+    let agentId = body.agentId;
+    if (
+      body.action === 'assign' &&
+      !agentId &&
+      typeof body.agent === 'string'
+    ) {
+      const agent = await db
         .prepare(
-          'UPDATE sandbox_orders SET data_json=?,version=? WHERE id=? AND owner_id=? AND version=?',
+          "SELECT id FROM manager_records WHERE kind='agent' AND json_extract(data_json,'$.name')=? AND json_extract(data_json,'$.active')=1",
         )
-        .bind(
-          JSON.stringify(next),
-          next.version,
-          body.orderId,
-          user.userId,
-          body.version,
-        ),
-      db
-        .prepare(
-          'INSERT INTO sandbox_events (id,owner_id,order_id,action,created_at) SELECT ?,?,?,?,? WHERE changes()=1',
-        )
-        .bind(crypto.randomUUID(), user.userId, body.orderId, body.action, now),
-    ]);
-    if (!results[0].meta.changes)
-      return json(
-        { error: 'Este pedido mudou. Actualize antes de continuar.' },
-        409,
-      );
-    return json({ ok: true });
+        .bind(body.agent.trim())
+        .first<{ id: string }>();
+      agentId = agent?.id;
+    }
+    return manageOrder(
+      new Request(request.url, {
+        method: 'POST',
+        headers: request.headers,
+        body: JSON.stringify({
+          ...body,
+          action: 'order',
+          step: body.action,
+          agentId,
+        }),
+      }),
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : '';
     if (/D1|SQLITE|database|constraint/i.test(message))
