@@ -2406,7 +2406,7 @@ summary {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #d95a00;
+  background: #c95000;
   color: #fff;
   font-family: var(--font-poppins), 'Poppins', sans-serif;
   height: 100%;
@@ -2427,11 +2427,11 @@ summary {
   inset: 0;
   background: linear-gradient(
     to bottom,
-    #d95a0000 48%,
-    #d95a001c 59%,
-    #d95a0077 72%,
-    #d95a00e8 88%,
-    #d95a00 100%
+    #c9500000 48%,
+    #c950001c 59%,
+    #c9500077 72%,
+    #c95000e8 88%,
+    #c95000 100%
   );
 }
 .mobile-photo-placeholder {
@@ -2456,7 +2456,7 @@ summary {
 .mobile-profile-wave {
   position: absolute;
   z-index: -1;
-  inset: 40% 0 0;
+  inset: calc(40% + 20cqw) 0 0;
   /* Preserve the supplied mountain contours; convert grey dots to white.
      Screen blending removes the PNG's white background after inversion. */
   background: url('/brand/profile-mountains.png') 38% top / cover no-repeat;
@@ -2629,7 +2629,7 @@ summary {
 .standalone-mobile-profile {
   height: 100dvh;
   overflow: hidden;
-  background: #d95a00;
+  background: #c95000;
 }
 .standalone-mobile-profile > .mobile-profile-frame {
   max-width: min(600px, 60dvh);
