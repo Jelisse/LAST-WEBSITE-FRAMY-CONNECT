@@ -2457,7 +2457,12 @@ summary {
   position: absolute;
   z-index: -1;
   inset: 40% 0 0;
-  background: url('/brand/profile-dots.svg') center top / 100% auto repeat-y;
+  /* Preserve the supplied mountain contours; convert grey dots to white.
+     Screen blending removes the PNG's white background after inversion. */
+  background: url('/brand/profile-mountains.png') 38% top / cover no-repeat;
+  filter: invert(1) brightness(2);
+  mix-blend-mode: screen;
+  opacity: 0.6;
   pointer-events: none;
 }
 .mobile-profile-body {
