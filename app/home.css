@@ -154,12 +154,12 @@
   height: 4%;
   background: radial-gradient(
     ellipse,
-    #40201566,
-    #40201520 45%,
+    #40201599,
+    #40201545 45%,
     transparent 72%
   );
   filter: blur(2px);
-  transform: skewY(6deg);
+  transform: none;
 }
 .home-hero-scene::before {
   left: 57%;
@@ -195,8 +195,8 @@
   bottom: 16%;
   z-index: 2;
   transform-origin: 50% 93%;
-  transform: skewY(6deg) scaleX(0.94) var(--card-motion, translateZ(0));
-  filter: drop-shadow(2px 2px 2px #49250f30);
+  transform: scaleX(0.94) var(--card-motion, translateZ(0));
+  filter: drop-shadow(4px 5px 3px #49250f55);
 }
 .home-card-surface {
   /* Clip the generated asset to its matte face and rounded physical edge. */
@@ -211,8 +211,8 @@
   bottom: 18%;
   z-index: 3;
   transform-origin: 50% 97.5%;
-  transform: skewY(6deg) scaleX(0.96) var(--phone-motion, translateZ(0));
-  filter: drop-shadow(3px 3px 3px #35251a35);
+  transform: scaleX(0.96) var(--phone-motion, translateZ(0));
+  filter: drop-shadow(5px 6px 4px #35251a60);
 }
 .home-phone-display {
   position: absolute;
