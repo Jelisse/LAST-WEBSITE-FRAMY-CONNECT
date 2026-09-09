@@ -5,6 +5,8 @@ import {
   validateProfile,
   transition,
   type SandboxOrder,
+  getPlan,
+  validatePlanContent,
 } from '@/lib/domain';
 import { products } from '@/lib/catalog';
 export const dynamic = 'force-dynamic';
@@ -15,7 +17,7 @@ export async function GET() {
   if (!user) return json({ error: 'Inicie sessão para continuar.' }, 401);
   try {
     const db = database();
-    const [p, orders, events] = await Promise.all([
+    const [p, orders, events, membership] = await Promise.all([
       db
         .prepare('SELECT * FROM profiles WHERE owner_id = ?')
         .bind(user.userId)
@@ -36,6 +38,12 @@ export async function GET() {
         )
         .bind(user.userId)
         .all(),
+      db
+        .prepare(
+          'SELECT plan_id,version FROM sandbox_memberships WHERE owner_id=?',
+        )
+        .bind(user.userId)
+        .first<{ plan_id: string; version: number }>(),
     ]);
     return json({
       profile: p ? JSON.parse(p.draft_json) : null,
@@ -44,6 +52,11 @@ export async function GET() {
         ? JSON.parse(p.published_json).username
         : null,
       profileVersion: p?.version ?? 0,
+      membership: {
+        planId: membership?.plan_id ?? 'individual',
+        version: membership?.version ?? 0,
+        mode: 'sandbox',
+      },
       orders: orders.results.map((o) => JSON.parse(o.data_json)),
       events: events.results,
     });
@@ -60,12 +73,12 @@ export async function POST(request: Request) {
   const origin = request.headers.get('origin');
   if (!origin || origin !== new URL(request.url).origin)
     return json({ error: 'Origem não autorizada.' }, 403);
-  if (Number(request.headers.get('content-length')) > 12000)
+  if (Number(request.headers.get('content-length')) > 64000)
     return json({ error: 'Pedido demasiado grande.' }, 413);
   let body: Record<string, unknown>;
   try {
     const raw = await request.text();
-    if (raw.length > 12000)
+    if (raw.length > 64000)
       return json({ error: 'Pedido demasiado grande.' }, 413);
     body = JSON.parse(raw);
     if (!body || typeof body !== 'object' || Array.isArray(body)) throw Error();
@@ -75,6 +88,46 @@ export async function POST(request: Request) {
   try {
     const db = database(),
       now = new Date().toISOString();
+    if (body.action === 'activate-sandbox-plan') {
+      if (!Number.isInteger(body.version) || Number(body.version) < 0)
+        return json({ error: 'Versão inválida.' }, 422);
+      const plan = getPlan(body.planId);
+      const p = await db
+        .prepare(
+          'SELECT draft_json,published_json,version FROM profiles WHERE owner_id=?',
+        )
+        .bind(user.userId)
+        .first<{
+          draft_json: string;
+          published_json: string | null;
+          version: number;
+        }>();
+      // A downgrade must never discard saved or published content.
+      if (p) validatePlanContent(JSON.parse(p.draft_json), plan.id);
+      if (p?.published_json)
+        validatePlanContent(JSON.parse(p.published_json), plan.id);
+      const result = await db
+        .prepare(`INSERT INTO sandbox_memberships (owner_id,plan_id,version,updated_at)
+        SELECT ?,?,1,? WHERE COALESCE((SELECT version FROM sandbox_memberships WHERE owner_id=?),0)=?
+        AND COALESCE((SELECT version FROM profiles WHERE owner_id=?),0)=?
+        ON CONFLICT(owner_id) DO UPDATE SET plan_id=excluded.plan_id,version=sandbox_memberships.version+1,updated_at=excluded.updated_at`)
+        .bind(
+          user.userId,
+          plan.id,
+          now,
+          user.userId,
+          body.version,
+          user.userId,
+          p?.version ?? 0,
+        )
+        .run();
+      if (!result.meta.changes)
+        return json(
+          { error: 'O plano ou perfil mudou. Actualize antes de continuar.' },
+          409,
+        );
+      return json({ ok: true, simulation: true });
+    }
     if (
       body.action === 'save-profile' ||
       body.action === 'publish-profile' ||
@@ -83,6 +136,13 @@ export async function POST(request: Request) {
       if (!Number.isInteger(body.version) || Number(body.version) < 0)
         return json({ error: 'Versão inválida.' }, 422);
       const profile = validateProfile(body.profile);
+      const membership = await db
+        .prepare(
+          'SELECT plan_id,version FROM sandbox_memberships WHERE owner_id=?',
+        )
+        .bind(user.userId)
+        .first<{ plan_id: string; version: number }>();
+      validatePlanContent(profile, membership?.plan_id ?? 'individual');
       const published =
         body.action === 'publish-profile'
           ? JSON.stringify(publicProfile(profile))
@@ -103,7 +163,7 @@ export async function POST(request: Request) {
       if (body.version === 0) {
         result = await db
           .prepare(
-            'INSERT OR IGNORE INTO profiles (owner_id,username,draft_json,published_json,version,updated_at) VALUES (?,?,?,?,1,?)',
+            'INSERT OR IGNORE INTO profiles (owner_id,username,draft_json,published_json,version,updated_at) SELECT ?,?,?,?,1,? WHERE COALESCE((SELECT version FROM sandbox_memberships WHERE owner_id=?),0)=?',
           )
           .bind(
             user.userId,
@@ -111,17 +171,26 @@ export async function POST(request: Request) {
             JSON.stringify(profile),
             published,
             now,
+            user.userId,
+            membership?.version ?? 0,
           )
           .run();
       } else {
         const expr = body.action === 'save-profile' ? 'published_json' : '?';
         const q = db.prepare(
-          `UPDATE profiles SET draft_json=?, published_json=${expr},version=version+1,updated_at=? WHERE owner_id=? AND version=?`,
+          `UPDATE profiles SET draft_json=?, published_json=${expr},version=version+1,updated_at=? WHERE owner_id=? AND version=? AND COALESCE((SELECT version FROM sandbox_memberships WHERE owner_id=?),0)=?`,
         );
         result =
           body.action === 'save-profile'
             ? await q
-                .bind(JSON.stringify(profile), now, user.userId, body.version)
+                .bind(
+                  JSON.stringify(profile),
+                  now,
+                  user.userId,
+                  body.version,
+                  user.userId,
+                  membership?.version ?? 0,
+                )
                 .run()
             : await q
                 .bind(
@@ -130,6 +199,8 @@ export async function POST(request: Request) {
                   now,
                   user.userId,
                   body.version,
+                  user.userId,
+                  membership?.version ?? 0,
                 )
                 .run();
       }

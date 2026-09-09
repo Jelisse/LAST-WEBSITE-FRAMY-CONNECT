@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { plans, getPlan, validatePlanContent } from '../lib/domain.ts';
 import {
   transition,
   financials,
@@ -77,4 +78,90 @@ test('private fields never enter publication; unsafe links and reserved names re
   assert.throws(() =>
     validateProfile({ ...p, website: 'https://user:secret@example.com' }),
   );
+});
+
+test('five monthly plans enforce increasing link and biography allowances', () => {
+  assert.deepEqual(
+    plans.map((p) => p.dollars),
+    [1, 3, 5, 9, 15],
+  );
+  for (const plan of plans) {
+    assert.doesNotThrow(() =>
+      validatePlanContent(
+        {
+          links: Array(plan.links).fill({
+            label: 'Site',
+            url: 'https://example.com',
+          }),
+          bio: 'x'.repeat(plan.bio),
+        },
+        plan.id,
+      ),
+    );
+    assert.throws(() =>
+      validatePlanContent(
+        {
+          links: Array(plan.links + 1).fill({
+            label: 'Site',
+            url: 'https://example.com',
+          }),
+        },
+        plan.id,
+      ),
+    );
+    assert.throws(() =>
+      validatePlanContent({ bio: 'x'.repeat(plan.bio + 1) }, plan.id),
+    );
+  }
+  assert.throws(() => getPlan('enterprise-free'));
+});
+
+test('profile links reject unsafe addresses and retain ordered labels', () => {
+  const profile = {
+    name: 'Test User',
+    username: 'links_test',
+    title: '',
+    email: '',
+    phone: '',
+    website: '',
+    showEmail: false,
+    showPhone: false,
+  };
+  assert.deepEqual(validateProfile(profile).links, []);
+  assert.equal(validateProfile(profile).bio, '');
+  for (const url of [
+    'javascript:alert(1)',
+    'http://example.com',
+    'https://u:p@example.com',
+    'not a url',
+  ]) {
+    assert.throws(() =>
+      validateProfile({ ...profile, links: [{ label: 'Site', url }] }),
+    );
+  }
+  assert.throws(() =>
+    validateProfile({
+      ...profile,
+      links: [{ label: ' ', url: 'https://example.com' }],
+    }),
+  );
+  assert.throws(() =>
+    validateProfile({
+      ...profile,
+      links: Array(51).fill({ label: 'Site', url: 'https://example.com' }),
+    }),
+  );
+  const saved = validateProfile({
+    ...profile,
+    bio: 'Hello',
+    links: [
+      { label: ' First ', url: 'https://example.com/1' },
+      { label: 'Second', url: 'https://example.com/2' },
+    ],
+  });
+  assert.deepEqual(
+    publicProfile(saved).links.map((link) => link.label),
+    ['First', 'Second'],
+  );
+  assert.equal(publicProfile(saved).bio, 'Hello');
 });

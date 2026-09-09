@@ -9,8 +9,10 @@ Requirements: Node.js 22.13 or newer and npm.
 1. Run `npm ci`.
 2. On first setup only, apply the initial generated schema to an empty local database:
    `npm exec wrangler -- d1 execute DB --local --config wrangler.local.json --persist-to .wrangler/state --file drizzle/0000_tidy_hairball.sql`
-3. Run `npm run dev` and open the local URL printed by the server.
-4. Open `/dashboard`. Local sign-in uses the starter's development account. Deployed access uses the private Sites identity.
+3. Apply the plan migration once to both fresh databases and databases from the first milestone:
+   `npm exec wrangler -- d1 execute DB --local --config wrangler.local.json --persist-to .wrangler/state --file drizzle/0001_awesome_ultimo.sql`
+4. Run `npm run dev` and open the local URL printed by the server.
+5. Open `/dashboard`. Local sign-in uses the starter's development account. Deployed access uses the private Sites identity.
 
 Do not apply the initial schema again to an existing database. Generate and review new migrations for future schema changes. Production migrations are packaged and applied by Sites.
 
@@ -20,6 +22,7 @@ Do not apply the initial schema again to an existing database. Generate and revi
 - Original extracted logo, Poppins typography, orange and warm-neutral design tokens.
 - Owner-scoped profile draft saving, reserved usernames, privacy controls, publication/unpublication and public projection.
 - Contact VCF download and native/copy link sharing.
+- Five proposed monthly plans, owner-scoped preview plan activation, server-enforced link and biography allowances, ordered profile links, and downgrade protection. See `PLAN_PACKAGES.md`. Preview activation does not purchase a subscription.
 - Owner-scoped sandbox orders, simulated payment/refund, assignment, production, QC, delivery evidence and audit events.
 - Customer, operations, agent, finance and CEO preview views. All operational views use the same owner's isolated sandbox data; view selection is not a role grant.
 - Derived sandbox revenue/cost/advances, stage counts and CSV order export.

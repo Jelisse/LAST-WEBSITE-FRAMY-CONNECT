@@ -218,6 +218,7 @@ export default async function Page({
             </div>
             <h1>{p.name}</h1>
             <p>{p.title}</p>
+            {p.bio && <p className="profile-bio">{p.bio}</p>}
             <ProfileShare profile={p} />
             <p className="quiet-note">
               Identidade publicada na prévia privada Framy Connect.

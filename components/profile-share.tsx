@@ -55,6 +55,17 @@ export function ProfileShare({ profile }: { profile: Profile }) {
   return (
     <>
       <div className="public-contact-links">
+        {(profile.links ?? []).map((link, index) => (
+          <a
+            key={index}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Globe2 size={19} />
+            {link.label}
+          </a>
+        ))}
         {profile.email && (
           <a href={`mailto:${profile.email}`}>
             <Mail size={19} />

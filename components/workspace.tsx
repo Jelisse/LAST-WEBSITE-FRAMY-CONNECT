@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CustomerOverview } from '@/components/customer-overview';
+import { PlanPicker } from '@/components/plan-picker';
+import { ProfileLinksEditor } from '@/components/profile-links-editor';
 import {
   Collapsible,
   CollapsibleContent,
@@ -64,6 +66,8 @@ import {
   orderLabels,
   type Profile,
   type SandboxOrder,
+  type PlanId,
+  validatePlanContent,
 } from '@/lib/domain';
 import { products, money } from '@/lib/catalog';
 import type { WorkspaceData } from '@/lib/profile-types';
@@ -113,7 +117,8 @@ export function Workspace({ displayName }: { displayName: string }) {
     [proof, setProof] = useState(''),
     [checks, setChecks] = useState<boolean[]>([false, false, false, false]),
     [chosenProduct, setChosenProduct] = useState('metal'),
-    [testToolsOpen, setTestToolsOpen] = useState(false);
+    [testToolsOpen, setTestToolsOpen] = useState(false),
+    [plansOpen, setPlansOpen] = useState(false);
   const pendingCreate = useRef<string | null>(null);
   const load = useCallback(async (resetProfile = false) => {
     const r = await fetch('/api/workspace', { cache: 'no-store' });
@@ -146,7 +151,11 @@ export function Workspace({ displayName }: { displayName: string }) {
         };
         if (routeTab[window.location.pathname]) {
           setTab(routeTab[window.location.pathname]);
-          setTestToolsOpen(['operations', 'ceo', 'agent'].includes(routeTab[window.location.pathname]));
+          setTestToolsOpen(
+            ['operations', 'ceo', 'agent'].includes(
+              routeTab[window.location.pathname],
+            ),
+          );
         }
         const product = new URLSearchParams(window.location.search).get(
           'product',
@@ -293,6 +302,24 @@ export function Workspace({ displayName }: { displayName: string }) {
           : 'Rascunho guardado.',
     );
   }
+  function openPlans() {
+    setError('');
+    setPlansOpen(true);
+  }
+  async function selectPlan(planId: PlanId) {
+    if (!data) return;
+    await run(async () => {
+      validatePlanContent(profile, planId);
+      await send({
+        action: 'activate-sandbox-plan',
+        planId,
+        version: data.membership.version,
+      });
+      await load(false);
+      setPlansOpen(false);
+      setTab('profile');
+    }, 'Plano de teste activado. As caixas estão disponíveis. Nenhuma cobrança foi efectuada.');
+  }
   async function action(
     o: SandboxOrder,
     kind: string,
@@ -392,7 +419,16 @@ export function Workspace({ displayName }: { displayName: string }) {
     </div>
   );
   return (
-    <SidebarProvider>
+    <SidebarProvider className="refined-workspace">
+      {plansOpen && data && (
+        <PlanPicker
+          current={data.membership.planId}
+          busy={busy}
+          error={error}
+          onClose={() => setPlansOpen(false)}
+          onSelect={selectPlan}
+        />
+      )}
       <Sidebar className="workspace-sidebar">
         <SidebarHeader className="p-6">
           <Link className="brand" href="/">
@@ -482,9 +518,13 @@ export function Workspace({ displayName }: { displayName: string }) {
               </span>
             </span>
           </div>
-          <Link href="/" className="text-link">
-            Ver website <ArrowUpRight size={16} />
-          </Link>
+          <Button
+            className="plan-upgrade header-upgrade"
+            disabled={loading || busy || !data}
+            onClick={openPlans}
+          >
+            Upgrade plan <ArrowUpRight size={17} />
+          </Button>
         </header>
         <main
           id="main"
@@ -547,6 +587,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                   displayName={displayName}
                   onNavigate={setTab}
                   onInspect={inspect}
+                  onUpgrade={openPlans}
                 />
               )}
               {tab === 'profile' && (
@@ -672,6 +713,16 @@ export function Workspace({ displayName }: { displayName: string }) {
                           />
                         </label>
                       </div>
+                      <ProfileLinksEditor
+                        profile={profile}
+                        planId={data.membership.planId}
+                        disabled={busy}
+                        onChange={(next) => {
+                          setProfile(next);
+                          setDirty(true);
+                        }}
+                        onUpgrade={openPlans}
+                      />
                       <div className="form-actions">
                         <Button
                           className="control-btn"
@@ -734,6 +785,9 @@ export function Workspace({ displayName }: { displayName: string }) {
                         </div>
                         <h2>{profile.name || 'O seu nome'}</h2>
                         <p>{profile.title || 'O seu título ou profissão'}</p>
+                        {profile.bio && (
+                          <p className="profile-bio">{profile.bio}</p>
+                        )}
                         {profile.showEmail && profile.email && (
                           <div className="preview-contact">{profile.email}</div>
                         )}
@@ -745,8 +799,14 @@ export function Workspace({ displayName }: { displayName: string }) {
                             <Globe2 size={18} /> Website / portefólio
                           </div>
                         )}
+                        {(profile.links ?? []).map((link, index) => (
+                          <div className="preview-contact" key={index}>
+                            <Globe2 size={18} />
+                            {link.label || `Link ${index + 1}`}
+                          </div>
+                        ))}
                         <div className="preview-contact">
-                          framyconnect.co.mz/{profile.username || 'o_seu_nome'}
+                          /{profile.username || 'o_seu_nome'}
                         </div>
                       </div>
                     </div>

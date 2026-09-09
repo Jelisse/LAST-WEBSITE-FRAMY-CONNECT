@@ -1,3 +1,57 @@
+export const plans = [
+  {
+    id: 'individual',
+    name: 'Individual',
+    audience: 'Indivíduos',
+    dollars: 1,
+    links: 3,
+    bio: 0,
+    description: 'Os seus contactos essenciais.',
+  },
+  {
+    id: 'creator',
+    name: 'Criador',
+    audience: 'Criadores',
+    dollars: 3,
+    links: 8,
+    bio: 160,
+    description: 'O seu conteúdo, num só lugar.',
+  },
+  {
+    id: 'professional',
+    name: 'Profissional',
+    audience: 'Profissionais',
+    dollars: 5,
+    links: 15,
+    bio: 400,
+    description: 'Mais espaço para o seu trabalho.',
+  },
+  {
+    id: 'institution',
+    name: 'Instituição',
+    audience: 'Instituições',
+    dollars: 9,
+    links: 30,
+    bio: 800,
+    description: 'Recursos e informação da instituição.',
+  },
+  {
+    id: 'organisation',
+    name: 'Organização',
+    audience: 'Organizações',
+    dollars: 15,
+    links: 50,
+    bio: 1200,
+    description: 'Uma presença completa para a organização.',
+  },
+] as const;
+export type PlanId = (typeof plans)[number]['id'];
+export function getPlan(id: unknown) {
+  const plan = plans.find((item) => item.id === id);
+  if (!plan) throw new Error('Plano inválido.');
+  return plan;
+}
+export type ProfileLink = { label: string; url: string };
 export type Profile = {
   name: string;
   username: string;
@@ -7,6 +61,8 @@ export type Profile = {
   website: string;
   showEmail: boolean;
   showPhone: boolean;
+  links?: ProfileLink[];
+  bio?: string;
 };
 export const blankProfile: Profile = {
   name: '',
@@ -17,6 +73,8 @@ export const blankProfile: Profile = {
   website: '',
   showEmail: false,
   showPhone: false,
+  links: [],
+  bio: '',
 };
 const reserved = new Set([
   'api',
@@ -81,6 +139,34 @@ export function validateProfile(input: unknown): Profile {
   }
   if (typeof p.showEmail !== 'boolean' || typeof p.showPhone !== 'boolean')
     throw new Error('Reveja a visibilidade dos contactos.');
+  const rawLinks = p.links ?? [];
+  if (!Array.isArray(rawLinks) || rawLinks.length > 50)
+    throw new Error('Máximo de 50 links por perfil.');
+  const links = rawLinks.map((link): ProfileLink => {
+    if (
+      !link ||
+      typeof link !== 'object' ||
+      typeof link.label !== 'string' ||
+      typeof link.url !== 'string' ||
+      !link.label.trim() ||
+      link.label.length > 60 ||
+      link.url.length > 300
+    )
+      throw new Error('Cada link precisa de um título e endereço válidos.');
+    let url;
+    try {
+      url = new URL(link.url.trim());
+    } catch {
+      throw new Error('Os links devem começar por https://.');
+    }
+    if (url.protocol !== 'https:' || url.username || url.password)
+      throw new Error('Use links https:// sem credenciais.');
+    if (url.href.length > 300)
+      throw new Error('O endereço do link é demasiado longo.');
+    return { label: link.label.trim(), url: url.href };
+  });
+  if (p.bio !== undefined && (typeof p.bio !== 'string' || p.bio.length > 1200))
+    throw new Error('A biografia deve ter até 1200 caracteres.');
   return {
     name,
     username,
@@ -90,7 +176,23 @@ export function validateProfile(input: unknown): Profile {
     website,
     showEmail: p.showEmail,
     showPhone: p.showPhone,
+    links,
+    bio: typeof p.bio === 'string' ? p.bio.trim() : '',
   };
+}
+export function validatePlanContent(
+  profile: Pick<Profile, 'links' | 'bio'>,
+  planId: unknown,
+) {
+  const plan = getPlan(planId);
+  if ((profile.links?.length ?? 0) > plan.links)
+    throw new Error(
+      `O plano ${plan.name} permite ${plan.links} links. Remova links ou escolha um plano superior.`,
+    );
+  if ((profile.bio?.length ?? 0) > plan.bio)
+    throw new Error(
+      `O plano ${plan.name} permite ${plan.bio} caracteres de biografia. Reduza o texto ou escolha um plano superior.`,
+    );
 }
 export function publicProfile(p: Profile): Profile {
   return {

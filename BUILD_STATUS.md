@@ -2,6 +2,12 @@
 
 This folder is the first runnable development milestone, not a production launch.
 
+## Customer plans update
+
+The customer dashboard now focuses on identity, current plan, and links, with an Upgrade plan comparison and package detail flow. Five monthly price proposals correspond to the five audiences in WEBSITE.md. Preview plan selections persist in `sandbox_memberships`; links and biographies persist in profile drafts and publication snapshots. The API enforces capacity and rejects a downgrade that would exceed the target allowance in either snapshot. Concurrent profile/plan writes use version guards.
+
+This remains a no-charge preview. There is no recurring billing, checkout, verified payment webhook, subscription renewal/cancellation or tax calculation. The sandbox membership table must never be treated as paid entitlement evidence. A production integration must grant entitlements from verified provider events. Institution/organisation prices are per profile and do not include team accounts, verified credentials or physical NFC products.
+
 ## Delivery scope
 
 - SVG-derived public website and catalogue.
