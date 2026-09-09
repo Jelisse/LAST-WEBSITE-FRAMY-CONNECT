@@ -20,12 +20,14 @@ import {
   LogOut,
   Download,
   ShieldCheck,
-  Globe2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CustomerOverview } from '@/components/customer-overview';
 import { PlanPicker } from '@/components/plan-picker';
 import { ProfileLinksEditor } from '@/components/profile-links-editor';
+import { MobileProfile } from '@/components/mobile-profile';
+import { ProfilePhotoUpload } from '@/components/profile-photo-upload';
+import { ProfileHandoff } from '@/components/profile-handoff';
 import {
   Collapsible,
   CollapsibleContent,
@@ -68,6 +70,7 @@ import {
   type SandboxOrder,
   type PlanId,
   validatePlanContent,
+  publicProfile,
 } from '@/lib/domain';
 import { products, money } from '@/lib/catalog';
 import type { WorkspaceData } from '@/lib/profile-types';
@@ -118,7 +121,8 @@ export function Workspace({ displayName }: { displayName: string }) {
     [checks, setChecks] = useState<boolean[]>([false, false, false, false]),
     [chosenProduct, setChosenProduct] = useState('metal'),
     [testToolsOpen, setTestToolsOpen] = useState(false),
-    [plansOpen, setPlansOpen] = useState(false);
+    [plansOpen, setPlansOpen] = useState(false),
+    [uploadingPhoto, setUploadingPhoto] = useState(false);
   const pendingCreate = useRef<string | null>(null);
   const load = useCallback(async (resetProfile = false) => {
     const r = await fetch('/api/workspace', { cache: 'no-store' });
@@ -288,7 +292,7 @@ export function Workspace({ displayName }: { displayName: string }) {
     }
   }
   async function save(action: string) {
-    if (!data) return;
+    if (!data || uploadingPhoto) return;
     await run(
       async () => {
         await send({ action, profile, version: data.profileVersion });
@@ -520,7 +524,7 @@ export function Workspace({ displayName }: { displayName: string }) {
           </div>
           <Button
             className="plan-upgrade header-upgrade"
-            disabled={loading || busy || !data}
+            disabled={loading || busy || uploadingPhoto || !data}
             onClick={openPlans}
           >
             Upgrade plan <ArrowUpRight size={17} />
@@ -555,7 +559,7 @@ export function Workspace({ displayName }: { displayName: string }) {
               variant="outline"
               className="control-btn"
               aria-label="Actualizar dados"
-              disabled={busy || loading}
+              disabled={busy || loading || uploadingPhoto}
               onClick={() => run(() => load(false), 'Dados actualizados.')}
             >
               <RefreshCw size={17} /> Actualizar
@@ -591,7 +595,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                 />
               )}
               {tab === 'profile' && (
-                <div className="editor-grid">
+                <div className="editor-grid profile-editor-layout">
                   <section className="panel">
                     <div className="section-heading">
                       <h2>A sua identidade</h2>
@@ -613,134 +617,149 @@ export function Workspace({ displayName }: { displayName: string }) {
                         void save('save-profile');
                       }}
                     >
-                      <div className="form-grid">
-                        {(
-                          [
-                            {
-                              key: 'name',
-                              label: 'Nome completo',
-                              placeholder: 'Como quer ser conhecido?',
-                            },
-                            {
-                              key: 'username',
-                              label: 'Nome de utilizador',
-                              placeholder: 'o_seu_nome',
-                            },
-                            {
-                              key: 'title',
-                              label: 'Título ou profissão',
-                              placeholder: 'O que faz?',
-                            },
-                            {
-                              key: 'website',
-                              label: 'Website ou portefólio',
-                              placeholder: 'https://…',
-                            },
-                            {
-                              key: 'email',
-                              label: 'Email de contacto',
-                              placeholder: 'nome@exemplo.com',
-                            },
-                            {
-                              key: 'phone',
-                              label: 'Telefone',
-                              placeholder: '+258 …',
-                            },
-                          ] as const
-                        ).map((f) => (
-                          <label
-                            className="field"
-                            key={f.key}
-                            htmlFor={`profile-${f.key}`}
-                          >
-                            {f.label}
-                            <Input
-                              id={`profile-${f.key}`}
-                              value={profile[f.key]}
-                              maxLength={
-                                f.key === 'username'
-                                  ? 40
-                                  : f.key === 'name'
-                                    ? 90
-                                    : f.key === 'title'
-                                      ? 120
-                                      : f.key === 'phone'
-                                        ? 24
-                                        : f.key === 'email'
-                                          ? 160
-                                          : 300
-                              }
-                              required={
-                                f.key === 'name' || f.key === 'username'
-                              }
-                              readOnly={
-                                f.key === 'username' && data.profileVersion > 0
-                              }
-                              onChange={(e) => {
-                                setProfile({
-                                  ...profile,
-                                  [f.key]: e.target.value,
-                                });
+                      <fieldset
+                        className="profile-editor-fields"
+                        disabled={busy || uploadingPhoto}
+                      >
+                        <ProfilePhotoUpload
+                          profile={profile}
+                          disabled={busy}
+                          onUploading={setUploadingPhoto}
+                          onChange={(next) => {
+                            setProfile(next);
+                            setDirty(true);
+                          }}
+                        />
+                        <div className="form-grid">
+                          {(
+                            [
+                              {
+                                key: 'name',
+                                label: 'Nome completo',
+                                placeholder: 'Como quer ser conhecido?',
+                              },
+                              {
+                                key: 'username',
+                                label: 'Nome de utilizador',
+                                placeholder: 'o_seu_nome',
+                              },
+                              {
+                                key: 'title',
+                                label: 'Título ou profissão',
+                                placeholder: 'O que faz?',
+                              },
+                              {
+                                key: 'website',
+                                label: 'Website ou portefólio',
+                                placeholder: 'https://…',
+                              },
+                              {
+                                key: 'email',
+                                label: 'Email de contacto',
+                                placeholder: 'nome@exemplo.com',
+                              },
+                              {
+                                key: 'phone',
+                                label: 'Telefone',
+                                placeholder: '+258 …',
+                              },
+                            ] as const
+                          ).map((f) => (
+                            <label
+                              className="field"
+                              key={f.key}
+                              htmlFor={`profile-${f.key}`}
+                            >
+                              {f.label}
+                              <Input
+                                id={`profile-${f.key}`}
+                                value={profile[f.key]}
+                                maxLength={
+                                  f.key === 'username'
+                                    ? 40
+                                    : f.key === 'name'
+                                      ? 90
+                                      : f.key === 'title'
+                                        ? 120
+                                        : f.key === 'phone'
+                                          ? 24
+                                          : f.key === 'email'
+                                            ? 160
+                                            : 300
+                                }
+                                required={
+                                  f.key === 'name' || f.key === 'username'
+                                }
+                                readOnly={
+                                  f.key === 'username' &&
+                                  data.profileVersion > 0
+                                }
+                                onChange={(e) => {
+                                  setProfile({
+                                    ...profile,
+                                    [f.key]: e.target.value,
+                                  });
+                                  setDirty(true);
+                                }}
+                                placeholder={f.placeholder}
+                              />
+                            </label>
+                          ))}
+                        </div>
+                        <div className="visibility">
+                          <h3>O que aparece no seu perfil?</h3>
+                          <label htmlFor="show-email">
+                            <span>Mostrar email ao público</span>
+                            <Switch
+                              id="show-email"
+                              checked={profile.showEmail}
+                              onCheckedChange={(v) => {
+                                setProfile({ ...profile, showEmail: v });
                                 setDirty(true);
                               }}
-                              placeholder={f.placeholder}
                             />
                           </label>
-                        ))}
-                      </div>
-                      <div className="visibility">
-                        <h3>O que aparece no seu perfil?</h3>
-                        <label htmlFor="show-email">
-                          <span>Mostrar email ao público</span>
-                          <Switch
-                            id="show-email"
-                            checked={profile.showEmail}
-                            onCheckedChange={(v) => {
-                              setProfile({ ...profile, showEmail: v });
-                              setDirty(true);
-                            }}
-                          />
-                        </label>
-                        <label htmlFor="show-phone">
-                          <span>Mostrar telefone ao público</span>
-                          <Switch
-                            id="show-phone"
-                            checked={profile.showPhone}
-                            onCheckedChange={(v) => {
-                              setProfile({ ...profile, showPhone: v });
-                              setDirty(true);
-                            }}
-                          />
-                        </label>
-                      </div>
-                      <ProfileLinksEditor
-                        profile={profile}
-                        planId={data.membership.planId}
-                        disabled={busy}
-                        onChange={(next) => {
-                          setProfile(next);
-                          setDirty(true);
-                        }}
-                        onUpgrade={openPlans}
-                      />
-                      <div className="form-actions">
-                        <Button
-                          className="control-btn"
-                          variant="outline"
+                          <label htmlFor="show-phone">
+                            <span>Mostrar telefone ao público</span>
+                            <Switch
+                              id="show-phone"
+                              checked={profile.showPhone}
+                              onCheckedChange={(v) => {
+                                setProfile({ ...profile, showPhone: v });
+                                setDirty(true);
+                              }}
+                            />
+                          </label>
+                        </div>
+                        <ProfileLinksEditor
+                          profile={profile}
+                          planId={data.membership.planId}
                           disabled={busy}
-                          type="submit"
-                        >
-                          <Save size={17} /> Guardar rascunho
-                        </Button>
-                        <Button
-                          className="btn btn-primary"
-                          type="button"
-                          disabled={busy}
-                          onClick={() => save('publish-profile')}
-                        >
-                          Publicar perfil <ArrowUpRight size={20} />
-                        </Button>
-                      </div>
+                          onChange={(next) => {
+                            setProfile(next);
+                            setDirty(true);
+                          }}
+                          onUpgrade={openPlans}
+                        />
+                        <div className="form-actions">
+                          <Button
+                            className="control-btn"
+                            variant="outline"
+                            disabled={busy}
+                            type="submit"
+                          >
+                            <Save size={17} /> Guardar rascunho
+                          </Button>
+                          <Button
+                            className="btn btn-primary"
+                            type="button"
+                            disabled={busy}
+                            onClick={() => save('publish-profile')}
+                          >
+                            Publicar perfil <ArrowUpRight size={20} />
+                          </Button>
+                        </div>
+                      </fieldset>
                     </form>
                     {data.published && (
                       <div className="published-actions">
@@ -765,53 +784,30 @@ export function Workspace({ displayName }: { displayName: string }) {
                       privada. Não é enviada para motores de pesquisa.
                     </p>
                   </section>
-                  <aside>
+                  <aside className="profile-preview-column">
                     <span className="preview-label">
-                      PRÉ-VISUALIZAÇÃO · CAMPOS VISÍVEIS
+                      O SEU PERFIL · PRÉ-VISUALIZAÇÃO
                     </span>
-                    <div className="profile-preview">
-                      <div className="profile-cover">
-                        <Image
-                          width={220}
-                          height={100}
-                          unoptimized
-                          src="/brand/logo.svg"
-                          alt="Framy Connect"
-                        />
-                      </div>
-                      <div className="profile-content">
-                        <div className="profile-avatar">
-                          {initials(profile.name)}
-                        </div>
-                        <h2>{profile.name || 'O seu nome'}</h2>
-                        <p>{profile.title || 'O seu título ou profissão'}</p>
-                        {profile.bio && (
-                          <p className="profile-bio">{profile.bio}</p>
-                        )}
-                        {profile.showEmail && profile.email && (
-                          <div className="preview-contact">{profile.email}</div>
-                        )}
-                        {profile.showPhone && profile.phone && (
-                          <div className="preview-contact">{profile.phone}</div>
-                        )}
-                        {profile.website && (
-                          <div className="preview-contact">
-                            <Globe2 size={18} /> Website / portefólio
-                          </div>
-                        )}
-                        {(profile.links ?? []).map((link, index) => (
-                          <div className="preview-contact" key={index}>
-                            <Globe2 size={18} />
-                            {link.label || `Link ${index + 1}`}
-                          </div>
-                        ))}
-                        <div className="preview-contact">
-                          /{profile.username || 'o_seu_nome'}
-                        </div>
-                      </div>
-                    </div>
+                    <MobileProfile
+                      profile={publicProfile(profile)}
+                      published={data.published}
+                      preview
+                    />
+                    <ProfileHandoff
+                      username={
+                        data.publishedUsername || data.profile?.username
+                      }
+                      published={data.published}
+                    />
                   </aside>
                 </div>
+              )}
+              {tab === 'operations' && (
+                <ProfileHandoff
+                  username={data.publishedUsername || data.profile?.username}
+                  published={data.published}
+                  operations
+                />
               )}
               {['orders', 'operations', 'agent'].includes(tab) && (
                 <>

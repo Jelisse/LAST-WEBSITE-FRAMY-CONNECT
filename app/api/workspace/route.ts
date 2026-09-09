@@ -1,4 +1,5 @@
 import { getChatGPTUser } from '@/app/chatgpt-auth';
+import { env } from 'cloudflare:workers';
 import { database } from '@/lib/server-db';
 import {
   publicProfile,
@@ -136,6 +137,16 @@ export async function POST(request: Request) {
       if (!Number.isInteger(body.version) || Number(body.version) < 0)
         return json({ error: 'Versão inválida.' }, 422);
       const profile = validateProfile(body.profile);
+      if (profile.photoUrl && body.action !== 'unpublish-profile') {
+        const photo = await env.PROFILE_PHOTOS?.head(
+          `profiles/${profile.photoUrl.split('/').pop()}`,
+        );
+        if (!photo || photo.customMetadata?.ownerId !== user.userId)
+          return json(
+            { error: 'Carregue a sua própria fotografia antes de guardar.' },
+            422,
+          );
+      }
       const membership = await db
         .prepare(
           'SELECT plan_id,version FROM sandbox_memberships WHERE owner_id=?',

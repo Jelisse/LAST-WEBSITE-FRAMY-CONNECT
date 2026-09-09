@@ -1,9 +1,8 @@
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, ArrowUpRight } from 'lucide-react';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
-import { ProfileShare } from '@/components/profile-share';
+import { MobileProfile } from '@/components/mobile-profile';
 import { database } from '@/lib/server-db';
 import type { Profile } from '@/lib/domain';
 export const dynamic = 'force-dynamic';
@@ -195,38 +194,8 @@ export default async function Page({
   if (!row) notFound();
   const p = JSON.parse(row.published_json) as Profile;
   return (
-    <>
-      <SiteHeader />
-      <main id="main" className="public-profile-page">
-        <div className="public-profile">
-          <div className="profile-cover">
-            <Image
-              width={220}
-              height={100}
-              unoptimized
-              src="/brand/logo.svg"
-              alt="Framy Connect"
-            />
-          </div>
-          <div className="profile-content">
-            <div className="profile-avatar">
-              {p.name
-                .split(/\s+/)
-                .slice(0, 2)
-                .map((s) => s[0])
-                .join('')}
-            </div>
-            <h1>{p.name}</h1>
-            <p>{p.title}</p>
-            {p.bio && <p className="profile-bio">{p.bio}</p>}
-            <ProfileShare profile={p} />
-            <p className="quiet-note">
-              Identidade publicada na prévia privada Framy Connect.
-            </p>
-          </div>
-        </div>
-      </main>
-      <SiteFooter />
-    </>
+    <main id="main" className="standalone-mobile-profile">
+      <MobileProfile profile={p} published />
+    </main>
   );
 }

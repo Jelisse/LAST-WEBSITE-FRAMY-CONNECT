@@ -2,6 +2,14 @@
 
 This folder is the first runnable development milestone, not a production launch.
 
+## Mobile identity reference update
+
+The editor preview and published identity route now share the portrait-led orange mobile layout from USER MOBILE-01.png. Photo upload accepts JPG/PNG/WebP up to 5 MB, persists in the PROFILE_PHOTOS R2 binding and saves its immutable reference and crop position with the profile. Draft photos are owner-only; published photos are served only while referenced by a publication. Profile saves verify photo ownership. Replaced uploads are retained so an existing published snapshot is not broken by editing a draft; storage cleanup is a future maintenance task.
+
+The profile has social links, vCard download, a locally generated QR for its actual published URL, and native/copy sharing. The generated URL appears in the Operations preview, within the existing owner-isolated sandbox. It does not introduce production staff access to other users' profiles. Browser and functional testing of this update is deferred at the user's request.
+
+Social SVG assets come from the Simple Icons project (https://github.com/simple-icons/simple-icons); the dotted geometric background is a code-native interpretation of the supplied reference. The person and text in the reference are not seeded into customer accounts.
+
 ## Customer plans update
 
 The customer dashboard now focuses on identity, current plan, and links, with an Upgrade plan comparison and package detail flow. Five monthly price proposals correspond to the five audiences in WEBSITE.md. Preview plan selections persist in `sandbox_memberships`; links and biographies persist in profile drafts and publication snapshots. The API enforces capacity and rejects a downgrade that would exceed the target allowance in either snapshot. Concurrent profile/plan writes use version guards.

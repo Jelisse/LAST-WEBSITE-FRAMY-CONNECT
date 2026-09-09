@@ -63,6 +63,8 @@ export type Profile = {
   showPhone: boolean;
   links?: ProfileLink[];
   bio?: string;
+  photoUrl?: string;
+  photoPosition?: number;
 };
 export const blankProfile: Profile = {
   name: '',
@@ -75,6 +77,8 @@ export const blankProfile: Profile = {
   showPhone: false,
   links: [],
   bio: '',
+  photoUrl: '',
+  photoPosition: 35,
 };
 const reserved = new Set([
   'api',
@@ -167,6 +171,20 @@ export function validateProfile(input: unknown): Profile {
   });
   if (p.bio !== undefined && (typeof p.bio !== 'string' || p.bio.length > 1200))
     throw new Error('A biografia deve ter até 1200 caracteres.');
+  const photoUrl = p.photoUrl ?? '';
+  if (
+    typeof photoUrl !== 'string' ||
+    (photoUrl && !/^\/api\/profile-photo\/[0-9a-f-]{36}$/.test(photoUrl))
+  )
+    throw new Error('Carregue uma fotografia válida.');
+  const photoPosition = p.photoPosition ?? 35;
+  if (
+    typeof photoPosition !== 'number' ||
+    !Number.isFinite(photoPosition) ||
+    photoPosition < 0 ||
+    photoPosition > 100
+  )
+    throw new Error('Posição da fotografia inválida.');
   return {
     name,
     username,
@@ -178,6 +196,8 @@ export function validateProfile(input: unknown): Profile {
     showPhone: p.showPhone,
     links,
     bio: typeof p.bio === 'string' ? p.bio.trim() : '',
+    photoUrl,
+    photoPosition,
   };
 }
 export function validatePlanContent(
