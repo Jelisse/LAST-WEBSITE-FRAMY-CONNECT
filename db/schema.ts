@@ -45,3 +45,7 @@ export const sandboxEvents = sqliteTable(
   },
   (t) => [index('events_owner_time').on(t.ownerId, t.createdAt)],
 );
+
+export const orderManagers = sqliteTable('order_managers', {
+  userId: text('user_id').primaryKey(),
+});

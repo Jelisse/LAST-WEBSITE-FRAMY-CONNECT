@@ -17,7 +17,12 @@ const signin = await fetch(base + '/signin-with-chatgpt?return_to=/dashboard', {
 });
 assert.equal(signin.status, 302);
 const cookie = signin.headers.get('set-cookie').split(';')[0];
-const headers = { cookie, origin: base, 'Content-Type': 'application/json' };
+const headers = {
+  cookie,
+  origin: base,
+  'Content-Type': 'application/json',
+  'X-Framy-Order-Management': 'true',
+};
 const api = async (body) => {
   const response = await fetch(base + '/api/workspace', {
     method: 'POST',

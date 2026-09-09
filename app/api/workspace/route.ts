@@ -11,6 +11,7 @@ import {
 } from '@/lib/domain';
 import { publicProduct } from '@/lib/catalog';
 import { getProducts, canManageCatalog } from '@/lib/server-catalog';
+import { canManageOrders } from '@/lib/server-order-access';
 export const dynamic = 'force-dynamic';
 const json = (data: unknown, status = 200) =>
   Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -36,7 +37,7 @@ export async function GET() {
         .all<{ data_json: string }>(),
       db
         .prepare(
-          'SELECT id, order_id AS orderId, action, created_at AS createdAt FROM sandbox_events WHERE owner_id = ? ORDER BY created_at DESC LIMIT 100',
+          'SELECT id, order_id AS orderId, action, created_at AS createdAt FROM sandbox_events WHERE owner_id = ? ORDER BY created_at DESC',
         )
         .bind(user.userId)
         .all(),
@@ -50,6 +51,7 @@ export async function GET() {
     return json({
       products: (await getProducts()).map(publicProduct),
       canManageProducts: await canManageCatalog(user.userId),
+      canManageOrders: await canManageOrders(user.userId),
       profile: p ? JSON.parse(p.draft_json) : null,
       published: !!p?.published_json,
       publishedUsername: p?.published_json
@@ -227,6 +229,18 @@ export async function POST(request: Request) {
           409,
         );
       return json({ ok: true });
+    }
+    if (
+      request.headers.get('x-framy-order-management') !== 'true' ||
+      !(await canManageOrders(user.userId))
+    ) {
+      return json(
+        {
+          error:
+            'O acompanhamento do pedido é apenas de consulta. Apenas a equipa autorizada pode alterar pedidos.',
+        },
+        403,
+      );
     }
     if (body.action === 'create-order') {
       if (typeof body.id !== 'string' || !/^[0-9a-f-]{36}$/.test(body.id))

@@ -3,6 +3,7 @@ import type { Profile, SandboxOrder, PlanId } from './domain';
 export type WorkspaceData = {
   products: PublicProduct[];
   canManageProducts: boolean;
+  canManageOrders: boolean;
   profile: Profile | null;
   published: boolean;
   publishedUsername: string | null;

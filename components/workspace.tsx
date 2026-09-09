@@ -192,21 +192,29 @@ export function Workspace({ displayName }: { displayName: string }) {
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
   }, [dirty]);
-  const send = useCallback(async (payload: Record<string, unknown>) => {
-    const response = await fetch('/api/workspace', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const result = (await response.json()) as {
-      error?: string;
-      ok?: boolean;
-      id?: string;
-    };
-    if (!response.ok)
-      throw new Error(result.error ?? 'Não foi possível guardar.');
-    return result;
-  }, []);
+  const canEditOrders =
+    !!data?.canManageOrders && ['operations', 'agent'].includes(tab);
+  const send = useCallback(
+    async (payload: Record<string, unknown>) => {
+      const response = await fetch('/api/workspace', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(canEditOrders ? { 'X-Framy-Order-Management': 'true' } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
+      const result = (await response.json()) as {
+        error?: string;
+        ok?: boolean;
+        id?: string;
+      };
+      if (!response.ok)
+        throw new Error(result.error ?? 'Não foi possível guardar.');
+      return result;
+    },
+    [canEditOrders],
+  );
   const create = useCallback(
     async (productId: string) => {
       if (!products.some((p) => p.id === productId && p.available))
@@ -216,7 +224,6 @@ export function Workspace({ displayName }: { displayName: string }) {
       await send({ action: 'create-order', id, productId });
       pendingCreate.current = null;
       const updated = await load();
-      setTab('orders');
       setNotice('Pedido de teste criado. Nenhum pagamento foi efectuado.');
       return updated.orders.find((o) => o.id === id);
     },
@@ -240,7 +247,7 @@ export function Workspace({ displayName }: { displayName: string }) {
         };
       }
     ).modelContext;
-    if (!context) return;
+    if (!context || !canEditOrders) return;
     const lifecycle = new AbortController();
     try {
       Promise.resolve(
@@ -279,7 +286,7 @@ export function Workspace({ displayName }: { displayName: string }) {
       ).catch(() => {});
     } catch {}
     return () => lifecycle.abort();
-  }, [create]);
+  }, [create, canEditOrders]);
   async function run(
     fn: () => Promise<unknown>,
     message = 'Alteração guardada.',
@@ -423,7 +430,11 @@ export function Workspace({ displayName }: { displayName: string }) {
         <div className="empty-panel">
           <Package size={30} />
           <h3>Ainda não há pedidos</h3>
-          <p>Crie um pedido de teste para explorar o percurso completo.</p>
+          <p>
+            {canEditOrders
+              ? 'Crie um pedido de teste para explorar o percurso completo.'
+              : 'Quando o seu pedido for registado, pode acompanhar aqui todas as etapas.'}
+          </p>
         </div>
       )}
     </div>
@@ -832,56 +843,60 @@ export function Workspace({ displayName }: { displayName: string }) {
                     <div>
                       <h2>
                         {tab === 'orders'
-                          ? 'Experimente o percurso completo.'
+                          ? 'Acompanhe o seu pedido.'
                           : tab === 'operations'
                             ? 'Cada pedido, no sítio certo.'
                             : 'O próximo toque passa por si.'}
                       </h2>
                       <p className="muted">
                         {tab === 'orders'
-                          ? 'Crie um pedido de demonstração. Os valores abaixo são referências de teste, não preços comerciais.'
+                          ? 'Consulte o pagamento, a produção e a entrega. A nossa equipa actualiza cada etapa do seu pedido.'
                           : tab === 'operations'
                             ? 'Atribua um agente e acompanhe os pedidos de teste até à entrega.'
                             : 'Abra um pedido atribuído, inicie a produção e conclua o controlo de qualidade.'}
                       </p>
                     </div>
-                    <Button
-                      className="btn btn-primary"
-                      disabled={busy}
-                      onClick={() =>
-                        run(
-                          () => create(chosenProduct),
-                          'Pedido de teste criado, sem cobrança.',
-                        )
-                      }
-                    >
-                      <Plus /> Novo pedido de teste
-                    </Button>
+                    {canEditOrders && (
+                      <Button
+                        className="btn btn-primary"
+                        disabled={busy}
+                        onClick={() =>
+                          run(
+                            () => create(chosenProduct),
+                            'Pedido de teste criado, sem cobrança.',
+                          )
+                        }
+                      >
+                        <Plus /> Novo pedido de teste
+                      </Button>
+                    )}
                   </div>
-                  <fieldset
-                    className="product-choice"
-                    aria-label="Produto para o novo pedido"
-                  >
-                    {products
-                      .filter((p) => p.available)
-                      .map((p) => (
-                        <Button
-                          key={p.id}
-                          variant={
-                            chosenProduct === p.id ? 'secondary' : 'outline'
-                          }
-                          aria-pressed={chosenProduct === p.id}
-                          className="control-btn"
-                          disabled={busy}
-                          onClick={() => {
-                            setChosenProduct(p.id);
-                            pendingCreate.current = null;
-                          }}
-                        >
-                          {p.name}
-                        </Button>
-                      ))}
-                  </fieldset>
+                  {canEditOrders && (
+                    <fieldset
+                      className="product-choice"
+                      aria-label="Produto para o novo pedido"
+                    >
+                      {products
+                        .filter((p) => p.available)
+                        .map((p) => (
+                          <Button
+                            key={p.id}
+                            variant={
+                              chosenProduct === p.id ? 'secondary' : 'outline'
+                            }
+                            aria-pressed={chosenProduct === p.id}
+                            className="control-btn"
+                            disabled={busy}
+                            onClick={() => {
+                              setChosenProduct(p.id);
+                              pendingCreate.current = null;
+                            }}
+                          >
+                            {p.name}
+                          </Button>
+                        ))}
+                    </fieldset>
+                  )}
                   {orderTable}
                 </>
               )}
@@ -1026,6 +1041,14 @@ export function Workspace({ displayName }: { displayName: string }) {
                 <strong>{money(selected.amount)}</strong>
               </div>
               <p>{payment(selected)}</p>
+              <p className="muted">
+                Agente: {selected.agent || 'Por atribuir'} · Controlo de
+                qualidade: {selected.qc ? 'Concluído' : 'Pendente'}
+              </p>
+              <p className="muted">
+                Última actualização:{' '}
+                {new Date(selected.updatedAt).toLocaleString('pt-PT')}
+              </p>
               {error && (
                 <p role="alert" className="message">
                   {error}
@@ -1044,7 +1067,37 @@ export function Workspace({ displayName }: { displayName: string }) {
                     </span>
                   ))}
               </div>
-              {selected.status === 'PENDING_PAYMENT' && (
+              <section aria-label="Histórico do pedido">
+                <h3>Histórico do pedido</h3>
+                <ol>
+                  {(data?.events ?? [])
+                    .filter((e) => e.orderId === selected.id)
+                    .slice()
+                    .reverse()
+                    .map((e) => (
+                      <li key={e.id}>
+                        <time dateTime={e.createdAt}>
+                          {new Date(e.createdAt).toLocaleString('pt-PT')}
+                        </time>{' '}
+                        —{' '}
+                        {(
+                          {
+                            created: 'Pedido criado',
+                            pay: 'Pagamento confirmado',
+                            assign: 'Agente atribuído',
+                            start: 'Produção iniciada',
+                            ready:
+                              'Controlo de qualidade concluído · Pronto para entrega',
+                            deliver: 'Entrega concluída',
+                            cancel: 'Pedido cancelado',
+                            refund: 'Pagamento reembolsado',
+                          } as Record<string, string>
+                        )[e.action] ?? e.action}
+                      </li>
+                    ))}
+                </ol>
+              </section>
+              {canEditOrders && selected.status === 'PENDING_PAYMENT' && (
                 <Button
                   disabled={busy}
                   className="control-btn"
@@ -1053,7 +1106,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                   Simular pagamento confirmado
                 </Button>
               )}
-              {selected.status === 'QUEUED' && (
+              {canEditOrders && selected.status === 'QUEUED' && (
                 <>
                   <label className="field" htmlFor="agent-name">
                     Agente de teste
@@ -1082,7 +1135,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                   </Button>
                 </>
               )}
-              {selected.status === 'IN_PRODUCTION' && (
+              {canEditOrders && selected.status === 'IN_PRODUCTION' && (
                 <>
                   <h3>Controlo de qualidade</h3>
                   {[
@@ -1115,7 +1168,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                   </Button>
                 </>
               )}
-              {selected.status === 'READY' && (
+              {canEditOrders && selected.status === 'READY' && (
                 <>
                   <label className="field" htmlFor="delivery-proof">
                     Evidência de entrega de teste
@@ -1142,17 +1195,19 @@ export function Workspace({ displayName }: { displayName: string }) {
                   {selected.proof}
                 </p>
               )}
-              {['PENDING_PAYMENT', 'QUEUED'].includes(selected.status) && (
-                <Button
-                  variant="outline"
-                  disabled={busy}
-                  className="control-btn"
-                  onClick={() => action(selected, 'cancel')}
-                >
-                  Cancelar pedido de teste
-                </Button>
-              )}
-              {selected.status === 'CANCELLED' &&
+              {canEditOrders &&
+                ['PENDING_PAYMENT', 'QUEUED'].includes(selected.status) && (
+                  <Button
+                    variant="outline"
+                    disabled={busy}
+                    className="control-btn"
+                    onClick={() => action(selected, 'cancel')}
+                  >
+                    Cancelar pedido de teste
+                  </Button>
+                )}
+              {canEditOrders &&
+                selected.status === 'CANCELLED' &&
                 selected.paid &&
                 !selected.refunded && (
                   <Button
