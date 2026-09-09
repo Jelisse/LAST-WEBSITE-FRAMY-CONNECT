@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { SiteFooter } from '@/components/site-shell';
 import { HomeHeroScene } from '@/components/home-hero-scene';
+import { HomeSharingScene } from '@/components/home-sharing-scene';
 import { ProductIcon } from '@/components/product-icon';
 import { products } from '@/lib/catalog';
 import './home.css';
@@ -123,6 +124,7 @@ export default function Home() {
             <HomeHeroScene />
           </div>
         </section>
+        <HomeSharingScene />
         <section className="home-about" id="sobre">
           <h2>
             Quem
@@ -208,7 +210,7 @@ export default function Home() {
             ))}
           </div>
         </section>
-        <section className="home-how" id="como-funciona">
+        <section className="home-how" id="primeiros-passos">
           <h2>Do primeiro toque à próxima conexão.</h2>
           <div>
             {[

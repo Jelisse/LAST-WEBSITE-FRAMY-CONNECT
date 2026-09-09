@@ -7,7 +7,7 @@ export function HomeHeroScene() {
     <div
       className="home-hero-scene"
       role="img"
-      aria-label="iPhone com um exemplo de perfil Framy e cartão NFC laranja sobre uma base"
+      aria-label="iPhone com um exemplo de perfil Framy e cartões NFC laranja, preto e branco sobre uma base"
     >
       <div className="home-scene-base" data-motion-layer="base">
         <Image
@@ -19,6 +19,13 @@ export function HomeHeroScene() {
           priority
         />
       </div>
+      {(['white', 'black'] as const).map((color) => (
+        <div key={color} className={`home-back-card home-back-card-${color}`} data-motion-layer={`card-${color}`}>
+          <Nfc />
+          <Image src="/brand/logo.svg" alt="" width={220} height={100} unoptimized />
+          <p>O Seu Mundo<br />num Toque.</p>
+        </div>
+      ))}
       <div className="home-scene-card" data-motion-layer="card">
         <Image
           className="home-card-surface"
