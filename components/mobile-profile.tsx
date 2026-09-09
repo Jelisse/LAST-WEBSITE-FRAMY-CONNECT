@@ -17,22 +17,10 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import type { Profile } from '@/lib/domain';
+import { socialPlatform } from '@/lib/social-platform';
 
 function SocialIcon({ url }: { url: string }) {
-  let host = '';
-  try {
-    host = new URL(url).hostname.toLowerCase();
-  } catch {}
-  const domain = (name: string) => host === name || host.endsWith(`.${name}`);
-  const brand = domain('instagram.com')
-    ? 'instagram'
-    : domain('tiktok.com')
-      ? 'tiktok'
-      : domain('wa.me') || domain('whatsapp.com')
-        ? 'whatsapp'
-        : domain('line.me') || domain('line.naver.jp')
-          ? 'line'
-          : null;
+  const brand = socialPlatform(url);
   if (brand)
     return (
       <Image
