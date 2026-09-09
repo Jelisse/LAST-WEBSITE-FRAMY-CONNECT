@@ -357,8 +357,9 @@ export async function POST(request: Request) {
       return json({ ok: true });
     }
     if (
-      request.headers.get('x-framy-order-management') !== 'true' ||
-      !(await canManageOrders(user.userId))
+      body.action !== 'submit-order' &&
+      (request.headers.get('x-framy-order-management') !== 'true' ||
+        !(await canManageOrders(user.userId)))
     ) {
       return json(
         {
@@ -368,7 +369,8 @@ export async function POST(request: Request) {
         403,
       );
     }
-    if (body.action === 'create-order') {
+    if (body.action === 'create-order' || body.action === 'submit-order') {
+      const delivery = validateDelivery(body);
       if (typeof body.id !== 'string' || !/^[0-9a-f-]{36}$/.test(body.id))
         return json({ error: 'Referência inválida.' }, 422);
       const product = (await getProducts()).find(
@@ -386,7 +388,11 @@ export async function POST(request: Request) {
       if (existing) {
         if (
           existing.owner_id !== user.userId ||
-          JSON.parse(existing.data_json).productId !== body.productId
+          JSON.parse(existing.data_json).productId !== body.productId ||
+          JSON.parse(existing.data_json).deliveryCity !==
+            delivery.deliveryCity ||
+          (JSON.parse(existing.data_json).deliveryAddress ?? '') !==
+            delivery.deliveryAddress
         )
           return json(
             {
@@ -404,6 +410,7 @@ export async function POST(request: Request) {
       if ((count?.n ?? 0) >= 100)
         return json({ error: 'Limite de 100 pedidos de teste atingido.' }, 422);
       const o: SandboxOrder = {
+        ...delivery,
         id: body.id,
         productId: product.id,
         productName: product.name,

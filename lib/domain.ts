@@ -110,6 +110,7 @@ const reserved = new Set([
   'preview',
   'settings',
   'checkout',
+  'encomendar',
   'tracking',
   'operations',
   'cofounder',

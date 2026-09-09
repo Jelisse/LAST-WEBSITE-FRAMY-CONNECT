@@ -62,13 +62,30 @@ assert.ok(
     (p) => p.id === productId,
   ),
 );
+for (const deliveryCity of [undefined, '', '   ']) {
+  assert.equal(
+    (
+      await request('/api/workspace', {
+        action: 'submit-order',
+        id: orderId,
+        productId,
+        deliveryCity,
+      })
+    ).status,
+    422,
+  );
+}
+assert.ok(
+  !(await request('/api/manager')).data.orders.some((o) => o.id === orderId),
+);
 assert.equal(
   (
-    await request(
-      '/api/workspace',
-      { action: 'create-order', id: orderId, productId },
-      { 'X-Framy-Order-Management': 'true' },
-    )
+    await request('/api/workspace', {
+      action: 'submit-order',
+      id: orderId,
+      productId,
+      deliveryCity: 'Maputo',
+    })
   ).status,
   200,
 );

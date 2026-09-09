@@ -61,7 +61,7 @@ export default async function Page({
             </div>
             <Link
               className="btn btn-primary"
-              href={p.available ? `/dashboard?product=${p.id}` : '/contacto'}
+              href={p.available ? `/encomendar/${p.id}` : '/contacto'}
             >
               {p.available
                 ? 'Experimentar no espaço de teste'

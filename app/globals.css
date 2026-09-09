@@ -3106,3 +3106,29 @@ summary {
 .delivery-editor [role='alert'] {
   color: #b32e20;
 }
+
+.order-submission {
+  max-width: 780px;
+  margin: 36px auto;
+  padding: 0 20px;
+}
+.order-submission h1 {
+  font-size: 30px;
+  margin-bottom: 24px;
+}
+.order-submission-product {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.order-submission-product img {
+  width: 140px;
+  border-radius: 14px;
+}
+.order-submission p {
+  line-height: 1.7;
+}
+.order-submission-product h2 {
+  font-size: 20px;
+}

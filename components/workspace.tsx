@@ -73,6 +73,7 @@ import {
   validatePlanContent,
   publicProfile,
 } from '@/lib/domain';
+import { validateDelivery } from '@/lib/delivery';
 import { DeliveryEditor } from './delivery-editor';
 import { usernameFromName } from '@/lib/domain';
 import { money } from '@/lib/catalog';
@@ -167,6 +168,13 @@ export function Workspace({ displayName }: { displayName: string }) {
             ),
           );
         }
+        const submittedId = new URLSearchParams(window.location.search).get(
+          'order',
+        );
+        if (submittedId) {
+          setTab('orders');
+          setSelected(d.orders.find((o) => o.id === submittedId) ?? null);
+        }
         const product = new URLSearchParams(window.location.search).get(
           'product',
         );
@@ -218,19 +226,25 @@ export function Workspace({ displayName }: { displayName: string }) {
     },
     [canEditOrders],
   );
+  const [orderCity, setOrderCity] = useState('');
   const create = useCallback(
     async (productId: string) => {
       if (!products.some((p) => p.id === productId && p.available))
         throw new Error('Produto de teste inválido.');
       const id = pendingCreate.current ?? crypto.randomUUID();
       pendingCreate.current = id;
-      await send({ action: 'create-order', id, productId });
+      await send({
+        action: 'create-order',
+        id,
+        productId,
+        ...validateDelivery({ deliveryCity: orderCity }),
+      });
       pendingCreate.current = null;
       const updated = await load();
       setNotice('Pedido de teste criado. Nenhum pagamento foi efectuado.');
       return updated.orders.find((o) => o.id === id);
     },
-    [load, send, products],
+    [load, send, products, orderCity],
   );
   useEffect(() => {
     type Tool = {
@@ -907,6 +921,22 @@ export function Workspace({ displayName }: { displayName: string }) {
                       </Button>
                     )}
                   </div>
+                  {canEditOrders && (
+                    <label className="field">
+                      Local de entrega obrigatório
+                      <Input
+                        value={orderCity}
+                        minLength={2}
+                        maxLength={90}
+                        required
+                        placeholder="Ex.: Maputo ou Beira"
+                        onChange={(e) => {
+                          setOrderCity(e.target.value);
+                          pendingCreate.current = null;
+                        }}
+                      />
+                    </label>
+                  )}
                   {canEditOrders && (
                     <fieldset
                       className="product-choice"
