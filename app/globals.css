@@ -2758,3 +2758,204 @@ summary {
     grid-row: 2;
   }
 }
+
+/* iPhone 17 device chrome is confined to the profile editor wrapper. */
+.iphone-preview {
+  width: 100%;
+  max-width: 380px;
+  margin-inline: auto;
+}
+.iphone-device {
+  position: relative;
+  padding: 9px;
+  border: 2px solid #77777b;
+  border-radius: 52px;
+  background: #111113;
+  box-shadow:
+    0 0 0 1px #202023,
+    inset 0 0 0 2px #353539,
+    0 24px 42px -18px #1d1d1f50;
+}
+.iphone-display {
+  position: relative;
+  aspect-ratio: 1206 / 2622;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 41px;
+  background: #000;
+  transform: translateZ(0);
+}
+.iphone-screen-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  border-radius: inherit;
+}
+.iphone-screen-scroll::-webkit-scrollbar {
+  display: none;
+}
+.iphone-screen-scroll:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+}
+.iphone-screen-scroll .mobile-identity-page {
+  box-shadow: none;
+  border-radius: 0;
+}
+.iphone-screen-scroll .mobile-profile-body {
+  padding-bottom: 14cqw;
+}
+.iphone-status {
+  position: absolute;
+  z-index: 3;
+  inset: 0 0 auto;
+  height: 54px;
+  padding: 17px 23px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  color: white;
+  pointer-events: none;
+  font:
+    600 13px/1 -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  text-shadow: 0 1px 5px #0007;
+  background: linear-gradient(#00000024, transparent);
+}
+.iphone-island {
+  position: absolute;
+  width: 29%;
+  height: 27px;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 30px;
+  background: #050506;
+  box-shadow: inset -1px -1px 2px #202025;
+}
+.iphone-island::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    #22334d,
+    #0a1020 45%,
+    #060709 70%
+  );
+}
+.iphone-status-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.iphone-status-icons svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.4;
+}
+.iphone-status-icons svg:last-child {
+  width: 21px;
+}
+.iphone-home-area {
+  position: absolute;
+  z-index: 3;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  background: linear-gradient(transparent, #00000010);
+}
+.iphone-home-area span {
+  width: 33%;
+  height: 4px;
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: 0 1px 3px #0003;
+}
+.iphone-action-key,
+.iphone-volume-keys,
+.iphone-power-key {
+  position: absolute;
+  width: 4px;
+  background: linear-gradient(90deg, #47474b, #99999e, #29292c);
+  border-radius: 3px;
+}
+.iphone-action-key {
+  left: -5px;
+  top: 15%;
+  height: 23px;
+}
+.iphone-volume-keys {
+  left: -5px;
+  top: 22%;
+  height: 43px;
+}
+.iphone-volume-keys::after {
+  content: '';
+  position: absolute;
+  inset: 53px 0 auto;
+  height: 43px;
+  border-radius: inherit;
+  background: inherit;
+}
+.iphone-power-key {
+  right: -5px;
+  top: 26%;
+  height: 65px;
+}
+.iphone-preview-caption {
+  text-align: center;
+  color: #626267;
+  font-size: 0.8125rem;
+  margin: 18px 0 0;
+}
+.iphone-preview-caption span {
+  margin-inline: 5px;
+}
+@media (max-width: 1200px) and (min-width: 951px) {
+  .iphone-device {
+    padding: 7px;
+    border-radius: 41px;
+  }
+  .iphone-display {
+    border-radius: 32px;
+  }
+  .iphone-status {
+    padding-inline: 15px;
+    font-size: 11px;
+  }
+  .iphone-status-icons {
+    gap: 2px;
+  }
+  .iphone-status-icons svg {
+    width: 11px;
+    height: 11px;
+  }
+  .iphone-status-icons svg:last-child {
+    width: 17px;
+  }
+  .iphone-island {
+    height: 23px;
+    top: 11px;
+  }
+  .iphone-island::after {
+    top: 7px;
+    width: 8px;
+    height: 8px;
+  }
+}

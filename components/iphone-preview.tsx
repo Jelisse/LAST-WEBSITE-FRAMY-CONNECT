@@ -1,0 +1,40 @@
+import type { ReactNode } from 'react';
+import { BatteryFull, Signal, Wifi } from 'lucide-react';
+
+/** Editor-only device chrome. Published profiles never import this wrapper. */
+export function IPhonePreview({ children }: { children: ReactNode }) {
+  return (
+    <div className="iphone-preview">
+      <div className="iphone-device">
+        <span className="iphone-action-key" aria-hidden="true" />
+        <span className="iphone-volume-keys" aria-hidden="true" />
+        <span className="iphone-power-key" aria-hidden="true" />
+        <div className="iphone-display">
+          <div className="iphone-status" aria-hidden="true">
+            <span>9:41</span>
+            <span className="iphone-island" />
+            <span className="iphone-status-icons">
+              <Signal />
+              <Wifi />
+              <BatteryFull />
+            </span>
+          </div>
+          <div
+            className="iphone-screen-scroll"
+            tabIndex={0}
+            role="region"
+            aria-label="Pré-visualização do perfil no iPhone 17. Desloque para ver todo o perfil."
+          >
+            {children}
+          </div>
+          <div className="iphone-home-area" aria-hidden="true">
+            <span />
+          </div>
+        </div>
+      </div>
+      <p className="iphone-preview-caption">
+        iPhone 17 <span>·</span> Deslize para ver o perfil
+      </p>
+    </div>
+  );
+}

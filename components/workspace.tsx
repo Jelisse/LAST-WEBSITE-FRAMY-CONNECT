@@ -26,6 +26,7 @@ import { CustomerOverview } from '@/components/customer-overview';
 import { PlanPicker } from '@/components/plan-picker';
 import { ProfileLinksEditor } from '@/components/profile-links-editor';
 import { MobileProfile } from '@/components/mobile-profile';
+import { IPhonePreview } from '@/components/iphone-preview';
 import { ProfilePhotoUpload } from '@/components/profile-photo-upload';
 import { ProfileHandoff } from '@/components/profile-handoff';
 import {
@@ -790,11 +791,13 @@ export function Workspace({ displayName }: { displayName: string }) {
                     <span className="preview-label">
                       O SEU PERFIL · PRÉ-VISUALIZAÇÃO
                     </span>
-                    <MobileProfile
-                      profile={publicProfile(profile)}
-                      published={data.published}
-                      preview
-                    />
+                    <IPhonePreview>
+                      <MobileProfile
+                        profile={publicProfile(profile)}
+                        published={data.published}
+                        preview
+                      />
+                    </IPhonePreview>
                     <ProfileHandoff
                       username={
                         data.publishedUsername || data.profile?.username
