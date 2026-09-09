@@ -716,15 +716,15 @@
   .sharing-stage { display:block; aspect-ratio:1.72; max-width:1250px; padding-bottom:0; margin-bottom:34px; }
   .sharing-method { position:absolute; left:0; top:0; width:40%; height:100%; aspect-ratio:auto; }
   .sharing-method h3 { position:absolute; top:0; left:15%; margin:0; }
-  .sharing-method > .sharing-card { left:0; top:29%; width:52%; height:39%; transform:skewY(5deg); }
-  .sharing-method > .sharing-phone { right:auto; left:54%; top:7%; bottom:auto; width:46%; transform:rotate(-2deg); }
+  .sharing-method > .sharing-card { left:0; top:28%; width:53%; height:40%; transform:perspective(900px) rotateY(-13deg) rotateZ(-1deg); }
+  .sharing-method > .sharing-phone { right:auto; left:54%; top:6%; bottom:auto; width:50%; transform:perspective(1100px) rotateY(-12deg) rotateZ(-2deg); }
   .sharing-wave { left:41%; top:26%; width:24%; }
-  .sharing-result { position:absolute; left:43%; top:9%; width:19%; margin:0; padding:9px; border-radius:21px; }
+  .sharing-result { position:absolute; left:44%; top:9%; width:18.5%; margin:0; padding:9px; border-radius:21px; }
   .sharing-result > span { position:absolute; top:100%; left:-15%; width:130%; padding-top:13px; }
   .sharing-scan { left:66%; width:34%; }
   .sharing-scan h3 { left:33%; }
-  .sharing-scan > .sharing-card { left:0; top:31%; width:66%; height:36%; transform:skewY(5deg); }
-  .sharing-scan > .sharing-phone { left:37%; top:15%; width:63%; transform:rotate(5deg); }
+  .sharing-scan > .sharing-card { left:0; top:30%; width:65%; height:36%; transform:perspective(900px) rotateY(-18deg) rotateZ(4deg); }
+  .sharing-scan > .sharing-phone { left:39%; top:14%; width:60%; transform:perspective(1100px) rotateY(-15deg) rotateZ(5deg); }
   .sharing-method > p { top:auto; bottom:-3%; width:90%; max-width:310px; }
   .sharing-arrows { bottom:3%; height:12%; }
 }
@@ -735,8 +735,14 @@
 }
 @media (max-width:700px) {
   .sharing-stage { column-gap:22px; }
-  .sharing-method > .sharing-phone { width:62%; right:-3%; bottom:3%; }
-  .sharing-method > .sharing-card { width:61%; top:35%; height:37%; left:-2%; }
-  .sharing-scan > .sharing-phone { bottom:-2%; }
+  .sharing-method > .sharing-phone { width:62%; right:-3%; bottom:3%; transform:perspective(800px) rotateY(-12deg) rotateZ(-2deg); }
+  .sharing-method > .sharing-card { width:61%; top:35%; height:37%; left:-2%; transform:perspective(700px) rotateY(-13deg); }
+  .sharing-scan > .sharing-phone { bottom:-2%; transform:perspective(800px) rotateY(-15deg) rotateZ(5deg); }
   .sharing-result { width:48%; margin-top:40px; }
 }
+
+.sharing-method > .sharing-card { transform-origin:50% 100%; box-shadow:3px 1px 0 #8a310e,5px 10px 12px #38211025,12px 30px 24px -18px #46271266; }
+.sharing-scan > .sharing-card { box-shadow:3px 1px 0 #151311,5px 10px 12px #241e1925,12px 30px 24px -18px #241e1966; }
+.sharing-method > .sharing-phone { transform-origin:50% 95%; }
+.sharing-method > .sharing-phone::after { content:''; position:absolute; z-index:-1; width:110%; height:5%; left:-3%; bottom:0; border-radius:50%; background:radial-gradient(ellipse,#30231e55,transparent 70%); filter:blur(4px); transform:rotate(-3deg); }
+.sharing-result { transform:none; box-shadow:0 10px 26px #48352412,0 0 24px 8px #ffffffcc,inset 0 0 0 6px #faf9f7; }
