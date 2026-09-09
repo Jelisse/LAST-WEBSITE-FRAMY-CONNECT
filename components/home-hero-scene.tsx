@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Nfc } from 'lucide-react';
 
 /** Independent transform layers, ready for future motion. The screen is static. */
 export function HomeHeroScene() {
@@ -20,18 +21,34 @@ export function HomeHeroScene() {
       </div>
       <div className="home-scene-card" data-motion-layer="card">
         <Image
-          src="/home/nfc-card.png"
+          src="/home/nfc-card-blank.png"
           alt=""
           width={1024}
           height={1536}
           unoptimized
           priority
         />
+        <div className="home-card-print">
+          <Nfc className="home-card-nfc" />
+          <Image
+            className="home-card-logo"
+            src="/brand/logo.svg"
+            alt=""
+            width={220}
+            height={100}
+            unoptimized
+          />
+          <p>
+            O Seu Mundo
+            <br />
+            num Toque.
+          </p>
+        </div>
       </div>
       <div className="home-scene-phone" data-motion-layer="phone">
         <Image
           className="home-phone-shell"
-          src="/home/iphone-shell.png"
+          src="/home/iphone-side-shell.png"
           alt=""
           width={896}
           height={1792}

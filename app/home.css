@@ -137,6 +137,7 @@
   stroke-width: 1.5;
 }
 .home-hero-scene {
+  container-type: inline-size;
   position: relative;
   aspect-ratio: 1.02;
   isolation: isolate;
@@ -151,7 +152,7 @@
 }
 .home-scene-base {
   width: 115%;
-  bottom: -7%;
+  bottom: -9%;
   left: -5%;
   z-index: 1;
   transform: var(--base-motion, none);
@@ -164,27 +165,61 @@
   height: auto;
 }
 .home-scene-card {
-  width: 40%;
-  left: 8%;
-  bottom: 12%;
+  width: 38%;
+  left: 14%;
+  bottom: 16%;
   z-index: 2;
-  transform: var(--card-motion, rotateY(-12deg) rotateZ(7deg));
-  filter: drop-shadow(10px 12px 8px #81300026);
+  transform-origin: 50% 93%;
+  transform: rotateY(-22deg) rotateZ(6deg) var(--card-motion, translateZ(0));
+  filter: drop-shadow(5px 4px 3px #81300040);
 }
 .home-scene-phone {
-  width: 44%;
-  left: 49%;
-  bottom: 11%;
+  width: 40%;
+  left: 52%;
+  bottom: 18%;
   z-index: 3;
-  transform: var(--phone-motion, rotateY(-13deg) rotateZ(-3deg));
-  filter: drop-shadow(14px 14px 10px #81300030);
+  transform-origin: 50% 97.5%;
+  transform: rotateY(-10deg) rotateZ(-2deg) var(--phone-motion, translateZ(0));
+  filter: drop-shadow(5px 4px 3px #81300050);
 }
 .home-phone-display {
   position: absolute;
-  inset: 4.2% 9.3% 4.1%;
+  inset: 4.2% 12.1% 4.1% 9.3%;
   border-radius: 15% / 7%;
   overflow: hidden;
   background: #c95000;
+}
+.home-card-print {
+  position: absolute;
+  inset: 7% 10% 8%;
+  color: white;
+}
+.home-card-print .home-card-logo {
+  position: absolute;
+  width: 76%;
+  height: auto;
+  left: 12%;
+  top: 34%;
+  filter: brightness(0) invert(1);
+}
+.home-card-nfc {
+  position: absolute;
+  top: 4%;
+  right: 4%;
+  width: 4cqw;
+  height: 4cqw;
+  stroke-width: 1.5;
+}
+.home-card-print p {
+  position: absolute;
+  top: 64%;
+  left: 12%;
+  width: 76%;
+  margin: 0;
+  font-size: 2.4cqw;
+  line-height: 1.45;
+  font-weight: 400;
+  text-align: center;
 }
 .home-phone-display img {
   object-fit: fill;
