@@ -9,7 +9,8 @@ import {
   getPlan,
   validatePlanContent,
 } from '@/lib/domain';
-import { products } from '@/lib/catalog';
+import { publicProduct } from '@/lib/catalog';
+import { getProducts, canManageCatalog } from '@/lib/server-catalog';
 export const dynamic = 'force-dynamic';
 const json = (data: unknown, status = 200) =>
   Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -47,6 +48,8 @@ export async function GET() {
         .first<{ plan_id: string; version: number }>(),
     ]);
     return json({
+      products: (await getProducts()).map(publicProduct),
+      canManageProducts: await canManageCatalog(user.userId),
       profile: p ? JSON.parse(p.draft_json) : null,
       published: !!p?.published_json,
       publishedUsername: p?.published_json
@@ -228,7 +231,7 @@ export async function POST(request: Request) {
     if (body.action === 'create-order') {
       if (typeof body.id !== 'string' || !/^[0-9a-f-]{36}$/.test(body.id))
         return json({ error: 'Referência inválida.' }, 422);
-      const product = products.find(
+      const product = (await getProducts()).find(
         (p) => p.id === body.productId && p.available,
       );
       if (!product)

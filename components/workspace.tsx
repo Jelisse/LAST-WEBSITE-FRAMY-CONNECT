@@ -73,7 +73,8 @@ import {
   validatePlanContent,
   publicProfile,
 } from '@/lib/domain';
-import { products, money } from '@/lib/catalog';
+import { money } from '@/lib/catalog';
+import { ProductManager } from './product-manager';
 import type { WorkspaceData } from '@/lib/profile-types';
 
 const signOutHref = '/signout-with-chatgpt?return_to=/';
@@ -124,6 +125,7 @@ export function Workspace({ displayName }: { displayName: string }) {
     [testToolsOpen, setTestToolsOpen] = useState(false),
     [plansOpen, setPlansOpen] = useState(false),
     [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const products = data?.products ?? [];
   const pendingCreate = useRef<string | null>(null);
   const load = useCallback(async (resetProfile = false) => {
     const r = await fetch('/api/workspace', { cache: 'no-store' });
@@ -165,7 +167,10 @@ export function Workspace({ displayName }: { displayName: string }) {
         const product = new URLSearchParams(window.location.search).get(
           'product',
         );
-        if (product && products.some((p) => p.id === product && p.available)) {
+        if (
+          product &&
+          d.products.some((p) => p.id === product && p.available)
+        ) {
           setChosenProduct(product);
           setTab('orders');
         }
@@ -215,7 +220,7 @@ export function Workspace({ displayName }: { displayName: string }) {
       setNotice('Pedido de teste criado. Nenhum pagamento foi efectuado.');
       return updated.orders.find((o) => o.id === id);
     },
-    [load, send],
+    [load, send, products],
   );
   useEffect(() => {
     type Tool = {
@@ -806,6 +811,13 @@ export function Workspace({ displayName }: { displayName: string }) {
                     />
                   </aside>
                 </div>
+              )}
+              {tab === 'operations' && data.canManageProducts && (
+                <ProductManager
+                  onSaved={() => {
+                    void load();
+                  }}
+                />
               )}
               {tab === 'operations' && (
                 <ProfileHandoff

@@ -2,11 +2,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, Search } from 'lucide-react';
-import { products } from '@/lib/catalog';
-import { ProductIcon } from './product-icon';
+import { money, type PublicProduct } from '@/lib/catalog';
+
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-export function Catalog() {
+export function Catalog({ products }: { products: PublicProduct[] }) {
   const [category, setCategory] = useState('Todos');
   const [query, setQuery] = useState('');
   const shown = products.filter(
@@ -46,7 +46,14 @@ export function Catalog() {
           <Link className="product-card" key={p.id} href={`/produtos/${p.id}`}>
             <div className={`product-visual tone-${i % 3}`}>
               <span className="product-category">{p.category}</span>
-              <ProductIcon type={p.icon} />
+              <img
+                className="catalog-product-image"
+                src={p.imageUrl}
+                alt={p.name}
+                width={1254}
+                height={1254}
+                loading="lazy"
+              />
               <span className="product-arrow">
                 <ArrowUpRight size={22} />
               </span>
@@ -55,7 +62,7 @@ export function Catalog() {
               <h2>{p.name}</h2>
               <p>{p.tagline}</p>
               <span>
-                {p.available ? 'Conhecer o produto' : 'Solução sob consulta'}{' '}
+                {p.available ? money(p.amount) : 'Solução sob consulta'}{' '}
                 <ArrowUpRight size={15} />
               </span>
             </div>

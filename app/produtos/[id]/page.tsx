@@ -1,16 +1,20 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowUpRight, Check, ChevronLeft } from 'lucide-react';
-import { products } from '@/lib/catalog';
+import { money } from '@/lib/catalog';
+import { getProducts } from '@/lib/server-catalog';
+export const dynamic = 'force-dynamic';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
-import { ProductIcon } from '@/components/product-icon';
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return { title: products.find((p) => p.id === id)?.name ?? 'Produto' };
+  return {
+    title: (await getProducts()).find((p) => p.id === id)?.name ?? 'Produto',
+  };
 }
 export default async function Page({
   params,
@@ -18,7 +22,7 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const p = products.find((p) => p.id === id);
+  const p = (await getProducts()).find((p) => p.id === id);
   if (!p) notFound();
   return (
     <>
@@ -29,13 +33,16 @@ export default async function Page({
         </Link>
         <div className="product-detail">
           <div className="product-detail-art">
-            <ProductIcon type={p.icon} size={130} />
+            <img src={p.imageUrl} alt={p.name} width={1254} height={1254} />
             <span>{p.name}</span>
           </div>
           <div>
             <span className="eyebrow">{p.category}</span>
             <h1>{p.name}</h1>
             <h2>{p.tagline}</h2>
+            <p className="product-detail-price">
+              {p.available ? money(p.amount) : 'Sob consulta'}
+            </p>
             <p>{p.description}</p>
             <ul className="benefit-list">
               <li>

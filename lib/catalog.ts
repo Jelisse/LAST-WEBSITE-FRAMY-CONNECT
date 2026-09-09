@@ -1,4 +1,44 @@
-export const products = [
+export type Product = {
+  id: string;
+  name: string;
+  category: string;
+  icon: string;
+  tagline: string;
+  description: string;
+  amount: number;
+  cost: number;
+  audience: string;
+  available: boolean;
+  imageUrl: string;
+  version: number;
+};
+const seedProducts = [
+  {
+    id: 'pvc',
+    name: 'PVC Business Cards',
+    category: 'Cartões',
+    icon: 'card',
+    tagline: 'A sua identidade num cartão leve e resistente.',
+    description:
+      'Um cartão NFC em PVC para partilhar a sua identidade digital num único toque.',
+    amount: 0,
+    cost: 0,
+    audience: 'Profissionais',
+    available: false,
+  },
+  {
+    id: 'wood',
+    name: 'Wooden Business Cards',
+    category: 'Cartões',
+    icon: 'card',
+    tagline: 'Uma apresentação com um toque natural.',
+    description:
+      'Um cartão NFC em madeira que liga uma apresentação natural ao seu perfil digital.',
+    amount: 0,
+    cost: 0,
+    audience: 'Profissionais',
+    available: false,
+  },
   {
     id: 'metal',
     name: 'Metal NFC Card',
@@ -129,6 +169,18 @@ export const products = [
     available: false,
   },
 ];
+export const products: Product[] = seedProducts.map((p) => ({
+  ...p,
+  imageUrl: `/products/${p.id}.png`,
+  version: 0,
+}));
+export type PublicProduct = Omit<Product, 'cost'>;
+export function publicProduct({
+  cost: _cost,
+  ...product
+}: Product): PublicProduct {
+  return product;
+}
 export function money(minor: number) {
   return new Intl.NumberFormat('pt-MZ', {
     style: 'currency',

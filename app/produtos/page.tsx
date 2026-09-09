@@ -1,7 +1,11 @@
+import { getProducts } from '@/lib/server-catalog';
+import { publicProduct } from '@/lib/catalog';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { Catalog } from '@/components/catalog';
 export const metadata = { title: 'Produtos' };
-export default function Page() {
+export const dynamic = 'force-dynamic';
+export default async function Page() {
+  const products = (await getProducts()).map(publicProduct);
   return (
     <>
       <SiteHeader />
@@ -16,7 +20,7 @@ export default function Page() {
           Do cartão que o apresenta ao acessório que o acompanha. Encontre o seu
           próximo toque.
         </p>
-        <Catalog />
+        <Catalog products={products} />
       </main>
       <SiteFooter />
     </>

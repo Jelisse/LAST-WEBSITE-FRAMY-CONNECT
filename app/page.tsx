@@ -17,8 +17,8 @@ import {
 import { SiteFooter } from '@/components/site-shell';
 import { HomeHeroScene } from '@/components/home-hero-scene';
 import { HomeSharingScene } from '@/components/home-sharing-scene';
-import { ProductIcon } from '@/components/product-icon';
-import { products } from '@/lib/catalog';
+
+import { getProducts } from '@/lib/server-catalog';
 import './home.css';
 
 const audiences = [
@@ -41,7 +41,9 @@ const audiences = [
   },
 ];
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+export default async function Home() {
+  const products = await getProducts();
   return (
     <div className="framy-home">
       <header className="home-nav">
@@ -167,15 +169,6 @@ export default function Home() {
         <section className="home-products" id="produtos">
           <h2>PRODUTOS</h2>
           <div className="home-products-grid">
-            {[
-              ['PVC Business Cards', 'A sua identidade num cartão leve e resistente.'],
-              ['Wooden Business Cards', 'Uma apresentação com um toque natural.'],
-            ].map(([name, tagline]) => (
-              <Link className="home-product" href="/contacto" key={name}>
-                <div className="home-product-art"><ProductIcon type="card" /></div>
-                <div className="home-product-copy"><h3>{name}</h3><p>{tagline}</p><ArrowUpRight size={18} /></div>
-              </Link>
-            ))}
             {products.map((p) => (
               <Link
                 className="home-product"
@@ -183,7 +176,13 @@ export default function Home() {
                 href={`/produtos/${p.id}`}
               >
                 <div className="home-product-art">
-                  <ProductIcon type={p.icon} />
+                  <img
+                    src={p.imageUrl}
+                    alt={p.name}
+                    width={1254}
+                    height={1254}
+                    loading="lazy"
+                  />
                 </div>
                 <div className="home-product-copy">
                   <h3>{p.name}</h3>

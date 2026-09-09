@@ -1,4 +1,14 @@
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
+export const productCatalog = sqliteTable('product_catalog', {
+  id: text('id').primaryKey(),
+  dataJson: text('data_json').notNull(),
+  version: integer('version').notNull().default(1),
+  updatedBy: text('updated_by').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+export const catalogManagers = sqliteTable('catalog_managers', {
+  userId: text('user_id').primaryKey(),
+});
 export const sandboxMemberships = sqliteTable('sandbox_memberships', {
   ownerId: text('owner_id').primaryKey(),
   planId: text('plan_id').notNull(),
