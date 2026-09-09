@@ -739,3 +739,8 @@
  .sharing-card-tagline { font-size:.9cqw; }
 }
 .sharing-card-identity small img { width:1.15cqw; height:1.15cqw; filter:brightness(0) invert(1); }
+/* Product arrangement: two standing cards and a separate acrylic NFC keychain. */
+.home-hero-scene .home-scene-card { left:18%; width:36%; bottom:17%; }
+.home-hero-scene .home-back-card-black { left:15%; bottom:20%; width:28%; height:46%; transform:rotate(-5deg); }
+.home-scene-keychain { position:absolute; left:2%; bottom:10%; width:29%; z-index:4; transform:rotate(-16deg) var(--keychain-motion,translateZ(0)); transform-origin:50% 85%; filter:drop-shadow(2px 4px 2px #3e302025); }
+.home-scene-keychain svg { display:block; width:100%; height:auto; overflow:visible; }

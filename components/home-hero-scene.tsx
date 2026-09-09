@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Nfc } from 'lucide-react';
+import { HomeNfcKeychain } from './home-nfc-keychain';
 
 /** Independent transform layers, ready for future motion. The screen is static. */
 export function HomeHeroScene() {
@@ -7,7 +8,7 @@ export function HomeHeroScene() {
     <div
       className="home-hero-scene"
       role="img"
-      aria-label="iPhone com um exemplo de perfil Framy e cartões NFC laranja, preto e branco sobre uma base"
+      aria-label="iPhone com um exemplo de perfil Framy, cartões NFC laranja e preto e porta-chaves NFC sobre uma base"
     >
       <div className="home-scene-base" data-motion-layer="base">
         <Image
@@ -19,7 +20,7 @@ export function HomeHeroScene() {
           priority
         />
       </div>
-      {(['white', 'black'] as const).map((color) => (
+      {(['black'] as const).map((color) => (
         <div key={color} className={`home-back-card home-back-card-${color}`} data-motion-layer={`card-${color}`}>
           <Nfc />
           <Image src="/brand/logo.svg" alt="" width={220} height={100} unoptimized />
@@ -53,6 +54,7 @@ export function HomeHeroScene() {
           </p>
         </div>
       </div>
+      <HomeNfcKeychain />
       <div className="home-scene-phone" data-motion-layer="phone">
         <Image
           className="home-phone-shell"
