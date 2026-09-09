@@ -2,23 +2,9 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #2e2c29;
+  background: #30231e;
   color: #f4eee7;
   padding: 76px 6% 26px;
-}
-.brand-footer::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  right: -35px;
-  top: 0;
-  width: 340px;
-  height: 300px;
-  background: radial-gradient(circle, #e1c6ad 2.5px, transparent 3px) 0 0 / 15px
-    15px;
-  opacity: 0.12;
-  mask-image: radial-gradient(ellipse at 90% 0, black, transparent 72%);
 }
 .brand-footer-inner {
   max-width: 1280px;
@@ -158,8 +144,5 @@
   .brand-footer-bottom > div {
     flex-wrap: wrap;
     gap: 12px 24px;
-  }
-  .brand-footer::after {
-    width: 220px;
   }
 }
