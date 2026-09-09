@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { orderProgress, submissionTime } from '@/lib/order-progress';
 import {
   LayoutDashboard,
   Boxes,
@@ -86,6 +87,12 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
     [editing, setEditing] = useState<Agent | ManagedPlan | null>(null),
     [editKind, setEditKind] = useState('agent'),
     [stock, setStock] = useState<Product | null>(null);
+  const [progressHours, setProgressHours] = useState(48);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(timer);
+  }, []);
   const [stockMode, setStockMode] = useState('entry');
   const [stockAgent, setStockAgent] = useState('');
   const [agentId, setAgentId] = useState(''),
@@ -183,7 +190,11 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
         'Valor MZN',
         'Custo MZN',
         'Agente',
-        'Data',
+        'Data (UTC)',
+        'Submetido (Maputo)',
+        'Progresso',
+        'Tempo decorrido',
+        'Prazo de referência (horas)',
       ],
       ...orderRows.map((o) => [
         o.id,
@@ -193,6 +204,10 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
         String(o.cost / 100),
         o.agent,
         o.createdAt,
+        submissionTime(o.createdAt),
+        orderProgress(o, now, progressHours).label,
+        orderProgress(o, now, progressHours).elapsed,
+        String(progressHours),
       ]),
     ];
     const csv = rows
@@ -223,6 +238,8 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
         <thead>
           <tr>
             <th>Pedido / cliente</th>
+            <th>Submetido (Maputo)</th>
+            <th>Progresso</th>
             <th>Estado</th>
             <th>Pagamento</th>
             <th>Valor</th>
@@ -242,6 +259,23 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   <small>
                     #{o.id.slice(0, 8)} · {o.profile?.name ?? o.ownerId}
                   </small>
+                </td>
+                <td>
+                  <time dateTime={o.createdAt}>
+                    {submissionTime(o.createdAt)}
+                  </time>
+                </td>
+                <td>
+                  <span
+                    className={`manager-progress manager-progress-${orderProgress(o, now, progressHours).tone}`}
+                  >
+                    {orderProgress(o, now, progressHours).label}
+                  </span>
+                  {orderProgress(o, now, progressHours).elapsed && (
+                    <small>
+                      Há {orderProgress(o, now, progressHours).elapsed}
+                    </small>
+                  )}
                 </td>
                 <td>
                   <span className="manager-badge">{orderLabels[o.status]}</span>
@@ -536,6 +570,30 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                       </select>
                     )}
                   </div>
+                  {tab === 'orders' && (
+                    <div className="manager-toolbar">
+                      <p className="manager-muted">
+                        Em atraso: pedido por concluir há mais de{' '}
+                        {progressHours} horas desde a submissão. Referência de
+                        acompanhamento, não prazo de entrega contratado.
+                      </p>
+                      <label>
+                        Prazo de referência
+                        <select
+                          value={progressHours}
+                          onChange={(e) =>
+                            setProgressHours(Number(e.target.value))
+                          }
+                        >
+                          {[24, 48, 72, 120, 168].map((h) => (
+                            <option key={h} value={h}>
+                              {h} horas
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+                  )}
                   <section className="manager-card">
                     {tab === 'orders' ? (
                       table
@@ -911,6 +969,17 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   {orderLabels[selected.status]}
                 </span>{' '}
                 · {money(selected.amount)}
+              </p>
+              <p>
+                Submetido:{' '}
+                <time dateTime={selected.createdAt}>
+                  {submissionTime(selected.createdAt)}
+                </time>{' '}
+                (Maputo)
+              </p>
+              <p>
+                Progresso: {orderProgress(selected, now, progressHours).label} ·
+                Referência: {progressHours} horas
               </p>
               <p>Agente: {selected.agent || 'Por atribuir'}</p>
               {selected.profile && (
