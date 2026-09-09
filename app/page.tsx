@@ -133,8 +133,11 @@ export default function Home() {
           </h2>
           <div className="home-about-content">
             <p className="home-about-intro">
-              Fazer do toque a linguagem universal da identidade, para cada
-              pessoa e cada instituição à qual pertencem.
+              A Framy Connect transforma cartões, etiquetas e pulseiras em
+              identidades digitais instantâneas. Com um simples toque, pessoas e
+              organizações podem partilhar e comprovar quem são, o que
+              conquistaram e o que representam, de forma simples, confiável e
+              acessível.
             </p>
             <div className="home-purpose-grid">
               <article>
@@ -143,8 +146,8 @@ export default function Home() {
                 </span>
                 <h3>VISÃO</h3>
                 <p>
-                  Um mundo onde cada pessoa pode apresentar quem é e partilhar o
-                  que representa, num único toque.
+                  Fazer do toque a linguagem universal da identidade, para cada
+                  pessoa e cada instituição à qual pertencem.
                 </p>
               </article>
               <article>
@@ -153,8 +156,9 @@ export default function Home() {
                 </span>
                 <h3>MISSÃO</h3>
                 <p>
-                  Ligar a sua identidade ao mundo físico através de produtos NFC
-                  e perfis digitais simples de actualizar e partilhar.
+                  Transformar cada toque numa conexão de confiança, tornando
+                  identidades, conquistas e pertenças instantaneamente
+                  acessíveis, verificáveis e universais.
                 </p>
               </article>
             </div>
