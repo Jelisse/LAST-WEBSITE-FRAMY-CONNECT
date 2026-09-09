@@ -63,8 +63,10 @@ export async function GET() {
     return json({ error: 'Não foi possível carregar o Manager.' }, 503);
   }
 }
-const reservedSQL =
+const allReservedSQL =
   "SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('QUEUED','IN_PRODUCTION','READY')";
+const reservedSQL =
+  "SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('QUEUED','IN_PRODUCTION','READY') AND COALESCE(json_extract(data_json,'$.agentId'),'')=? AND COALESCE(json_extract(data_json,'$.agentId'),'')<>''";
 export async function POST(request: Request) {
   try {
     const user = await authorized();
@@ -150,7 +152,7 @@ export async function POST(request: Request) {
         );
       return json({ ok: true });
     }
-    if (b.action === 'stock') {
+    if (b.action === 'stock' || b.action === 'stock-transfer') {
       const productId = text('productId', 70),
         quantity = integer('quantity', -100000, 100000),
         reason = text('reason', 250),
@@ -159,32 +161,78 @@ export async function POST(request: Request) {
         throw Error('Movimento inválido.');
       if (!(await getProducts()).some((p) => p.id === productId))
         throw Error('Produto inválido.');
-      const result = await db.batch([
+      const destination = typeof b.agentId === 'string' ? b.agentId : '';
+      const source = typeof b.fromAgentId === 'string' ? b.fromAgentId : '';
+      for (const location of new Set([destination, source]))
+        if (location) {
+          const row = await db
+            .prepare(
+              "SELECT data_json FROM manager_records WHERE id=? AND kind='agent'",
+            )
+            .bind(location)
+            .first<{ data_json: string }>();
+          if (
+            !row ||
+            (location === destination && !JSON.parse(row.data_json).active)
+          )
+            throw Error('Seleccione um agente activo para receber stock.');
+        }
+      const transfer = b.action === 'stock-transfer';
+      if (transfer && (quantity < 1 || source === destination))
+        throw Error('Seleccione origens diferentes e uma quantidade positiva.');
+      const location = transfer ? source : destination;
+      const delta = transfer ? -quantity : quantity;
+      const statements = [
         db
           .prepare(
-            `INSERT OR IGNORE INTO stock_movements SELECT ?,?,?,?,?,? WHERE COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)+? >= (${reservedSQL})`,
+            `INSERT OR IGNORE INTO stock_movements(id,product_id,quantity,reason,actor,created_at,agent_id) SELECT ?,?,?,?,?,?,? WHERE COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=? AND agent_id=?),0)+? >= (${reservedSQL}) AND (?=1 OR COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)+? >= (${allReservedSQL}))`,
           )
           .bind(
             id,
             productId,
-            quantity,
+            delta,
             reason,
             user.userId,
             now,
+            location,
+            productId,
+            location,
+            delta,
+            productId,
+            location,
+            transfer ? 1 : 0,
             productId,
             quantity,
             productId,
           ),
         audit(
-          'Movimento de stock',
+          transfer ? 'Transferência de stock' : 'Movimento de stock',
           productId + ': ' + quantity + ' · ' + reason,
         ),
-      ]);
+      ];
+      if (transfer)
+        statements.push(
+          db
+            .prepare(
+              'INSERT INTO stock_movements(id,product_id,quantity,reason,actor,created_at,agent_id) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM manager_audit WHERE id=?)',
+            )
+            .bind(
+              id + '-received',
+              productId,
+              quantity,
+              reason,
+              user.userId,
+              now,
+              destination,
+              eventId,
+            ),
+        );
+      const result = await db.batch(statements);
       if (!result[0].meta.changes)
         return json(
           {
             error:
-              'Movimento repetido ou stock insuficiente para as reservas existentes.',
+              'Movimento repetido ou stock disponível insuficiente na origem.',
           },
           409,
         );
@@ -225,13 +273,39 @@ export async function POST(request: Request) {
       let guard = '',
         args: (string | number)[] = [];
       if (step === 'pay') {
-        guard = ` AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)>(${reservedSQL})`;
+        guard = ` AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)>(${allReservedSQL})`;
         args = [order.productId, order.productId];
+      }
+      let moveReserved = false;
+      if (step === 'assign' && b.agentId !== order.agentId) {
+        const target = String(b.agentId),
+          source = order.agentId ?? '';
+        const balance = await db
+          .prepare(
+            `SELECT COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=? AND agent_id=?),0)-(${reservedSQL}) AS available`,
+          )
+          .bind(order.productId, target, order.productId, target)
+          .first<{ available: number }>();
+        moveReserved = (balance?.available ?? 0) < 1;
+        if (moveReserved) {
+          guard = ` AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=? AND agent_id=?),0)>=(${reservedSQL}) AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=? AND agent_id=?),0)>0`;
+          args = [
+            order.productId,
+            source,
+            order.productId,
+            source,
+            order.productId,
+            source,
+          ];
+        } else {
+          guard = ` AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=? AND agent_id=?),0)>(${reservedSQL})`;
+          args = [order.productId, target, order.productId, target];
+        }
       }
       if (step === 'deliver') {
         guard =
-          ' AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)>0';
-        args = [order.productId];
+          ' AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=? AND agent_id=?),0)>0';
+        args = [order.productId, order.agentId ?? ''];
       }
       const statements = [
         db
@@ -249,11 +323,33 @@ export async function POST(request: Request) {
           )
           .bind(crypto.randomUUID(), row.owner_id, id, step, now, eventId),
       );
+      if (moveReserved) {
+        for (const [suffix, quantity, location] of [
+          ['out', -1, order.agentId ?? ''],
+          ['in', 1, String(b.agentId)],
+        ] as const)
+          statements.push(
+            db
+              .prepare(
+                'INSERT INTO stock_movements(id,product_id,quantity,reason,actor,created_at,agent_id) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM manager_audit WHERE id=?)',
+              )
+              .bind(
+                eventId + '-' + suffix,
+                order.productId,
+                quantity,
+                'Atribuição do pedido #' + id,
+                user.userId,
+                now,
+                location,
+                eventId,
+              ),
+          );
+      }
       if (step === 'deliver')
         statements.push(
           db
             .prepare(
-              'INSERT INTO stock_movements SELECT ?,?,-1,?,?,? WHERE EXISTS(SELECT 1 FROM manager_audit WHERE id=?)',
+              'INSERT INTO stock_movements(id,product_id,quantity,reason,actor,created_at,agent_id) SELECT ?,?,-1,?,?,?,? WHERE EXISTS(SELECT 1 FROM manager_audit WHERE id=?)',
             )
             .bind(
               'delivery-' + id,
@@ -261,6 +357,7 @@ export async function POST(request: Request) {
               'Entrega #' + id,
               user.userId,
               now,
+              order.agentId ?? '',
               eventId,
             ),
         );

@@ -178,6 +178,93 @@ assert.equal(
 assert.ok(
   !(await request('/api/workspace')).data.plans.some((p) => p.id === planId),
 );
+assert.equal(
+  (await request('/api/manager', { ...agent, version: 1, active: false }))
+    .status,
+  200,
+);
+assert.equal(
+  (
+    await request('/api/manager', {
+      action: 'stock',
+      id: crypto.randomUUID(),
+      productId,
+      agentId,
+      quantity: 1,
+      reason: 'QA ' + suffix,
+    })
+  ).status,
+  422,
+  'Inactive agent cannot receive stock',
+);
+assert.equal(
+  (await request('/api/manager', { ...agent, version: 2, active: true }))
+    .status,
+  200,
+);
+assert.equal(
+  (
+    await request('/api/manager', {
+      action: 'stock',
+      id: crypto.randomUUID(),
+      productId,
+      quantity: 5,
+      reason: 'QA ' + suffix,
+    })
+  ).status,
+  200,
+);
+const transfer = {
+  action: 'stock-transfer',
+  id: crypto.randomUUID(),
+  productId,
+  agentId,
+  quantity: 3,
+  reason: 'QA ' + suffix,
+};
+assert.equal((await request('/api/manager', transfer)).status, 200);
+assert.equal(
+  (await request('/api/manager', transfer)).status,
+  409,
+  'Transfer replay blocked',
+);
+assert.equal(
+  (await request('/api/manager', { ...transfer, id: crypto.randomUUID() }))
+    .status,
+  409,
+  'Cannot transfer more than central stock',
+);
+const transferred = (await request('/api/manager')).data.movements.filter(
+  (m) => m.product_id === productId,
+);
+assert.equal(
+  transferred
+    .filter((m) => m.agent_id === agentId)
+    .reduce((n, m) => n + m.quantity, 0),
+  3,
+);
+assert.equal(
+  transferred.filter((m) => !m.agent_id).reduce((n, m) => n + m.quantity, 0),
+  2,
+);
+assert.equal(
+  (await request('/api/manager', { ...agent, version: 3, active: false }))
+    .status,
+  200,
+);
+assert.equal(
+  (
+    await request('/api/manager', {
+      ...transfer,
+      id: crypto.randomUUID(),
+      agentId: '',
+      fromAgentId: agentId,
+      quantity: 3,
+    })
+  ).status,
+  200,
+  'Inactive agent stock can return to central',
+);
 console.log(
   'PASS: Manager access, CSRF, product creation, agent versioning, stock reservations, complete order flow, customer timeline and dynamic plans.',
 );

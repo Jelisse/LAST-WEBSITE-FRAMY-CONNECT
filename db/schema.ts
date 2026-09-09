@@ -59,6 +59,7 @@ export const managerRecords = sqliteTable('manager_records', {
   updatedAt: text('updated_at').notNull(),
 });
 export const stockMovements = sqliteTable('stock_movements', {
+  agentId: text('agent_id').notNull().default(''),
   id: text('id').primaryKey(),
   productId: text('product_id').notNull(),
   quantity: integer('quantity').notNull(),

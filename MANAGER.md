@@ -17,3 +17,6 @@ Overview and finance can filter orders by creation date and export CSV. Revenue 
 
 ## Verification
 `node tests/manager-api.mjs` creates removable QA fixtures and checks authorization, CSRF, new products, agent optimistic versions, stock reservation/delivery, customer event propagation and active plans. It writes `outputs/manager-test-cleanup.sql`; apply that file to the local DB afterwards to remove only those fixtures. `node tests/orders-readonly-api.mjs` verifies customer mutation blocking. Use the Manager test for the new fulfilment flow; the historical smoke script assumes untracked stock and is not the current workflow test.
+
+## Agent stock custody
+Migration 0005 adds stock custody by stable agent ID; existing movements remain central. Manager can deactivate/reactivate agents, add quantities to central or an active agent, allocate central stock, and return stock from active or inactive agents. Transfers use atomic paired ledger entries and do not change total quantity. Assigned reservations cannot be transferred away; unassigned paid orders reserve globally. Order assignment uses available agent stock or transfers its reserved central unit automatically. Delivery deducts from the assigned agent. Existing agent stock and history remain visible after deactivation.

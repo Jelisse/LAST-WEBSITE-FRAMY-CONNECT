@@ -42,6 +42,7 @@ type Agent = {
 };
 type Order = SandboxOrder & { ownerId: string; profile: Profile | null };
 type Movement = {
+  agent_id: string;
   id: string;
   product_id: string;
   quantity: number;
@@ -85,6 +86,8 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
     [editing, setEditing] = useState<Agent | ManagedPlan | null>(null),
     [editKind, setEditKind] = useState('agent'),
     [stock, setStock] = useState<Product | null>(null);
+  const [stockMode, setStockMode] = useState('entry');
+  const [stockAgent, setStockAgent] = useState('');
   const [agentId, setAgentId] = useState(''),
     [proof, setProof] = useState(''),
     [qc, setQc] = useState(false);
@@ -583,6 +586,20 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                                     >
                                       Editar
                                     </button>
+                                    <button
+                                      className="manager-secondary"
+                                      style={{ marginLeft: 12 }}
+                                      disabled={busy}
+                                      onClick={() =>
+                                        void save({
+                                          ...a,
+                                          action: 'agent',
+                                          active: !a.active,
+                                        })
+                                      }
+                                    >
+                                      {a.active ? 'Desactivar' : 'Reactivar'}
+                                    </button>
                                   </td>
                                 </tr>
                               ))}
@@ -603,6 +620,17 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                           Registe o stock inicial antes de confirmar novos
                           pagamentos.
                         </p>
+                        <button
+                          className="manager-primary"
+                          disabled={!data.products.length}
+                          onClick={() => {
+                            setStockMode('entry');
+                            setStockAgent('');
+                            setStock(data.products[0]);
+                          }}
+                        >
+                          <Plus size={16} /> Adicionar stock
+                        </button>
                         <div className="manager-table-scroll">
                           <table>
                             <thead>
@@ -638,12 +666,76 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                                       </span>
                                     </td>
                                     <td>
-                                      <button onClick={() => setStock(p)}>
-                                        Registar movimento
+                                      <button
+                                        onClick={() => {
+                                          setStockMode('entry');
+                                          setStockAgent('');
+                                          setStock(p);
+                                        }}
+                                      >
+                                        Adicionar / atribuir
                                       </button>
                                     </td>
                                   </tr>
                                 ))}
+                            </tbody>
+                          </table>
+                        </div>
+                        <h3>Stock por agente</h3>
+                        <p className="manager-muted">
+                          As reservas de pedidos sem agente estão incluídas no
+                          total do produto. Ao atribuir um pedido, a unidade
+                          passa para o agente.
+                        </p>
+                        <div className="manager-table-scroll">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Local / agente</th>
+                                <th>Produto</th>
+                                <th>Físico</th>
+                                <th>Reservado</th>
+                                <th>Disponível</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {[
+                                { id: '', name: 'Stock central', active: true },
+                                ...data.agents,
+                              ].flatMap((a) =>
+                                data.products.map((p) => {
+                                  const physical = data.movements
+                                    .filter(
+                                      (m) =>
+                                        m.product_id === p.id &&
+                                        (m.agent_id ?? '') === a.id,
+                                    )
+                                    .reduce((n, m) => n + m.quantity, 0);
+                                  const reserved = data.orders.filter(
+                                    (o) =>
+                                      o.productId === p.id &&
+                                      !!o.agentId &&
+                                      (o.agentId ?? '') === a.id &&
+                                      [
+                                        'QUEUED',
+                                        'IN_PRODUCTION',
+                                        'READY',
+                                      ].includes(o.status),
+                                  ).length;
+                                  return physical || reserved ? (
+                                    <tr key={a.id + p.id}>
+                                      <td>
+                                        {a.name}
+                                        {!a.active ? ' · Inactivo' : ''}
+                                      </td>
+                                      <td>{p.name}</td>
+                                      <td>{physical}</td>
+                                      <td>{reserved}</td>
+                                      <td>{physical - reserved}</td>
+                                    </tr>
+                                  ) : null;
+                                }),
+                              )}
                             </tbody>
                           </table>
                         </div>
@@ -658,7 +750,16 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                                   (p) => p.id === m.product_id,
                                 )?.name ?? m.product_id}
                               </strong>
-                              <span>{m.reason}</span>
+                              <span>
+                                {m.reason}
+                                <small>
+                                  {m.agent_id
+                                    ? (data.agents.find(
+                                        (a) => a.id === m.agent_id,
+                                      )?.name ?? m.agent_id)
+                                    : 'Stock central'}
+                                </small>
+                              </span>
                               <small>
                                 {date(m.created_at)} · {m.actor}
                               </small>
@@ -1138,10 +1239,10 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
         }}
       >
         <DialogContent className="manager-dialog">
-          <DialogTitle>Movimento de stock</DialogTitle>
+          <DialogTitle>Adicionar ou atribuir stock</DialogTitle>
           <DialogDescription>
-            {stock?.name} · Quantidade positiva para entrada, negativa para
-            saída.
+            Registe novas unidades ou transfira stock existente sem alterar o
+            total.
           </DialogDescription>
           {stock && (
             <form
@@ -1149,7 +1250,9 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                 e.preventDefault();
                 const f = new FormData(e.currentTarget);
                 void save({
-                  action: 'stock',
+                  action: stockMode === 'entry' ? 'stock' : 'stock-transfer',
+                  agentId: stockMode === 'return' ? '' : stockAgent,
+                  fromAgentId: stockMode === 'return' ? stockAgent : '',
                   id: crypto.randomUUID(),
                   productId: stock.id,
                   quantity: Number(f.get('quantity')),
@@ -1164,12 +1267,69 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   </p>
                 )}
                 <label>
+                  Produto
+                  <select
+                    value={stock.id}
+                    onChange={(e) =>
+                      setStock(
+                        data!.products.find((p) => p.id === e.target.value)!,
+                      )
+                    }
+                  >
+                    {data?.products.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Operação
+                  <select
+                    value={stockMode}
+                    onChange={(e) => {
+                      setStockMode(e.target.value);
+                      setStockAgent('');
+                    }}
+                  >
+                    <option value="entry">Entrada de novo stock</option>
+                    <option value="assign">
+                      Atribuir stock central a um agente
+                    </option>
+                    <option value="return">
+                      Devolver stock de agente ao central
+                    </option>
+                  </select>
+                </label>
+                <label>
+                  {stockMode === 'return' ? 'Agente de origem' : 'Destino'}
+                  <select
+                    required={stockMode !== 'entry'}
+                    value={stockAgent}
+                    onChange={(e) => setStockAgent(e.target.value)}
+                  >
+                    <option value="">
+                      {stockMode === 'entry'
+                        ? 'Stock central'
+                        : 'Seleccionar agente'}
+                    </option>
+                    {data?.agents
+                      .filter((a) => a.active || stockMode === 'return')
+                      .map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.name}
+                          {!a.active ? ' · Inactivo' : ''}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+                <label>
                   Quantidade
                   <input
                     required
                     name="quantity"
                     type="number"
-                    min="-100000"
+                    min="1"
                     max="100000"
                     step="1"
                   />
