@@ -710,3 +710,33 @@
  .sharing-arrows { display:none; }
 }
 
+/* Reference composition: two staggered sharing scenes around one slim profile. */
+@media (min-width: 701px) {
+  .home-sharing > header { margin-bottom: 34px; }
+  .sharing-stage { display:block; aspect-ratio:1.72; max-width:1250px; padding-bottom:0; margin-bottom:34px; }
+  .sharing-method { position:absolute; left:0; top:0; width:40%; height:100%; aspect-ratio:auto; }
+  .sharing-method h3 { position:absolute; top:0; left:15%; margin:0; }
+  .sharing-method > .sharing-card { left:0; top:29%; width:52%; height:39%; transform:skewY(5deg); }
+  .sharing-method > .sharing-phone { right:auto; left:54%; top:7%; bottom:auto; width:46%; transform:rotate(-2deg); }
+  .sharing-wave { left:41%; top:26%; width:24%; }
+  .sharing-result { position:absolute; left:43%; top:9%; width:19%; margin:0; padding:9px; border-radius:21px; }
+  .sharing-result > span { position:absolute; top:100%; left:-15%; width:130%; padding-top:13px; }
+  .sharing-scan { left:66%; width:34%; }
+  .sharing-scan h3 { left:33%; }
+  .sharing-scan > .sharing-card { left:0; top:31%; width:66%; height:36%; transform:skewY(5deg); }
+  .sharing-scan > .sharing-phone { left:37%; top:15%; width:63%; transform:rotate(5deg); }
+  .sharing-method > p { top:auto; bottom:-3%; width:90%; max-width:310px; }
+  .sharing-arrows { bottom:3%; height:12%; }
+}
+@media (min-width:701px) and (max-width:950px) {
+  .sharing-method h3 { font-size:11px; padding:8px 10px; }
+  .sharing-method > p { font-size:10px; }
+  .sharing-result > span { font-size:9px; }
+}
+@media (max-width:700px) {
+  .sharing-stage { column-gap:22px; }
+  .sharing-method > .sharing-phone { width:62%; right:-3%; bottom:3%; }
+  .sharing-method > .sharing-card { width:61%; top:35%; height:37%; left:-2%; }
+  .sharing-scan > .sharing-phone { bottom:-2%; }
+  .sharing-result { width:48%; margin-top:40px; }
+}
