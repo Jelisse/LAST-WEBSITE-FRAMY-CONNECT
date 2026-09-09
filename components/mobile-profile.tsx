@@ -178,7 +178,11 @@ export function MobileProfile({
             {profile.title || 'O seu título ou profissão'}
           </p>
           {profile.bio && <p className="mobile-profile-bio">{profile.bio}</p>}
-          <nav className="mobile-profile-links" aria-label="Links do perfil">
+          <nav
+            className="mobile-profile-links"
+            aria-label="Links do perfil — deslize para ver mais"
+            tabIndex={0}
+          >
             {links.map((link, index) => (
               <a
                 key={index}

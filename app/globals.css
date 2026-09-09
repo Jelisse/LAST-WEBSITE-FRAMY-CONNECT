@@ -2399,6 +2399,7 @@ summary {
 }
 .mobile-profile-frame {
   width: 100%;
+  height: 100%;
   container-type: inline-size;
 }
 .mobile-identity-page {
@@ -2408,7 +2409,7 @@ summary {
   background: #d95a00;
   color: #fff;
   font-family: var(--font-poppins), 'Poppins', sans-serif;
-  min-height: 216.7cqw;
+  height: 100%;
 }
 .profile-preview-column .mobile-identity-page {
   border-radius: 0;
@@ -2417,7 +2418,7 @@ summary {
 .mobile-portrait {
   position: absolute;
   inset: 0 0 auto;
-  height: 112cqw;
+  height: 53%;
   z-index: -2;
 }
 .mobile-portrait::after {
@@ -2455,14 +2456,20 @@ summary {
 .mobile-profile-wave {
   position: absolute;
   z-index: -1;
-  inset: 101cqw 0 0;
+  inset: 40% 0 0;
   background: url('/brand/profile-dots.svg') center top / 100% auto repeat-y;
   pointer-events: none;
 }
 .mobile-profile-body {
-  position: relative;
-  padding: 90cqw 4cqw 9cqw;
+  position: absolute;
+  inset: 40% 0 0;
+  padding: 0 4cqw max(6cqw, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
   text-align: center;
+}
+.mobile-profile-body > :not(.mobile-profile-links) {
+  flex-shrink: 0;
 }
 .mobile-profile-body > h1,
 .mobile-profile-body > h2 {
@@ -2489,12 +2496,29 @@ summary {
   max-width: 80cqw;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 .mobile-profile-links {
   width: 59cqw;
   margin: 0 auto;
   display: grid;
   gap: 1.4cqw;
+  flex: 1 1 0;
+  min-height: 0;
+  align-content: start;
+  grid-auto-rows: max-content;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff80 transparent;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-profile-links:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 3px;
 }
 .mobile-profile-links a {
   display: flex;
@@ -2539,7 +2563,7 @@ summary {
   align-items: center;
   justify-content: space-between;
   width: 59cqw;
-  margin: 5cqw auto 0;
+  margin: 3cqw auto 0;
 }
 .mobile-profile-actions button {
   display: grid;
@@ -2568,14 +2592,14 @@ summary {
   outline-offset: 4px;
 }
 .mobile-profile-footer {
-  margin: 9.5cqw auto 0;
+  margin: 3cqw auto 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.7cqw;
 }
 .mobile-profile-footer img {
-  width: 36cqw;
+  width: 27cqw;
   height: auto;
   filter: brightness(0) invert(1);
 }
@@ -2584,18 +2608,26 @@ summary {
   color: #ffffffc4;
 }
 .mobile-profile-message {
-  display: block;
-  margin: 4cqw auto 0;
+  position: absolute;
+  z-index: 4;
+  bottom: 3cqw;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  padding: 2cqw 3cqw;
+  border-radius: 2cqw;
+  background: #873800;
   max-width: 75cqw;
   font-size: 3cqw;
   overflow-wrap: anywhere;
 }
 .standalone-mobile-profile {
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
   background: #d95a00;
 }
 .standalone-mobile-profile > .mobile-profile-frame {
-  max-width: 600px;
+  max-width: min(600px, 60dvh);
   margin-inline: auto;
 }
 .profile-qr-dialog {
@@ -2785,29 +2817,15 @@ summary {
   background: #000;
   transform: translateZ(0);
 }
-.iphone-screen-scroll {
+.iphone-screen {
   position: absolute;
   inset: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
   border-radius: inherit;
 }
-.iphone-screen-scroll::-webkit-scrollbar {
-  display: none;
-}
-.iphone-screen-scroll:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: -4px;
-}
-.iphone-screen-scroll .mobile-identity-page {
+.iphone-screen .mobile-identity-page {
   box-shadow: none;
   border-radius: 0;
-}
-.iphone-screen-scroll .mobile-profile-body {
-  padding-bottom: 14cqw;
 }
 .iphone-status {
   position: absolute;

@@ -20,10 +20,9 @@ export function IPhonePreview({ children }: { children: ReactNode }) {
             </span>
           </div>
           <div
-            className="iphone-screen-scroll"
-            tabIndex={0}
+            className="iphone-screen"
             role="region"
-            aria-label="Pré-visualização do perfil no iPhone 17. Desloque para ver todo o perfil."
+            aria-label="Pré-visualização do perfil no iPhone 17"
           >
             {children}
           </div>
@@ -33,7 +32,7 @@ export function IPhonePreview({ children }: { children: ReactNode }) {
         </div>
       </div>
       <p className="iphone-preview-caption">
-        iPhone 17 <span>·</span> Deslize para ver o perfil
+        iPhone 17 <span>·</span> Deslize na lista para ver mais links
       </p>
     </div>
   );
