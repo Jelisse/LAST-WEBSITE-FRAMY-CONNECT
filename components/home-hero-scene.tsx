@@ -21,7 +21,8 @@ export function HomeHeroScene() {
       </div>
       <div className="home-scene-card" data-motion-layer="card">
         <Image
-          src="/home/nfc-card-blank.png"
+          className="home-card-surface"
+          src="/home/nfc-card-matte.png"
           alt=""
           width={1024}
           height={1536}

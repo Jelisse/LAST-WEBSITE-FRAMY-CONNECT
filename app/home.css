@@ -144,6 +144,31 @@
   perspective: 1400px;
   align-self: end;
 }
+.home-hero-scene::before,
+.home-hero-scene::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  top: 78.8%;
+  height: 4%;
+  background: radial-gradient(
+    ellipse,
+    #40201566,
+    #40201520 45%,
+    transparent 72%
+  );
+  filter: blur(2px);
+  transform: skewY(6deg);
+}
+.home-hero-scene::before {
+  left: 57%;
+  width: 39%;
+}
+.home-hero-scene::after {
+  left: 18%;
+  width: 36%;
+}
 .home-scene-base,
 .home-scene-phone,
 .home-scene-card {
@@ -170,8 +195,15 @@
   bottom: 16%;
   z-index: 2;
   transform-origin: 50% 93%;
-  transform: rotateY(-22deg) rotateZ(6deg) var(--card-motion, translateZ(0));
-  filter: drop-shadow(5px 4px 3px #81300040);
+  transform: skewY(6deg) scaleX(0.94) var(--card-motion, translateZ(0));
+  filter: drop-shadow(2px 2px 2px #49250f30);
+}
+.home-card-surface {
+  /* Clip the generated asset to its matte face and rounded physical edge. */
+  clip-path: inset(6.8% 9% 7.4% 9% round 8% / 5%);
+}
+.home-phone-shell {
+  filter: brightness(0.8) saturate(0.65);
 }
 .home-scene-phone {
   width: 40%;
@@ -179,8 +211,8 @@
   bottom: 18%;
   z-index: 3;
   transform-origin: 50% 97.5%;
-  transform: rotateY(-10deg) rotateZ(-2deg) var(--phone-motion, translateZ(0));
-  filter: drop-shadow(5px 4px 3px #81300050);
+  transform: skewY(6deg) scaleX(0.96) var(--phone-motion, translateZ(0));
+  filter: drop-shadow(3px 3px 3px #35251a35);
 }
 .home-phone-display {
   position: absolute;
@@ -216,7 +248,7 @@
   left: 12%;
   width: 76%;
   margin: 0;
-  font-size: 2.4cqw;
+  font-size: 1.6cqw;
   line-height: 1.45;
   font-weight: 400;
   text-align: center;
