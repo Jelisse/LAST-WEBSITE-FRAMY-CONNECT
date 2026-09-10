@@ -126,9 +126,7 @@ export default async function Home() {
         <HomeSharingScene />
         <section className="home-about" id="sobre">
           <h2>
-            Quem
-            <br />
-            Somos
+            Quem somos<span aria-hidden="true">.</span>
           </h2>
           <div className="home-about-content">
             <p className="home-about-intro">
@@ -143,7 +141,7 @@ export default async function Home() {
                 <span className="home-purpose-icon">
                   <Eye />
                 </span>
-                <h3>VISÃO</h3>
+                <h3>Visão</h3>
                 <p>
                   Fazer do toque a linguagem universal da identidade, para cada
                   pessoa e cada instituição à qual pertencem.
@@ -153,7 +151,7 @@ export default async function Home() {
                 <span className="home-purpose-icon">
                   <Target />
                 </span>
-                <h3>MISSÃO</h3>
+                <h3>Missão</h3>
                 <p>
                   Transformar cada toque numa conexão de confiança, tornando
                   identidades, conquistas e pertenças instantaneamente
