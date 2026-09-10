@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "framy-connect-staging",
+  "main": "vinext/server/fetch-handler",
+  "compatibility_date": "2026-09-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "framy-connect-staging",
+      "database_id": "d53a1009-119e-41c2-9f05-db685dc9a0f4"
+    }
+  ]
+}
