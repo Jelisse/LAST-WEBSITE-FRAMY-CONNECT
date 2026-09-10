@@ -320,10 +320,11 @@ export default async function Home() {
         <section className="home-how" id="primeiros-passos">
           <h2>Pronto para a próxima conexão?</h2>
           <p>
-            Comece pelo seu perfil. Depois, escolha o produto que o acompanha.
+            Escolha o seu produto. Depois, seleccione o plano e personalize o
+            seu perfil.
           </p>
-          <Link className="home-primary" href="/perfil">
-            Criar a minha identidade <ArrowUpRight size={18} />
+          <Link className="home-primary" href="/produtos">
+            Escolher o meu produto <ArrowUpRight size={18} />
           </Link>
         </section>
       </main>

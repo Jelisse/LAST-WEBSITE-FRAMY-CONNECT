@@ -74,6 +74,7 @@ import {
   publicProfile,
 } from '@/lib/domain';
 import { validateDelivery } from '@/lib/delivery';
+import { CustomerOrders, OrderProgressLine } from './customer-orders';
 import { DeliveryEditor } from './delivery-editor';
 import { usernameFromName } from '@/lib/domain';
 import { money } from '@/lib/catalog';
@@ -902,7 +903,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                       </h2>
                       <p className="muted">
                         {tab === 'orders'
-                          ? 'Indique o local de entrega em cada pedido e acompanhe o pagamento, a produção e a entrega.'
+                          ? 'Veja em que etapa está cada pedido e consulte o histórico, do pagamento à entrega.'
                           : tab === 'operations'
                             ? 'Atribua um agente e acompanhe os pedidos de teste até à entrega.'
                             : 'Abra um pedido atribuído, inicie a produção e conclua o controlo de qualidade.'}
@@ -965,7 +966,15 @@ export function Workspace({ displayName }: { displayName: string }) {
                         ))}
                     </fieldset>
                   )}
-                  {orderTable}
+                  {tab === 'orders' ? (
+                    <CustomerOrders
+                      orders={orders}
+                      events={data?.events ?? []}
+                      onOpen={inspect}
+                    />
+                  ) : (
+                    orderTable
+                  )}
                 </>
               )}
               {['finance', 'ceo'].includes(tab) && (
@@ -1133,19 +1142,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                   {error}
                 </p>
               )}
-              <div className="order-timeline">
-                {Object.entries(orderLabels)
-                  .filter(([k]) => k !== 'CANCELLED')
-                  .map(([k, v], i) => (
-                    <span
-                      key={k}
-                      className={selected.status === k ? 'current' : ''}
-                    >
-                      <b>{i + 1}</b>
-                      {v}
-                    </span>
-                  ))}
-              </div>
+              <OrderProgressLine order={selected} />
               <section aria-label="Histórico do pedido">
                 <h3>Histórico do pedido</h3>
                 <ol>
