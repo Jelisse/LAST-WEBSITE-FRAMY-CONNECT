@@ -168,6 +168,8 @@ export function Workspace({ displayName }: { displayName: string }) {
             ),
           );
         }
+        if (new URLSearchParams(window.location.search).get('plans') === '1')
+          setPlansOpen(true);
         const submittedId = new URLSearchParams(window.location.search).get(
           'order',
         );

@@ -5,45 +5,88 @@ import {
   ArrowUpRight,
   Eye,
   Target,
-  Star,
-  BriefcaseBusiness,
-  Store,
-  Building2,
-  UsersRound,
   Nfc,
-  ShieldCheck,
   Smartphone,
+  RefreshCw,
 } from 'lucide-react';
 import { SiteFooter } from '@/components/site-shell';
 import { HomeHeroScene } from '@/components/home-hero-scene';
 import { HomeSharingScene } from '@/components/home-sharing-scene';
-
 import { getProducts } from '@/lib/server-catalog';
+import { getManagedPlans } from '@/lib/server-plans';
+import { money } from '@/lib/catalog';
 import './home.css';
 
+const productNames: Record<string, string> = {
+  'PVC Business Cards': 'Cartão NFC em PVC',
+  'Wooden Business Cards': 'Cartão NFC em madeira',
+  'Metal NFC Card': 'Cartão NFC em metal',
+  'NFC Keychain': 'Porta-chaves NFC',
+  'NFC Tag': 'Etiqueta NFC',
+  'NFC Sticker': 'Autocolante NFC',
+  'NFC Bracelet': 'Pulseira NFC',
+  'Smart Event Badge': 'Crachá para eventos',
+  'Restaurant QR Menu': 'Menu digital QR',
+  'Google Review Stand': 'Suporte de avaliações Google',
+  'Digital Catalog': 'Catálogo digital',
+  'Employee Card': 'Cartão de colaborador',
+};
 const audiences = [
-  { name: 'Indivíduos', text: 'Este sou eu.', icon: Star },
-  {
-    name: 'Criadores',
-    text: 'Este é o meu trabalho, segue-me.',
-    icon: BriefcaseBusiness,
-  },
-  {
-    name: 'Profissionais',
-    text: 'Esta é a minha credencial, confie nela.',
-    icon: Store,
-  },
-  { name: 'Instituições', text: 'Este é quem pertence aqui.', icon: Building2 },
-  {
-    name: 'Organizações',
-    text: 'Este é quem nos representa.',
-    icon: UsersRound,
-  },
+  [
+    'Indivíduos',
+    'Reúna os seus contactos e partilhe-os nas conversas do dia a dia.',
+  ],
+  [
+    'Criadores',
+    'Dê acesso às suas redes sociais, vídeos e portefólio num único perfil.',
+  ],
+  [
+    'Profissionais',
+    'Apresente o seu trabalho e facilite o contacto depois de cada encontro.',
+  ],
+  [
+    'Instituições',
+    'Organize os links e os recursos que quer disponibilizar à sua comunidade.',
+  ],
+  [
+    'Organizações',
+    'Apresente a equipa, os serviços e os contactos da sua organização.',
+  ],
 ];
-
+const questions = [
+  [
+    'Preciso de instalar uma aplicação?',
+    'Quem recebe o seu perfil pode abri-lo no navegador. Para partilhar por toque, o telemóvel precisa de ser compatível com NFC. O código QR oferece outra forma de acesso.',
+  ],
+  [
+    'Posso actualizar os meus contactos?',
+    'Sim. Pode editar a fotografia, os contactos e os links em A minha identidade. O endereço do perfil mantém-se, para continuar a usar o mesmo cartão.',
+  ],
+  [
+    'O produto inclui uma subscrição?',
+    'Os produtos físicos e os planos digitais são apresentados separadamente. A inclusão de um plano na compra e as condições comerciais serão confirmadas antes do lançamento.',
+  ],
+  [
+    'Como indico o local de entrega?',
+    'Antes de submeter o pedido, indique a cidade ou localidade de entrega. Pode acrescentar o bairro e um ponto de referência. A equipa usa essa informação para organizar a entrega; confirme a cobertura e o prazo antes da compra.',
+  ],
+  [
+    'O perfil comprova uma identidade ou credencial?',
+    'O perfil apresenta a informação partilhada pelo seu titular. A presença de informação no perfil não constitui, por si só, uma verificação de identidade ou certificação de credenciais.',
+  ],
+];
 export const dynamic = 'force-dynamic';
 export default async function Home() {
-  const products = await getProducts();
+  const [products, allPlans] = await Promise.all([
+    getProducts(),
+    getManagedPlans(),
+  ]);
+  const featured = [...products]
+    .sort((a, b) => Number(b.available) - Number(a.available))
+    .slice(0, 4);
+  const plans = allPlans
+    .filter((p) => p.active)
+    .sort((a, b) => a.dollars - b.dollars);
   return (
     <div className="framy-home">
       <header className="home-nav">
@@ -58,20 +101,15 @@ export default async function Home() {
           />
         </Link>
         <nav aria-label="Navegação principal">
-          <Link href="/" aria-current="page">
-            Página Inicial
-          </Link>
-          <a href="#sobre">Sobre nós</a>
+          <a href="#como-funciona">Como funciona</a>
           <a href="#produtos">Produtos</a>
-          <Link href="/contacto">Contacto</Link>
+          <a href="#planos">Planos</a>
+          <a href="#sobre">Sobre nós</a>
         </nav>
         <div className="home-nav-actions">
           <AccountMenu className="home-account" />
           <Link className="home-buy" href="/produtos">
-            Compre agora
-          </Link>
-          <Link className="home-agent" href="/aplicar">
-            Torne-se agente
+            Ver produtos <ArrowUpRight size={16} />
           </Link>
         </div>
       </header>
@@ -84,18 +122,18 @@ export default async function Home() {
                 <br />
                 Num Toque.
               </h1>
-              <h2>
-                An entire identity,
-                <br />
-                instantly.
-              </h2>
+              <p className="home-offer">
+                Cartões e acessórios NFC que partilham o seu perfil digital por
+                toque ou QR.
+              </p>
               <p>
-                Quem você é. O que conquistou. O que representa. Tudo acessível,
-                partilhável e pronto para ser descoberto, num único toque.
+                Os seus contactos, redes sociais e trabalho num só lugar.
+                Escolha o formato que o acompanha e actualize o perfil sempre
+                que precisar.
               </p>
               <div className="home-hero-actions">
                 <Link className="home-primary" href="/produtos">
-                  Compre agora <ArrowUpRight size={18} />
+                  Escolher o meu produto <ArrowUpRight size={18} />
                 </Link>
                 <a className="home-secondary" href="#como-funciona">
                   Como funciona <Nfc size={19} />
@@ -104,19 +142,15 @@ export default async function Home() {
               <div className="home-hero-benefits">
                 <span>
                   <Nfc />
-                  Partilhe instantaneamente
-                  <br />o que importa
+                  Toque ou QR
                 </span>
                 <span>
                   <Smartphone />
-                  Sem apps.
-                  <br />
-                  Sem complicações.
+                  Abre no navegador
                 </span>
                 <span>
-                  <ShieldCheck />
-                  Ligação segura
-                  <br />e actualizável
+                  <RefreshCw />
+                  Perfil actualizável
                 </span>
               </div>
             </div>
@@ -124,6 +158,114 @@ export default async function Home() {
           </div>
         </section>
         <HomeSharingScene />
+        <section className="home-products" id="produtos">
+          <div className="home-section-heading">
+            <div>
+              <h2>Um formato para o seu dia.</h2>
+              <p>
+                Explore os produtos em destaque e encontre o seu próximo toque.
+              </p>
+            </div>
+            <Link className="home-text-link" href="/produtos">
+              Ver todos os produtos <ArrowUpRight size={18} />
+            </Link>
+          </div>
+          <p className="home-disclosure">
+            Catálogo em preparação. Valores de demonstração em MT; preços e
+            disponibilidade comercial a confirmar antes do lançamento.
+          </p>
+          <div className="home-products-grid">
+            {featured.map((p) => (
+              <Link
+                className="home-product"
+                key={p.id}
+                href={`/produtos/${p.id}`}
+              >
+                <div className="home-product-art">
+                  <img
+                    src={p.imageUrl}
+                    alt=""
+                    width={1254}
+                    height={1254}
+                    loading="lazy"
+                  />
+                </div>
+                <div className="home-product-copy">
+                  <h3>{productNames[p.name] ?? p.name}</h3>
+                  <p>{p.tagline}</p>
+                  <strong className="home-product-price">
+                    {p.available ? money(p.amount) : 'Sob consulta'}
+                  </strong>
+                  <span className="home-product-status">
+                    {p.available
+                      ? 'Produto físico · valor de demonstração'
+                      : 'Contacte-nos para conhecer esta solução'}
+                  </span>
+                  <ArrowUpRight size={18} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+        <section className="home-plans" id="planos">
+          <div className="home-section-heading">
+            <div>
+              <h2>Mais espaço para o seu perfil.</h2>
+              <p>
+                Planos digitais mensais em USD. Compare o número de links e o
+                espaço de apresentação.
+              </p>
+            </div>
+          </div>
+          <p className="home-disclosure">
+            Planos de demonstração, sem cobrança nesta prévia. Produto físico e
+            subscrição apresentados separadamente.
+          </p>
+          <div className="home-plans-grid">
+            {plans.map((p) => (
+              <article className="home-plan" key={p.id}>
+                <h3>{p.name}</h3>
+                <p>{p.description}</p>
+                <div className="home-plan-price">
+                  US${' '}
+                  {new Intl.NumberFormat('pt-MZ', {
+                    maximumFractionDigits: 2,
+                  }).format(p.dollars)}
+                  <span> / mês</span>
+                </div>
+                <ul>
+                  <li>Até {p.links} links no perfil</li>
+                  <li>
+                    {p.bio > 0
+                      ? `Biografia até ${p.bio} caracteres`
+                      : 'Contactos essenciais, sem biografia'}
+                  </li>
+                </ul>
+              </article>
+            ))}
+          </div>
+          {plans.length === 0 ? (
+            <p>
+              Os planos estão a ser actualizados. Contacte-nos para mais
+              informações.
+            </p>
+          ) : (
+            <Link className="home-text-link" href="/perfil?plans=1">
+              Explorar planos na minha conta <ArrowUpRight size={18} />
+            </Link>
+          )}
+        </section>
+        <section className="home-audience" id="quem-atendemos">
+          <h2>Uma conexão à sua medida.</h2>
+          <div className="home-audience-grid">
+            {audiences.map(([name, text]) => (
+              <article className="home-audience-card" key={name}>
+                <h3>{name}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
         <section className="home-about" id="sobre">
           <h2>
             Quem somos<span aria-hidden="true">.</span>
@@ -161,81 +303,26 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className="home-products" id="produtos">
-          <h2>PRODUTOS</h2>
-          <div className="home-products-grid">
-            {products.map((p) => (
-              <Link
-                className="home-product"
-                key={p.id}
-                href={`/produtos/${p.id}`}
-              >
-                <div className="home-product-art">
-                  <img
-                    src={p.imageUrl}
-                    alt={p.name}
-                    width={1254}
-                    height={1254}
-                    loading="lazy"
-                  />
-                </div>
-                <div className="home-product-copy">
-                  <h3>{p.name}</h3>
-                  <p>{p.tagline}</p>
-                  <ArrowUpRight size={18} />
-                </div>
-              </Link>
+        <section className="home-faq" id="perguntas">
+          <h2>Antes do primeiro toque.</h2>
+          <div>
+            {questions.map(([q, a]) => (
+              <details key={q}>
+                <summary>{q}</summary>
+                <p>{a}</p>
+              </details>
             ))}
           </div>
-        </section>
-        <section className="home-audience" id="quem-atendemos">
-          <h2>
-            Quem
-            <br />
-            atendemos
-          </h2>
-          <div className="home-audience-grid">
-            {audiences.map(({ name, text, icon: Icon }) => (
-              <Link href="/produtos" className="home-audience-card" key={name}>
-                <div>
-                  <h3>{name}</h3>
-                  <p>{text}</p>
-                </div>
-                <span>
-                  <Icon />
-                </span>
-              </Link>
-            ))}
-          </div>
+          <Link className="home-text-link" href="/contacto">
+            Falar com a Framy <ArrowUpRight size={18} />
+          </Link>
         </section>
         <section className="home-how" id="primeiros-passos">
-          <h2>Do primeiro toque à próxima conexão.</h2>
-          <div>
-            {[
-              [
-                '01',
-                'Crie a sua identidade',
-                'Escolha a fotografia, os contactos e os links que quer partilhar.',
-              ],
-              [
-                '02',
-                'Escolha o seu produto',
-                'Encontre o formato que faz parte do seu dia a dia.',
-              ],
-              [
-                '03',
-                'Toque. E conecte-se.',
-                'Aproxime de um telemóvel compatível ou partilhe o seu QR.',
-              ],
-            ].map(([number, title, text]) => (
-              <article key={number}>
-                <span>{number}</span>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </article>
-            ))}
-          </div>
-          <Link className="home-primary" href="/dashboard">
+          <h2>Pronto para a próxima conexão?</h2>
+          <p>
+            Comece pelo seu perfil. Depois, escolha o produto que o acompanha.
+          </p>
+          <Link className="home-primary" href="/perfil">
             Criar a minha identidade <ArrowUpRight size={18} />
           </Link>
         </section>
