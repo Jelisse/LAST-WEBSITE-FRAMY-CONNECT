@@ -1001,6 +1001,16 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                 {selected.deliveryCity || 'A aguardar informação do cliente'}
               </p>
               {selected.deliveryAddress && <p>{selected.deliveryAddress}</p>}
+              {selected.deliveryContact && (
+                <p>Contacto de entrega: {selected.deliveryContact}</p>
+              )}
+              {selected.checkoutPlan && (
+                <p>
+                  Plano associado: {selected.checkoutPlan.name} · US${' '}
+                  {selected.checkoutPlan.dollars}/mês · até{' '}
+                  {selected.checkoutPlan.links} links
+                </p>
+              )}
               <p>Agente: {selected.agent || 'Por atribuir'}</p>
               <ProfileHandoff
                 key={selected.id}

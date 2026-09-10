@@ -409,7 +409,68 @@ export async function POST(request: Request) {
         .first<{ n: number }>();
       if ((count?.n ?? 0) >= 100)
         return json({ error: 'Limite de 100 pedidos de teste atingido.' }, 422);
+      let checkout: Partial<SandboxOrder> = {};
+      if (body.checkout === true) {
+        const profileRow = await db
+          .prepare(
+            'SELECT username,published_json,version FROM profiles WHERE owner_id=?',
+          )
+          .bind(user.userId)
+          .first<{
+            username: string;
+            published_json: string | null;
+            version: number;
+          }>();
+        const member = await db
+          .prepare(
+            'SELECT plan_id,terms_json FROM sandbox_memberships WHERE owner_id=?',
+          )
+          .bind(user.userId)
+          .first<{ plan_id: string; terms_json: string | null }>();
+        const terms = membershipTerms(member);
+        const currentPlan = (await getManagedPlans()).find(
+          (p) => p.id === body.planId && p.active,
+        );
+        if (
+          !profileRow?.published_json ||
+          profileRow.version !== body.profileVersion
+        )
+          return json(
+            {
+              error: 'Aprove e publique o perfil antes de confirmar o pedido.',
+            },
+            409,
+          );
+        if (
+          !member ||
+          !currentPlan ||
+          member.plan_id !== body.planId ||
+          currentPlan.version !== body.planVersion ||
+          terms.version !== body.planVersion
+        )
+          return json(
+            {
+              error:
+                'As condições do plano mudaram. Reveja a escolha antes de confirmar.',
+            },
+            409,
+          );
+        if (
+          typeof body.deliveryContact !== 'string' ||
+          body.deliveryContact.trim().length < 6 ||
+          body.deliveryContact.length > 40 ||
+          /[\u0000-\u001f]/.test(body.deliveryContact)
+        )
+          return json({ error: 'Indique um contacto de entrega válido.' }, 422);
+        checkout = {
+          checkoutPlan: terms,
+          profileUsername: profileRow.username,
+          approvedProfileVersion: profileRow.version,
+          deliveryContact: body.deliveryContact.trim(),
+        };
+      }
       const o: SandboxOrder = {
+        ...checkout,
         ...delivery,
         id: body.id,
         productId: product.id,

@@ -3132,3 +3132,113 @@ summary {
 .order-submission-product h2 {
   font-size: 20px;
 }
+.order-submission {
+  max-width: 1280px;
+}
+.purchase-flow h1 {
+  font-size: clamp(30px, 4vw, 46px);
+  margin-bottom: 12px;
+}
+.purchase-steps {
+  display: flex;
+  list-style: none;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 26px 0;
+}
+.purchase-steps button {
+  padding: 12px;
+  border: 1px solid #ddd4cc;
+  border-radius: 12px;
+}
+.purchase-steps [aria-current='step'] button {
+  background: #b83b09;
+  color: white;
+}
+.purchase-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 24px;
+  align-items: start;
+}
+.purchase-layout .panel {
+  padding: 28px;
+}
+.purchase-layout h2 {
+  margin-bottom: 24px;
+}
+.purchase-layout p {
+  line-height: 1.7;
+  margin-block: 16px;
+}
+.purchase-layout label:not(.purchase-consent) {
+  display: block;
+  margin-bottom: 20px;
+}
+.purchase-layout input:not([type='checkbox']):not([type='radio']),
+.purchase-layout textarea {
+  width: 100%;
+  display: block;
+  border: 1px solid #ddd4cc;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 8px;
+}
+.purchase-product {
+  width: 180px;
+  border-radius: 16px;
+}
+.purchase-plans label {
+  padding: 18px;
+  border: 1px solid #ddd4cc;
+  border-radius: 14px;
+  cursor: pointer;
+}
+.purchase-plans span {
+  display: block;
+  margin-top: 8px;
+}
+.purchase-plans input {
+  margin-right: 10px;
+}
+.purchase-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+.purchase-summary {
+  position: sticky;
+  top: 24px;
+}
+.purchase-profile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.8fr);
+  gap: 24px;
+}
+.purchase-profile .iphone-preview {
+  width: 100%;
+  max-width: 320px;
+  margin: auto;
+}
+.purchase-consent {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  line-height: 1.6;
+}
+.purchase-consent input {
+  margin-top: 6px;
+}
+@media (max-width: 900px) {
+  .purchase-layout {
+    grid-template-columns: 1fr;
+  }
+  .purchase-summary {
+    position: static;
+  }
+  .purchase-profile {
+    grid-template-columns: 1fr;
+  }
+}

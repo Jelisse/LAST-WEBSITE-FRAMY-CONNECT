@@ -267,6 +267,10 @@ export type Journal = {
   amount: number;
 };
 export type SandboxOrder = {
+  checkoutPlan?: ManagedPlan;
+  profileUsername?: string;
+  approvedProfileVersion?: number;
+  deliveryContact?: string;
   deliveryCity?: string;
   deliveryAddress?: string;
   id: string;

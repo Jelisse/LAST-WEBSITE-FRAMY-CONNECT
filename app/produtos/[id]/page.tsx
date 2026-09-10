@@ -64,7 +64,7 @@ export default async function Page({
               href={p.available ? `/encomendar/${p.id}` : '/contacto'}
             >
               {p.available
-                ? 'Experimentar no espaço de teste'
+                ? 'Personalizar e comprar'
                 : 'Falar sobre esta solução'}{' '}
               <ArrowUpRight size={20} />
             </Link>
