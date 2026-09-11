@@ -1,1 +1,4 @@
-export { default, metadata, dynamic } from '../dashboard/page';
+import { redirect } from 'next/navigation';
+export default function Page() {
+  redirect('/manager?section=finance');
+}

@@ -111,6 +111,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
     return d as Data;
   }, []);
   useEffect(() => {
+    if(new URLSearchParams(location.search).get('section')==='finance') setSection('finance');
     void load().catch((e) => setError(e.message));
   }, [load]);
   const save = async (payload: Record<string, unknown>) => {

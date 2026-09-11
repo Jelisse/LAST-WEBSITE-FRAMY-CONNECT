@@ -71,7 +71,8 @@ const reservedSQL =
   "SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('QUEUED','IN_PRODUCTION','READY') AND COALESCE(json_extract(data_json,'$.agentId'),'')=? AND COALESCE(json_extract(data_json,'$.agentId'),'')<>''";
 export async function POST(request: Request) {
   try {
-    const user = await authorized();
+    const user = await getChatGPTUser();
+    if (user && user.role !== 'manager' && user.role !== 'agent') return json({error:'Acesso reservado.'},403);
     if (!user) return json({ error: 'Acesso reservado ao Manager.' }, 403);
     if (request.headers.get('origin') !== new URL(request.url).origin)
       return json({ error: 'Origem não autorizada.' }, 403);
@@ -79,6 +80,7 @@ export async function POST(request: Request) {
     if (raw.length > 24000)
       return json({ error: 'Pedido demasiado grande.' }, 413);
     const b = JSON.parse(raw);
+    if(user.role==='agent' && (b.action!=='order'||!['start','ready','deliver'].includes(b.step))) return json({error:'Acção não autorizada.'},403);
     const db = database(),
       now = new Date().toISOString(),
       eventId = crypto.randomUUID();
@@ -257,6 +259,7 @@ export async function POST(request: Request) {
           409,
         );
       const order = JSON.parse(row.data_json) as SandboxOrder;
+      if(user.role==='agent' && order.agentId!==user.userId) return json({error:'Pedido não atribuído a esta conta.'},403);
       if (step === 'assign') {
         if (!order.deliveryCity)
           throw Error(

@@ -81,14 +81,13 @@ import { money } from '@/lib/catalog';
 import { ProductManager } from './product-manager';
 import type { WorkspaceData } from '@/lib/profile-types';
 
-const signOutHref = '/signout-with-chatgpt?return_to=/';
+const signOutHref = '/sair';
 const menu = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
   { id: 'profile', label: 'A minha identidade', icon: UserRound },
   { id: 'orders', label: 'O meu pedido', icon: Package },
   { id: 'operations', label: 'Operações · teste', icon: Settings2 },
   { id: 'agent', label: 'Agente · teste', icon: BriefcaseBusiness },
-  { id: 'finance', label: 'Financeiro · teste', icon: Wallet },
   { id: 'ceo', label: 'CEO · teste', icon: ChartNoAxesCombined },
 ];
 const date = (value: string) =>

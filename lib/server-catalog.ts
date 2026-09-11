@@ -3,7 +3,7 @@ import { products, type Product } from './catalog';
 
 export async function canManageCatalog(userId: string) {
   return !!(await database()
-    .prepare('SELECT user_id FROM catalog_managers WHERE user_id=?')
+    .prepare("SELECT id FROM auth_accounts WHERE id=? AND role='manager' AND active=1")
     .bind(userId)
     .first());
 }

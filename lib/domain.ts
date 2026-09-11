@@ -94,6 +94,9 @@ export const blankProfile: Profile = {
 const reserved = new Set([
   'api',
   'dashboard',
+  'exemplo',
+  'entrar',
+  'sair',
   'manager',
   'finance',
   'produtos',

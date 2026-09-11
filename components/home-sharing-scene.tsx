@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Nfc, ScanLine, Globe, Camera, Zap } from 'lucide-react';
 
-const exampleProfile = '/teste_02136211';
+const exampleProfile = '/exemplo';
 
 function DemoCard({ qr }: { qr?: string }) {
   return (

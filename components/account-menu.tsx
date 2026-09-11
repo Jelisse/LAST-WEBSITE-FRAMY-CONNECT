@@ -6,7 +6,6 @@ import {
   ChevronDown,
   Settings2,
   BriefcaseBusiness,
-  Wallet,
   ChartNoAxesCombined,
 } from 'lucide-react';
 import {
@@ -36,12 +35,6 @@ const dashboards = [
     label: 'Agente',
     description: 'Produção e entregas',
     icon: BriefcaseBusiness,
-  },
-  {
-    href: '/finance',
-    label: 'Financeiro',
-    description: 'Pagamentos e resultados',
-    icon: Wallet,
   },
   {
     href: '/cofounder',
@@ -85,6 +78,9 @@ export function AccountMenu({
               </span>
             </DropdownMenuItem>
           ))}
+          <DropdownMenuItem render={<Link href="/sair" />} nativeButton={false} className="account-menu-option">
+            Terminar sessão / trocar de conta
+          </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

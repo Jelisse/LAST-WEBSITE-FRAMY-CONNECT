@@ -321,14 +321,14 @@ export function OrderSubmission({
                 <a
                   className="btn btn-primary"
                   href={
-                    '/signin-with-chatgpt?return_to=' +
+                    '/entrar?return_to=' +
                     encodeURIComponent('/encomendar/' + product.id)
                   }
                 >
                   Continuar com a conta
                 </a>
                 <p>
-                  A autenticação disponível nesta prévia utiliza ChatGPT. A sua
+                  Entre ou crie uma conta com email e palavra-passe. A sua
                   escolha de produto e plano será mantida no regresso.
                 </p>
               </>
