@@ -1,5 +1,5 @@
 'use client';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import { Check, Package, MapPin, ArrowUpRight } from 'lucide-react';
 import { orderLabels, type SandboxOrder } from '@/lib/domain';
 import { money } from '@/lib/catalog';

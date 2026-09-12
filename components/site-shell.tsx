@@ -1,6 +1,6 @@
 import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import { ArrowUpRight, Mail, ShieldCheck } from 'lucide-react';
 export function SiteHeader() {
   return (

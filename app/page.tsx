@@ -1,6 +1,6 @@
 import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import {
   ArrowUpRight,
   Eye,
@@ -108,9 +108,9 @@ export default async function Home() {
         </nav>
         <div className="home-nav-actions">
           <AccountMenu className="home-account" />
-          <Link className="home-buy" href="/produtos">
+          <a className="home-buy" href="/produtos">
             Ver produtos <ArrowUpRight size={16} />
-          </Link>
+          </a>
         </div>
       </header>
       <main id="main">

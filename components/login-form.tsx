@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 export function LoginForm() {
   const [register, setRegister] = useState(false),
     [busy, setBusy] = useState(false),

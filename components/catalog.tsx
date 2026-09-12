@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import { ArrowUpRight, Search } from 'lucide-react';
 import { money, type PublicProduct } from '@/lib/catalog';
 

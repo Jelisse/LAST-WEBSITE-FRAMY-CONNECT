@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import { ArrowUpRight, Check, ChevronLeft } from 'lucide-react';
 import { money } from '@/lib/catalog';
 import { getProducts } from '@/lib/server-catalog';

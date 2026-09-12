@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import { orderProgress, submissionTime } from '@/lib/order-progress';
 import {
   LayoutDashboard,

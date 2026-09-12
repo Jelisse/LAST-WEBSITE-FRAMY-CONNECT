@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import {
   ArrowUpRight,
   ChevronDown,
