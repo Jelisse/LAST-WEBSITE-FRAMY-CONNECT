@@ -1,7 +1,7 @@
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
 import { ManagerWorkspace } from '@/components/manager-workspace';
 import { canManageOrders } from '@/lib/server-order-access';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import './manager.css';
 export const dynamic = 'force-dynamic';
 export const metadata = {

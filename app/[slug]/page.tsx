@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import { Mail, ArrowUpRight } from 'lucide-react';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { MobileProfile } from '@/components/mobile-profile';

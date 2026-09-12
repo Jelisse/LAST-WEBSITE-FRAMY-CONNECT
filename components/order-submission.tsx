@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import { money, type PublicProduct } from '@/lib/catalog';
 import {
   blankProfile,

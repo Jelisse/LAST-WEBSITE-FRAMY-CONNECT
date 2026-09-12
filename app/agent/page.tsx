@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
 import { type SandboxOrder, orderLabels } from '@/lib/domain';

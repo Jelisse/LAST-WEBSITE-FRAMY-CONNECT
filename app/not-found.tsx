@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/hard-link';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 export default function NotFound() {
   return (
