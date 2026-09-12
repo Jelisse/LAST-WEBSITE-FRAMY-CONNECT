@@ -478,9 +478,20 @@ export async function POST(request: Request) {
             'SELECT plan_id,terms_json,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
           )
           .bind(user.userId)
-          .first<{ plan_id: string; terms_json: string | null; trial_expires_at: string | null }>();
-        if (member?.plan_id === FREE_PLAN_ID && member.trial_expires_at && member.trial_expires_at <= now)
-          return json({error:'O período gratuito terminou. Contacte a equipa.'},422);
+          .first<{
+            plan_id: string;
+            terms_json: string | null;
+            trial_expires_at: string | null;
+          }>();
+        if (
+          member?.plan_id === FREE_PLAN_ID &&
+          member.trial_expires_at &&
+          member.trial_expires_at <= now
+        )
+          return json(
+            { error: 'O período gratuito terminou. Contacte a equipa.' },
+            422,
+          );
         const terms = membershipTerms(member);
         const currentPlan = (await getManagedPlans()).find(
           (p) => p.id === FREE_PLAN_ID && p.id === body.planId && p.active,
@@ -599,9 +610,25 @@ export async function POST(request: Request) {
       await db.batch([
         db
           .prepare(
-            'INSERT OR IGNORE INTO sandbox_orders (id,owner_id,data_json,version,created_at) VALUES (?,?,?,1,?)',
+            'INSERT OR IGNORE INTO sandbox_orders (id,owner_id,data_json,version,created_at) SELECT ?,?,?,1,? WHERE ? IS NULL OR EXISTS(SELECT 1 FROM product_options WHERE id=? AND quantity>0 AND enabled=1)',
           )
-          .bind(o.id, user.userId, JSON.stringify(o), now),
+          .bind(
+            o.id,
+            user.userId,
+            JSON.stringify(o),
+            now,
+            design?.optionId ?? null,
+            design?.optionId ?? null,
+          ),
+        ...(design
+          ? [
+              db
+                .prepare(
+                  'UPDATE product_options SET quantity=quantity-1,version=version+1 WHERE id=? AND changes()=1',
+                )
+                .bind(design.optionId),
+            ]
+          : []),
         db
           .prepare(
             'INSERT INTO sandbox_events (id,owner_id,order_id,action,created_at) SELECT ?,?,?,?,? WHERE changes()=1',

@@ -14,7 +14,7 @@ The keychain payment button opens the supplied fixed checkout URL after order cr
 
 ## Deployment
 
-1. Back up the target database and apply `drizzle/0007_product_personalisation.sql` and `drizzle/0008_printed_pvc_price.sql` once before deploying the new app. The migration creates `product_options`, reservation/cancellation triggers, and trial timestamps, and updates any persisted keychain price to 500 MT. It has been applied to the local preview database only.
+1. Back up the target database and apply `drizzle/0007_product_personalisation.sql` and `drizzle/0008_printed_pvc_price.sql` once before deploying the new app. The migration creates `product_options`, transactional stock-reservation support, and trial timestamps, and updates any persisted keychain price to 500 MT. It has been applied to the local preview database only.
 2. Ensure the deployment has the existing `DB` binding and an R2 bucket bound as `PROFILE_PHOTOS`. The local preview supplies both; the checked-in staging `wrangler.jsonc` currently declares only DB, so uploads need the R2 binding configured for that deployment.
 3. Ship `public/pdf.worker.min.mjs` alongside the application. It must match the installed `pdfjs-dist` version. When upgrading PDF.js, copy its `build/pdf.worker.min.mjs` into `public` again.
 4. Build and deploy using the project's chosen hosting workflow. No remote database or deployment was changed by this implementation.
