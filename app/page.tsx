@@ -108,9 +108,9 @@ export default async function Home() {
         </nav>
         <div className="home-nav-actions">
           <AccountMenu className="home-account" />
-          <Link className="home-buy" href="/produtos">
+          <a className="home-buy" href="/produtos">
             Ver produtos <ArrowUpRight size={16} />
-          </Link>
+          </a>
         </div>
       </header>
       <main id="main">
