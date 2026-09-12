@@ -187,7 +187,7 @@ export default async function Page({
   if (!/^[a-z0-9_]{3,40}$/.test(slug)) notFound();
   const row = await database()
     .prepare(
-      'SELECT published_json FROM profiles WHERE username=? AND published_json IS NOT NULL',
+      `SELECT published_json FROM profiles WHERE username=? AND published_json IS NOT NULL AND NOT EXISTS (SELECT 1 FROM sandbox_memberships m WHERE m.owner_id=profiles.owner_id AND m.plan_id='free-30' AND m.trial_expires_at <= strftime('%Y-%m-%dT%H:%M:%fZ','now'))`,
     )
     .bind(slug)
     .first<{ published_json: string }>();

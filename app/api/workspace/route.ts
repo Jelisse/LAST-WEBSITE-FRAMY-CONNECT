@@ -1,3 +1,8 @@
+import {
+  FREE_PLAN_ID,
+  validateDesign,
+  supportsDesign,
+} from '@/lib/customisation';
 import { validateDelivery, canEditDelivery } from '@/lib/delivery';
 import { POST as manageOrder } from '@/app/api/manager/route';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
@@ -175,6 +180,32 @@ export async function POST(request: Request) {
       return json({ ok: true });
     }
     if (body.action === 'activate-sandbox-plan') {
+      if (body.planId !== FREE_PLAN_ID)
+        return json(
+          { error: 'Apenas o plano de 30 dias grátis está disponível.' },
+          422,
+        );
+      const trial = await db
+        .prepare(
+          'SELECT trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
+        )
+        .bind(user.userId)
+        .first<{
+          trial_started_at: string | null;
+          trial_expires_at: string | null;
+        }>();
+      if (trial?.trial_expires_at && trial.trial_expires_at <= now)
+        return json(
+          {
+            error:
+              'O período gratuito terminou. Contacte a equipa para continuar.',
+          },
+          422,
+        );
+      const trialStart = trial?.trial_started_at ?? now;
+      const trialEnd =
+        trial?.trial_expires_at ??
+        new Date(Date.parse(trialStart) + 30 * 86400000).toISOString();
       if (!Number.isInteger(body.version) || Number(body.version) < 0)
         return json({ error: 'Versão inválida.' }, 422);
       const plan = (await getManagedPlans()).find(
@@ -203,15 +234,17 @@ export async function POST(request: Request) {
       if (p?.published_json)
         validatePlanContent(JSON.parse(p.published_json), plan);
       const result = await db
-        .prepare(`INSERT INTO sandbox_memberships (owner_id,plan_id,version,updated_at,terms_json)
-        SELECT ?,?,1,?,? WHERE COALESCE((SELECT version FROM sandbox_memberships WHERE owner_id=?),0)=?
+        .prepare(`INSERT INTO sandbox_memberships (owner_id,plan_id,version,updated_at,terms_json,trial_started_at,trial_expires_at)
+        SELECT ?,?,1,?,?,?,? WHERE COALESCE((SELECT version FROM sandbox_memberships WHERE owner_id=?),0)=?
         AND COALESCE((SELECT version FROM profiles WHERE owner_id=?),0)=?
-        ON CONFLICT(owner_id) DO UPDATE SET plan_id=excluded.plan_id,version=sandbox_memberships.version+1,updated_at=excluded.updated_at,terms_json=excluded.terms_json`)
+        ON CONFLICT(owner_id) DO UPDATE SET plan_id=excluded.plan_id,version=sandbox_memberships.version+1,updated_at=excluded.updated_at,terms_json=excluded.terms_json,trial_started_at=excluded.trial_started_at,trial_expires_at=excluded.trial_expires_at`)
         .bind(
           user.userId,
           plan.id,
           now,
           JSON.stringify(plan),
+          trialStart,
+          trialEnd,
           user.userId,
           body.version,
           user.userId,
@@ -262,6 +295,23 @@ export async function POST(request: Request) {
           }
           profileInput = { ...input, username: candidate };
         }
+      }
+      if (body.action === 'publish-profile') {
+        const trial = await db
+          .prepare(
+            'SELECT plan_id,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
+          )
+          .bind(user.userId)
+          .first<{ plan_id: string; trial_expires_at: string | null }>();
+        if (
+          trial?.plan_id === FREE_PLAN_ID &&
+          trial.trial_expires_at &&
+          trial.trial_expires_at <= now
+        )
+          return json(
+            { error: 'O período gratuito terminou. Contacte a equipa.' },
+            422,
+          );
       }
       const profile = validateProfile(profileInput);
       if (profile.photoUrl && body.action !== 'unpublish-profile') {
@@ -389,6 +439,8 @@ export async function POST(request: Request) {
         if (
           existing.owner_id !== user.userId ||
           JSON.parse(existing.data_json).productId !== body.productId ||
+          JSON.parse(existing.data_json).design?.optionId !==
+            (body.design as { optionId?: string } | undefined)?.optionId ||
           JSON.parse(existing.data_json).deliveryCity !==
             delivery.deliveryCity ||
           (JSON.parse(existing.data_json).deliveryAddress ?? '') !==
@@ -423,13 +475,15 @@ export async function POST(request: Request) {
           }>();
         const member = await db
           .prepare(
-            'SELECT plan_id,terms_json FROM sandbox_memberships WHERE owner_id=?',
+            'SELECT plan_id,terms_json,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
           )
           .bind(user.userId)
-          .first<{ plan_id: string; terms_json: string | null }>();
+          .first<{ plan_id: string; terms_json: string | null; trial_expires_at: string | null }>();
+        if (member?.plan_id === FREE_PLAN_ID && member.trial_expires_at && member.trial_expires_at <= now)
+          return json({error:'O período gratuito terminou. Contacte a equipa.'},422);
         const terms = membershipTerms(member);
         const currentPlan = (await getManagedPlans()).find(
-          (p) => p.id === body.planId && p.active,
+          (p) => p.id === FREE_PLAN_ID && p.id === body.planId && p.active,
         );
         if (
           !profileRow?.published_json ||
@@ -469,7 +523,61 @@ export async function POST(request: Request) {
           deliveryContact: body.deliveryContact.trim(),
         };
       }
+      const design = validateDesign(body.design, product);
+      if (supportsDesign(product) && !body.checkout)
+        return json(
+          {
+            error:
+              'Utilize o percurso de compra para escolher o modelo e aprovar o design.',
+          },
+          422,
+        );
+      if (design) {
+        const stock = await db
+          .prepare('SELECT quantity,enabled FROM product_options WHERE id=?')
+          .bind(design.optionId)
+          .first<{ quantity: number; enabled: number }>();
+        if (!stock?.enabled || stock.quantity < 1)
+          return json(
+            {
+              error:
+                'O modelo está sem stock ou foi desactivado. Escolha outro.',
+            },
+            409,
+          );
+        for (const side of ['front', 'back'] as const) {
+          const a = design[side];
+          if (!a) continue;
+          const asset = await env.PROFILE_PHOTOS?.head(`designs/${a.assetId}`);
+          if (!asset || asset.customMetadata?.ownerId !== user.userId)
+            return json(
+              { error: 'Carregue o seu próprio ficheiro de design.' },
+              422,
+            );
+        }
+        if (product.category === 'Cartões') {
+          const row = await db
+            .prepare('SELECT draft_json FROM profiles WHERE owner_id=?')
+            .bind(user.userId)
+            .first<{ draft_json: string }>();
+          const p = row ? JSON.parse(row.draft_json) : null;
+          if (!p?.email || !p?.name)
+            return json(
+              {
+                error: 'Nome e email são obrigatórios para imprimir o cartão.',
+              },
+              422,
+            );
+          design.holderName = p.name;
+          design.holderEmail = p.email;
+          design.profileUrl = new URL(
+            '/' + checkout.profileUsername,
+            request.url,
+          ).href;
+        }
+      }
       const o: SandboxOrder = {
+        design,
         ...checkout,
         ...delivery,
         id: body.id,

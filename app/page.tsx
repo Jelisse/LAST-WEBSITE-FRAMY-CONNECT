@@ -231,7 +231,7 @@ export default async function Home() {
                   {new Intl.NumberFormat('pt-MZ', {
                     maximumFractionDigits: 2,
                   }).format(p.dollars)}
-                  <span> / mês</span>
+                  <span>{p.id === 'free-30' ? ' / 30 dias' : ' / mês'}</span>
                 </div>
                 <ul>
                   <li>Até {p.links} links no perfil</li>

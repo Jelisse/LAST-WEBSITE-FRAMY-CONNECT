@@ -5,6 +5,7 @@ import { money } from '@/lib/catalog';
 import { getProducts } from '@/lib/server-catalog';
 export const dynamic = 'force-dynamic';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
+import { CardShowcase } from '@/components/card-showcase';
 
 export async function generateMetadata({
   params,
@@ -33,7 +34,11 @@ export default async function Page({
         </Link>
         <div className="product-detail">
           <div className="product-detail-art">
-            <img src={p.imageUrl} alt={p.name} width={1254} height={1254} />
+            {p.id === 'pvc' ? (
+              <CardShowcase />
+            ) : (
+              <img src={p.imageUrl} alt={p.name} width={1254} height={1254} />
+            )}
             <span>{p.name}</span>
           </div>
           <div>

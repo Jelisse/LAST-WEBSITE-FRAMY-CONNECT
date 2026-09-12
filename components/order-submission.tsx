@@ -15,6 +15,16 @@ import { MobileProfile } from './mobile-profile';
 import { IPhonePreview } from './iphone-preview';
 import { ProfilePhotoUpload } from './profile-photo-upload';
 import { ProfileLinksEditor } from './profile-links-editor';
+import { ProductDesigner } from './product-designer';
+import { artworkFile } from '@/lib/artwork-storage';
+import {
+  FREE_PLAN_ID,
+  PAYMENT_URL,
+  supportsDesign,
+  blankOption,
+  keychainChoices,
+  type ProductDesign,
+} from '@/lib/customisation';
 type Data = {
   profile: Profile | null;
   profileVersion: number;
@@ -32,7 +42,7 @@ export function OrderSubmission({
 }) {
   const key = 'framy-checkout:' + (account?.id ?? 'visitor') + ':' + product.id;
   const [step, setStep] = useState(0),
-    [planId, setPlanId] = useState(plans[0]?.id ?? ''),
+    [planId, setPlanId] = useState(FREE_PLAN_ID),
     [profile, setProfile] = useState<Profile>(blankProfile),
     [city, setCity] = useState(''),
     [address, setAddress] = useState(''),
@@ -45,6 +55,10 @@ export function OrderSubmission({
     [approved, setApproved] = useState(false),
     [orderId, setOrderId] = useState(''),
     [done, setDone] = useState(false);
+  const [design, setDesign] = useState<ProductDesign>({
+    ...(product.category === 'Cartões' ? { cardTheme: 'forest' as const } : {}),
+    optionId: product.id === 'keychain' ? 'tiktok' : blankOption(product),
+  });
   const plan = plans.find((p) => p.id === planId);
   async function load() {
     const r = await fetch('/api/workspace', { cache: 'no-store' });
@@ -57,22 +71,20 @@ export function OrderSubmission({
     let active = true;
     (async () => {
       try {
-        const raw = localStorage.getItem(key);
+        const raw =
+          localStorage.getItem(key) ??
+          localStorage.getItem('framy-checkout:visitor:' + product.id);
         const saved = raw ? JSON.parse(raw) : null;
         const d = account ? await load() : null;
         if (!active) return;
+        if (saved?.design) setDesign(saved.design);
         setProfile(saved?.profile ?? d?.profile ?? blankProfile);
         setCity(saved?.city ?? '');
         setAddress(saved?.address ?? '');
         setContact(saved?.contact ?? '');
         setOrderId(saved?.orderId ?? crypto.randomUUID());
         setDone(saved?.done === true);
-        setPlanId(
-          saved?.planId ??
-            sessionStorage.getItem('framy-purchase-plan:' + product.id) ??
-            plans[0]?.id ??
-            '',
-        );
+        setPlanId(FREE_PLAN_ID);
         setStep(
           Math.min(
             saved?.step ??
@@ -112,14 +124,20 @@ export function OrderSubmission({
             contact,
             orderId,
             done,
+            design,
           }),
         );
-      else localStorage.setItem(key, JSON.stringify({ step, planId, orderId }));
+      else
+        localStorage.setItem(
+          key,
+          JSON.stringify({ step, planId, orderId, design }),
+        );
     } catch {
       /* Storage may be disabled; in-memory checkout remains available. */
     }
   }, [
     ready,
+    design,
     step,
     planId,
     profile,
@@ -144,7 +162,27 @@ export function OrderSubmission({
     setError('');
     setBusy(true);
     try {
-      if (step === 1 && !plan) throw Error('Escolha um plano disponível.');
+      if (step === 0 && supportsDesign(product)) {
+        const r = await fetch('/api/product-options', { cache: 'no-store' });
+        const d = (await r.json()) as {
+          error?: string;
+          options: { id: string; enabled: number; quantity: number }[];
+        };
+        if (!r.ok) throw Error(d.error);
+        if (
+          !d.options.some(
+            (o: { id: string; enabled: number; quantity: number }) =>
+              o.id === design.optionId && o.enabled && o.quantity > 0,
+          )
+        )
+          throw Error(
+            'Modelo indisponível. Escolha outro modelo ou actualize a página.',
+          );
+        if (design.optionId === 'blank-keychain' && !design.front)
+          throw Error('Adicione o seu logótipo ou design PDF.');
+      }
+      if (step === 1 && (!plan || plan.id !== FREE_PLAN_ID))
+        throw Error('Escolha um plano disponível.');
       if (step === 2 && !account)
         throw Error('Inicie sessão para guardar o seu perfil.');
       if (step === 3) {
@@ -153,6 +191,8 @@ export function OrderSubmission({
           ...profile,
           username: profile.username || usernameFromName(profile.name),
         });
+        if (product.category === 'Cartões' && !p.email)
+          throw Error('Indique o email a imprimir no cartão.');
         validatePlanContent(p, plan);
         if (
           data.membership.version === 0 ||
@@ -201,7 +241,26 @@ export function OrderSubmission({
         version: data.profileVersion,
       });
       const latest = await load();
+      const savedDesign = { ...design };
+      if (supportsDesign(product))
+        for (const side of ['front', 'back'] as const) {
+          const a = savedDesign[side];
+          if (!a || a.assetId) continue;
+          const file = await artworkFile(a.fileKey);
+          if (!file)
+            throw Error('Volte ao produto e carregue novamente o ficheiro.');
+          const r = await fetch('/api/design-assets', {
+            method: 'POST',
+            headers: { 'Content-Type': file.type },
+            body: file,
+          });
+          const uploaded = (await r.json()) as { error?: string; id: string };
+          if (!r.ok) throw Error(uploaded.error);
+          savedDesign[side] = { ...a, assetId: uploaded.id };
+        }
+      setDesign(savedDesign);
       await post({
+        design: supportsDesign(product) ? savedDesign : undefined,
         action: 'submit-order',
         id: orderId,
         productId: product.id,
@@ -224,12 +283,22 @@ export function OrderSubmission({
   if (done)
     return (
       <section className="panel">
-        <h1>Pedido de demonstração submetido.</h1>
+        <h1>Pedido registado.</h1>
         <p>Referência: {orderId}</p>
         <p>
           O produto, plano, perfil e local de entrega estão associados ao seu
           pedido. Nenhuma cobrança foi efectuada. O pagamento continua pendente.
         </p>
+        {product.id === 'keychain' && (
+          <a
+            className="btn btn-primary"
+            href={PAYMENT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Pagar 500 MT
+          </a>
+        )}
         <Link className="btn btn-primary" href={'/dashboard?order=' + orderId}>
           Acompanhar o pedido
         </Link>
@@ -242,10 +311,10 @@ export function OrderSubmission({
     <div className="purchase-flow">
       <h1>O seu próximo toque.</h1>
       <p className="muted">
-        Demonstração sem cobranças.{' '}
+        {step === 0 ? 'Escolha o modelo ou crie o seu design. ' : ''}
         {account
           ? 'O progresso fica guardado neste dispositivo.'
-          : 'Escolha o produto e o plano antes de iniciar sessão.'}
+          : 'Pode guardar a sua escolha e continuar com a conta.'}
       </p>
       <ol className="purchase-steps">
         {steps.map((s, i) => (
@@ -267,25 +336,33 @@ export function OrderSubmission({
           <h2>{steps[step]}</h2>
           {step === 0 && (
             <>
-              <img
-                className="purchase-product"
-                src={product.imageUrl}
-                alt={product.name}
-              />
               <h3>{product.name}</h3>
               <p>{product.description}</p>
               <strong>{money(product.amount)} · 1 unidade</strong>
-              <p>
-                Valor do produto físico, sem entrega ou subscrição. Condições
-                comerciais a confirmar.
-              </p>
+              <p>Preço do produto físico. Entrega a confirmar.</p>
+              {supportsDesign(product) ? (
+                <ProductDesigner
+                  product={product}
+                  design={design}
+                  onChange={setDesign}
+                  profile={profile}
+                  onBusy={setUploading}
+                />
+              ) : (
+                <img
+                  className="purchase-product"
+                  src={product.imageUrl}
+                  alt={product.name}
+                />
+              )}
               <Link href="/produtos">Escolher outro produto</Link>
             </>
           )}
           {step === 1 && (
             <>
               <p>
-                Subscrição digital mensal, apresentada separadamente do produto.
+                Comece com 30 dias grátis. Os restantes planos estão em breve
+                disponíveis.
               </p>
               <div className="purchase-plans">
                 {plans.map((p) => (
@@ -293,11 +370,14 @@ export function OrderSubmission({
                     <input
                       type="radio"
                       name="plan"
+                      disabled={p.id !== FREE_PLAN_ID}
                       checked={planId === p.id}
                       onChange={() => setPlanId(p.id)}
                     />
                     <strong>
-                      {p.name} · US$ {p.dollars}/mês
+                      {p.id === FREE_PLAN_ID
+                        ? '30 dias grátis · 0 MT'
+                        : `${p.name} · US$ ${p.dollars}/mês · Em breve`}
                     </strong>
                     <span>
                       Até {p.links} links · {p.description}
@@ -365,6 +445,20 @@ export function OrderSubmission({
                   O endereço será criado a partir do seu nome. Fotografia e
                   links podem ser completados mais tarde.
                 </p>
+                {product.category === 'Cartões' && (
+                  <label>
+                    Email a imprimir no cartão *
+                    <input
+                      type="email"
+                      value={profile.email}
+                      onChange={(e) =>
+                        setProfile({ ...profile, email: e.target.value })
+                      }
+                      required
+                    />
+                    <small>Este email será impresso no cartão.</small>
+                  </label>
+                )}
                 <ProfileLinksEditor
                   profile={profile}
                   planId={plan.id}
@@ -430,10 +524,20 @@ export function OrderSubmission({
                 Contacto: {contact}
               </p>
               <p>
-                Hoje: <strong>sem cobrança</strong>. O pedido fica a aguardar
-                pagamento. Entrega, moeda de liquidação e data de início da
-                subscrição serão confirmadas antes de uma compra real.
+                Produto: <strong>{money(product.amount)}</strong>. O pedido fica
+                a aguardar pagamento. O plano digital é gratuito durante 30
+                dias, sem renovação automática. Entrega a confirmar.
               </p>
+              {supportsDesign(product) && (
+                <ProductDesigner
+                  product={product}
+                  design={design}
+                  onChange={setDesign}
+                  profile={profile}
+                  readOnly
+                  onBusy={setUploading}
+                />
+              )}
               <label className="purchase-consent">
                 <input
                   type="checkbox"
@@ -441,8 +545,8 @@ export function OrderSubmission({
                   onChange={(e) => setApproved(e.target.checked)}
                 />
                 Aprovo a publicação do meu perfil e do respectivo link para
-                codificação, e compreendo que este pedido e plano são de
-                demonstração.
+                codificação e aprovo o modelo e o design de impressão
+                apresentados.
               </label>
             </>
           )}
@@ -468,10 +572,10 @@ export function OrderSubmission({
             ) : (
               <button
                 className="btn btn-primary"
-                disabled={busy || !approved}
+                disabled={busy || uploading || !approved}
                 onClick={finish}
               >
-                {busy ? 'A confirmar…' : 'Confirmar pedido de demonstração'}
+                {busy ? 'A confirmar…' : 'Confirmar pedido'}
               </button>
             )}
           </div>
@@ -480,17 +584,16 @@ export function OrderSubmission({
           <h2>O seu pedido</h2>
           <p>{product.name}</p>
           <strong>{money(product.amount)}</strong>
-          <p>
-            {plan
-              ? `${plan.name} · US$ ${plan.dollars}/mês`
-              : 'Escolha um plano'}
-          </p>
+          {supportsDesign(product) && (
+            <p>
+              {keychainChoices.find((c) => c.id === design.optionId)?.name ??
+                'Personalizado'}
+            </p>
+          )}
+          {step > 0 && <p>Plano: 30 dias grátis · 0 MT</p>}
           <p>Entrega: a confirmar</p>
           <hr />
-          <p>
-            Os valores em MT e USD são apresentados separadamente. Nenhum
-            pagamento real está activo.
-          </p>
+          <p>Preço por unidade. A entrega é confirmada separadamente.</p>
           <Link href="/contacto">Precisa de ajuda?</Link>
         </aside>
       </div>

@@ -80,10 +80,10 @@ test('private fields never enter publication; unsafe links and reserved names re
   );
 });
 
-test('five monthly plans enforce increasing link and biography allowances', () => {
+test('free trial and five monthly plans enforce their content allowances', () => {
   assert.deepEqual(
     plans.map((p) => p.dollars),
-    [1, 3, 5, 9, 15],
+    [0, 1, 3, 5, 9, 15],
   );
   for (const plan of plans) {
     assert.doesNotThrow(() =>

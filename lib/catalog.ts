@@ -15,16 +15,16 @@ export type Product = {
 const seedProducts = [
   {
     id: 'pvc',
-    name: 'PVC Business Cards',
+    name: 'Cartão NFC PVC Personalizado',
     category: 'Cartões',
     icon: 'card',
-    tagline: 'A sua identidade num cartão leve e resistente.',
+    tagline: 'O seu cartão, impresso e personalizado.',
     description:
-      'Um cartão NFC em PVC para partilhar a sua identidade digital num único toque.',
-    amount: 0,
+      'Cartão NFC em PVC de 85,5 × 54 mm. Inclui impressão a cores na frente e no verso, personalização com o seu logótipo, nome e email, e configuração NFC e QR para o seu perfil.',
+    amount: 95000,
     cost: 0,
     audience: 'Profissionais',
-    available: false,
+    available: true,
   },
   {
     id: 'wood',
@@ -60,7 +60,7 @@ const seedProducts = [
     tagline: 'As suas conexões. Sempre consigo.',
     description:
       'Leve a sua identidade nas chaves e partilhe o seu perfil quando surgir uma nova oportunidade.',
-    amount: 30000,
+    amount: 50000,
     cost: 8000,
     audience: 'Indivíduos',
     available: true,

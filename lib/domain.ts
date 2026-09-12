@@ -1,5 +1,15 @@
 export const plans = [
   {
+    id: 'free-30',
+    name: '30 dias grátis',
+    audience: 'Todos',
+    dollars: 0,
+    links: 15,
+    bio: 400,
+    description:
+      'Experimente o seu perfil durante 30 dias, sem renovação automática.',
+  },
+  {
     id: 'individual',
     name: 'Individual',
     audience: 'Indivíduos',
@@ -270,6 +280,7 @@ export type Journal = {
   amount: number;
 };
 export type SandboxOrder = {
+  design?: import('./customisation').ProductDesign;
   checkoutPlan?: ManagedPlan;
   profileUsername?: string;
   approvedProfileVersion?: number;

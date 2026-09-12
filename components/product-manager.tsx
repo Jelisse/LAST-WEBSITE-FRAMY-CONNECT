@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import type { Product } from '@/lib/catalog';
+import { PersonalisationManager } from './personalisation-manager';
 import { money } from '@/lib/catalog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -117,6 +118,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
       className="panel product-management"
       aria-labelledby="product-management-title"
     >
+      <PersonalisationManager />
       <header>
         <Button
           disabled={busy || !!draft}

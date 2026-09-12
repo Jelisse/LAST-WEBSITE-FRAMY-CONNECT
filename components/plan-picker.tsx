@@ -57,11 +57,15 @@ export function PlanPicker({
             <div className="plan-summary">
               <span>
                 {choice.name}
-                <small>Mensal · por perfil</small>
+                <small>
+                  {choice.id === 'free-30'
+                    ? '30 dias · sem renovação automática'
+                    : 'Mensal · por perfil'}
+                </small>
               </span>
               <strong>
                 US${choice.dollars}
-                <small>/mês</small>
+                <small>{choice.id === 'free-30' ? '/ 30 dias' : '/mês'}</small>
               </strong>
             </div>
             <ul className="plan-inclusions">
@@ -114,7 +118,8 @@ export function PlanPicker({
               Um plano para cada conexão.
             </DialogTitle>
             <DialogDescription className="plans-intro">
-              Escolha o espaço de que precisa. A partir de US$1 por mês.
+              Comece com 30 dias grátis. Os restantes planos estão em breve
+              disponíveis.
             </DialogDescription>
             <div className="plans-grid">
               {plans.map((plan) => (
@@ -136,9 +141,13 @@ export function PlanPicker({
                       <span>US$</span>
                       {plan.dollars}
                     </strong>
-                    <span>/mês</span>
+                    <span>{plan.id === 'free-30' ? '/ 30 dias' : '/mês'}</span>
                   </div>
-                  <p className="plan-per-profile">Por perfil · mensal</p>
+                  <p className="plan-per-profile">
+                    {plan.id === 'free-30'
+                      ? 'Sem renovação automática'
+                      : 'Por perfil · mensal'}
+                  </p>
                   <Button
                     className={
                       plan.id === 'professional'
@@ -146,10 +155,16 @@ export function PlanPicker({
                         : 'plan-select'
                     }
                     variant="outline"
-                    disabled={plan.id === current || busy}
+                    disabled={
+                      plan.id !== 'free-30' || plan.id === current || busy
+                    }
                     onClick={() => setSelected(plan.id)}
                   >
-                    {plan.id === current ? 'Plano actual' : 'Ver plano'}
+                    {plan.id === current
+                      ? 'Plano actual'
+                      : plan.id === 'free-30'
+                        ? 'Começar 30 dias grátis'
+                        : 'Em breve'}
                     {plan.id !== current && <ArrowRight size={16} />}
                   </Button>
                   <ul>
