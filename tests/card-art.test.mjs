@@ -37,3 +37,22 @@ test('print document retains physical size and escapes customer information', ()
   assert.ok(svg.includes('name@example.test'));
   assert.ok(svg.includes('data:image/png;base64,TEST'));
 });
+
+test('custom colors survive order validation and appear on both print faces', () => {
+  const colors = {from: '#112233', to: '#445566', accent: '#778899', text: '#ABCDEF'};
+  const saved = validateDesign({optionId: 'blank-card', cardTheme: 'frame', cardColors: colors}, {id: 'pvc', category: 'Cartões'});
+  assert.deepEqual(saved.cardColors, colors);
+  for (const side of ['front', 'back']) {
+    const svg = cardArtwork({theme: saved.cardTheme, colors: saved.cardColors, side});
+    for (const color of Object.values(colors)) assert.ok(svg.includes(color));
+    assert.match(svg, /width="85.5mm" height="54mm"/);
+  }
+  assert.throws(() => validateDesign({optionId: 'blank-card', cardColors: {...colors, accent: '"/><script>'}}, {id: 'pvc', category: 'Cartões'}));
+});
+test('new layouts produce different printable compositions', () => {
+  const output = ['ocean', 'minimal', 'diagonal', 'frame'].map((theme) => {
+    const saved = validateDesign({optionId: 'blank-card', cardTheme: theme}, {id: 'pvc', category: 'Cartões'});
+    return cardArtwork({theme: saved.cardTheme, side: 'front'});
+  });
+  assert.equal(new Set(output).size, 4);
+});

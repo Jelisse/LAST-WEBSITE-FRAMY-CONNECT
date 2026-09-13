@@ -3881,3 +3881,17 @@ summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.card-style-picker button > img { display: block; width: 100%; aspect-ratio: 85.5/54; border-radius: 6px; margin-bottom: 10px; }
+.card-colors { margin: 24px 0 32px; padding: 22px; background: #f7f8fa; border: 1px solid #ddd; border-radius: 14px; }
+.color-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.color-heading h3 { margin: 0; }
+.color-heading button { font-size: 14px; text-decoration: underline; }
+.color-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; margin: 18px 0; }
+.card-color-field > span { display: block; margin-bottom: 8px; font-size: 16px; }
+.card-color-field > div { display: flex; align-items: center; gap: 10px; }
+.card-color-field input[type=color] { width: 52px; height: 46px; padding: 3px; flex-shrink: 0; cursor: pointer; }
+.card-color-field input[type=text] { width: 100%; min-width: 0; height: 46px; font: 16px ui-monospace,monospace; }
+.card-color-field input[aria-invalid=true] { border-color: #b42318; }
+.card-color-field small { color: #b42318; }
+@media(max-width: 480px) { .color-grid { grid-template-columns: 1fr; } .card-colors { padding: 14px; } }

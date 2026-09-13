@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { cardThemes, cardArtwork, cardArtworkUrl } from '@/lib/card-art';
+import { cardThemes, cardArtwork, cardArtworkUrl, cardPalette } from '@/lib/card-art';
 import { artworkFile } from '@/lib/artwork-storage';
 import {
   blankOption,
@@ -218,6 +218,7 @@ export function ProductDesigner({
             src={cardArtworkUrl(
               cardArtwork({
                 theme: design.cardTheme,
+        colors: design.cardColors,
                 side: s,
                 name: profile.name,
                 email: profile.email,
@@ -279,6 +280,7 @@ export function ProductDesigner({
       const a = design[side];
       const svg = cardArtwork({
         theme: design.cardTheme,
+        colors: design.cardColors,
         side,
         name: profile.name,
         email: profile.email,
@@ -449,18 +451,29 @@ export function ProductDesigner({
                     type="button"
                     key={t.id}
                     aria-pressed={(design.cardTheme ?? 'plain') === t.id}
-                    onClick={() => onChange({ ...design, cardTheme: t.id })}
+                    onClick={() => onChange({ ...design, cardTheme: t.id, cardColors: undefined })}
                   >
-                    <span
-                      style={{
-                        background: `linear-gradient(120deg,${t.from},${t.to})`,
-                      }}
-                    />
+                    <img alt="" src={cardArtworkUrl(cardArtwork({theme: t.id, side: 'front'}))} />
                     {t.name}
                   </button>
                 ))}
               </div>
             </div>
+          )}
+          {card && !readOnly && (
+            <section className="card-colors" aria-label="Cores do cartão">
+              <div className="color-heading"><h3>Crie a sua combinação de cores</h3>
+                <button type="button" onClick={() => onChange({...design, cardColors: undefined})}>Repor cores do modelo</button>
+              </div>
+              <p>Escolha uma cor ou escreva o código HEX. As cores aplicam-se à frente e ao verso.</p>
+              <div className="color-grid">
+                {([['from', 'Fundo'], ['to', 'Fim do degradé'], ['accent', 'Detalhes'], ['text', 'Texto']] as const).map(([key, label]) => (
+                  <CardColorField key={key} label={label} value={cardPalette(design.cardTheme, design.cardColors)[key]}
+                    onChange={(value) => onChange({...design, cardColors: {...cardPalette(design.cardTheme, design.cardColors), [key]: value}})} />
+                ))}
+              </div>
+              <small>Para um fundo liso, use o mesmo código nas duas cores do degradé. Imagens e PDFs mantêm as suas cores originais.</small>
+            </section>
           )}
           <div className="designer-heading">
             <h3>O seu design</h3>
@@ -623,4 +636,21 @@ export function ProductDesigner({
       {error && <p role="alert">{error}</p>}
     </div>
   );
+}
+
+function CardColorField({label, value, onChange}: {label: string; value: string; onChange: (value: string) => void}) {
+  const [hex, setHex] = useState(value);
+  useEffect(() => setHex(value), [value]);
+  const normalise = (input: string) => {
+    const raw = input.trim().replace(/^#/, '');
+    return /^[0-9a-f]{3}$/i.test(raw) ? '#' + [...raw].map((c) => c + c).join('') : '#' + raw;
+  };
+  const valid = /^#[0-9a-f]{6}$/i.test(normalise(hex));
+  return <div className="card-color-field"><span>{label}</span><div>
+    <input type="color" aria-label={`${label}: seleccionar cor`} value={value} onChange={(e) => onChange(e.target.value)} />
+    <input type="text" aria-label={`${label}: código HEX`} value={hex} maxLength={7} spellCheck={false} aria-invalid={!valid}
+      onChange={(e) => {setHex(e.target.value); if (/^#?[0-9a-f]{6}$/i.test(e.target.value)) onChange(normalise(e.target.value));}}
+      onBlur={() => {if (valid) {const next = normalise(hex).toUpperCase();setHex(next);onChange(next);}}}
+      placeholder="#FF6600" />
+  </div>{!valid && <small role="status">Use 3 ou 6 caracteres: 0–9 e A–F.</small>}</div>;
 }
