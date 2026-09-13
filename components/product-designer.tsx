@@ -377,7 +377,7 @@ export function ProductDesigner({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   return (
-    <div className="product-designer">
+    <div className={`product-designer seamless-designer ${card ? "card-editor" : "keychain-editor"}`}>
       {!readOnly && !card && (
         <>
           <h3>Escolha o seu porta-chaves</h3>
@@ -416,7 +416,7 @@ export function ProductDesigner({
           </div>
         </>
       )}
-      {!readOnly && (
+      {!readOnly && (!card || !custom) && (
         <button
           className={`custom-choice ${custom ? 'chosen' : ''}`}
           aria-pressed={custom}
@@ -438,12 +438,13 @@ export function ProductDesigner({
       )}
       {custom && (
         <>
+          <div className="editor-workspace">
+          <div className="editor-settings">
           {card && !readOnly && (
             <div className="card-style-picker">
-              <h3>Escolha o estilo do cartão</h3>
+              <h3>Modelo</h3>
               <p>
-                Personalize a frente e o verso com o seu logótipo. Para um PDF
-                com design completo, escolha «Design próprio».
+                Escolha uma base para o seu cartão.
               </p>
               <div>
                 {cardThemes.map((t) => (
@@ -462,10 +463,10 @@ export function ProductDesigner({
           )}
           {card && !readOnly && (
             <section className="card-colors" aria-label="Cores do cartão">
-              <div className="color-heading"><h3>Crie a sua combinação de cores</h3>
-                <button type="button" onClick={() => onChange({...design, cardColors: undefined})}>Repor cores do modelo</button>
+              <div className="color-heading"><h3>Cores</h3>
+                <button type="button" onClick={() => onChange({...design, cardColors: undefined})}>Repor</button>
               </div>
-              <p>Escolha uma cor ou escreva o código HEX. As cores aplicam-se à frente e ao verso.</p>
+              <p>Selector de cor ou código HEX.</p>
               <div className="color-grid">
                 {([['from', 'Fundo'], ['to', 'Fim do degradé'], ['accent', 'Detalhes'], ['text', 'Texto']] as const).map(([key, label]) => (
                   <CardColorField key={key} label={label} value={cardPalette(design.cardTheme, design.cardColors)[key]}
@@ -475,8 +476,10 @@ export function ProductDesigner({
               <small>Para um fundo liso, use o mesmo código nas duas cores do degradé. Imagens e PDFs mantêm as suas cores originais.</small>
             </section>
           )}
+          </div>
+          <div className="editor-preview">
           <div className="designer-heading">
-            <h3>O seu design</h3>
+            <h3>{card ? 'O seu cartão' : 'O seu porta-chaves'}</h3>
             <p>
               {card
                 ? 'Nome, email e QR são adicionados ao verso após a criação do perfil.'
@@ -498,7 +501,7 @@ export function ProductDesigner({
               </div>
             </div>
             <div className="designer-controls">
-              <strong>Visualização 3D</strong>
+              <strong>Pré-visualização 3D</strong>
               <label>
                 Rodar
                 <input
@@ -538,7 +541,7 @@ export function ProductDesigner({
               {!readOnly && (card || side === 'front') && (
                 <>
                   <label>
-                    Carregar logótipo ou design PDF
+                    Logótipo ou design próprio
                     <input
                       type="file"
                       accept="image/png,image/jpeg,application/pdf"
@@ -546,8 +549,7 @@ export function ProductDesigner({
                     />
                   </label>
                   <small>
-                    PNG, JPG ou PDF · até 8 MB. O PDF original é guardado para
-                    produção.
+                    PNG, JPG ou PDF · até 8 MB.
                   </small>
                   {selected && (
                     <>
@@ -598,7 +600,10 @@ export function ProductDesigner({
               )}
             </div>
           </div>
-          <h4>Vista 2D para impressão · {card ? '85,5 × 54 mm' : 'Ø 28 mm'}</h4>
+          </div>
+          </div>
+          <details className="print-disclosure">
+          <summary>Arte para impressão <span>{card ? '85,5 × 54 mm' : 'Ø 28 mm'} · Ver 2D e descarregar</span></summary>
           <div className="flat-designs">
             <figure>
               {face('front', true)}
@@ -624,6 +629,7 @@ export function ProductDesigner({
             Exportação à escala de 300 ppp, sem sangria. Confirmar margens e
             acabamento com a gráfica. A prévia é ilustrativa.
           </p>
+          </details>
         </>
       )}
       {readOnly && !custom && (
