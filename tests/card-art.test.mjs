@@ -80,7 +80,7 @@ test('editable copy survives validation and replaces fixed branding without chan
   assert.deepEqual(saved.cardText, cardText);
   const front = cardArtwork({theme:'navy-gold', side:'front', copy:saved.cardText.front});
   assert.ok(front.includes('My &lt;Logo&gt;'));
-  assert.ok(front.includes('Ana'));
+  assert.ok(!front.includes('Ana'));
   const back = cardArtwork({theme:'navy-gold', side:'back', copy:saved.cardText.back, qr:'data:image/png;base64,REALQR'});
   assert.ok(back.includes('Maria'));
   assert.ok(back.includes('Contact me'));
@@ -135,4 +135,25 @@ test('Repor removes edits from both sides and preserves the template and profile
   assert.equal(saved.cardText, undefined);
   assert.equal(saved.cardColors, undefined);
   assert.ok(cardArtwork({theme:reset.cardTheme,side:'front'}).includes('>Logo</text>'));
+});
+
+test('all templates reserve branding for the front and contact information for the back', () => {
+  for (const theme of [...cardThemes.map(t => t.id), 'forest', 'violet', 'framy', 'ocean', 'minimal', 'diagonal', 'frame']) {
+    const copy = {brand:'Unique Brand', subtitle:'Unique Subtitle', name:'Unique Customer', email:'unique@example.test', action:'Unique Action'};
+    const front = cardArtwork({theme, side:'front', name:copy.name, email:copy.email, copy});
+    const back = cardArtwork({theme, side:'back', name:copy.name, email:copy.email, copy, qr:'data:image/png;base64,QR'});
+    for (const value of [copy.brand, copy.subtitle]) {
+      assert.ok(front.includes(value), `${theme}: missing front branding`);
+      assert.ok(!back.includes(value), `${theme}: duplicated branding`);
+    }
+    for (const value of [copy.name, copy.email]) {
+      assert.ok(!front.includes(value), `${theme}: duplicated contact information`);
+      assert.ok(back.includes(value), `${theme}: missing back contact information`);
+    }
+    assert.ok(!front.includes(copy.action));
+    assert.ok(!front.includes('data:image/png;base64,QR'));
+    assert.ok(back.includes('data:image/png;base64,QR'));
+    const frontFields = cardCopyFields(theme, 'front');
+    assert.ok(cardCopyFields(theme, 'back').every(field => !frontFields.includes(field)));
+  }
 });

@@ -555,7 +555,7 @@ export function ProductDesigner({
             <h3>{card ? 'O seu cartão' : 'O seu porta-chaves'}</h3>
             <p>
               {card
-                ? 'Edite os textos e adicione o seu logótipo. O QR é gerado a partir do perfil.'
+                ? 'Logótipo e marca na frente. Nome, email e QR apenas no verso.'
                 : 'O verso mantém o logótipo Framy Connect.'}
             </p>
           </div>
@@ -573,6 +573,8 @@ export function ProductDesigner({
                 <div className="model-back">{face('back')}</div>
               </div>
             </div>
+          </div>
+          </div>
             <div className="designer-controls">
               <strong>Pré-visualização 3D</strong>
               <label>
@@ -620,7 +622,7 @@ export function ProductDesigner({
                     return <label key={key}>{labels[key]}<input type="text" value={design.cardText?.[side]?.[key] ?? defaults[key]} maxLength={key === 'email' ? 120 : 80}
                       onChange={(e) => onChange({...design, cardText: {...design.cardText, [side]: {...design.cardText?.[side], [key]: e.target.value}}})} /></label>;
                   })}
-                  <small>Edite cada lado separadamente. O QR continua ligado ao perfil.</small>
+                  <small>A frente apresenta a marca; o verso reúne os contactos e o QR do perfil.</small>
                 </section>
               )}
               {!readOnly && (card || side === 'front') && (
@@ -692,8 +694,6 @@ export function ProductDesigner({
                 </>
               )}
             </div>
-          </div>
-          </div>
           </div>
           <details className="print-disclosure">
           <summary>Arte para impressão <span>{card ? portrait ? '54 × 85,5 mm' : '85,5 × 54 mm' : 'Ø 28 mm'} · Ver 2D e descarregar</span></summary>
