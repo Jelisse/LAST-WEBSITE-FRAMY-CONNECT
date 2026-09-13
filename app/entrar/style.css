@@ -1,9 +1,22 @@
 .auth-page {
+  position: relative;
+  isolation: isolate;
   min-height: 100svh;
   display: grid;
   place-items: center;
   padding: 24px;
-  background: #faf6f2;
+  background: #ff5a00;
+}
+.auth-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url('/brand/profile-mountains.png') center bottom / cover no-repeat;
+  filter: invert(1) brightness(2);
+  mix-blend-mode: screen;
+  opacity: 0.55;
 }
 .auth-card {
   width: 100%;
