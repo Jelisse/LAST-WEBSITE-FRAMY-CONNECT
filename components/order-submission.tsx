@@ -56,7 +56,7 @@ export function OrderSubmission({
     [orderId, setOrderId] = useState(''),
     [done, setDone] = useState(false);
   const [design, setDesign] = useState<ProductDesign>({
-    ...(product.category === 'Cartões' ? { cardTheme: 'forest' as const } : {}),
+    ...(product.category === 'Cartões' ? { cardTheme: 'navy-gold' as const } : {}),
     optionId: product.id === 'keychain' ? 'tiktok' : blankOption(product),
   });
   const plan = plans.find((p) => p.id === planId);

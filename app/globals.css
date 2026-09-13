@@ -3942,3 +3942,11 @@ summary {
 @media(max-width: 1100px) { .seamless-designer .editor-workspace { grid-template-columns: 1fr; } .seamless-designer .editor-preview { position: static; } .seamless-designer .card-style-picker > div { grid-template-columns: repeat(4,minmax(0,1fr)); } }
 @media(max-width: 550px) { .seamless-designer .card-style-picker > div { grid-template-columns: repeat(2,minmax(0,1fr)); } .seamless-designer .designer-stage { min-height: 260px; } }
 @media(prefers-reduced-motion: reduce) { .seamless-designer * { transition: none !important; } }
+
+.seamless-designer .card-style-picker button > .template-preview { display: grid; place-items: center; aspect-ratio: 85.5/54; background: #f1f1ef; border: 0; border-radius: 5px; margin-bottom: 8px; overflow: hidden; }
+.template-preview img { display: block; width: 100%; height: auto; }
+.template-preview.template-portrait img { width: auto; height: 100%; max-height: 100%; aspect-ratio: 54/85.5; object-fit: contain; }
+.design-card.portrait-card { aspect-ratio: 54/85.5; }
+.portrait-editor .keyring-model { width: 56%; max-width: 190px; aspect-ratio: 54/85.5; }
+.portrait-editor .designer-stage { min-height: 350px; padding: 25px 0; }
+.portrait-editor .flat-designs figure { max-width: 185px; }

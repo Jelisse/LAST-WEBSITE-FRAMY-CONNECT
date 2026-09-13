@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cardArtwork } from '../lib/card-art.ts';
+import { cardArtwork, cardThemes, cardIsPortrait } from '../lib/card-art.ts';
 import { validateDesign } from '../lib/customisation.ts';
 import { products } from '../lib/catalog.ts';
 test('PVC price includes the printed personalised product', () => {
@@ -55,4 +55,21 @@ test('new layouts produce different printable compositions', () => {
     return cardArtwork({theme: saved.cardTheme, side: 'front'});
   });
   assert.equal(new Set(output).size, 4);
+});
+
+test('reference collection replaces old choices and prints portrait dimensions correctly', () => {
+  assert.equal(cardThemes.length, 12);
+  assert.ok(!cardThemes.some((t) => ['forest','violet','framy','ocean','minimal','diagonal','frame'].includes(t.id)));
+  for (const theme of cardThemes) {
+    const saved = validateDesign({optionId: 'blank-card', cardTheme: theme.id}, {id: 'pvc', category: 'Cartões'});
+    for (const side of ['front', 'back']) {
+      const svg = cardArtwork({theme: saved.cardTheme, side, name: 'A <B>', email: 'test@example.com', qr: 'data:image/png;base64,QR'});
+      assert.ok(svg.includes(cardIsPortrait(theme.id) ? 'width="54mm" height="85.5mm"' : 'width="85.5mm" height="54mm"'));
+      if (side === 'back') {
+        assert.ok(svg.includes('A &lt;B&gt;'));
+        assert.ok(svg.includes('test@example.com'));
+        assert.ok(svg.includes('data:image/png;base64,QR'));
+      }
+    }
+  }
 });

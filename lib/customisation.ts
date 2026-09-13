@@ -54,7 +54,7 @@ export function validateDesign(
   if (product.category === 'Cartões') {
     if (
       d.cardTheme &&
-      !['forest', 'violet', 'framy', 'plain', 'ocean', 'minimal', 'diagonal', 'frame'].includes(d.cardTheme)
+      !['forest', 'violet', 'framy', 'plain', 'ocean', 'minimal', 'diagonal', 'frame', 'navy-gold', 'black-essential', 'silver-wave', 'blue-rings', 'white-studio', 'blue-connect', 'black-signature', 'gold-hex', 'graphite-vertical', 'architect-vertical', 'violet-vertical'].includes(d.cardTheme)
     )
       throw Error('Estilo de cartão inválido.');
     result.cardTheme = d.cardTheme ?? 'plain';

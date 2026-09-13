@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { cardThemes, cardArtwork, cardArtworkUrl, cardPalette } from '@/lib/card-art';
+import { cardThemes, cardArtwork, cardArtworkUrl, cardPalette, cardIsPortrait } from '@/lib/card-art';
 import { artworkFile } from '@/lib/artwork-storage';
 import {
   blankOption,
@@ -99,8 +99,14 @@ export function ProductDesigner({
     [tilt, setTilt] = useState(12),
     [qr, setQr] = useState(''),
     [art, setArt] = useState({ front: '', back: '' });
+  const portrait = card && cardIsPortrait(design.cardTheme);
   const custom = design.optionId === blank;
   const available = options.find((o) => o.id === blank);
+  useEffect(() => {
+    if (card && !readOnly && design.cardTheme && !cardThemes.some((t) => t.id === design.cardTheme)) {
+      onChange({...design, cardTheme: 'navy-gold', cardColors: undefined});
+    }
+  }, [card, readOnly, design.cardTheme]);
   useEffect(() => {
     let alive = true;
     fetch('/api/product-options', { cache: 'no-store' })
@@ -207,7 +213,7 @@ export function ProductDesigner({
     const a = design[s];
     if (card)
       return (
-        <div className={`design-face design-card ${print ? 'flat-face' : ''}`}>
+        <div className={`design-face design-card ${portrait ? "portrait-card" : ""} ${print ? 'flat-face' : ''}`}>
           <img
             className="card-composition"
             alt={
@@ -295,7 +301,7 @@ export function ProductDesigner({
       );
       const link = document.createElement('a');
       link.href = url;
-      link.download = `cartao-85.5x54mm-${side}.svg`;
+      link.download = `cartao-${portrait ? "54x85.5" : "85.5x54"}mm-${side}.svg`;
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       return;
@@ -377,7 +383,7 @@ export function ProductDesigner({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   return (
-    <div className={`product-designer seamless-designer ${card ? "card-editor" : "keychain-editor"}`}>
+    <div className={`product-designer seamless-designer ${portrait ? "portrait-editor" : ""} ${card ? "card-editor" : "keychain-editor"}`}>
       {!readOnly && !card && (
         <>
           <h3>Escolha o seu porta-chaves</h3>
@@ -444,7 +450,7 @@ export function ProductDesigner({
             <div className="card-style-picker">
               <h3>Modelo</h3>
               <p>
-                Escolha uma base para o seu cartão.
+                Escolha um modelo horizontal ou vertical.
               </p>
               <div>
                 {cardThemes.map((t) => (
@@ -454,7 +460,7 @@ export function ProductDesigner({
                     aria-pressed={(design.cardTheme ?? 'plain') === t.id}
                     onClick={() => onChange({ ...design, cardTheme: t.id, cardColors: undefined })}
                   >
-                    <img alt="" src={cardArtworkUrl(cardArtwork({theme: t.id, side: 'front'}))} />
+                    <span className={`template-preview ${cardIsPortrait(t.id) ? 'template-portrait' : ''}`}><img alt="" src={cardArtworkUrl(cardArtwork({theme: t.id, side: 'front'}))} /></span>
                     {t.name}
                   </button>
                 ))}
@@ -603,7 +609,7 @@ export function ProductDesigner({
           </div>
           </div>
           <details className="print-disclosure">
-          <summary>Arte para impressão <span>{card ? '85,5 × 54 mm' : 'Ø 28 mm'} · Ver 2D e descarregar</span></summary>
+          <summary>Arte para impressão <span>{card ? portrait ? '54 × 85,5 mm' : '85,5 × 54 mm' : 'Ø 28 mm'} · Ver 2D e descarregar</span></summary>
           <div className="flat-designs">
             <figure>
               {face('front', true)}
