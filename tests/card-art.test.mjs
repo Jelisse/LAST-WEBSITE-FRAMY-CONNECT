@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cardArtwork, cardThemes, cardIsPortrait } from '../lib/card-art.ts';
-import { validateDesign } from '../lib/customisation.ts';
+import { cardArtwork, cardThemes, cardIsPortrait, cardCopyFields } from '../lib/card-art.ts';
+import { validateDesign, resetProductDesign } from '../lib/customisation.ts';
 import { products } from '../lib/catalog.ts';
 test('PVC price includes the printed personalised product', () => {
   const pvc = products.find((p) => p.id === 'pvc');
@@ -94,7 +94,8 @@ test('editable copy survives validation and replaces fixed branding without chan
 });
 
 test('every logo upload occupies its template placeholder and retains contact text', () => {
-  for (const theme of cardThemes) for (const side of ['front','back']) {
+  for (const theme of cardThemes) {
+    const side = 'front';
     const placeholder = cardArtwork({theme:theme.id,side});
     const uploaded = cardArtwork({theme:theme.id,side, name:'Customer', email:'customer@example.test', art:{src:'data:image/png;base64,IMAGE',scale:100,x:0,y:0,placement:'logo'}});
     assert.equal(placeholder.match(/data-logo-slot="([^"]+)"/)[1], uploaded.match(/data-logo-slot="([^"]+)"/)[1]);
@@ -103,4 +104,35 @@ test('every logo upload occupies its template placeholder and retains contact te
     assert.ok(uploaded.includes('clip-path="url(#logo-slot)"'));
     if (side === 'back') { assert.ok(uploaded.includes('Customer')); assert.ok(uploaded.includes('customer@example.test')); }
   }
+});
+
+test('card backs never render logo placeholders or uploaded logos, while retaining profile and QR', () => {
+  for (const theme of [...cardThemes.map(t => t.id), 'forest', 'violet', 'framy', 'ocean', 'minimal', 'diagonal', 'frame']) {
+    for (const art of [undefined, {src:'data:image/png;base64,LOGO',scale:100,x:0,y:0,placement:'logo'}]) {
+      const svg = cardArtwork({theme, side:'back', name:'Customer', email:'customer@example.test', qr:'data:image/png;base64,QR', art});
+      assert.ok(!svg.includes('data-logo-slot'));
+      assert.ok(!svg.includes('>Logo</text>'));
+      assert.ok(!svg.includes('data:image/png;base64,LOGO'));
+      assert.ok(svg.includes('Customer'));
+      assert.ok(svg.includes('customer@example.test'));
+      assert.ok(svg.includes('data:image/png;base64,QR'));
+      assert.ok(!cardCopyFields(theme, 'back').includes('brand'));
+    }
+  }
+});
+
+test('Repor removes edits from both sides and preserves the template and profile identity', () => {
+  const base = {optionId:'blank-card', cardTheme:'blue-connect', editorVersion:2, profileUrl:'https://example.test/customer', holderName:'Customer', holderEmail:'customer@example.test'};
+  const art = {fileKey:'logo', assetId:'saved-logo', name:'logo.png', page:1, scale:120, x:10, y:20, placement:'logo'};
+  const edited = {...base, front:art, back:art, cardText:{front:{brand:'Edited'},back:{name:'Edited'}},cardColors:{from:'#112233',to:'#445566',accent:'#778899',text:'#ffffff'}};
+  const reset = resetProductDesign(edited);
+  assert.deepEqual(reset, base);
+  assert.equal(edited.front, art);
+  assert.deepEqual(resetProductDesign(reset), base);
+  const saved = validateDesign(reset, {id:'pvc',category:'Cartões'});
+  assert.equal(saved.front, undefined);
+  assert.equal(saved.back, undefined);
+  assert.equal(saved.cardText, undefined);
+  assert.equal(saved.cardColors, undefined);
+  assert.ok(cardArtwork({theme:reset.cardTheme,side:'front'}).includes('>Logo</text>'));
 });

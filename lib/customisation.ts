@@ -35,6 +35,14 @@ export type ProductDesign = {
   holderName?: string;
   holderEmail?: string;
 };
+export function resetProductDesign(design: ProductDesign): ProductDesign {
+  const defaults = {...design};
+  delete defaults.front;
+  delete defaults.back;
+  delete defaults.cardText;
+  delete defaults.cardColors;
+  return defaults;
+}
 export function supportsDesign(product: { id: string; category: string }) {
   return product.id === 'keychain' || product.category === 'Cartões';
 }

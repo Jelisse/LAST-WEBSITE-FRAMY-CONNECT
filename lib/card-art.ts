@@ -27,8 +27,8 @@ export function cardIsPortrait(theme?: CardTheme) { return !!theme?.endsWith('-v
 export type CardCopy = Partial<Record<'brand' | 'subtitle' | 'name' | 'email' | 'action', string>>;
 export function cardCopyFields(theme: CardTheme | undefined, side: 'front' | 'back'): (keyof CardCopy)[] {
   if (side === 'front') return cardIsPortrait(theme) || theme === 'navy-gold' || theme === 'gold-hex' ? ['brand', 'name', 'email'] : theme === 'plain' ? ['brand', 'subtitle', 'action'] : ['brand', 'subtitle'];
-  if (cardIsPortrait(theme)) return ['brand', 'name', 'email'];
-  return theme === 'silver-wave' || theme === 'black-signature' ? ['brand','name','email'] : theme === 'plain' ? ['brand','name','email','action'] : ['brand','name','email','action'];
+  if (cardIsPortrait(theme)) return ['name', 'email'];
+  return theme === 'silver-wave' || theme === 'black-signature' ? ['name','email'] : ['name','email','action'];
 }
 export function cardLogoSlot(theme: CardTheme = 'plain', side: 'front' | 'back') {
   if (cardIsPortrait(theme)) return {x: 52, y: side === 'back' ? 250 : theme === 'violet-vertical' ? 620 : 395, width: 330, height: 140};
@@ -37,6 +37,7 @@ export function cardLogoSlot(theme: CardTheme = 'plain', side: 'front' | 'back')
   return {x: 305, y: 215, width: 400, height: 125};
 }
 function cardLogoLayer(theme: CardTheme, side: 'front' | 'back', art: Parameters<typeof cardArtwork>[0]['art'], copy: CardCopy, color: string) {
+  if (side === 'back') return '';
   const box = cardLogoSlot(theme, side);
   if (art && art.placement !== 'logo') return '';
   const content = art

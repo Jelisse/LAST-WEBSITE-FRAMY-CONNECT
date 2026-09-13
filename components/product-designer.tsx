@@ -6,6 +6,7 @@ import { clearLogoBackground } from '@/lib/logo-background';
 import { artworkFile } from '@/lib/artwork-storage';
 import {
   blankOption,
+  resetProductDesign,
   keychainChoices,
   type Artwork,
   type ProductDesign,
@@ -204,6 +205,8 @@ export function ProductDesigner({
     setProcessing(true);
     onBusy?.(true);
     try {
+      if (card && side === 'back' && file.type !== 'application/pdf')
+        throw Error('O logótipo só pode ser colocado na frente, no local «Logo».');
       if (
         !['image/png', 'image/jpeg', 'application/pdf'].includes(file.type) ||
         file.size > 8 * 1024 * 1024
@@ -258,6 +261,16 @@ export function ProductDesigner({
   }
   function adjust(patch: Partial<Artwork>) {
     if (selected) onChange({ ...design, [side]: { ...selected, ...patch } });
+  }
+  function resetDesign() {
+    onChange(resetProductDesign(design));
+    setOriginals({});
+    setArt({front: '', back: ''});
+    setTolerance(30);
+    setError('');
+    setSide('front');
+    setRotation(-18);
+    setTilt(12);
   }
   function face(s: 'front' | 'back', print = false) {
     const a = design[s];
@@ -523,9 +536,10 @@ export function ProductDesigner({
           {card && !readOnly && (
             <section className="card-colors" aria-label="Cores do cartão">
               <div className="color-heading"><h3>Cores</h3>
-                <button type="button" onClick={() => onChange({...design, cardColors: undefined})}>Repor</button>
+                <button type="button" onClick={resetDesign} title="Remover ficheiros e repor textos e cores de ambos os lados">Repor</button>
               </div>
               <p>Selector de cor ou código HEX.</p>
+              <p>Repor remove os ficheiros e as edições de texto e cor dos dois lados. Mantém o modelo escolhido e o QR do perfil.</p>
               <div className="color-grid">
                 {([['from', 'Fundo'], ['to', 'Fim do degradé'], ['accent', 'Detalhes'], ['text', 'Texto']] as const).map(([key, label]) => (
                   <CardColorField key={key} label={label} value={cardPalette(design.cardTheme, design.cardColors)[key]}
@@ -612,20 +626,20 @@ export function ProductDesigner({
               {!readOnly && (card || side === 'front') && (
                 <>
                   <label>
-                    Logótipo ou design próprio
+                    {card && side === 'back' ? 'Design próprio (PDF)' : 'Logótipo ou design próprio'}
                     <input
                       type="file"
-                      accept="image/png,image/jpeg,application/pdf"
+                      accept={card && side === 'back' ? 'application/pdf' : 'image/png,image/jpeg,application/pdf'}
                       onChange={(e) => {void upload(e.target.files?.[0]); e.target.value = '';}}
                     />
                   </label>
                   <small>
-                    PNG ou JPG substitui «Logo» no local indicado. PDF para design completo · até 8 MB.
+                    {card && side === 'back' ? 'O logótipo aparece apenas na frente. PDF para design completo · até 8 MB.' : 'PNG ou JPG substitui «Logo» no local indicado. PDF para design completo · até 8 MB.'}
                   </small>
                   {selected && (
                     <>
                       <p>{selected.name}</p>
-                      {!selected.name.toLowerCase().endsWith('.pdf') && (
+                      {(!card || side === 'front') && !selected.name.toLowerCase().endsWith('.pdf') && (
                         <div className="logo-background-controls">
                           <label>Intensidade da remoção<input type="range" min="0" max="100" value={tolerance} onChange={(e) => setTolerance(Number(e.target.value))} /></label>
                           <button type="button" onClick={() => void removeBackground()}>Remover fundo</button>
