@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { cardThemes, cardArtwork, cardArtworkUrl, cardPalette, cardIsPortrait } from '@/lib/card-art';
+import { cardThemes, cardArtwork, cardArtworkUrl, cardPalette, cardIsPortrait, cardCopyFields } from '@/lib/card-art';
+import { clearLogoBackground } from '@/lib/logo-background';
 import { artworkFile } from '@/lib/artwork-storage';
 import {
   blankOption,
@@ -99,6 +100,9 @@ export function ProductDesigner({
     [tilt, setTilt] = useState(12),
     [qr, setQr] = useState(''),
     [art, setArt] = useState({ front: '', back: '' });
+  const [processing, setProcessing] = useState(false);
+  const [tolerance, setTolerance] = useState(30);
+  const [originals, setOriginals] = useState<Partial<Record<'front' | 'back', Artwork>>>({});
   const portrait = card && cardIsPortrait(design.cardTheme);
   const custom = design.optionId === blank;
   const available = options.find((o) => o.id === blank);
@@ -185,6 +189,7 @@ export function ProductDesigner({
   async function upload(file?: File) {
     if (!file) return;
     setError('');
+    setProcessing(true);
     onBusy?.(true);
     try {
       if (
@@ -195,17 +200,50 @@ export function ProductDesigner({
       const fileKey = crypto.randomUUID();
       await renderFile(file, 1);
       await artworkFile(fileKey, file);
+      setOriginals((prev) => ({...prev, [side]: undefined}));
       onChange({
         ...design,
-        [side]: { fileKey, name: file.name, page: 1, scale: 80, x: 0, y: 0 },
+        [side]: { fileKey, name: file.name, page: 1, scale: file.type === 'application/pdf' || !card ? 80 : 30, x: 0, y: card && side === 'back' ? -35 : 0 },
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Não foi possível carregar.');
     } finally {
+      setProcessing(false);
       onBusy?.(false);
     }
   }
   const selected = design[side];
+  async function removeBackground() {
+    if (!selected || selected.name.toLowerCase().endsWith('.pdf')) return;
+    setError(''); setProcessing(true); onBusy?.(true);
+    try {
+      const original = originals[side] ?? selected;
+      let blob = await artworkFile(original.fileKey);
+      if (!blob && original.assetId) {
+        const response = await fetch(`/api/design-assets/${original.assetId}`);
+        if (!response.ok) throw Error('Não foi possível abrir o logótipo.');
+        blob = await response.blob();
+      }
+      if (!blob) throw Error('Carregue novamente o logótipo.');
+      const image = await createImageBitmap(blob);
+      const ratio = Math.min(1, 1800 / Math.max(image.width, image.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(image.width * ratio));
+      canvas.height = Math.max(1, Math.round(image.height * ratio));
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height); image.close();
+      const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const removed = clearLogoBackground(pixels.data, canvas.width, canvas.height, tolerance);
+      if (!removed) throw Error('Não foi detectado um fundo liso. Ajuste a intensidade ou use um PNG transparente.');
+      ctx.putImageData(pixels, 0, 0);
+      const png = await new Promise<Blob>((resolve, reject) => canvas.toBlob((result) => result ? resolve(result) : reject(Error('Não foi possível criar o PNG.')), 'image/png'));
+      const fileKey = crypto.randomUUID();
+      await artworkFile(fileKey, png);
+      setOriginals((prev) => ({...prev, [side]: original}));
+      onChange({...design, [side]: {...selected, assetId: undefined, fileKey, name: original.name.replace(/\.[^.]+$/, '') + '-sem-fundo.png'}});
+    } catch (e) { setError(e instanceof Error ? e.message : 'Não foi possível remover o fundo.'); }
+    finally { setProcessing(false); onBusy?.(false); }
+  }
   function adjust(patch: Partial<Artwork>) {
     if (selected) onChange({ ...design, [side]: { ...selected, ...patch } });
   }
@@ -225,6 +263,7 @@ export function ProductDesigner({
               cardArtwork({
                 theme: design.cardTheme,
         colors: design.cardColors,
+                copy: design.cardText?.[s],
                 side: s,
                 name: profile.name,
                 email: profile.email,
@@ -287,6 +326,7 @@ export function ProductDesigner({
       const svg = cardArtwork({
         theme: design.cardTheme,
         colors: design.cardColors,
+        copy: design.cardText?.[side],
         side,
         name: profile.name,
         email: profile.email,
@@ -384,6 +424,7 @@ export function ProductDesigner({
   }
   return (
     <div className={`product-designer seamless-designer ${portrait ? "portrait-editor" : ""} ${card ? "card-editor" : "keychain-editor"}`}>
+      <fieldset className="editor-inputs" disabled={processing} aria-busy={processing}>
       {!readOnly && !card && (
         <>
           <h3>Escolha o seu porta-chaves</h3>
@@ -488,7 +529,7 @@ export function ProductDesigner({
             <h3>{card ? 'O seu cartão' : 'O seu porta-chaves'}</h3>
             <p>
               {card
-                ? 'Nome, email e QR são adicionados ao verso após a criação do perfil.'
+                ? 'Edite os textos e adicione o seu logótipo. O QR é gerado a partir do perfil.'
                 : 'O verso mantém o logótipo Framy Connect.'}
             </p>
           </div>
@@ -544,6 +585,18 @@ export function ProductDesigner({
                   </button>
                 ))}
               </div>
+              {!readOnly && card && (
+                <section className="card-text-fields" aria-label={`Textos ${side === 'front' ? 'da frente' : 'do verso'}`}>
+                  <h3>Textos · {side === 'front' ? 'Frente' : 'Verso'}</h3>
+                  {cardCopyFields(design.cardTheme, side).map((key) => {
+                    const defaults = {brand: 'Logo', subtitle: '', name: profile.name || 'Nome do titular', email: profile.email || 'Email do titular', action: design.cardTheme === 'plain' && side === 'front' ? '' : 'Aproxime ou leia o QR'};
+                    const labels = {brand: 'Logo / nome da marca', subtitle: 'Subtítulo', name: 'Nome no cartão', email: 'Email no cartão', action: 'Texto de apoio'};
+                    return <label key={key}>{labels[key]}<input type="text" value={design.cardText?.[side]?.[key] ?? defaults[key]} maxLength={key === 'email' ? 120 : 80}
+                      onChange={(e) => onChange({...design, cardText: {...design.cardText, [side]: {...design.cardText?.[side], [key]: e.target.value}}})} /></label>;
+                  })}
+                  <small>Edite cada lado separadamente. O QR continua ligado ao perfil.</small>
+                </section>
+              )}
               {!readOnly && (card || side === 'front') && (
                 <>
                   <label>
@@ -551,7 +604,7 @@ export function ProductDesigner({
                     <input
                       type="file"
                       accept="image/png,image/jpeg,application/pdf"
-                      onChange={(e) => void upload(e.target.files?.[0])}
+                      onChange={(e) => {void upload(e.target.files?.[0]); e.target.value = '';}}
                     />
                   </label>
                   <small>
@@ -560,6 +613,14 @@ export function ProductDesigner({
                   {selected && (
                     <>
                       <p>{selected.name}</p>
+                      {!selected.name.toLowerCase().endsWith('.pdf') && (
+                        <div className="logo-background-controls">
+                          <label>Intensidade da remoção<input type="range" min="0" max="100" value={tolerance} onChange={(e) => setTolerance(Number(e.target.value))} /></label>
+                          <button type="button" onClick={() => void removeBackground()}>Remover fundo</button>
+                          {originals[side] && <button type="button" onClick={() => {onChange({...design, [side]: {...originals[side]!, scale: selected.scale, x: selected.x, y: selected.y}});setOriginals((prev) => ({...prev, [side]: undefined}));}}>Restaurar original</button>}
+                          <small>Para fundos lisos. A remoção é feita neste dispositivo. Para fundos complexos, use um PNG transparente.</small>
+                        </div>
+                      )}
                       {selected.name.toLowerCase().endsWith('.pdf') && (
                         <label>
                           Página do PDF
@@ -595,7 +656,7 @@ export function ProductDesigner({
                       <button
                         type="button"
                         onClick={() =>
-                          onChange({ ...design, [side]: undefined })
+                          (setOriginals((prev) => ({...prev, [side]: undefined})), onChange({ ...design, [side]: undefined }))
                         }
                       >
                         Remover ficheiro
@@ -645,6 +706,8 @@ export function ProductDesigner({
             design.optionId}
         </p>
       )}
+      {processing && <p role="status">A processar o logótipo…</p>}
+      </fieldset>
       {error && <p role="alert">{error}</p>}
     </div>
   );

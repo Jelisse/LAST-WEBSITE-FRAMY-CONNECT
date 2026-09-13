@@ -56,7 +56,7 @@ export function OrderSubmission({
     [orderId, setOrderId] = useState(''),
     [done, setDone] = useState(false);
   const [design, setDesign] = useState<ProductDesign>({
-    ...(product.category === 'Cartões' ? { cardTheme: 'navy-gold' as const } : {}),
+    ...(product.category === 'Cartões' ? { cardTheme: 'navy-gold' as const, editorVersion: 2 } : {}),
     optionId: product.id === 'keychain' ? 'tiktok' : blankOption(product),
   });
   const plan = plans.find((p) => p.id === planId);
@@ -77,7 +77,16 @@ export function OrderSubmission({
         const saved = raw ? JSON.parse(raw) : null;
         const d = account ? await load() : null;
         if (!active) return;
-        if (saved?.design) setDesign(saved.design);
+        if (saved?.design) {
+          const restored = saved.design;
+          if (product.category === 'Cartões' && restored.editorVersion !== 2 && !saved.done) {
+            // Start the new editor without the previously uploaded preview logos.
+            if (!restored.front?.name?.toLowerCase().endsWith('.pdf')) restored.front = undefined;
+            if (!restored.back?.name?.toLowerCase().endsWith('.pdf')) restored.back = undefined;
+            restored.editorVersion = 2;
+          }
+          setDesign(restored);
+        }
         setProfile(saved?.profile ?? d?.profile ?? blankProfile);
         setCity(saved?.city ?? '');
         setAddress(saved?.address ?? '');

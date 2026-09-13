@@ -24,6 +24,12 @@ export const cardThemes = [
 ] as const;
 export type CardTheme = (typeof cardThemes)[number]['id'] | (typeof legacyThemes)[number]['id'];
 export function cardIsPortrait(theme?: CardTheme) { return !!theme?.endsWith('-vertical'); }
+export type CardCopy = Partial<Record<'brand' | 'subtitle' | 'name' | 'email' | 'action', string>>;
+export function cardCopyFields(theme: CardTheme | undefined, side: 'front' | 'back'): (keyof CardCopy)[] {
+  if (side === 'front') return cardIsPortrait(theme) || theme === 'navy-gold' || theme === 'gold-hex' ? ['brand', 'name', 'email'] : theme === 'plain' ? ['brand', 'subtitle', 'action'] : ['brand', 'subtitle'];
+  if (cardIsPortrait(theme)) return ['name', 'email'];
+  return theme === 'silver-wave' || theme === 'black-signature' ? ['brand','name','email'] : theme === 'plain' ? ['name','email','action'] : ['brand','name','email','action'];
+}
 export type CardColors = { from: string; to: string; accent: string; text: string };
 export function cardPalette(theme: CardTheme = 'plain', colors?: Partial<CardColors>): CardColors {
   const t = cardThemes.find((item) => item.id === theme) ?? legacyThemes.find((item) => item.id === theme) ?? legacyThemes[3];
@@ -50,7 +56,9 @@ export function cardArtwork({
   qr = '',
   art,
   colors,
+  copy = {},
 }: {
+  copy?: CardCopy;
   theme?: CardTheme;
   colors?: Partial<CardColors>;
   side: 'front' | 'back';
@@ -59,7 +67,7 @@ export function cardArtwork({
   qr?: string;
   art?: { src: string; scale: number; x: number; y: number };
 }) {
-  if (theme !== 'plain' && cardThemes.some((t) => t.id === theme)) return referenceArtwork({theme, side, name, email, qr, art, colors});
+  if (theme !== 'plain' && cardThemes.some((t) => t.id === theme)) return referenceArtwork({theme, side, name, email, qr, art, colors, copy});
   const t = legacyThemes.find((t) => t.id === theme) ?? legacyThemes[3];
   const plain = t.id === 'plain';
   const palette = cardPalette(theme, colors);
@@ -88,20 +96,18 @@ export function cardArtwork({
   const artwork = art
     ? `<image href="${escape(art.src)}" x="${505 + art.x * 10.1 - (1010 * art.scale) / 200}" y="${319 + art.y * 6.38 - (638 * art.scale) / 200}" width="${(1010 * art.scale) / 100}" height="${(638 * art.scale) / 100}" preserveAspectRatio="xMidYMid meet"/>`
     : '';
-  const front = art
-    ? ''
-    : `${label('FRAMY', 275, 310, 105, 600, 700)}${label('C O N N E C T', 285, 364, 31, 600)}${label('O seu mundo. Num toque.', 285, 480, 25, 600)}`;
+  const front = `${label((art ? '' : copy.brand ?? 'Logo'), 275, 310, 105, 600, 700)}${label(copy.subtitle ?? '', 285, 364, 31, 600)}${label(copy.action ?? '', 285, 480, 25, 600)}`;
   const identityPanel = !colors && ['plain', 'forest', 'violet', 'framy'].includes(theme)
     ? plain ? '<rect x="0" y="338" width="1010" height="300" fill="white"/>' : '<rect x="44" y="333" width="922" height="261" rx="16" fill="#000000" fill-opacity=".68"/>'
     : `<rect x="44" y="333" width="922" height="261" rx="16" fill="${panel}" fill-opacity=".92"/>`;
-  const back = `${identityPanel}${label(name || 'Nome do titular', 76, 410, 38, 560, 700)}${label(email || 'Email do titular', 76, 465, 27, 560)}${label('Aproxime o telemóvel ou leia o QR', 76, 548, 22, 560)}<rect x="708" y="346" width="225" height="225" rx="12" fill="white"/>${qr ? `<image href="${escape(qr)}" x="715" y="353" width="211" height="211"/>` : '<text x="820" y="439" text-anchor="middle" fill="#43564f" font-family="Arial,sans-serif" font-size="24">QR do perfil</text><text x="820" y="475" text-anchor="middle" fill="#43564f" font-family="Arial,sans-serif" font-size="18">após criar o perfil</text>'}`;
+  const back = `${identityPanel}${label(copy.name ?? (name || 'Nome do titular'), 76, 410, 38, 560, 700)}${label(copy.email ?? (email || 'Email do titular'), 76, 465, 27, 560)}${label(copy.action ?? 'Aproxime ou leia o QR', 76, 548, 22, 560)}<rect x="708" y="346" width="225" height="225" rx="12" fill="white"/>${qr ? `<image href="${escape(qr)}" x="715" y="353" width="211" height="211"/>` : '<text x="820" y="439" text-anchor="middle" fill="#43564f" font-family="Arial,sans-serif" font-size="24">QR do perfil</text><text x="820" y="475" text-anchor="middle" fill="#43564f" font-family="Arial,sans-serif" font-size="18">após criar o perfil</text>'}`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="85.5mm" height="54mm" viewBox="0 0 1010 638">${background}${artwork}${side === 'front' ? front : back}</svg>`;
 }
 export function cardArtworkUrl(svg: string) {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-function referenceArtwork({theme, side, name = '', email = '', qr = '', art, colors}: Parameters<typeof cardArtwork>[0]) {
+function referenceArtwork({theme, side, name = '', email = '', qr = '', art, colors, copy = {}}: Parameters<typeof cardArtwork>[0]) {
   const p = cardPalette(theme, colors);
   const portrait = cardIsPortrait(theme);
   const w = portrait ? 638 : 1010, h = portrait ? 1010 : 638;
@@ -126,15 +132,15 @@ function referenceArtwork({theme, side, name = '', email = '', qr = '', art, col
   const qrBlock = `<rect x="${qx}" y="${qy}" width="${qrSize}" height="${qrSize}" rx="4" fill="#fff"/>${qr ? `<image href="${escape(qr)}" x="${qx}" y="${qy}" width="${qrSize}" height="${qrSize}"/>` : `<text x="${qx+qrSize/2}" y="${qy+90}" text-anchor="middle" fill="#333" font-size="22" font-family="Arial,sans-serif">QR do perfil</text><text x="${qx+qrSize/2}" y="${qy+122}" text-anchor="middle" fill="#555" font-size="15" font-family="Arial,sans-serif">após criar o perfil</text>`}`;
   const tx = portrait ? 52 : 65;
   const front = portrait
-    ? `${nfc(510,70)}${text('FRAMY CONNECT',52,theme === 'violet-vertical' ? 700 : 480,30,520,600)}${text(name || 'Nome do titular',52,835,30,530,600)}${text(email || 'Email do titular',52,885,22,530)}`
+    ? `${nfc(510,70)}${text((art ? '' : copy.brand ?? 'Logo'),52,theme === 'violet-vertical' ? 700 : 480,30,520,600)}${text(copy.name ?? (name || 'Nome do titular'),52,835,30,530,600)}${text(copy.email ?? (email || 'Email do titular'),52,885,22,530)}`
     : gold || theme === 'gold-hex'
-      ? `${nfc(70,65)}${text('FRAMY CONNECT',65,265,28,590,600)}${text(name || 'Nome do titular',65,390,46,570,600)}${text(email || 'Email do titular',65,452,26,550)}`
-      : `${text('FRAMY',505,315,theme === 'black-essential' ? 91 : 66,650,600,'middle')}${text('C O N N E C T',505,365,23,600,400,'middle')}${nfc(870,520)}`;
+      ? `${nfc(70,65)}${text((art ? '' : copy.brand ?? 'Logo'),65,265,28,590,600)}${text(copy.name ?? (name || 'Nome do titular'),65,390,46,570,600)}${text(copy.email ?? (email || 'Email do titular'),65,452,26,550)}`
+      : `${text((art ? '' : copy.brand ?? 'Logo'),505,315,theme === 'black-essential' ? 91 : 66,650,600,'middle')}${text(copy.subtitle ?? '',505,365,23,600,400,'middle')}${nfc(870,520)}`;
   // An opaque identity area keeps uploaded artwork away from the printed contact details.
   const back = portrait
-    ? `<rect x="30" y="475" width="578" height="460" fill="${p.to}"/>${text(name || 'Nome do titular',319,525,32,520,600,'middle')}${qrBlock}${text(email || 'Email do titular',319,850,23,520,400,'middle')}${nfc(510,70)}`
+    ? `<rect x="30" y="475" width="578" height="460" fill="${p.to}"/>${text(copy.name ?? (name || 'Nome do titular'),319,525,32,520,600,'middle')}${qrBlock}${text(copy.email ?? (email || 'Email do titular'),319,850,23,520,400,'middle')}${nfc(510,70)}`
     : centered
-      ? `<rect x="50" y="115" width="910" height="425" fill="${p.to}"/>${qrBlock}${text(name || 'Nome do titular',505,425,34,810,600,'middle')}${text(email || 'Email do titular',505,480,25,810,400,'middle')}${text('FRAMY CONNECT',65,75,23,660,600)}${nfc(900,530)}`
-      : `<rect x="40" y="295" width="930" height="270" fill="${p.to}"/>${text('FRAMY CONNECT',tx,100,25,650,600)}${text(name || 'Nome do titular',tx,390,40,625,600)}${text(email || 'Email do titular',tx,447,25,625)}${text('Aproxime ou leia o QR',tx,520,21,625)}${qrBlock}${nfc(890,65)}`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${portrait ? 54 : 85.5}mm" height="${portrait ? 85.5 : 54}mm" viewBox="0 0 ${w} ${h}">${bg}${userArt}${side === 'front' ? art ? '' : front : back}</svg>`;
+      ? `<rect x="50" y="115" width="910" height="425" fill="${p.to}"/>${qrBlock}${text(copy.name ?? (name || 'Nome do titular'),505,425,34,810,600,'middle')}${text(copy.email ?? (email || 'Email do titular'),505,480,25,810,400,'middle')}${text((art ? '' : copy.brand ?? 'Logo'),65,75,23,660,600)}${nfc(900,530)}`
+      : `<rect x="40" y="295" width="930" height="270" fill="${p.to}"/>${text((art ? '' : copy.brand ?? 'Logo'),tx,100,25,650,600)}${text(copy.name ?? (name || 'Nome do titular'),tx,390,40,625,600)}${text(copy.email ?? (email || 'Email do titular'),tx,447,25,625)}${text(copy.action ?? 'Aproxime ou leia o QR',tx,520,21,625)}${qrBlock}${nfc(890,65)}`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${portrait ? 54 : 85.5}mm" height="${portrait ? 85.5 : 54}mm" viewBox="0 0 ${w} ${h}">${bg}${userArt}${side === 'front' ? front : back}</svg>`;
 }

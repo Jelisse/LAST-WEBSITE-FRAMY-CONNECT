@@ -73,3 +73,22 @@ test('reference collection replaces old choices and prints portrait dimensions c
     }
   }
 });
+
+test('editable copy survives validation and replaces fixed branding without changing QR', () => {
+  const cardText = {front: {brand: 'My <Logo>', name: 'Ana', email: 'ana@example.test'}, back: {brand: '', name: 'Maria', email: 'maria@example.test', action: 'Contact me'}};
+  const saved = validateDesign({optionId: 'blank-card', cardTheme: 'navy-gold', cardText, editorVersion: 2}, {id:'pvc',category:'Cartões'});
+  assert.deepEqual(saved.cardText, cardText);
+  const front = cardArtwork({theme:'navy-gold', side:'front', copy:saved.cardText.front});
+  assert.ok(front.includes('My &lt;Logo&gt;'));
+  assert.ok(front.includes('Ana'));
+  const back = cardArtwork({theme:'navy-gold', side:'back', copy:saved.cardText.back, qr:'data:image/png;base64,REALQR'});
+  assert.ok(back.includes('Maria'));
+  assert.ok(back.includes('Contact me'));
+  assert.ok(back.includes('data:image/png;base64,REALQR'));
+  for (const theme of cardThemes) {
+    const svg = cardArtwork({theme:theme.id,side:'front'});
+    assert.ok(svg.includes('Logo'));
+    assert.ok(!svg.includes('FRAMY'));
+  }
+  assert.throws(() => validateDesign({optionId:'blank-card',cardText:{front:{brand:'X'.repeat(81)}}},{id:'pvc',category:'Cartões'}));
+});

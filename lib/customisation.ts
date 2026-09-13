@@ -23,6 +23,8 @@ export type Artwork = {
   assetId?: string;
 };
 export type ProductDesign = {
+  editorVersion?: number;
+  cardText?: Partial<Record<'front' | 'back', import('./card-art').CardCopy>>;
   cardColors?: import('./card-art').CardColors;
   cardTheme?: import('./card-art').CardTheme;
   optionId: string;
@@ -58,6 +60,22 @@ export function validateDesign(
     )
       throw Error('Estilo de cartão inválido.');
     result.cardTheme = d.cardTheme ?? 'plain';
+    if (d.editorVersion === 2) result.editorVersion = 2;
+    if (d.cardText !== undefined) {
+      if (!d.cardText || typeof d.cardText !== 'object') throw Error('Texto inválido.');
+      result.cardText = {};
+      for (const side of ['front', 'back'] as const) {
+        const copy = d.cardText[side];
+        if (copy === undefined) continue;
+        if (!copy || typeof copy !== 'object') throw Error('Texto inválido.');
+        result.cardText[side] = {};
+        for (const key of ['brand','subtitle','name','email','action'] as const) {
+          if (copy[key] === undefined) continue;
+          if (typeof copy[key] !== 'string' || copy[key]!.length > (key === 'email' ? 120 : 80)) throw Error('Texto demasiado longo.');
+          result.cardText[side]![key] = copy[key];
+        }
+      }
+    }
     if (d.cardColors !== undefined) {
       if (!d.cardColors || typeof d.cardColors !== 'object' ||
         !['from', 'to', 'accent', 'text'].every((key) =>
