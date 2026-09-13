@@ -27,8 +27,22 @@ export function cardIsPortrait(theme?: CardTheme) { return !!theme?.endsWith('-v
 export type CardCopy = Partial<Record<'brand' | 'subtitle' | 'name' | 'email' | 'action', string>>;
 export function cardCopyFields(theme: CardTheme | undefined, side: 'front' | 'back'): (keyof CardCopy)[] {
   if (side === 'front') return cardIsPortrait(theme) || theme === 'navy-gold' || theme === 'gold-hex' ? ['brand', 'name', 'email'] : theme === 'plain' ? ['brand', 'subtitle', 'action'] : ['brand', 'subtitle'];
-  if (cardIsPortrait(theme)) return ['name', 'email'];
-  return theme === 'silver-wave' || theme === 'black-signature' ? ['brand','name','email'] : theme === 'plain' ? ['name','email','action'] : ['brand','name','email','action'];
+  if (cardIsPortrait(theme)) return ['brand', 'name', 'email'];
+  return theme === 'silver-wave' || theme === 'black-signature' ? ['brand','name','email'] : theme === 'plain' ? ['brand','name','email','action'] : ['brand','name','email','action'];
+}
+export function cardLogoSlot(theme: CardTheme = 'plain', side: 'front' | 'back') {
+  if (cardIsPortrait(theme)) return {x: 52, y: side === 'back' ? 250 : theme === 'violet-vertical' ? 620 : 395, width: 330, height: 140};
+  if (side === 'back') return {x: 65, y: 30, width: 300, height: theme === 'silver-wave' || theme === 'black-signature' ? 75 : 125};
+  if (theme === 'navy-gold' || theme === 'gold-hex') return {x: 65, y: 205, width: 300, height: 110};
+  return {x: 305, y: 215, width: 400, height: 125};
+}
+function cardLogoLayer(theme: CardTheme, side: 'front' | 'back', art: Parameters<typeof cardArtwork>[0]['art'], copy: CardCopy, color: string) {
+  const box = cardLogoSlot(theme, side);
+  if (art && art.placement !== 'logo') return '';
+  const content = art
+    ? `<defs><clipPath id="logo-slot"><rect x="${box.x}" y="${box.y}" width="${box.width}" height="${box.height}"/></clipPath></defs><image clip-path="url(#logo-slot)" href="${escape(art.src)}" x="${box.x + box.width * (.5 + art.x/100 - art.scale/200)}" y="${box.y + box.height * (.5 + art.y/100 - art.scale/200)}" width="${box.width*art.scale/100}" height="${box.height*art.scale/100}" preserveAspectRatio="xMidYMid meet"/>`
+    : `<text x="${box.x+box.width/2}" y="${box.y+box.height/2}" dominant-baseline="central" text-anchor="middle" font-family="Arial,sans-serif" font-size="${Math.min(46,box.height*.45)}" font-weight="600" fill="${color}" ${ (copy.brand ?? 'Logo').length > 12 ? `textLength="${box.width*.9}" lengthAdjust="spacingAndGlyphs"` : ''}>${escape(copy.brand ?? 'Logo')}</text>`;
+  return `<g data-logo-slot="${box.x},${box.y},${box.width},${box.height}">${content}</g>`;
 }
 export type CardColors = { from: string; to: string; accent: string; text: string };
 export function cardPalette(theme: CardTheme = 'plain', colors?: Partial<CardColors>): CardColors {
@@ -65,7 +79,7 @@ export function cardArtwork({
   name?: string;
   email?: string;
   qr?: string;
-  art?: { src: string; scale: number; x: number; y: number };
+  art?: { src: string; scale: number; x: number; y: number; placement?: 'logo' };
 }) {
   if (theme !== 'plain' && cardThemes.some((t) => t.id === theme)) return referenceArtwork({theme, side, name, email, qr, art, colors, copy});
   const t = legacyThemes.find((t) => t.id === theme) ?? legacyThemes[3];
@@ -93,15 +107,15 @@ export function cardArtwork({
           ? `<rect x="32" y="32" width="946" height="574" rx="12" fill="none" stroke="${palette.accent}" stroke-width="4"/><rect x="46" y="46" width="918" height="546" rx="8" fill="none" stroke="${palette.accent}" stroke-width="1"/>`
           : plain ? '' : `<path d="M0 0H330L130 638H0Z" fill="url(#${theme === 'violet' ? 'lines' : 'dots'})"/><path d="M770 0H1010V638H610Z" fill="url(#${theme === 'violet' ? 'lines' : 'dots'})"/>`;
   const background = `<defs><linearGradient id="bg" x2="1" y2=".5"><stop stop-color="${palette.from}"/><stop offset="1" stop-color="${palette.to}"/></linearGradient><pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="4" fill="${palette.accent}" opacity=".18"/></pattern><pattern id="lines" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M0 50L25 7H75L100 50L75 93H25Z" fill="none" stroke="${palette.accent}" stroke-opacity=".2" stroke-width="2"/></pattern></defs><rect width="1010" height="638" fill="url(#bg)"/>${decoration}`;
-  const artwork = art
+  const artwork = art && art.placement !== 'logo'
     ? `<image href="${escape(art.src)}" x="${505 + art.x * 10.1 - (1010 * art.scale) / 200}" y="${319 + art.y * 6.38 - (638 * art.scale) / 200}" width="${(1010 * art.scale) / 100}" height="${(638 * art.scale) / 100}" preserveAspectRatio="xMidYMid meet"/>`
     : '';
-  const front = `${label((art ? '' : copy.brand ?? 'Logo'), 275, 310, 105, 600, 700)}${label(copy.subtitle ?? '', 285, 364, 31, 600)}${label(copy.action ?? '', 285, 480, 25, 600)}`;
+  const front = `${label('', 275, 310, 105, 600, 700)}${label(copy.subtitle ?? '', 285, 364, 31, 600)}${label(copy.action ?? '', 285, 480, 25, 600)}`;
   const identityPanel = !colors && ['plain', 'forest', 'violet', 'framy'].includes(theme)
     ? plain ? '<rect x="0" y="338" width="1010" height="300" fill="white"/>' : '<rect x="44" y="333" width="922" height="261" rx="16" fill="#000000" fill-opacity=".68"/>'
     : `<rect x="44" y="333" width="922" height="261" rx="16" fill="${panel}" fill-opacity=".92"/>`;
   const back = `${identityPanel}${label(copy.name ?? (name || 'Nome do titular'), 76, 410, 38, 560, 700)}${label(copy.email ?? (email || 'Email do titular'), 76, 465, 27, 560)}${label(copy.action ?? 'Aproxime ou leia o QR', 76, 548, 22, 560)}<rect x="708" y="346" width="225" height="225" rx="12" fill="white"/>${qr ? `<image href="${escape(qr)}" x="715" y="353" width="211" height="211"/>` : '<text x="820" y="439" text-anchor="middle" fill="#43564f" font-family="Arial,sans-serif" font-size="24">QR do perfil</text><text x="820" y="475" text-anchor="middle" fill="#43564f" font-family="Arial,sans-serif" font-size="18">após criar o perfil</text>'}`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="85.5mm" height="54mm" viewBox="0 0 1010 638">${background}${artwork}${side === 'front' ? front : back}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="85.5mm" height="54mm" viewBox="0 0 1010 638">${background}${artwork}${side === 'front' ? front : back}${cardLogoLayer(theme, side, art, copy, palette.text)}</svg>`;
 }
 export function cardArtworkUrl(svg: string) {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
@@ -125,22 +139,22 @@ function referenceArtwork({theme, side, name = '', email = '', qr = '', art, col
   if (theme === 'architect-vertical') decor = `<g fill="none" stroke="${p.accent}" stroke-width="2" opacity=".3"><path d="M60 360V180L160 140V360M190 360V100L295 55V360M325 360V190L420 150V360M450 360V130L560 180V360"/>${[85,115,215,245,355,385,480,515].map(x=>`<path d="M${x} 205V325" stroke-dasharray="7 12"/>`).join('')}</g>`;
   if (theme === 'violet-vertical') decor = `<defs><linearGradient id="capsule" x2="1" y2="1"><stop stop-color="${p.accent}"/><stop offset=".3" stop-color="${p.from}"/><stop offset=".8" stop-color="${p.accent}"/><stop offset="1" stop-color="${p.to}"/></linearGradient></defs><g transform="rotate(32 319 300)" fill="url(#capsule)" stroke="${p.accent}" stroke-opacity=".3"><rect x="70" y="-260" width="120" height="600" rx="60"/><rect x="290" y="-70" width="150" height="680" rx="75"/><rect x="535" y="-200" width="90" height="520" rx="45"/></g>`;
   const bg = `<defs><linearGradient id="base" x2="1" y2="1"><stop stop-color="${p.from}"/><stop offset="1" stop-color="${p.to}"/></linearGradient></defs><rect width="${w}" height="${h}" fill="url(#base)"/>${decor}`;
-  const userArt = art ? `<image href="${escape(art.src)}" x="${w*(.5+art.x/100-art.scale/200)}" y="${h*(.5+art.y/100-art.scale/200)}" width="${w*art.scale/100}" height="${h*art.scale/100}" preserveAspectRatio="xMidYMid meet"/>` : '';
+  const userArt = art && art.placement !== 'logo' ? `<image href="${escape(art.src)}" x="${w*(.5+art.x/100-art.scale/200)}" y="${h*(.5+art.y/100-art.scale/200)}" width="${w*art.scale/100}" height="${h*art.scale/100}" preserveAspectRatio="xMidYMid meet"/>` : '';
   const qrSize = portrait ? 210 : 200;
   const qx = portrait ? (w-qrSize)/2 : centered ? 405 : 744;
   const qy = portrait ? 590 : centered ? 155 : 315;
   const qrBlock = `<rect x="${qx}" y="${qy}" width="${qrSize}" height="${qrSize}" rx="4" fill="#fff"/>${qr ? `<image href="${escape(qr)}" x="${qx}" y="${qy}" width="${qrSize}" height="${qrSize}"/>` : `<text x="${qx+qrSize/2}" y="${qy+90}" text-anchor="middle" fill="#333" font-size="22" font-family="Arial,sans-serif">QR do perfil</text><text x="${qx+qrSize/2}" y="${qy+122}" text-anchor="middle" fill="#555" font-size="15" font-family="Arial,sans-serif">após criar o perfil</text>`}`;
   const tx = portrait ? 52 : 65;
   const front = portrait
-    ? `${nfc(510,70)}${text((art ? '' : copy.brand ?? 'Logo'),52,theme === 'violet-vertical' ? 700 : 480,30,520,600)}${text(copy.name ?? (name || 'Nome do titular'),52,835,30,530,600)}${text(copy.email ?? (email || 'Email do titular'),52,885,22,530)}`
+    ? `${nfc(510,70)}${text('',52,theme === 'violet-vertical' ? 700 : 480,30,520,600)}${text(copy.name ?? (name || 'Nome do titular'),52,835,30,530,600)}${text(copy.email ?? (email || 'Email do titular'),52,885,22,530)}`
     : gold || theme === 'gold-hex'
-      ? `${nfc(70,65)}${text((art ? '' : copy.brand ?? 'Logo'),65,265,28,590,600)}${text(copy.name ?? (name || 'Nome do titular'),65,390,46,570,600)}${text(copy.email ?? (email || 'Email do titular'),65,452,26,550)}`
-      : `${text((art ? '' : copy.brand ?? 'Logo'),505,315,theme === 'black-essential' ? 91 : 66,650,600,'middle')}${text(copy.subtitle ?? '',505,365,23,600,400,'middle')}${nfc(870,520)}`;
+      ? `${nfc(70,65)}${text('',65,265,28,590,600)}${text(copy.name ?? (name || 'Nome do titular'),65,390,46,570,600)}${text(copy.email ?? (email || 'Email do titular'),65,452,26,550)}`
+      : `${text('',505,315,theme === 'black-essential' ? 91 : 66,650,600,'middle')}${text(copy.subtitle ?? '',505,365,23,600,400,'middle')}${nfc(870,520)}`;
   // An opaque identity area keeps uploaded artwork away from the printed contact details.
   const back = portrait
     ? `<rect x="30" y="475" width="578" height="460" fill="${p.to}"/>${text(copy.name ?? (name || 'Nome do titular'),319,525,32,520,600,'middle')}${qrBlock}${text(copy.email ?? (email || 'Email do titular'),319,850,23,520,400,'middle')}${nfc(510,70)}`
     : centered
-      ? `<rect x="50" y="115" width="910" height="425" fill="${p.to}"/>${qrBlock}${text(copy.name ?? (name || 'Nome do titular'),505,425,34,810,600,'middle')}${text(copy.email ?? (email || 'Email do titular'),505,480,25,810,400,'middle')}${text((art ? '' : copy.brand ?? 'Logo'),65,75,23,660,600)}${nfc(900,530)}`
-      : `<rect x="40" y="295" width="930" height="270" fill="${p.to}"/>${text((art ? '' : copy.brand ?? 'Logo'),tx,100,25,650,600)}${text(copy.name ?? (name || 'Nome do titular'),tx,390,40,625,600)}${text(copy.email ?? (email || 'Email do titular'),tx,447,25,625)}${text(copy.action ?? 'Aproxime ou leia o QR',tx,520,21,625)}${qrBlock}${nfc(890,65)}`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${portrait ? 54 : 85.5}mm" height="${portrait ? 85.5 : 54}mm" viewBox="0 0 ${w} ${h}">${bg}${userArt}${side === 'front' ? front : back}</svg>`;
+      ? `<rect x="50" y="115" width="910" height="425" fill="${p.to}"/>${qrBlock}${text(copy.name ?? (name || 'Nome do titular'),505,425,34,810,600,'middle')}${text(copy.email ?? (email || 'Email do titular'),505,480,25,810,400,'middle')}${text('',65,75,23,660,600)}${nfc(900,530)}`
+      : `<rect x="40" y="295" width="930" height="270" fill="${p.to}"/>${text('',tx,100,25,650,600)}${text(copy.name ?? (name || 'Nome do titular'),tx,390,40,625,600)}${text(copy.email ?? (email || 'Email do titular'),tx,447,25,625)}${text(copy.action ?? 'Aproxime ou leia o QR',tx,520,21,625)}${qrBlock}${nfc(890,65)}`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${portrait ? 54 : 85.5}mm" height="${portrait ? 85.5 : 54}mm" viewBox="0 0 ${w} ${h}">${bg}${userArt}${side === 'front' ? front : back}${cardLogoLayer(theme ?? 'plain', side, art, copy, p.text)}</svg>`;
 }

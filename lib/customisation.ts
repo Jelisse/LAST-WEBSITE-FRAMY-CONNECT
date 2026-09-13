@@ -14,6 +14,7 @@ export type StockOption = {
   version: number;
 };
 export type Artwork = {
+  placement?: 'logo';
   fileKey: string;
   name: string;
   page: number;
@@ -106,7 +107,9 @@ export function validateDesign(
       Math.abs(a.y) > 40
     )
       throw Error('Posição ou página inválida.');
+    if (a.placement !== undefined && (a.placement !== 'logo' || product.category !== 'Cartões')) throw Error('Posição de logótipo inválida.');
     result[side] = {
+      ...(a.placement === 'logo' ? {placement: 'logo' as const} : {}),
       assetId: a.assetId,
       fileKey: '',
       name: String(a.name).slice(0, 150),

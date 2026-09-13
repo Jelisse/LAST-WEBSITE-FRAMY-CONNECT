@@ -107,6 +107,18 @@ export function ProductDesigner({
   const custom = design.optionId === blank;
   const available = options.find((o) => o.id === blank);
   useEffect(() => {
+    if (!card || readOnly) return;
+    const next = {...design};
+    let changed = false;
+    for (const s of ['front','back'] as const) {
+      const a = design[s];
+      if (a && !a.placement && !a.name.toLowerCase().endsWith('.pdf')) {
+        next[s] = {...a, placement: 'logo', scale: 100, x: 0, y: 0}; changed = true;
+      }
+    }
+    if (changed) onChange(next);
+  }, [card, readOnly, design.front, design.back]);
+  useEffect(() => {
     if (card && !readOnly && design.cardTheme && !cardThemes.some((t) => t.id === design.cardTheme)) {
       onChange({...design, cardTheme: 'navy-gold', cardColors: undefined});
     }
@@ -203,7 +215,7 @@ export function ProductDesigner({
       setOriginals((prev) => ({...prev, [side]: undefined}));
       onChange({
         ...design,
-        [side]: { fileKey, name: file.name, page: 1, scale: file.type === 'application/pdf' || !card ? 80 : 30, x: 0, y: card && side === 'back' ? -35 : 0 },
+        [side]: { fileKey, name: file.name, page: 1, scale: file.type === 'application/pdf' || !card ? 80 : 100, x: 0, y: 0, ...(card && file.type !== 'application/pdf' ? {placement: 'logo' as const} : {}) },
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Não foi possível carregar.');
@@ -270,7 +282,7 @@ export function ProductDesigner({
                 qr,
                 art:
                   a && art[s]
-                    ? { src: art[s], scale: a.scale, x: a.x, y: a.y }
+                    ? { src: art[s], scale: a.scale, x: a.x, y: a.y, placement: a.placement }
                     : undefined,
               }),
             )}
@@ -333,7 +345,7 @@ export function ProductDesigner({
         qr,
         art:
           a && art[side]
-            ? { src: art[side], scale: a.scale, x: a.x, y: a.y }
+            ? { src: art[side], scale: a.scale, x: a.x, y: a.y, placement: a.placement }
             : undefined,
       });
       const url = URL.createObjectURL(
@@ -491,7 +503,7 @@ export function ProductDesigner({
             <div className="card-style-picker">
               <h3>Modelo</h3>
               <p>
-                Escolha um modelo horizontal ou vertical.
+                O texto «Logo» indica onde ficará o seu logótipo.
               </p>
               <div>
                 {cardThemes.map((t) => (
@@ -608,7 +620,7 @@ export function ProductDesigner({
                     />
                   </label>
                   <small>
-                    PNG, JPG ou PDF · até 8 MB.
+                    PNG ou JPG substitui «Logo» no local indicado. PDF para design completo · até 8 MB.
                   </small>
                   {selected && (
                     <>

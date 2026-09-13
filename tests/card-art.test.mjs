@@ -92,3 +92,15 @@ test('editable copy survives validation and replaces fixed branding without chan
   }
   assert.throws(() => validateDesign({optionId:'blank-card',cardText:{front:{brand:'X'.repeat(81)}}},{id:'pvc',category:'Cartões'}));
 });
+
+test('every logo upload occupies its template placeholder and retains contact text', () => {
+  for (const theme of cardThemes) for (const side of ['front','back']) {
+    const placeholder = cardArtwork({theme:theme.id,side});
+    const uploaded = cardArtwork({theme:theme.id,side, name:'Customer', email:'customer@example.test', art:{src:'data:image/png;base64,IMAGE',scale:100,x:0,y:0,placement:'logo'}});
+    assert.equal(placeholder.match(/data-logo-slot="([^"]+)"/)[1], uploaded.match(/data-logo-slot="([^"]+)"/)[1]);
+    assert.ok(uploaded.includes('data:image/png;base64,IMAGE'));
+    assert.ok(!uploaded.includes('>Logo</text>'));
+    assert.ok(uploaded.includes('clip-path="url(#logo-slot)"'));
+    if (side === 'back') { assert.ok(uploaded.includes('Customer')); assert.ok(uploaded.includes('customer@example.test')); }
+  }
+});
