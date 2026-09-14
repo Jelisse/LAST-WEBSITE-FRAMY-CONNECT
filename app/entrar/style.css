@@ -5,7 +5,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: #ff5a00;
+  background: #f05a29;
 }
 .auth-page::before {
   content: '';
@@ -14,9 +14,10 @@
   z-index: -1;
   pointer-events: none;
   background: url('/brand/profile-mountains.png') center bottom / cover no-repeat;
-  filter: invert(1) brightness(2);
+  filter: invert(1);
   mix-blend-mode: screen;
-  opacity: 0.55;
+  opacity: 0.18;
+  mask-image: linear-gradient(to bottom, transparent, #000 70%);
 }
 .auth-card {
   width: 100%;
