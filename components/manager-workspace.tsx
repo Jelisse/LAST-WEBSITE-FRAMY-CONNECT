@@ -21,6 +21,7 @@ import { OrderArtwork } from './order-artwork';
 import { ProfileHandoff } from './profile-handoff';
 import { AccountMenu } from './account-menu';
 import { ProductManager } from './product-manager';
+import { OperationsAgentReports } from './operations-agent-reports';
 import { money, type Product } from '@/lib/catalog';
 import {
   orderLabels,
@@ -523,6 +524,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
               )}
               {section === 'operations' && (
                 <>
+                  <OperationsAgentReports />
                   <Tabs
                     value={tab}
                     onChange={(v) => {
@@ -1015,6 +1017,11 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                 </p>
               )}
               <p>Agente: {selected.agent || 'Por atribuir'}</p>
+              {selected.fulfilment && <section><h3>Execução do agente</h3>
+                <p>Programação: {selected.fulfilment.programmedAt ? date(selected.fulfilment.programmedAt) : 'Pendente'} · Qualidade: {selected.fulfilment.checkedAt ? date(selected.fulfilment.checkedAt) : 'Pendente'} · Embalagem: {selected.fulfilment.packagedAt ? date(selected.fulfilment.packagedAt) : 'Pendente'}</p>
+                <p>Expedição: {selected.fulfilment.dispatchedAt ? date(selected.fulfilment.dispatchedAt) : 'Pendente'} · {selected.fulfilment.courier} · {selected.fulfilment.tracking}</p>
+                {selected.fulfilment.note && <p>Nota: {selected.fulfilment.note}</p>}
+              </section>}
               {selected.design && <OrderArtwork order={selected} />}
               <ProfileHandoff
                 key={selected.id}

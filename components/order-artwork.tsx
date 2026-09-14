@@ -2,7 +2,7 @@
 import type { SandboxOrder } from '@/lib/domain';
 import { blankProfile } from '@/lib/domain';
 import { ProductDesigner } from './product-designer';
-export function OrderArtwork({ order }: { order: SandboxOrder }) {
+export function OrderArtwork({ order }: { order: Pick<SandboxOrder, 'productId' | 'design' | 'profileUsername'> }) {
   const d = order.design;
   if (!d) return null;
   return (

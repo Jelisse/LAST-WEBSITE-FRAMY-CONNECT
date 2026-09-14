@@ -280,6 +280,8 @@ export type Journal = {
   amount: number;
 };
 export type SandboxOrder = {
+  fulfilment?: import('./agent-workflow').Fulfilment;
+  paymentReference?: string;
   design?: import('./customisation').ProductDesign;
   checkoutPlan?: ManagedPlan;
   profileUsername?: string;
