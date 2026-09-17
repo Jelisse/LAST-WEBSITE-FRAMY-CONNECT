@@ -13,7 +13,10 @@ export function loginDestination(role: AccountRole, requested: string) {
     /^\/encomendar\/[a-z0-9-]+(?:\?[^#]*)?$/.test(requested)
   )
     return requested;
-  if (role === 'customer' && ['/perfil', '/dashboard'].includes(requested))
+  if (
+    role === 'customer' &&
+    ['/perfil', '/dashboard', '/aplicar'].includes(requested)
+  )
     return requested;
   return dashboardFor(role);
 }

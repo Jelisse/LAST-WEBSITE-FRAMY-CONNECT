@@ -39,6 +39,11 @@ export function PersonalisationManager() {
     <section className="panel">
       <h2>Modelos e personalização</h2>
       <p>
+        As quantidades por modelo não aumentam o stock físico total. A contagem
+        inicial confirmada é de 500 porta-chaves no conjunto; novas entradas e
+        atribuições são geridas em Operações → Stock.
+      </p>
+      <p>
         Stock disponível para novas encomendas. Ao chegar a zero, a opção fica
         indisponível automaticamente. As unidades são reservadas ao confirmar o
         pedido e devolvidas ao cancelar.

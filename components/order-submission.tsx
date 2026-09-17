@@ -428,7 +428,16 @@ export function OrderSubmission({
                     encodeURIComponent('/encomendar/' + product.id)
                   }
                 >
-                  Continuar com a conta
+                  Entrar
+                </a>
+                <a
+                  className="btn btn-outline"
+                  href={
+                    '/entrar?mode=register&return_to=' +
+                    encodeURIComponent('/encomendar/' + product.id)
+                  }
+                >
+                  Criar conta
                 </a>
                 <p>
                   Entre ou crie uma conta com email e palavra-passe. A sua

@@ -1,7 +1,10 @@
 export function securityHeaders(headers: Headers, secure: boolean) {
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  headers.set(
+    'Permissions-Policy',
+    'camera=(self), microphone=(), geolocation=()',
+  );
   if (secure) headers.set('Strict-Transport-Security', 'max-age=31536000');
   // Vinext streams inline bootstrap scripts; unsafe-inline is required until nonce support is wired.
   if (!headers.has('Content-Security-Policy'))

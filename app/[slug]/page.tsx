@@ -94,6 +94,14 @@ const pages: Record<
         text: 'Contactos de entrega e encomendas são consultados pelo titular e pela gestão. O agente atribuído recebe os dados necessários à execução e entrega. O pagamento é efectuado no prestador externo; não introduza dados de cartão ou códigos de pagamento em mensagens ou designs.',
       },
       {
+        title: 'Candidaturas e documentos privados',
+        text: 'Os dados pessoais, fotografia e BI da candidatura são consultados pelo candidato e pela gestão autorizada para análise. Os documentos não são publicados. Pode pedir correcção ou eliminação pelo apoio. A gestão decide manualmente sobre a candidatura.',
+      },
+      {
+        title: 'Visitas aos produtos',
+        text: 'Medimos visitas às páginas dos produtos, incluindo os produtos Brevemente, sem exigir uma compra. Um identificador aleatório por sessão evita repetições no mesmo dia; não guardamos o IP nesta estatística. Ao registar novas visitas, eliminamos os registos com mais de 90 dias. O painel apresenta os últimos 30 dias.',
+      },
+      {
         title: 'Retirar um perfil',
         text: 'Pode retirar a publicação no editor e terminar sessões em Segurança da conta. Para pedir correcção ou eliminação de dados e esclarecimentos sobre conservação, contacte support@framyconnect.co.mz. Os ficheiros carregados são conservados enquanto necessários ao perfil ou encomenda.',
       },

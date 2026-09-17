@@ -160,6 +160,263 @@ const post = async (route, body) => {
   const response = await route.POST(request(body));
   return { status: response.status, body: await response.json() };
 };
+
+test('catalogue: only keychains sell initially, stock count runs once, managers control publication and galleries', async () => {
+  const sql = fixture();
+  const catalog = await api('lib/server-catalog.ts');
+  const manage = await api('app/api/manage-products/route.ts');
+  const publicApi = await api('app/api/products/route.ts');
+  let products = await catalog.getProducts();
+  assert.deepEqual(
+    products.filter((p) => p.available).map((p) => p.id),
+    ['keychain'],
+  );
+  assert.equal(
+    sql
+      .prepare(
+        "SELECT SUM(quantity) n FROM stock_movements WHERE product_id='keychain'",
+      )
+      .get().n,
+    500,
+  );
+  sql.exec(
+    "INSERT INTO stock_movements VALUES('test-sale','keychain',-1,'test','test','2026-09-18','')",
+  );
+  await catalog.getProducts();
+  assert.equal(
+    sql
+      .prepare(
+        "SELECT SUM(quantity) n FROM stock_movements WHERE product_id='keychain'",
+      )
+      .get().n,
+    499,
+  );
+  let p = products.find((p) => p.id === 'metal');
+  assert.equal(
+    (await manage.PUT(request({ ...p, available: true }))).status,
+    403,
+  );
+  globalThis.__launch.user = { userId: 'manager-a', role: 'manager' };
+  let r = await manage.PUT(
+    request({
+      ...p,
+      available: true,
+      published: true,
+      images: [p.imageUrl, '/products/pvc.png'],
+    }),
+  );
+  assert.equal(r.status, 200);
+  p = (await r.json()).product;
+  assert.equal(
+    (await catalog.getProducts()).find((v) => v.id === 'metal').available,
+    true,
+  );
+  r = await manage.PUT(request({ ...p, published: false }));
+  assert.equal(r.status, 200);
+  assert.equal(
+    (await (await publicApi.GET()).json()).products.some(
+      (v) => v.id === 'metal',
+    ),
+    false,
+  );
+  assert.equal(
+    (await (await publicApi.GET()).json()).products.find((v) => v.id === 'pvc')
+      .amount,
+    0,
+  );
+  assert.equal(
+    (
+      await manage.PUT(
+        request({ ...p, images: ['https://evil.test/photo.jpg'] }),
+      )
+    ).status,
+    422,
+  );
+  sql.close();
+});
+
+test('product analytics count non-buyers once per session/day and exclude staff and hidden products', async () => {
+  const sql = fixture(),
+    route = await api('app/api/product-visits/route.ts');
+  const session = crypto.randomUUID();
+  globalThis.__launch.user = null;
+  for (let i = 0; i < 2; i++)
+    assert.equal(
+      (await post(route, { session, productId: 'wood' })).status,
+      200,
+    );
+  assert.equal(sql.prepare('SELECT COUNT(*) n FROM product_visits').get().n, 1);
+  assert.equal((await route.GET()).status, 403);
+  globalThis.__launch.user = { userId: 'manager-a', role: 'manager' };
+  assert.equal(
+    (await post(route, { session: crypto.randomUUID(), productId: 'wood' }))
+      .body.recorded,
+    false,
+  );
+  const stats = await (await route.GET()).json();
+  assert.equal(stats.visits[0].visits, 1);
+  assert.equal(stats.orders.length, 0);
+  sql.close();
+});
+
+test('applications enforce adult eligibility, private files, human review, and atomic agent activation', async () => {
+  const sql = fixture(),
+    route = await api('app/api/agent-applications/route.ts'),
+    uploads = await api('app/api/application-files/route.ts'),
+    download = await api('app/api/application-files/[id]/route.ts');
+  const storage = new Map();
+  globalThis.__launch.env.PROFILE_PHOTOS = {
+    async put(key, bytes, options) {
+      storage.set(key, { body: bytes, httpMetadata: options.httpMetadata });
+    },
+    async get(key) {
+      return storage.get(key);
+    },
+    async delete(key) {
+      storage.delete(key);
+    },
+  };
+  const customer = {
+    userId: 'customer-a',
+    role: 'customer',
+    email: 'customer-a@example.com',
+    displayName: 'Ana',
+  };
+  globalThis.__launch.user = customer;
+  const data = {
+    name: 'Ana Teste',
+    birthDate: '2000-02-29',
+    phone: '+258840000001',
+    whatsapp: '+258840000001',
+    city: 'Maputo',
+    occupation: 'Comerciante',
+    description: 'Trabalho com vendas e atendimento a clientes.',
+    consent: true,
+  };
+  assert.equal(
+    (
+      await post(route, {
+        action: 'save',
+        version: 0,
+        data: { ...data, birthDate: '2015-01-01' },
+      })
+    ).status,
+    422,
+  );
+  let result = await post(route, { action: 'save', version: 0, data });
+  assert.equal(result.status, 200);
+  let app = result.body.application;
+  assert.equal(
+    (await post(route, { action: 'submit', version: app.version })).status,
+    409,
+  );
+  for (const kind of ['portrait', 'id-front', 'id-back']) {
+    const r = await uploads.POST(
+      new Request(origin + '/api/application-files?kind=' + kind, {
+        method: 'POST',
+        headers: { origin },
+        body: new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]),
+      }),
+    );
+    assert.equal(r.status, 200, await r.text());
+  }
+  app = (await (await route.GET(new Request(origin))).json()).application;
+  const fileId = app.files[0].id;
+  assert.equal(app.files.length, 3);
+  result = await post(route, { action: 'submit', version: app.version });
+  assert.equal(result.status, 200);
+  app = result.body.application;
+  assert.equal(
+    (await post(route, { action: 'save', version: app.version, data })).status,
+    409,
+  );
+  globalThis.__launch.user = {
+    userId: 'customer-b',
+    role: 'customer',
+    email: 'customer-b@example.com',
+  };
+  assert.equal(
+    (
+      await download.GET(new Request(origin), {
+        params: Promise.resolve({ id: fileId }),
+      })
+    ).status,
+    404,
+  );
+  assert.equal(
+    (await route.GET(new Request(origin + '?review=1'))).status,
+    403,
+  );
+  globalThis.__launch.user = { userId: 'manager-a', role: 'manager' };
+  const image = await download.GET(new Request(origin), {
+    params: Promise.resolve({ id: fileId }),
+  });
+  assert.equal(image.status, 200);
+  assert.match(image.headers.get('cache-control'), /no-store/);
+  assert.equal(
+    (
+      await post(route, {
+        action: 'review',
+        id: app.id,
+        version: app.version,
+        status: 'APPROVED',
+        note: '',
+      })
+    ).status,
+    422,
+  );
+  sql
+    .prepare('INSERT INTO auth_sessions VALUES(?,?,?)')
+    .run('test-session', 'customer-a', Date.now() + 60000);
+  assert.equal(
+    (
+      await post(route, {
+        action: 'review',
+        id: app.id,
+        version: app.version,
+        status: 'APPROVED',
+        identityVerified: true,
+        note: '',
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    sql.prepare("SELECT role FROM auth_accounts WHERE id='customer-a'").get()
+      .role,
+    'agent',
+  );
+  assert.equal(
+    sql
+      .prepare(
+        "SELECT COUNT(*) n FROM auth_sessions WHERE account_id='customer-a'",
+      )
+      .get().n,
+    0,
+  );
+  assert.equal(
+    sql
+      .prepare(
+        "SELECT COUNT(*) n FROM manager_records WHERE id='customer-a' AND kind='agent'",
+      )
+      .get().n,
+    1,
+  );
+  assert.equal(
+    (
+      await post(route, {
+        action: 'review',
+        id: app.id,
+        version: app.version,
+        status: 'APPROVED',
+        identityVerified: true,
+        note: '',
+      })
+    ).status,
+    409,
+  );
+  sql.close();
+});
 const profile = {
   name: 'Cliente Teste',
   username: 'cliente_teste',

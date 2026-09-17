@@ -32,7 +32,9 @@ test('reject malformed prices, unsafe image sources and free available products'
     { version: -1 },
     { category: 'unknown' },
   ])
-    assert.throws(() => validateProduct({ ...seed, ...patch }, seed));
+    assert.throws(() =>
+      validateProduct({ ...seed, available: true, ...patch }, seed),
+    );
 });
 test('zero price allowed when a product is under consultation', () => {
   assert.equal(

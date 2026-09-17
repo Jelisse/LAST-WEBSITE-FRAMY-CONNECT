@@ -1,8 +1,12 @@
 'use client';
 import { useState } from 'react';
 import Link from '@/components/hard-link';
-export function LoginForm() {
-  const [register, setRegister] = useState(false),
+export function LoginForm({
+  initialRegister = false,
+}: {
+  initialRegister?: boolean;
+}) {
+  const [register, setRegister] = useState(initialRegister),
     [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   return (

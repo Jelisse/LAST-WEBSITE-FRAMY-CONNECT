@@ -55,15 +55,17 @@ export async function PUT(request: Request) {
         422,
       );
     }
-    if (product.imageUrl.startsWith('/api/product-image/')) {
-      const asset = await env.PROFILE_PHOTOS?.head(
-        `products/${product.imageUrl.split('/').pop()}`,
-      );
-      if (!asset)
-        return json(
-          { error: 'A imagem já não está disponível. Carregue-a novamente.' },
-          422,
+    for (const imageUrl of product.images ?? [product.imageUrl]) {
+      if (imageUrl.startsWith('/api/product-image/')) {
+        const asset = await env.PROFILE_PHOTOS?.head(
+          `products/${imageUrl.split('/').pop()}`,
         );
+        if (!asset)
+          return json(
+            { error: 'A imagem já não está disponível. Carregue-a novamente.' },
+            422,
+          );
+      }
     }
     const statement = database()
       .prepare(`INSERT INTO product_catalog (id,data_json,version,updated_by,updated_at)

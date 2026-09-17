@@ -5,7 +5,9 @@ import { Catalog } from '@/components/catalog';
 export const metadata = { title: 'Produtos' };
 export const dynamic = 'force-dynamic';
 export default async function Page() {
-  const products = (await getProducts()).map(publicProduct);
+  const products = (await getProducts())
+    .filter((p) => p.published !== false)
+    .map(publicProduct);
   return (
     <>
       <SiteHeader />

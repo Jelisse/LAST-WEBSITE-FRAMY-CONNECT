@@ -82,7 +82,8 @@ export default async function Home() {
     getProducts(),
     getManagedPlans(),
   ]);
-  const featured = [...products]
+  const featured = products
+    .filter((p) => p.published !== false)
     .sort((a, b) => Number(b.available) - Number(a.available))
     .slice(0, 4);
   const plans = allPlans
@@ -158,6 +159,15 @@ export default async function Home() {
             <HomeHeroScene />
           </div>
         </section>
+        <section className="home-agent-callout">
+          <div>
+            <h2>Faça parte da equipa Framy.</h2>
+            <p>Apresente a sua actividade e candidate-se a agente.</p>
+          </div>
+          <Link className="home-primary" href="/aplicar">
+            Tornar-se agente <ArrowUpRight size={18} />
+          </Link>
+        </section>
         <HomeSharingScene />
         <section className="home-products" id="produtos">
           <div className="home-section-heading">
@@ -172,8 +182,8 @@ export default async function Home() {
             </Link>
           </div>
           <p className="home-disclosure">
-            Catálogo em preparação. Valores de demonstração em MT; preços e
-            disponibilidade comercial a confirmar antes do lançamento.
+            Porta-chaves NFC disponíveis. Os restantes produtos chegam
+            brevemente.
           </p>
           <div className="home-products-grid">
             {featured.map((p) => (
@@ -195,12 +205,12 @@ export default async function Home() {
                   <h3>{productNames[p.name] ?? p.name}</h3>
                   <p>{p.tagline}</p>
                   <strong className="home-product-price">
-                    {p.available ? money(p.amount) : 'Sob consulta'}
+                    {p.available ? money(p.amount) : 'Brevemente'}
                   </strong>
                   <span className="home-product-status">
                     {p.available
-                      ? 'Produto físico · valor de demonstração'
-                      : 'Contacte-nos para conhecer esta solução'}
+                      ? 'Produto físico · disponível para encomenda'
+                      : 'Brevemente · compra ainda indisponível'}
                   </span>
                   <ArrowUpRight size={18} />
                 </div>

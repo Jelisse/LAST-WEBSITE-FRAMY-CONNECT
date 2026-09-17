@@ -71,7 +71,9 @@ export async function GET() {
         }>(),
     ]);
     return json({
-      products: (await getProducts()).map(publicProduct),
+      products: (await getProducts())
+        .filter((p) => p.published !== false)
+        .map(publicProduct),
       canManageProducts: await canManageCatalog(user.userId),
       canManageOrders: await canManageOrders(user.userId),
       profile: p ? JSON.parse(p.draft_json) : null,
@@ -445,7 +447,7 @@ export async function POST(request: Request) {
       if (typeof body.id !== 'string' || !/^[0-9a-f-]{36}$/.test(body.id))
         return json({ error: 'Referência inválida.' }, 422);
       const product = (await getProducts()).find(
-        (p) => p.id === body.productId && p.available,
+        (p) => p.id === body.productId && p.available && p.published !== false,
       );
       if (!product)
         return json(
@@ -670,7 +672,7 @@ export async function POST(request: Request) {
       await db.batch([
         db
           .prepare(
-            "INSERT OR IGNORE INTO sandbox_orders (id,owner_id,data_json,version,created_at) SELECT ?,?,?,1,? WHERE (? IS NULL OR EXISTS(SELECT 1 FROM product_options WHERE id=? AND quantity>0 AND enabled=1)) AND (SELECT COUNT(*) FROM sandbox_orders WHERE owner_id=? AND json_extract(data_json,'$.status')='PENDING_PAYMENT')<? AND EXISTS(SELECT 1 FROM profiles WHERE owner_id=? AND version=?) AND EXISTS(SELECT 1 FROM sandbox_memberships WHERE owner_id=? AND plan_id='free-30' AND trial_started_at<=? AND trial_expires_at>? AND version=?) AND COALESCE((SELECT version FROM manager_records WHERE id=? AND kind='plan'),0)=? AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)>(SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('PENDING_PAYMENT','QUEUED','IN_PRODUCTION','READY'))",
+            "INSERT OR IGNORE INTO sandbox_orders (id,owner_id,data_json,version,created_at) SELECT ?,?,?,1,? WHERE (? IS NULL OR EXISTS(SELECT 1 FROM product_options WHERE id=? AND quantity>0 AND enabled=1)) AND (SELECT COUNT(*) FROM sandbox_orders WHERE owner_id=? AND json_extract(data_json,'$.status')='PENDING_PAYMENT')<? AND EXISTS(SELECT 1 FROM profiles WHERE owner_id=? AND version=?) AND EXISTS(SELECT 1 FROM sandbox_memberships WHERE owner_id=? AND plan_id='free-30' AND trial_started_at<=? AND trial_expires_at>? AND version=?) AND COALESCE((SELECT version FROM manager_records WHERE id=? AND kind='plan'),0)=? AND COALESCE((SELECT version FROM product_catalog WHERE id=?),0)=? AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)>(SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('PENDING_PAYMENT','QUEUED','IN_PRODUCTION','READY'))",
           )
           .bind(
             o.id,
@@ -689,6 +691,8 @@ export async function POST(request: Request) {
             membershipVersion,
             body.planId,
             body.planVersion,
+            product.id,
+            product.version,
             product.id,
             product.id,
           ),

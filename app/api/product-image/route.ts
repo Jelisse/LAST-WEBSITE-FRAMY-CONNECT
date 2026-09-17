@@ -1,6 +1,8 @@
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { canManageCatalog } from '@/lib/server-catalog';
 import { env } from 'cloudflare:workers';
+import { reserveUpload, releaseUpload } from '@/lib/server-upload-quota';
+import { rateLimit } from '@/lib/request-limits';
 export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   const user = await getChatGPTUser();
@@ -12,6 +14,11 @@ export async function POST(request: Request) {
       return Response.json(
         { error: 'Sem permissão para editar produtos.' },
         { status: 403 },
+      );
+    if (!(await rateLimit(request, 'product-upload', 60)))
+      return Response.json(
+        { error: 'Limite temporário de carregamentos. Tente mais tarde.' },
+        { status: 429 },
       );
     const reader = request.body?.getReader();
     if (!reader || !env.PROFILE_PHOTOS)
@@ -50,12 +57,22 @@ export async function POST(request: Request) {
     if (!png && !jpeg && !webp)
       return Response.json({ error: 'Use PNG, JPG ou WebP.' }, { status: 422 });
     const id = crypto.randomUUID();
-    await env.PROFILE_PHOTOS.put(`products/${id}`, bytes, {
-      httpMetadata: {
-        contentType: png ? 'image/png' : jpeg ? 'image/jpeg' : 'image/webp',
-      },
-      customMetadata: { uploadedBy: user.userId },
-    });
+    if (!(await reserveUpload(id, user.userId, 'product', size)))
+      return Response.json(
+        { error: 'Limite de armazenamento atingido. Contacte o apoio.' },
+        { status: 413 },
+      );
+    try {
+      await env.PROFILE_PHOTOS.put(`products/${id}`, bytes, {
+        httpMetadata: {
+          contentType: png ? 'image/png' : jpeg ? 'image/jpeg' : 'image/webp',
+        },
+        customMetadata: { uploadedBy: user.userId },
+      });
+    } catch (error) {
+      await releaseUpload(id, user.userId);
+      throw error;
+    }
     return Response.json(
       { imageUrl: `/api/product-image/${id}` },
       { headers: { 'Cache-Control': 'no-store' } },

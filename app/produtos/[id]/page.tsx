@@ -1,4 +1,4 @@
-import { SourceImage } from '@/components/source-image';
+import { ProductGallery } from '@/components/product-gallery';
 import { notFound } from 'next/navigation';
 import Link from '@/components/hard-link';
 import { ArrowUpRight, Check, ChevronLeft } from 'lucide-react';
@@ -6,7 +6,6 @@ import { money } from '@/lib/catalog';
 import { getProducts } from '@/lib/server-catalog';
 export const dynamic = 'force-dynamic';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
-import { CardShowcase } from '@/components/card-showcase';
 
 export async function generateMetadata({
   params,
@@ -15,7 +14,9 @@ export async function generateMetadata({
 }) {
   const { id } = await params;
   return {
-    title: (await getProducts()).find((p) => p.id === id)?.name ?? 'Produto',
+    title:
+      (await getProducts()).find((p) => p.id === id && p.published !== false)
+        ?.name ?? 'Produto',
   };
 }
 export default async function Page({
@@ -24,7 +25,9 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const p = (await getProducts()).find((p) => p.id === id);
+  const p = (await getProducts()).find(
+    (p) => p.id === id && p.published !== false,
+  );
   if (!p) notFound();
   return (
     <>
@@ -35,16 +38,11 @@ export default async function Page({
         </Link>
         <div className="product-detail">
           <div className="product-detail-art">
-            {p.id === 'pvc' ? (
-              <CardShowcase />
-            ) : (
-              <SourceImage
-                src={p.imageUrl}
-                alt={p.name}
-                width={1254}
-                height={1254}
-              />
-            )}
+            <ProductGallery
+              id={p.id}
+              name={p.name}
+              images={p.images ?? [p.imageUrl]}
+            />
             <span>{p.name}</span>
           </div>
           <div>
@@ -52,7 +50,7 @@ export default async function Page({
             <h1>{p.name}</h1>
             <h2>{p.tagline}</h2>
             <p className="product-detail-price">
-              {p.available ? money(p.amount) : 'Sob consulta'}
+              {p.available ? money(p.amount) : 'Brevemente'}
             </p>
             <p>{p.description}</p>
             <ul className="benefit-list">
@@ -67,18 +65,19 @@ export default async function Page({
               </li>
             </ul>
             <div className="quiet-note">
-              Preço e entrega sob confirmação. Esta versão ainda não aceita
-              pagamentos.
-            </div>
-            <Link
-              className="btn btn-primary"
-              href={p.available ? `/encomendar/${p.id}` : '/contacto'}
-            >
               {p.available
-                ? 'Personalizar e comprar'
-                : 'Falar sobre esta solução'}{' '}
-              <ArrowUpRight size={20} />
-            </Link>
+                ? 'A encomenda reserva o produto durante 24 horas. O pagamento é confirmado após verificação pela equipa.'
+                : 'Este produto está em preparação. A compra será activada quando estiver disponível.'}
+            </div>
+            {p.available ? (
+              <Link className="btn btn-primary" href={`/encomendar/${p.id}`}>
+                Personalizar e comprar <ArrowUpRight size={20} />
+              </Link>
+            ) : (
+              <button className="btn btn-outline" disabled>
+                Brevemente
+              </button>
+            )}
           </div>
         </div>
       </main>

@@ -21,6 +21,7 @@ import { AgentAction } from './agent-action';
 import { agentOrderView } from '@/lib/agent-workflow';
 import { OrderArtwork } from './order-artwork';
 import { ProfileHandoff } from './profile-handoff';
+import { ApplicationManager } from './application-manager';
 import { AccountManager } from './account-manager';
 import { AccountMenu } from './account-menu';
 import { ProductManager } from './product-manager';
@@ -81,6 +82,7 @@ const sections = [
   { id: 'operations', label: 'Operações', icon: Boxes },
   { id: 'catalog', label: 'Produtos e planos', icon: ShoppingBag },
   { id: 'accounts', label: 'Contas e acessos', icon: Users },
+  { id: 'applications', label: 'Candidaturas', icon: Users },
   { id: 'finance', label: 'Financeiro', icon: Wallet },
 ];
 const date = (v: string) => new Date(v).toLocaleString('pt-PT');
@@ -378,9 +380,11 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                     ? 'Ligue os pedidos, a equipa e o stock.'
                     : section === 'catalog'
                       ? 'Os produtos e as subscrições que oferece aos seus clientes.'
-                      : section === 'accounts'
-                        ? 'Crie acessos, recupere contas e controle a disponibilidade da equipa.'
-                        : 'Acompanhe os valores recebidos, pendentes e reconhecidos.'}
+                      : section === 'applications'
+                        ? 'Analise e acompanhe as candidaturas a agente.'
+                        : section === 'accounts'
+                          ? 'Crie acessos, recupere contas e controle a disponibilidade da equipa.'
+                          : 'Acompanhe os valores recebidos, pendentes e reconhecidos.'}
               </p>
             </div>
             <button
@@ -435,6 +439,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                 </div>
               )}
               {section === 'accounts' && <AccountManager />}
+              {section === 'applications' && <ApplicationManager />}
               {section === 'overview' && (
                 <>
                   <div className="manager-metrics">

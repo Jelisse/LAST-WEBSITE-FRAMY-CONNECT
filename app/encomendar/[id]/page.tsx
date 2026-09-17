@@ -17,7 +17,9 @@ export default async function Page({
 }) {
   const { id } = await params;
   const user = await getChatGPTUser();
-  const product = (await getProducts()).find((p) => p.id === id && p.available);
+  const product = (await getProducts()).find(
+    (p) => p.id === id && p.available && p.published !== false,
+  );
   if (!product) notFound();
   return (
     <>

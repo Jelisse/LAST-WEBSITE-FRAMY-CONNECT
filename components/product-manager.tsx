@@ -2,6 +2,7 @@
 import { SourceImage } from '@/components/source-image';
 import { useEffect, useState } from 'react';
 import type { Product } from '@/lib/catalog';
+import { ProductAnalytics } from './product-analytics';
 import { PersonalisationManager } from './personalisation-manager';
 import { money } from '@/lib/catalog';
 import { Button } from './ui/button';
@@ -39,36 +40,37 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
     void Promise.resolve().then(load);
   }, []);
   function edit(p: Product) {
-    setDraft({ ...p });
+    setDraft({ ...p, images: p.images?.length ? [...p.images] : [p.imageUrl] });
     setPrice(String(p.amount / 100));
     setCost(String(p.cost / 100));
     setError('');
     setNotice('');
   }
-  async function upload(file: File | undefined) {
-    if (!file || !draft) return;
-    if (file.size > 8 * 1024 * 1024) {
-      setError('A imagem deve ter até 8 MB.');
+  async function upload(files: File[]) {
+    if (!files.length || !draft) return;
+    if ((draft.images?.length ?? 1) + files.length > 8) {
+      setError('A galeria pode ter até 8 fotografias.');
       return;
     }
     setBusy(true);
     setError('');
     try {
-      const r = await fetch('/api/product-image', {
-        method: 'POST',
-        headers: { 'Content-Type': file.type },
-        body: file,
-      });
-      const d = (await r.json()) as {
-        products: Product[];
-        product: Product;
-        imageUrl: string;
-        error?: string;
-      };
-      if (!r.ok) throw new Error(d.error);
-      setDraft((p) => (p ? { ...p, imageUrl: d.imageUrl } : p));
+      for (const file of files) {
+        if (file.size > 8 * 1024 * 1024)
+          throw Error('Cada fotografia deve ter até 8 MB.');
+        const r = await fetch('/api/product-image', {
+          method: 'POST',
+          headers: { 'Content-Type': file.type },
+          body: file,
+        });
+        const d = (await r.json()) as { error: string; imageUrl: string };
+        if (!r.ok) throw Error(d.error);
+        setDraft((p) =>
+          p ? { ...p, images: [...(p.images ?? [p.imageUrl]), d.imageUrl] } : p,
+        );
+      }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Não foi possível carregar.');
+      setError((e as Error).message);
     } finally {
       setBusy(false);
     }
@@ -119,6 +121,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
       className="panel product-management"
       aria-labelledby="product-management-title"
     >
+      <ProductAnalytics products={items} />
       <PersonalisationManager />
       <header>
         <Button
@@ -169,15 +172,56 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
           <div className="product-image-editor">
             <SourceImage src={draft.imageUrl} alt={draft.name} />
             <label>
-              Substituir imagem
+              Adicionar fotografias
               <input
                 type="file"
+                multiple
                 accept="image/png,image/jpeg,image/webp"
                 disabled={busy}
-                onChange={(e) => void upload(e.target.files?.[0])}
+                onChange={(e) => void upload(Array.from(e.target.files ?? []))}
               />
             </label>
-            <small>PNG, JPG ou WebP, até 8 MB.</small>
+            <small>Até 8 fotografias. PNG, JPG ou WebP, até 8 MB cada.</small>
+            <div className="gallery-editor">
+              {(draft.images ?? [draft.imageUrl]).map((src, i) => (
+                <div key={src}>
+                  <SourceImage src={src} alt={draft.name + ' — ' + (i + 1)} />
+                  <button
+                    type="button"
+                    disabled={busy || src === draft.imageUrl}
+                    onClick={() =>
+                      setDraft({
+                        ...draft,
+                        imageUrl: src,
+                        images: [
+                          src,
+                          ...(draft.images ?? []).filter((v) => v !== src),
+                        ],
+                      })
+                    }
+                  >
+                    {src === draft.imageUrl ? 'Principal' : 'Tornar principal'}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy || (draft.images?.length ?? 1) <= 1}
+                    onClick={() => {
+                      const images = (draft.images ?? []).filter(
+                        (v) => v !== src,
+                      );
+                      setDraft({
+                        ...draft,
+                        images,
+                        imageUrl:
+                          src === draft.imageUrl ? images[0] : draft.imageUrl,
+                      });
+                    }}
+                  >
+                    Retirar
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
           <fieldset disabled={busy}>
             <div className="product-fields">
@@ -266,16 +310,28 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
               <label className="product-availability">
                 <input
                   type="checkbox"
+                  checked={draft.published !== false}
+                  onChange={(e) =>
+                    setDraft({ ...draft, published: e.target.checked })
+                  }
+                />
+                Publicado no catálogo
+              </label>
+              <label className="product-availability">
+                <input
+                  type="checkbox"
                   checked={draft.available}
                   onChange={(e) =>
                     setDraft({ ...draft, available: e.target.checked })
                   }
                 />
-                Disponível para pedido
+                Vendas activas
               </label>
             </div>
             <p className="muted">
-              Desactivado: o produto continua visível como solução sob consulta.
+              Publicado e sem vendas: aparece como Brevemente, sem preço. Não
+              publicado: fica oculto. Para vender, active as vendas, defina o
+              preço e registe stock em Operações.
             </p>
             <div className="product-form-actions">
               <Button type="submit">
@@ -298,7 +354,13 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
               <SourceImage src={p.imageUrl} alt={p.name} />
               <div>
                 <h3>{p.name}</h3>
-                <p>{p.available ? money(p.amount) : 'Sob consulta'}</p>
+                <p>
+                  {p.published === false
+                    ? 'Oculto'
+                    : p.available
+                      ? money(p.amount)
+                      : 'Brevemente'}
+                </p>
               </div>
               <Button variant="outline" onClick={() => edit(p)}>
                 Editar

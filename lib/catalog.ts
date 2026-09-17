@@ -11,6 +11,9 @@ export type Product = {
   available: boolean;
   imageUrl: string;
   version: number;
+  published?: boolean;
+  images?: string[];
+  availabilityConfigured?: boolean;
 };
 const seedProducts = [
   {
@@ -171,6 +174,8 @@ const seedProducts = [
 ];
 export const products: Product[] = seedProducts.map((p) => ({
   ...p,
+  available: p.id === 'keychain',
+  published: true,
   imageUrl: `/products/${p.id}.png`,
   version: 0,
 }));
@@ -179,7 +184,7 @@ export function publicProduct({
   cost: _cost,
   ...product
 }: Product): PublicProduct {
-  return product;
+  return { ...product, amount: product.available ? product.amount : 0 };
 }
 export function money(minor: number) {
   return new Intl.NumberFormat('pt-MZ', {

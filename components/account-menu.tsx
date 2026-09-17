@@ -1,97 +1,86 @@
 'use client';
-
+import { useEffect, useState } from 'react';
 import Link from '@/components/hard-link';
-import {
-  UserRound,
-  ChevronDown,
-  Settings2,
-  BriefcaseBusiness,
-  ChartNoAxesCombined,
-} from 'lucide-react';
+import { UserRound, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
-
-const dashboards = [
-  {
-    href: '/dashboard',
-    label: 'Cliente',
-    description: 'Identidade e acompanhamento de pedidos',
-    icon: UserRound,
-  },
-  {
-    href: '/manager',
-    label: 'Gestor',
-    description: 'Operações, catálogo e finanças',
-    icon: Settings2,
-  },
-  {
-    href: '/agent',
-    label: 'Agente',
-    description: 'Produção e entregas',
-    icon: BriefcaseBusiness,
-  },
-  {
-    href: '/cofounder',
-    label: 'Direcção',
-    description: 'Visão global do negócio',
-    icon: ChartNoAxesCombined,
-  },
-];
-
 export function AccountMenu({
   className = 'account-link',
 }: {
   className?: string;
 }) {
+  const [dashboard, setDashboard] = useState('');
+  useEffect(() => {
+    void fetch('/api/session', { cache: 'no-store' })
+      .then((r) => r.json() as Promise<{ dashboard?: string }>)
+      .then((d) => setDashboard(d.dashboard || ''))
+      .catch(() => {});
+  }, []);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={`account-menu-trigger ${className}`}>
-        <UserRound size={17} aria-hidden="true" /> Minha Conta{' '}
-        <ChevronDown size={14} aria-hidden="true" />
+        <UserRound size={17} /> Minha Conta <ChevronDown size={14} />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
         sideOffset={10}
         className="account-menu-popup"
       >
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="account-menu-label">
-            Escolher painel
-          </DropdownMenuLabel>
-          {dashboards.map(({ href, label, description, icon: Icon }) => (
+        {dashboard ? (
+          <>
             <DropdownMenuItem
-              key={href}
-              render={<Link href={href} />}
+              render={<Link href={dashboard} />}
               nativeButton={false}
-              className="account-menu-option"
             >
-              <Icon size={20} aria-hidden="true" />
-              <span>
-                <strong>{label}</strong>
-                <small>{description}</small>
-              </span>
+              Abrir o meu painel
             </DropdownMenuItem>
-          ))}
-          <DropdownMenuItem
-            render={<Link href="/seguranca" />}
-            nativeButton={false}
-          >
-            Segurança da conta
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            render={<Link href="/sair" />}
-            nativeButton={false}
-            className="account-menu-option"
-          >
-            Terminar sessão / trocar de conta
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+            {dashboard === '/agent' && (
+              <DropdownMenuItem
+                render={<Link href="/dashboard" />}
+                nativeButton={false}
+              >
+                Os meus pedidos e perfil
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem
+              render={<Link href="/aplicar" />}
+              nativeButton={false}
+            >
+              A minha candidatura
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              render={<Link href="/seguranca" />}
+              nativeButton={false}
+            >
+              Segurança da conta
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              render={<Link href="/sair" />}
+              nativeButton={false}
+            >
+              Terminar sessão
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <>
+            <DropdownMenuItem
+              render={<Link href="/entrar" />}
+              nativeButton={false}
+            >
+              Entrar
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              render={<Link href="/entrar?mode=register" />}
+              nativeButton={false}
+            >
+              Criar conta
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

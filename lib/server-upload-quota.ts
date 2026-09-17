@@ -9,7 +9,7 @@ export async function reserveUpload(
   const result = await database()
     .prepare(`INSERT INTO stored_assets(id,owner_id,kind,bytes,created_at)
     SELECT ?,?,?,?,? WHERE COALESCE((SELECT SUM(bytes) FROM stored_assets WHERE owner_id=?),0)+?<=?
-    AND (SELECT COUNT(*) FROM stored_assets WHERE owner_id=?)<100`)
+    AND (SELECT COUNT(*) FROM stored_assets WHERE owner_id=?)<?`)
     .bind(
       id,
       ownerId,
@@ -18,8 +18,9 @@ export async function reserveUpload(
       new Date().toISOString(),
       ownerId,
       bytes,
-      MAX_ACCOUNT_BYTES,
+      kind === 'product' ? 500 * 1024 * 1024 : MAX_ACCOUNT_BYTES,
       ownerId,
+      kind === 'product' ? 1000 : 100,
     )
     .run();
   return result.meta.changes === 1;

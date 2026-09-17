@@ -1,6 +1,47 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+
+.home-agent-callout { max-width: 1200px; margin: 2rem auto; padding: 2rem; display:flex; align-items:center; justify-content:space-between; gap:1.5rem; background:#fce2d8; border-radius:1.5rem; }
+.home-agent-callout h2 { font-size:clamp(1.5rem,3vw,2rem); margin:0 0 .5rem; }
+.product-gallery { width:100%; }
+.product-gallery > img { width:100%; height:auto; object-fit:contain; }
+.gallery-thumbnails,.gallery-editor { display:flex; flex-wrap:wrap; gap:.75rem; margin-top:1rem; }
+.gallery-thumbnails button { padding:.25rem; border:2px solid transparent; border-radius:.5rem; background:white; }
+.gallery-thumbnails button[aria-pressed=true] { border-color:#b83708; }
+.product-detail-art .gallery-thumbnails img { width:70px; height:70px; object-fit:cover; }
+.gallery-editor > div { width:110px; display:grid; gap:.35rem; }
+.gallery-editor img { width:110px; height:100px; object-fit:cover; }
+.gallery-editor button { font-size:.875rem; padding:.4rem; border:1px solid #ccc; border-radius:.4rem; }
+.product-analytics { margin-bottom:2rem; padding-bottom:2rem; border-bottom:1px solid #e5ded8; }
+.product-analytics header { display:flex; justify-content:space-between; gap:1rem; }
+.product-analytics table { width:100%; border-collapse:collapse; }
+.product-analytics th,.product-analytics td { padding:.75rem; text-align:left; border-bottom:1px solid #e5ded8; }
+.table-scroll { overflow-x:auto; }
+.application-page { max-width:1080px; padding-block:3rem; }
+.application-page h1 { font-size:clamp(2rem,5vw,3.5rem); }
+.application-form { margin-top:2rem; }
+.application-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.25rem; border:0; padding:0; margin-block:2rem; }
+.application-fields legend { font-size:1.5rem; font-weight:600; margin-bottom:1.25rem; }
+.application-fields label,.application-manager fieldset>label,.application-documents label { display:flex; flex-direction:column; gap:.5rem; font-size:1rem; }
+.application-fields input:not([type=checkbox]),.application-fields textarea,.application-manager textarea { width:100%; padding:.8rem; border:1px solid #b8afaa; border-radius:.6rem; background:white; color:#302b29; }
+.application-wide { grid-column:1/-1; }
+.application-fields .application-consent,.application-manager .application-consent { display:flex; flex-direction:row; align-items:flex-start; gap:.75rem; }
+.application-consent input { margin-top:.35rem; flex-shrink:0; width:20px; height:20px; }
+.application-status { background:#fce2d8; border-radius:1rem; padding:1.5rem; margin:1.5rem 0; overflow-wrap:anywhere; }
+.application-files-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; margin-block:1.5rem; }
+.application-files-grid>div { border:1px solid #e5ded8; border-radius:1rem; padding:1rem; min-width:0; }
+.application-files-grid img { width:100%; height:180px; object-fit:contain; background:#eee6de; }
+.application-files-grid input { max-width:100%; font-size:.875rem; }
+.application-files-grid label { margin-block:1rem; }
+.application-documents h2 { margin-block:1.5rem .75rem; }
+.application-list { display:grid; gap:.75rem; margin-top:1rem; }
+.application-list>button { display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; text-align:left; padding:1rem; border:1px solid #e5ded8; border-radius:.7rem; }
+.application-manager dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; margin-block:1.5rem; }
+.application-manager dt { color:#595851; font-size:.875rem; }
+.application-manager dd { overflow-wrap:anywhere; }
+.application-manager fieldset { border:0; padding:1rem 0; display:grid; gap:1rem; }
+@media(max-width:640px) { .home-agent-callout { margin:1rem; flex-direction:column; align-items:flex-start; } .application-fields,.application-files-grid,.application-manager dl { grid-template-columns:1fr; } .application-wide { grid-column:1; } .product-analytics header { flex-direction:column; } }
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

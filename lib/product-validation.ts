@@ -40,6 +40,25 @@ export function validateProduct(input: unknown, existing: Product): Product {
   const category = text('category', 50);
   if (!['Cartões', 'Acessórios', 'Para organizações'].includes(category))
     throw new Error('Categoria inválida.');
+  if (data.published !== undefined && typeof data.published !== 'boolean')
+    throw Error('Publicação inválida.');
+  const images = data.images ?? [imageUrl];
+  if (
+    !Array.isArray(images) ||
+    images.length < 1 ||
+    images.length > 8 ||
+    images.some(
+      (v) =>
+        typeof v !== 'string' ||
+        !/^\/(?:products\/[a-z0-9-]+\.png|api\/product-image\/[0-9a-f-]{36})$/.test(
+          v,
+        ),
+    ) ||
+    new Set(images).size !== images.length
+  )
+    throw Error('Escolha entre 1 e 8 fotografias diferentes.');
+  if (!images.includes(imageUrl))
+    throw Error('A fotografia principal deve pertencer à galeria.');
   return {
     ...existing,
     name: text('name', 90),
@@ -51,6 +70,9 @@ export function validateProduct(input: unknown, existing: Product): Product {
     cost: Number(cost),
     available: data.available,
     imageUrl,
+    images,
+    published: data.published !== false,
+    availabilityConfigured: true,
     version: Number(data.version),
   };
 }

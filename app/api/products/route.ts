@@ -4,7 +4,11 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     return Response.json(
-      { products: (await getProducts()).map(publicProduct) },
+      {
+        products: (await getProducts())
+          .filter((p) => p.published !== false)
+          .map(publicProduct),
+      },
       { headers: { 'Cache-Control': 'no-store' } },
     );
   } catch {

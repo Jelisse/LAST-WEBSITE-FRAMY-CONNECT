@@ -32,6 +32,12 @@ export async function requireChatGPTUser(
       : returnTo === '/cofounder'
         ? 'director'
         : 'customer';
+  if (
+    user.role === 'agent' &&
+    role === 'customer' &&
+    ['/dashboard', '/perfil'].includes(returnTo)
+  )
+    return user;
   if (user.role !== role) redirect(dashboardFor(user.role));
   return user;
 }

@@ -1,3 +1,5 @@
+import { ApplicationManager } from '@/components/application-manager';
+import { ProductManager } from '@/components/product-manager';
 import { AccountManager } from '@/components/account-manager';
 import Link from '@/components/hard-link';
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
@@ -35,6 +37,8 @@ export default async function Page() {
         <p>{agents?.total ?? 0}</p>
       </article>
       <AccountManager />
+      <ApplicationManager />
+      <ProductManager />
       <h2>Pedidos por etapa</h2>
       {counts.results.length ? (
         counts.results.map((c) => (

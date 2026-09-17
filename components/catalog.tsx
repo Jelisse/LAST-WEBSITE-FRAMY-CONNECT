@@ -63,7 +63,7 @@ export function Catalog({ products }: { products: PublicProduct[] }) {
               <h2>{p.name}</h2>
               <p>{p.tagline}</p>
               <span>
-                {p.available ? money(p.amount) : 'Solução sob consulta'}{' '}
+                {p.available ? money(p.amount) : 'Brevemente'}{' '}
                 <ArrowUpRight size={15} />
               </span>
             </div>
@@ -76,8 +76,8 @@ export function Catalog({ products }: { products: PublicProduct[] }) {
         </p>
       )}
       <div className="quiet-note">
-        Catálogo em preparação. Preços e disponibilidade comercial serão
-        confirmados antes do lançamento.
+        Os produtos assinalados como Brevemente ainda não estão disponíveis para
+        compra.
       </div>
     </>
   );

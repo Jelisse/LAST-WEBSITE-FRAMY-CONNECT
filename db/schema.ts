@@ -166,3 +166,41 @@ export const storedAssets = sqliteTable(
   },
   (t) => [index('assets_owner').on(t.ownerId)],
 );
+
+export const productVisits = sqliteTable(
+  'product_visits',
+  {
+    id: text('id').primaryKey(),
+    productId: text('product_id').notNull(),
+    day: text('day').notNull(),
+  },
+  (t) => [index('product_visits_day_product').on(t.day, t.productId)],
+);
+export const agentApplications = sqliteTable(
+  'agent_applications',
+  {
+    id: text('id').primaryKey(),
+    ownerId: text('owner_id')
+      .notNull()
+      .unique()
+      .references(() => authAccounts.id),
+    dataJson: text('data_json').notNull(),
+    status: text('status').notNull().default('DRAFT'),
+    version: integer('version').notNull().default(1),
+    reviewNote: text('review_note').notNull().default(''),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (t) => [index('applications_status_updated').on(t.status, t.updatedAt)],
+);
+export const applicationFiles = sqliteTable(
+  'application_files',
+  {
+    id: text('id').primaryKey(),
+    applicationId: text('application_id')
+      .notNull()
+      .references(() => agentApplications.id),
+    kind: text('kind').notNull(),
+  },
+  (t) => [uniqueIndex('application_files_kind').on(t.applicationId, t.kind)],
+);
