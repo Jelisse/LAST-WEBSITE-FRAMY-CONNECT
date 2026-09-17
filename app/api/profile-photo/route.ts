@@ -1,3 +1,4 @@
+import { reserveUpload, releaseUpload } from '@/lib/server-upload-quota';
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 export const dynamic = 'force-dynamic';
@@ -55,12 +56,25 @@ export async function POST(request: Request) {
         { status: 422 },
       );
     const id = crypto.randomUUID();
-    await env.PROFILE_PHOTOS.put(`profiles/${id}`, bytes, {
-      httpMetadata: {
-        contentType: png ? 'image/png' : jpeg ? 'image/jpeg' : 'image/webp',
-      },
-      customMetadata: { ownerId: user.userId },
-    });
+    if (!(await reserveUpload(id, user.userId, 'profiles', length)))
+      return Response.json(
+        {
+          error:
+            'Limite de armazenamento atingido (50 MB ou 100 ficheiros). Contacte o apoio.',
+        },
+        { status: 429 },
+      );
+    try {
+      await env.PROFILE_PHOTOS.put(`profiles/${id}`, bytes, {
+        httpMetadata: {
+          contentType: png ? 'image/png' : jpeg ? 'image/jpeg' : 'image/webp',
+        },
+        customMetadata: { ownerId: user.userId },
+      });
+    } catch (e) {
+      await releaseUpload(id, user.userId);
+      throw e;
+    }
     return Response.json(
       { photoUrl: `/api/profile-photo/${id}` },
       { headers: { 'Cache-Control': 'no-store' } },

@@ -1,3 +1,4 @@
+import { SourceImage } from '@/components/source-image';
 import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
 import Link from '@/components/hard-link';
@@ -108,9 +109,9 @@ export default async function Home() {
         </nav>
         <div className="home-nav-actions">
           <AccountMenu className="home-account" />
-          <a className="home-buy" href="/produtos">
+          <Link className="home-buy" href="/produtos">
             Ver produtos <ArrowUpRight size={16} />
-          </a>
+          </Link>
         </div>
       </header>
       <main id="main">
@@ -182,7 +183,7 @@ export default async function Home() {
                 href={`/produtos/${p.id}`}
               >
                 <div className="home-product-art">
-                  <img
+                  <SourceImage
                     src={p.imageUrl}
                     alt=""
                     width={1254}

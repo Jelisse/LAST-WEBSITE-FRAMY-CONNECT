@@ -1,5 +1,6 @@
 'use client';
 
+import { SourceImage } from '@/components/source-image';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Nfc, ScanLine, Globe, Camera, Zap } from 'lucide-react';
@@ -21,7 +22,7 @@ function DemoCard({ qr }: { qr?: string }) {
         <span>Arquitecto e Planeador Fisico</span>
         <i />
         <small>
-          <img src="/social/instagram.svg" alt="" /> Instagram
+          <SourceImage src="/social/instagram.svg" alt="" /> Instagram
         </small>
         <small>
           <Globe /> Perfil Framy Connect
@@ -29,7 +30,7 @@ function DemoCard({ qr }: { qr?: string }) {
       </div>
       <span className="sharing-card-tagline">O Seu Mundo num Toque.</span>
       {qr ? (
-        <img
+        <SourceImage
           className="sharing-qr"
           src={qr}
           alt="QR para abrir o perfil de exemplo"

@@ -1,4 +1,5 @@
 'use client';
+import { clearPrivateDeviceData } from '@/lib/client-privacy';
 import { useEffect, useState } from 'react';
 export default function Page() {
   const [error, setError] = useState(false);
@@ -10,6 +11,11 @@ export default function Page() {
     })
       .then((r) => {
         if (!r.ok) throw Error();
+        try {
+          clearPrivateDeviceData();
+        } catch {
+          /* Browser storage can be unavailable. */
+        }
         location.replace('/');
       })
       .catch(() => setError(true));

@@ -169,7 +169,6 @@ export function MobileProfile({
           <nav
             className="mobile-profile-links"
             aria-label="Links do perfil — deslize para ver mais"
-            tabIndex={0}
           >
             {links.map((link, index) => (
               <a

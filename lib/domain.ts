@@ -103,6 +103,8 @@ export const blankProfile: Profile = {
 };
 const reserved = new Set([
   'api',
+  'activar',
+  'seguranca',
   'dashboard',
   'exemplo',
   'entrar',
@@ -280,6 +282,10 @@ export type Journal = {
   amount: number;
 };
 export type SandboxOrder = {
+  reservationExpiresAt?: string;
+  cancellationReason?: string;
+  checkoutFingerprint?: string;
+  approvedProfileSnapshot?: Profile;
   fulfilment?: import('./agent-workflow').Fulfilment;
   paymentReference?: string;
   design?: import('./customisation').ProductDesign;
@@ -392,8 +398,8 @@ export function transition(
     );
   return next;
 }
-export function financials(orders: SandboxOrder[]) {
-  const journal = orders.flatMap((o) => o.journal);
+export function financials(orders: { id: string; journal?: Journal[] }[]) {
+  const journal = orders.flatMap((o) => o.journal ?? []);
   const amount = (event: string) =>
     journal.filter((j) => j.event === event).reduce((s, j) => s + j.amount, 0);
   const captures = amount('capture'),

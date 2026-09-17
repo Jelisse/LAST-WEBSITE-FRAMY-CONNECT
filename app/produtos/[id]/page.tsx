@@ -1,3 +1,4 @@
+import { SourceImage } from '@/components/source-image';
 import { notFound } from 'next/navigation';
 import Link from '@/components/hard-link';
 import { ArrowUpRight, Check, ChevronLeft } from 'lucide-react';
@@ -37,7 +38,12 @@ export default async function Page({
             {p.id === 'pvc' ? (
               <CardShowcase />
             ) : (
-              <img src={p.imageUrl} alt={p.name} width={1254} height={1254} />
+              <SourceImage
+                src={p.imageUrl}
+                alt={p.name}
+                width={1254}
+                height={1254}
+              />
             )}
             <span>{p.name}</span>
           </div>

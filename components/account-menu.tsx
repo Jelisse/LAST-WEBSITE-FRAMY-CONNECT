@@ -26,7 +26,7 @@ const dashboards = [
   },
   {
     href: '/manager',
-    label: 'Manager',
+    label: 'Gestor',
     description: 'Operações, catálogo e finanças',
     icon: Settings2,
   },
@@ -62,7 +62,7 @@ export function AccountMenu({
       >
         <DropdownMenuGroup>
           <DropdownMenuLabel className="account-menu-label">
-            Escolher dashboard
+            Escolher painel
           </DropdownMenuLabel>
           {dashboards.map(({ href, label, description, icon: Icon }) => (
             <DropdownMenuItem
@@ -78,7 +78,17 @@ export function AccountMenu({
               </span>
             </DropdownMenuItem>
           ))}
-          <DropdownMenuItem render={<Link href="/sair" />} nativeButton={false} className="account-menu-option">
+          <DropdownMenuItem
+            render={<Link href="/seguranca" />}
+            nativeButton={false}
+          >
+            Segurança da conta
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            render={<Link href="/sair" />}
+            nativeButton={false}
+            className="account-menu-option"
+          >
             Terminar sessão / trocar de conta
           </DropdownMenuItem>
         </DropdownMenuGroup>

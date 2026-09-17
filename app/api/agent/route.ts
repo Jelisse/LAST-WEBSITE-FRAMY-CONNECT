@@ -1,3 +1,4 @@
+import { publicError } from '@/lib/public-error';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
 import {
@@ -298,9 +299,6 @@ export async function POST(request: Request) {
       );
     return json({ ok: true });
   } catch (e) {
-    return json(
-      { error: e instanceof Error ? e.message : 'Não foi possível guardar.' },
-      422,
-    );
+    return json({ error: publicError(e) }, 422);
   }
 }

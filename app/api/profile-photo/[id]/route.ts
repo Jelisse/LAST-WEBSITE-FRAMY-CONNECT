@@ -1,3 +1,4 @@
+import { activeProfileSQL } from '@/lib/entitlement';
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
@@ -19,9 +20,14 @@ export async function GET(
   if (object.customMetadata?.ownerId !== user?.userId) {
     const published = await database()
       .prepare(
-        "SELECT owner_id FROM profiles WHERE json_extract(published_json, '$.photoUrl')=? AND owner_id=? LIMIT 1",
+        `SELECT owner_id FROM profiles WHERE json_extract(published_json, '$.photoUrl')=? AND owner_id=? AND ${activeProfileSQL} LIMIT 1`,
       )
-      .bind(`/api/profile-photo/${id}`, object.customMetadata?.ownerId ?? '')
+      .bind(
+        `/api/profile-photo/${id}`,
+        object.customMetadata?.ownerId ?? '',
+        new Date().toISOString(),
+        new Date().toISOString(),
+      )
       .first();
     if (!published) return missing();
   }

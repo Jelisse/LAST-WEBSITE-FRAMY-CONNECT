@@ -13,7 +13,9 @@ export function OperationsAgentReports() {
     setError('');
   }, []);
   useEffect(() => {
-    void load().catch((e) => setError(e.message));
+    void Promise.resolve()
+      .then(load)
+      .catch((e) => setError(e.message));
     const timer = setInterval(
       () => void load().catch((e) => setError(e.message)),
       30000,

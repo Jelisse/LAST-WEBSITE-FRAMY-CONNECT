@@ -1,4 +1,5 @@
 'use client';
+import { SourceImage } from '@/components/source-image';
 import { useEffect, useState, useCallback } from 'react';
 import Link from '@/components/hard-link';
 import { orderProgress, submissionTime } from '@/lib/order-progress';
@@ -15,10 +16,12 @@ import {
   Users,
   Package,
   ChevronRight,
-  X,
 } from 'lucide-react';
+import { AgentAction } from './agent-action';
+import { agentOrderView } from '@/lib/agent-workflow';
 import { OrderArtwork } from './order-artwork';
 import { ProfileHandoff } from './profile-handoff';
+import { AccountManager } from './account-manager';
 import { AccountMenu } from './account-menu';
 import { ProductManager } from './product-manager';
 import { OperationsAgentReports } from './operations-agent-reports';
@@ -77,6 +80,7 @@ const sections = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
   { id: 'operations', label: 'Operações', icon: Boxes },
   { id: 'catalog', label: 'Produtos e planos', icon: ShoppingBag },
+  { id: 'accounts', label: 'Contas e acessos', icon: Users },
   { id: 'finance', label: 'Financeiro', icon: Wallet },
 ];
 const date = (v: string) => new Date(v).toLocaleString('pt-PT');
@@ -103,8 +107,8 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
   const [stockMode, setStockMode] = useState('entry');
   const [stockAgent, setStockAgent] = useState('');
   const [agentId, setAgentId] = useState(''),
-    [proof, setProof] = useState(''),
-    [qc, setQc] = useState(false);
+    [paymentReference, setPaymentReference] = useState(''),
+    [verifiedInProvider, setVerifiedInProvider] = useState(false);
   const load = useCallback(async () => {
     const r = await fetch('/api/manager', { cache: 'no-store' });
     const d = (await r.json()) as Data & { error?: string };
@@ -114,8 +118,10 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
   }, []);
   useEffect(() => {
     if (new URLSearchParams(location.search).get('section') === 'finance')
-      setSection('finance');
-    void load().catch((e) => setError(e.message));
+      queueMicrotask(() => setSection('finance'));
+    void Promise.resolve()
+      .then(load)
+      .catch((e) => setError(e.message));
   }, [load]);
   const save = async (payload: Record<string, unknown>) => {
     setBusy(true);
@@ -134,8 +140,12 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
       setEditing(null);
       setStock(null);
       setNotice('Alteração guardada.');
+      setPaymentReference('');
+      setVerifiedInProvider(false);
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Não foi possível guardar.');
+      return false;
     } finally {
       setBusy(false);
     }
@@ -153,7 +163,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
   const orders = (data?.orders ?? []).filter(
     (o) =>
       days === 'all' ||
-      Date.now() - new Date(o.createdAt).getTime() <= Number(days) * 86400000,
+      now - new Date(o.createdAt).getTime() <= Number(days) * 86400000,
   );
   const stockRows = (data?.products ?? []).map((p) => {
     const onHand = (data?.movements ?? [])
@@ -189,8 +199,6 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
     setSelected(o);
     setError('');
     setAgentId('');
-    setProof('');
-    setQc(false);
   };
   const exportReport = () => {
     const rows = [
@@ -326,7 +334,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
     <div className="manager-shell">
       <aside className="manager-sidebar">
         <Link href="/" aria-label="Página inicial">
-          <img src="/brand/logo.svg" alt="Framy Connect" />
+          <SourceImage src="/brand/logo.svg" alt="Framy Connect" />
         </Link>
         <span className="manager-eyebrow">MANAGER</span>
         <nav aria-label="Gestão">
@@ -353,7 +361,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
       <div className="manager-body">
         <header className="manager-top">
           <span>
-            Manager{' '}
+            Gestor{' '}
             <span>/ {sections.find((s) => s.id === section)?.label}</span>
           </span>
           <AccountMenu />
@@ -370,7 +378,9 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                     ? 'Ligue os pedidos, a equipa e o stock.'
                     : section === 'catalog'
                       ? 'Os produtos e as subscrições que oferece aos seus clientes.'
-                      : 'Acompanhe os valores recebidos, pendentes e reconhecidos.'}
+                      : section === 'accounts'
+                        ? 'Crie acessos, recupere contas e controle a disponibilidade da equipa.'
+                        : 'Acompanhe os valores recebidos, pendentes e reconhecidos.'}
               </p>
             </div>
             <button
@@ -386,24 +396,20 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
             </button>
           </div>
           <p className="manager-sandbox">
-            Ambiente de desenvolvimento · Pedidos e pagamentos simulados.
-            Valores de produtos em MZN; planos mensais em USD.
+            Gestão de encomendas · Confirme cada transacção no prestador antes
+            de a registar. Valores de produtos em MZN; planos mensais em USD.
           </p>
           {error && (
             <p role="alert" className="manager-error">
               {error}
             </p>
           )}
-          {notice && (
-            <p role="status" className="manager-notice">
-              {notice}
-            </p>
-          )}
+          {notice && <output className="manager-notice">{notice}</output>}
           {!data ? (
             <section className="manager-card">
               <p>
                 {error
-                  ? 'O Manager requer uma conta autorizada.'
+                  ? 'O Gestor requer uma conta autorizada.'
                   : 'A carregar o seu espaço de gestão…'}
               </p>
             </section>
@@ -428,6 +434,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   </button>
                 </div>
               )}
+              {section === 'accounts' && <AccountManager />}
               {section === 'overview' && (
                 <>
                   <div className="manager-metrics">
@@ -626,7 +633,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                               <th>Contacto</th>
                               <th>Pedidos atribuídos</th>
                               <th>Estado</th>
-                              <th />
+                              <th>Acções</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -717,7 +724,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                                 <th>Físico</th>
                                 <th>Reservado</th>
                                 <th>Disponível</th>
-                                <th />
+                                <th>Acções</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -980,7 +987,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
         <DialogContent className="manager-dialog">
           <DialogTitle>{selected?.productName}</DialogTitle>
           <DialogDescription>
-            Pedido #{selected?.id.slice(0, 8)} · Fluxo simulado
+            Pedido #{selected?.id.slice(0, 8)} · Acompanhamento da encomenda
           </DialogDescription>
           {selected && (
             <>
@@ -1017,11 +1024,36 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                 </p>
               )}
               <p>Agente: {selected.agent || 'Por atribuir'}</p>
-              {selected.fulfilment && <section><h3>Execução do agente</h3>
-                <p>Programação: {selected.fulfilment.programmedAt ? date(selected.fulfilment.programmedAt) : 'Pendente'} · Qualidade: {selected.fulfilment.checkedAt ? date(selected.fulfilment.checkedAt) : 'Pendente'} · Embalagem: {selected.fulfilment.packagedAt ? date(selected.fulfilment.packagedAt) : 'Pendente'}</p>
-                <p>Expedição: {selected.fulfilment.dispatchedAt ? date(selected.fulfilment.dispatchedAt) : 'Pendente'} · {selected.fulfilment.courier} · {selected.fulfilment.tracking}</p>
-                {selected.fulfilment.note && <p>Nota: {selected.fulfilment.note}</p>}
-              </section>}
+              {selected.fulfilment && (
+                <section>
+                  <h3>Execução do agente</h3>
+                  <p>
+                    Programação:{' '}
+                    {selected.fulfilment.programmedAt
+                      ? date(selected.fulfilment.programmedAt)
+                      : 'Pendente'}{' '}
+                    · Qualidade:{' '}
+                    {selected.fulfilment.checkedAt
+                      ? date(selected.fulfilment.checkedAt)
+                      : 'Pendente'}{' '}
+                    · Embalagem:{' '}
+                    {selected.fulfilment.packagedAt
+                      ? date(selected.fulfilment.packagedAt)
+                      : 'Pendente'}
+                  </p>
+                  <p>
+                    Expedição:{' '}
+                    {selected.fulfilment.dispatchedAt
+                      ? date(selected.fulfilment.dispatchedAt)
+                      : 'Pendente'}{' '}
+                    · {selected.fulfilment.courier} ·{' '}
+                    {selected.fulfilment.tracking}
+                  </p>
+                  {selected.fulfilment.note && (
+                    <p>Nota: {selected.fulfilment.note}</p>
+                  )}
+                </section>
+              )}
               {selected.design && <OrderArtwork order={selected} />}
               <ProfileHandoff
                 key={selected.id}
@@ -1037,6 +1069,36 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                 </p>
               )}
               <div className="manager-order-actions">
+                {['PENDING_PAYMENT', 'CANCELLED'].includes(selected.status) && (
+                  <fieldset disabled={busy}>
+                    <legend>Verificação da transacção</legend>
+                    <label>
+                      Referência única no prestador
+                      <input
+                        value={paymentReference}
+                        onChange={(e) => setPaymentReference(e.target.value)}
+                        maxLength={120}
+                      />
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={verifiedInProvider}
+                        onChange={(e) =>
+                          setVerifiedInProvider(e.target.checked)
+                        }
+                      />
+                      Verifiquei no prestador o valor de{' '}
+                      {money(selected.amount)}, a moeda MZN e a referência desta
+                      encomenda.
+                    </label>
+                    <p>
+                      Registar aqui não cobra nem devolve dinheiro. Confirme a
+                      operação no prestador antes de continuar.
+                    </p>
+                  </fieldset>
+                )}
+
                 {selected.status === 'PENDING_PAYMENT' && (
                   <button
                     disabled={busy}
@@ -1047,10 +1109,14 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                         orderId: selected.id,
                         version: selected.version,
                         step: 'pay',
+                        paymentReference,
+                        verifiedInProvider,
+                        verifiedAmount: selected.amount,
+                        currency: 'MZN',
                       })
                     }
                   >
-                    Confirmar pagamento simulado e reservar stock
+                    Registar pagamento verificado
                   </button>
                 )}
                 {selected.status === 'QUEUED' && (
@@ -1086,77 +1152,19 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                     >
                       Guardar atribuição
                     </button>
-                    <button
-                      disabled={busy || !selected.agent}
-                      className="manager-primary"
-                      onClick={() =>
-                        void save({
-                          action: 'order',
-                          orderId: selected.id,
-                          version: selected.version,
-                          step: 'start',
-                        })
-                      }
-                    >
-                      Iniciar produção
-                    </button>
                   </>
                 )}
-                {selected.status === 'IN_PRODUCTION' && (
-                  <>
-                    <label className="manager-check">
-                      <input
-                        type="checkbox"
-                        checked={qc}
-                        onChange={(e) => setQc(e.target.checked)}
-                      />{' '}
-                      Confirmei o NFC, o perfil, a identificação e o estado
-                      físico do produto.
-                    </label>
-                    <button
-                      disabled={busy || !qc}
-                      className="manager-primary"
-                      onClick={() =>
-                        void save({
-                          action: 'order',
-                          orderId: selected.id,
-                          version: selected.version,
-                          step: 'ready',
-                          qc,
-                        })
-                      }
-                    >
-                      Confirmar qualidade · Pronto para entrega
-                    </button>
-                  </>
-                )}
-                {selected.status === 'READY' && (
-                  <>
-                    <label>
-                      Evidência de entrega
-                      <input
-                        value={proof}
-                        maxLength={250}
-                        onChange={(e) => setProof(e.target.value)}
-                        placeholder="Confirmação de recepção ou referência"
-                      />
-                    </label>
-                    <button
-                      disabled={busy || proof.trim().length < 5}
-                      className="manager-primary"
-                      onClick={() =>
-                        void save({
-                          action: 'order',
-                          orderId: selected.id,
-                          version: selected.version,
-                          step: 'deliver',
-                          proof,
-                        })
-                      }
-                    >
-                      Confirmar entrega simulada
-                    </button>
-                  </>
+                {selected.paid && selected.agentId && (
+                  <AgentAction
+                    order={agentOrderView(
+                      selected,
+                      typeof window === 'undefined'
+                        ? 'https://framyconnect.co.mz'
+                        : window.location.origin,
+                    )}
+                    busy={busy}
+                    onSave={save}
+                  />
                 )}
                 {selected.status === 'DELIVERED' && (
                   <p>Entrega concluída: {selected.proof}</p>
@@ -1189,10 +1197,14 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                           orderId: selected.id,
                           version: selected.version,
                           step: 'refund',
+                          paymentReference,
+                          verifiedInProvider,
+                          verifiedAmount: selected.amount,
+                          currency: 'MZN',
                         })
                       }
                     >
-                      Confirmar reembolso simulado
+                      Registar reembolso verificado
                     </button>
                   )}
               </div>

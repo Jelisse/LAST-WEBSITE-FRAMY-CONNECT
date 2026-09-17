@@ -1,3 +1,7 @@
+import { publicError } from '@/lib/public-error';
+import { expireReservations } from '@/lib/server-reservations';
+import { validatePaymentEvidence } from '@/lib/payment-policy';
+import { agentTransition } from '@/lib/agent-workflow';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { canManageOrders } from '@/lib/server-order-access';
 import { database } from '@/lib/server-db';
@@ -15,6 +19,7 @@ export async function GET() {
   try {
     const user = await authorized();
     if (!user) return json({ error: 'Acesso reservado ao Manager.' }, 403);
+    await expireReservations();
     const db = database();
     const [orders, agents, movements, audit, products, plans] =
       await Promise.all([
@@ -49,7 +54,9 @@ export async function GET() {
         ...JSON.parse(r.data_json),
         ownerId: r.owner_id,
         profileUsername: r.username,
-        profile: r.published_json ? JSON.parse(r.published_json) : null,
+        profile:
+          JSON.parse(r.data_json).approvedProfileSnapshot ??
+          (r.published_json ? JSON.parse(r.published_json) : null),
       })),
       agents: agents.results.map((r) => ({
         ...JSON.parse(r.data_json),
@@ -122,7 +129,8 @@ export async function POST(request: Request) {
         const dollars = Number(b.dollars);
         if (
           !Number.isFinite(dollars) ||
-          dollars < 1 ||
+          dollars < (id === 'free-30' ? 0 : 1) ||
+          (id === 'free-30' && dollars !== 0) ||
           dollars > 10000 ||
           Math.abs(dollars * 100 - Math.round(dollars * 100)) > 0.0001
         )
@@ -243,6 +251,7 @@ export async function POST(request: Request) {
       return json({ ok: true });
     }
     if (b.action === 'order') {
+      await expireReservations();
       const id = text('orderId', 70),
         version = integer('version', 1, 1000000),
         step = text('step', 30);
@@ -259,6 +268,20 @@ export async function POST(request: Request) {
           409,
         );
       const order = JSON.parse(row.data_json) as SandboxOrder;
+      if (
+        step === 'pay' &&
+        Date.parse(
+          order.reservationExpiresAt ??
+            new Date(Date.parse(order.createdAt) + 86400000).toISOString(),
+        ) <= Date.now()
+      )
+        return json(
+          {
+            error:
+              'A reserva expirou. Confirme a disponibilidade e crie uma nova encomenda; reconcilie qualquer pagamento recebido.',
+          },
+          409,
+        );
       if (step === 'assign') {
         if (!order.deliveryCity)
           throw Error(
@@ -274,8 +297,29 @@ export async function POST(request: Request) {
           throw Error('Seleccione um agente activo.');
         b.agent = JSON.parse(agent.data_json).name;
       }
+      const evidence = ['pay', 'refund'].includes(step)
+        ? validatePaymentEvidence(b, order.amount)
+        : undefined;
+      const fulfilmentStep = [
+        'start',
+        'program',
+        'ready',
+        'package',
+        'dispatch',
+        'deliver',
+        'note',
+      ].includes(step);
       const next = {
-        ...transition(order, step, b),
+        ...(fulfilmentStep
+          ? agentTransition(
+              order,
+              order.agentId ?? '',
+              step,
+              b,
+              new URL(request.url).origin,
+            )
+          : transition(order, step, b)),
+        ...(step === 'pay' ? { paymentReference: evidence } : {}),
         ...(step === 'assign' ? { agentId: b.agentId } : {}),
       };
       let guard = '',
@@ -322,8 +366,31 @@ export async function POST(request: Request) {
               guard,
           )
           .bind(JSON.stringify(next), next.version, id, version, ...args),
-        audit('Pedido: ' + step, id),
+        audit(
+          evidence
+            ? 'Transacção verificada manualmente: ' + step
+            : 'Pedido: ' + step,
+          id,
+        ),
       ];
+      if (evidence)
+        statements.push(
+          db
+            .prepare(
+              'INSERT INTO payment_records(id,order_id,kind,provider_reference,amount,currency,verified_by,verified_at) SELECT ?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM manager_audit WHERE id=?)',
+            )
+            .bind(
+              crypto.randomUUID(),
+              id,
+              step === 'pay' ? 'capture' : 'refund',
+              evidence,
+              order.amount,
+              'MZN',
+              user.userId,
+              now,
+              eventId,
+            ),
+        );
       statements.push(
         db
           .prepare(
@@ -390,9 +457,6 @@ export async function POST(request: Request) {
     }
     return json({ error: 'Acção inválida.' }, 422);
   } catch (e) {
-    return json(
-      { error: e instanceof Error ? e.message : 'Não foi possível guardar.' },
-      422,
-    );
+    return json({ error: publicError(e) }, 422);
   }
 }

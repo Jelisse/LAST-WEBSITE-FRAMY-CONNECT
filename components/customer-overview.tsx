@@ -1,8 +1,9 @@
 'use client';
+import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
 import { ArrowRight, ArrowUpRight, Link2, Plus, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { orderLabels, type SandboxOrder } from '@/lib/domain';
+import { orderLabels } from '@/lib/domain';
 import type { WorkspaceData } from '@/lib/profile-types';
 
 export function CustomerOverview({
@@ -79,12 +80,18 @@ export function CustomerOverview({
         >
           <div className="essential-plan-heading">
             <span className="essential-kicker">O SEU PLANO</span>
-            <span className="essential-test-badge">Prévia</span>
+            <span className="essential-test-badge">
+              {data.membership.active ? 'Activo' : 'Por activar / expirado'}
+            </span>
           </div>
-          <h2 id="current-plan-title">{plan.name}</h2>
+          <h2 id="current-plan-title">
+            {data.membership.version ? plan.name : 'Comece com 30 dias grátis'}
+          </h2>
           <p className="essential-price">
-            US${plan.dollars}
-            <span> / mês · por perfil</span>
+            {plan.id === 'free-30' ? '0 MT' : `US$${plan.dollars}`}
+            <span>
+              {plan.id === 'free-30' ? ' / 30 dias' : ' / mês · por perfil'}
+            </span>
           </p>
           <div className="essential-usage">
             <span>
@@ -97,10 +104,12 @@ export function CustomerOverview({
             aria-label={`${links.length} de ${plan.links} links utilizados`}
           />
           <Button className="plan-upgrade" onClick={onUpgrade}>
-            Upgrade plan <ArrowUpRight size={18} />
+            Escolher plano <ArrowUpRight size={18} />
           </Button>
           <p className="essential-plan-note">
-            Mais caixas de links, a partir de US$1/mês.
+            {data.membership.expiresAt
+              ? `Período gratuito até ${new Date(data.membership.expiresAt).toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo' })}. Sem renovação automática.`
+              : 'Active o período gratuito para publicar o perfil.'}
           </p>
         </section>
       </div>

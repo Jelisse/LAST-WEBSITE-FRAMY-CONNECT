@@ -5,7 +5,7 @@ export function validateDelivery(input: Record<string, unknown>) {
     typeof city !== 'string' ||
     city.trim().length < 2 ||
     city.trim().length > 90 ||
-    /[\u0000-\u001f]/.test(city)
+    Array.from(city).some((c) => c.charCodeAt(0) < 32)
   )
     throw Error(
       'Indique a cidade ou localidade de entrega (2 a 90 caracteres).',
@@ -13,7 +13,7 @@ export function validateDelivery(input: Record<string, unknown>) {
   if (
     typeof address !== 'string' ||
     address.trim().length > 300 ||
-    /[\u0000-\u0008]/.test(address)
+    Array.from(address).some((c) => c.charCodeAt(0) < 9)
   )
     throw Error('Os detalhes da entrega devem ter até 300 caracteres.');
   return { deliveryCity: city.trim(), deliveryAddress: address.trim() };

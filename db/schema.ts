@@ -1,4 +1,10 @@
-import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
+import {
+  sqliteTable,
+  text,
+  integer,
+  index,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
 export const productCatalog = sqliteTable('product_catalog', {
   id: text('id').primaryKey(),
   dataJson: text('data_json').notNull(),
@@ -15,6 +21,8 @@ export const sandboxMemberships = sqliteTable('sandbox_memberships', {
   termsJson: text('terms_json'),
   version: integer('version').notNull().default(1),
   updatedAt: text('updated_at').notNull(),
+  trialStartedAt: text('trial_started_at'),
+  trialExpiresAt: text('trial_expires_at'),
 });
 export const profiles = sqliteTable('profiles', {
   ownerId: text('owner_id').primaryKey(),
@@ -74,3 +82,87 @@ export const managerAudit = sqliteTable('manager_audit', {
   subject: text('subject').notNull(),
   createdAt: text('created_at').notNull(),
 });
+
+export const authAccounts = sqliteTable('auth_accounts', {
+  id: text('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  name: text('name').notNull(),
+  passwordHash: text('password_hash').notNull(),
+  role: text('role').notNull(),
+  active: integer('active').notNull().default(1),
+  createdAt: text('created_at').notNull(),
+  version: integer('version').notNull().default(1),
+});
+export const authSessions = sqliteTable(
+  'auth_sessions',
+  {
+    tokenHash: text('token_hash').primaryKey(),
+    accountId: text('account_id')
+      .notNull()
+      .references(() => authAccounts.id),
+    expiresAt: integer('expires_at').notNull(),
+  },
+  (t) => [index('auth_sessions_account').on(t.accountId)],
+);
+export const authAttempts = sqliteTable('auth_attempts', {
+  key: text('key').primaryKey(),
+  count: integer('count').notNull(),
+  expiresAt: integer('expires_at').notNull(),
+});
+export const productOptions = sqliteTable('product_options', {
+  id: text('id').primaryKey(),
+  label: text('label').notNull(),
+  quantity: integer('quantity').notNull(),
+  enabled: integer('enabled').notNull().default(1),
+  version: integer('version').notNull().default(0),
+});
+export const authInvitations = sqliteTable(
+  'auth_invitations',
+  {
+    tokenHash: text('token_hash').primaryKey(),
+    accountId: text('account_id')
+      .notNull()
+      .references(() => authAccounts.id),
+    createdBy: text('created_by')
+      .notNull()
+      .references(() => authAccounts.id),
+    expiresAt: integer('expires_at').notNull(),
+    usedAt: integer('used_at'),
+    createdAt: text('created_at').notNull(),
+  },
+  (t) => [index('invitations_account').on(t.accountId)],
+);
+export const paymentRecords = sqliteTable(
+  'payment_records',
+  {
+    id: text('id').primaryKey(),
+    orderId: text('order_id')
+      .notNull()
+      .references(() => sandboxOrders.id),
+    kind: text('kind').notNull(),
+    providerReference: text('provider_reference').notNull(),
+    amount: integer('amount').notNull(),
+    currency: text('currency').notNull(),
+    verifiedBy: text('verified_by')
+      .notNull()
+      .references(() => authAccounts.id),
+    verifiedAt: text('verified_at').notNull(),
+  },
+  (t) => [
+    uniqueIndex('payment_reference_unique').on(t.kind, t.providerReference),
+    uniqueIndex('payment_order_kind_unique').on(t.orderId, t.kind),
+  ],
+);
+export const storedAssets = sqliteTable(
+  'stored_assets',
+  {
+    id: text('id').primaryKey(),
+    ownerId: text('owner_id')
+      .notNull()
+      .references(() => authAccounts.id),
+    kind: text('kind').notNull(),
+    bytes: integer('bytes').notNull(),
+    createdAt: text('created_at').notNull(),
+  },
+  (t) => [index('assets_owner').on(t.ownerId)],
+);

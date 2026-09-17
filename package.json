@@ -6,10 +6,10 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "test": "node --experimental-strip-types --test tests/domain.test.mjs",
+    "test": "node --experimental-strip-types scripts/test.mjs",
     "typecheck": "tsc --noEmit",
     "dev": "vinext dev",
-    "build": "node scripts/build-cloudflare.mjs",
+    "build": "node scripts/build-sites.mjs",
     "build:cloudflare": "node scripts/build-cloudflare.mjs",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",

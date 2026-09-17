@@ -1,13 +1,13 @@
-import {
-  forwardRef,
-  type ComponentPropsWithoutRef,
-} from 'react';
+import { forwardRef, type ComponentPropsWithoutRef } from 'react';
 
-const HardLink = forwardRef<
-  HTMLAnchorElement,
-  ComponentPropsWithoutRef<'a'>
->(function HardLink(props, ref) {
-  return <a ref={ref} {...props} />;
-});
+const HardLink = forwardRef<HTMLAnchorElement, ComponentPropsWithoutRef<'a'>>(
+  function HardLink({ children, ...props }, ref) {
+    return (
+      <a ref={ref} {...props}>
+        {children}
+      </a>
+    );
+  },
+);
 
 export default HardLink;

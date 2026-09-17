@@ -12,7 +12,9 @@ export function PersonalisationManager() {
     setRows(d.options);
   }
   useEffect(() => {
-    void load().catch((e) => setMessage(e.message));
+    void Promise.resolve()
+      .then(load)
+      .catch((e) => setMessage(e.message));
   }, []);
   async function save(row: StockOption) {
     setBusy(true);
@@ -105,7 +107,7 @@ export function PersonalisationManager() {
           </div>
         ))}
       </div>
-      {message && <p role="status">{message}</p>}
+      {message && <output>{message}</output>}
     </section>
   );
 }

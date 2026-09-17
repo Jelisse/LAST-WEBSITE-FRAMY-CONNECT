@@ -1,4 +1,5 @@
 'use client';
+import { SourceImage } from '@/components/source-image';
 import { useEffect, useState } from 'react';
 import type { Product } from '@/lib/catalog';
 import { PersonalisationManager } from './personalisation-manager';
@@ -35,7 +36,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
     }
   }
   useEffect(() => {
-    void load();
+    void Promise.resolve().then(load);
   }, []);
   function edit(p: Product) {
     setDraft({ ...p });
@@ -72,7 +73,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
       setBusy(false);
     }
   }
-  async function save(event: React.FormEvent) {
+  async function save(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!draft) return;
     const parse = (value: string) => {
@@ -155,11 +156,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
           Actualizar
         </Button>
       </header>
-      {notice && (
-        <p role="status" className="product-save-notice">
-          {notice}
-        </p>
-      )}
+      {notice && <output className="product-save-notice">{notice}</output>}
       {error && (
         <p role="alert" className="product-save-error">
           {error}
@@ -170,7 +167,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
       ) : draft ? (
         <form onSubmit={save} className="product-management-form">
           <div className="product-image-editor">
-            <img src={draft.imageUrl} alt={draft.name} />
+            <SourceImage src={draft.imageUrl} alt={draft.name} />
             <label>
               Substituir imagem
               <input
@@ -184,9 +181,10 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
           </div>
           <fieldset disabled={busy}>
             <div className="product-fields">
-              <label>
+              <label htmlFor="field-componentsproductmanagertsx-0">
                 Nome
                 <Input
+                  id="field-componentsproductmanagertsx-0"
                   required
                   maxLength={90}
                   value={draft.name}
@@ -206,9 +204,13 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                   ))}
                 </select>
               </label>
-              <label className="product-field-wide">
+              <label
+                htmlFor="field-componentsproductmanagertsx-1"
+                className="product-field-wide"
+              >
                 Frase curta
                 <Input
+                  id="field-componentsproductmanagertsx-1"
                   required
                   maxLength={160}
                   value={draft.tagline}
@@ -229,27 +231,30 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                   }
                 />
               </label>
-              <label>
+              <label htmlFor="field-componentsproductmanagertsx-2">
                 Preço (MZN)
                 <Input
+                  id="field-componentsproductmanagertsx-2"
                   required
                   inputMode="decimal"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                 />
               </label>
-              <label>
+              <label htmlFor="field-componentsproductmanagertsx-3">
                 Custo interno (MZN)
                 <Input
+                  id="field-componentsproductmanagertsx-3"
                   required
                   inputMode="decimal"
                   value={cost}
                   onChange={(e) => setCost(e.target.value)}
                 />
               </label>
-              <label>
+              <label htmlFor="field-componentsproductmanagertsx-4">
                 Público
                 <Input
+                  id="field-componentsproductmanagertsx-4"
                   required
                   maxLength={60}
                   value={draft.audience}
@@ -290,7 +295,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
         <div className="managed-products">
           {items.map((p) => (
             <article key={p.id}>
-              <img src={p.imageUrl} alt={p.name} />
+              <SourceImage src={p.imageUrl} alt={p.name} />
               <div>
                 <h3>{p.name}</h3>
                 <p>{p.available ? money(p.amount) : 'Sob consulta'}</p>

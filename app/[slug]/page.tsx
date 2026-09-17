@@ -1,3 +1,4 @@
+import { activeProfileSQL } from '@/lib/entitlement';
 import { notFound } from 'next/navigation';
 import Link from '@/components/hard-link';
 import { Mail, ArrowUpRight } from 'lucide-react';
@@ -47,7 +48,7 @@ const pages: Record<
       },
       {
         title: 'Apoio ao cliente',
-        text: 'Para questões sobre o seu perfil, use support@framyconnect.co.mz. Esta prévia de desenvolvimento não aceita pagamentos nem confirma encomendas comerciais.',
+        text: 'Para questões sobre o seu perfil, use support@framyconnect.co.mz. Indique a referência da encomenda ao contactar a equipa. O pagamento é confirmado após verificação no prestador.',
       },
     ],
   },
@@ -66,51 +67,51 @@ const pages: Record<
       },
       {
         title: 'Quem vê os meus dados?',
-        text: 'O perfil apresenta apenas os contactos cuja visibilidade activou. Nesta fase, a prévia inteira é privada e o acesso ao perfil depende também das permissões do site.',
+        text: 'O perfil apresenta apenas os contactos cuja visibilidade activou. Quem tem o endereço pode consultar um perfil publicado enquanto o período gratuito estiver activo. Pode retirar a publicação no seu painel.',
       },
       {
-        title: 'Como funciona o espaço de teste?',
-        text: 'Os pedidos e pagamentos são simulados. Pode percorrer as etapas de produção e entrega sem qualquer cobrança, movimentação de stock real ou instrução a um agente.',
+        title: 'Como acompanho uma encomenda?',
+        text: 'Depois de confirmar o pedido, consulte a referência e o estado na sua conta. A produção começa após confirmação do pagamento e atribuição à equipa. Reservas não pagas expiram após 24 horas.',
       },
     ],
   },
   privacidade: {
     title: 'A sua identidade. A sua escolha.',
-    eyebrow: 'PRIVACIDADE DA PRÉVIA',
+    eyebrow: 'PRIVACIDADE',
     intro:
-      'Esta versão é um ambiente de desenvolvimento privado. A política comercial definitiva será publicada antes do lançamento.',
+      'Conheça os dados utilizados para gerir a sua conta, publicar o seu perfil e acompanhar as suas encomendas.',
     blocks: [
       {
         title: 'Dados que escolhe guardar',
-        text: 'O editor guarda o seu nome, título, nome de utilizador, contactos e link. O email e o telefone não aparecem no perfil publicado sem a sua escolha explícita.',
+        text: 'Guardamos os dados da conta, o perfil, as fotografias e os designs que envia. O email e o telefone do perfil só são publicados quando activa a respectiva visibilidade.',
       },
       {
         title: 'Acesso e publicação',
-        text: 'O acesso ao espaço guardado é associado à sua sessão da prévia. Publicar um perfil não altera o acesso privado do site nem activa a indexação em motores de pesquisa.',
+        text: 'A conta e os rascunhos exigem sessão. Os perfis publicados são acessíveis pelo seu endereço enquanto o plano estiver activo. Retirar a publicação impede novas consultas; conteúdos já partilhados ou copiados por terceiros podem permanecer fora do serviço.',
       },
       {
-        title: 'Pedidos de teste',
-        text: 'Os pedidos, nomes de agentes e evidências inseridos são dados de simulação. Use exemplos e não carregue documentos de identificação ou dados de pagamento.',
+        title: 'Encomendas e pagamentos',
+        text: 'Contactos de entrega e encomendas são consultados pelo titular e pela gestão. O agente atribuído recebe os dados necessários à execução e entrega. O pagamento é efectuado no prestador externo; não introduza dados de cartão ou códigos de pagamento em mensagens ou designs.',
       },
       {
         title: 'Retirar um perfil',
-        text: 'Pode retirar a publicação no editor. Para questões sobre os seus dados, contacte support@framyconnect.co.mz.',
+        text: 'Pode retirar a publicação no editor e terminar sessões em Segurança da conta. Para pedir correcção ou eliminação de dados e esclarecimentos sobre conservação, contacte support@framyconnect.co.mz. Os ficheiros carregados são conservados enquanto necessários ao perfil ou encomenda.',
       },
     ],
   },
   termos: {
     title: 'Antes de começar.',
-    eyebrow: 'CONDIÇÕES DA PRÉVIA',
+    eyebrow: 'CONDIÇÕES DO SERVIÇO',
     intro:
-      'Esta versão permite avaliar o produto em desenvolvimento e não constitui uma loja comercial activa.',
+      'Consulte as condições do perfil digital e confirme os detalhes da sua encomenda antes de efectuar o pagamento.',
     blocks: [
       {
-        title: 'Sem compras reais',
-        text: 'Preços, custos, pagamentos e entregas no espaço de teste são exclusivamente demonstrativos. Não constituem propostas comerciais nem recibos fiscais.',
+        title: 'Perfil digital e produto físico',
+        text: 'O perfil digital tem um período gratuito de 30 dias, sem renovação automática. Os produtos físicos são pagos separadamente. O pedido registado aguarda confirmação do pagamento; não constitui recibo de pagamento.',
       },
       {
-        title: 'Funcionalidades em preparação',
-        text: 'O sistema de autenticação comercial, integração de pagamentos, gestão de stock, regras fiscais e permissões operacionais definitivas serão concluídos antes do lançamento.',
+        title: 'Entrega, cancelamento e apoio',
+        text: 'Confirme com a equipa o custo e prazo de entrega e as condições de cancelamento, personalização e devolução antes de pagar. Guarde a referência da encomenda e da transacção. Para apoio, contacte support@framyconnect.co.mz.',
       },
     ],
   },
@@ -187,9 +188,9 @@ export default async function Page({
   if (!/^[a-z0-9_]{3,40}$/.test(slug)) notFound();
   const row = await database()
     .prepare(
-      `SELECT published_json FROM profiles WHERE username=? AND published_json IS NOT NULL AND NOT EXISTS (SELECT 1 FROM sandbox_memberships m WHERE m.owner_id=profiles.owner_id AND m.plan_id='free-30' AND m.trial_expires_at <= strftime('%Y-%m-%dT%H:%M:%fZ','now'))`,
+      `SELECT published_json FROM profiles WHERE username=? AND published_json IS NOT NULL AND ${activeProfileSQL}`,
     )
-    .bind(slug)
+    .bind(slug, new Date().toISOString(), new Date().toISOString())
     .first<{ published_json: string }>();
   if (!row) notFound();
   const p = JSON.parse(row.published_json) as Profile;

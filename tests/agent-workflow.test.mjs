@@ -190,18 +190,36 @@ const dataModule = (code) =>
   'data:text/javascript;base64,' + Buffer.from(code).toString('base64');
 async function route(file) {
   const dependencies = {
+    '@/lib/server-reservations': dataModule(
+      'export async function expireReservations(){}',
+    ),
+    '@/lib/payment-policy': dataModule(
+      'export function validatePaymentEvidence(){throw Error("Not used in this agent-only test");}',
+    ),
+    '@/lib/public-error': dataModule(
+      'export function publicError(e){return e.message;}',
+    ),
     '@/app/chatgpt-auth': dataModule(
       'export async function getChatGPTUser(){return globalThis.__agentTest.user;}',
     ),
     '@/lib/server-db': dataModule(
       'export function database(){return globalThis.__agentTest.db;}',
     ),
-    '@/lib/agent-workflow': new URL('../lib/agent-workflow.ts', import.meta.url).href,
+    '@/lib/agent-workflow': new URL('../lib/agent-workflow.ts', import.meta.url)
+      .href,
     '@/lib/domain': new URL('../lib/domain.ts', import.meta.url).href,
-    '@/lib/server-order-access': dataModule("export async function canManageOrders(){return globalThis.__agentTest.user?.role==='manager';}"),
-    '@/lib/server-catalog': dataModule('export async function getProducts(){return [];}'),
-    '@/lib/server-plans': dataModule('export async function getManagedPlans(){return [];}'),
-    'cloudflare:workers': dataModule("export const env={PROFILE_PHOTOS:{async get(){return {body:'approved artwork',customMetadata:{ownerId:'customer-owner'},httpMetadata:{contentType:'image/png'}};}}};"),
+    '@/lib/server-order-access': dataModule(
+      "export async function canManageOrders(){return globalThis.__agentTest.user?.role==='manager';}",
+    ),
+    '@/lib/server-catalog': dataModule(
+      'export async function getProducts(){return [];}',
+    ),
+    '@/lib/server-plans': dataModule(
+      'export async function getManagedPlans(){return [];}',
+    ),
+    'cloudflare:workers': dataModule(
+      "export const env={PROFILE_PHOTOS:{async get(){return {body:'approved artwork',customMetadata:{ownerId:'customer-owner'},httpMetadata:{contentType:'image/png'}};}}};",
+    ),
   };
   // File URLs preserve Windows drive paths and spaces.
   dependencies['@/lib/agent-workflow'] = new URL(
@@ -233,6 +251,23 @@ test('database routes isolate agents, persist operations reports, and deliver ex
     sql.exec(
       readFileSync(new URL('../drizzle/' + file, import.meta.url), 'utf8'),
     );
+  for (const id of ['customer-owner', 'manager', 'agent-a', 'agent-b'])
+    sql
+      .prepare(
+        'INSERT INTO auth_accounts(id,email,name,password_hash,role,created_at) VALUES(?,?,?,?,?,?)',
+      )
+      .run(
+        id,
+        id + '@example.com',
+        id,
+        '!test',
+        id === 'manager'
+          ? 'manager'
+          : id.startsWith('agent')
+            ? 'agent'
+            : 'customer',
+        new Date().toISOString(),
+      );
   const user = { userId: 'agent-a', displayName: 'Agent A', role: 'agent' };
   globalThis.__agentTest = { user, db: sqliteD1(sql) };
   const api = await route('../app/api/agent/route.ts');
@@ -264,16 +299,39 @@ test('database routes isolate agents, persist operations reports, and deliver ex
       headers: { origin, 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-  assert.equal((await manager.POST(req({action:'order',orderId:'order-a',version:1,step:'ready',qc:true},'/api/manager'))).status,403);
-  assert.equal((await manager.GET()).status,403);
-  const assetId=crypto.randomUUID();
-  const assetRequest=()=>assets.GET(new Request(origin+'/api/design-assets/'+assetId),{params:Promise.resolve({id:assetId})});
-  assert.equal((await assetRequest()).status,404);
-  sql.prepare("UPDATE sandbox_orders SET data_json=json_set(data_json,'$.design.front.assetId',?) WHERE id='order-a'").run(assetId);
-  assert.equal((await assetRequest()).status,200);
-  globalThis.__agentTest.user={...user,userId:'agent-b'};
-  assert.equal((await assetRequest()).status,404);
-  globalThis.__agentTest.user=user;
+  assert.equal(
+    (
+      await manager.POST(
+        req(
+          {
+            action: 'order',
+            orderId: 'order-a',
+            version: 1,
+            step: 'ready',
+            qc: true,
+          },
+          '/api/manager',
+        ),
+      )
+    ).status,
+    403,
+  );
+  assert.equal((await manager.GET()).status, 403);
+  const assetId = crypto.randomUUID();
+  const assetRequest = () =>
+    assets.GET(new Request(origin + '/api/design-assets/' + assetId), {
+      params: Promise.resolve({ id: assetId }),
+    });
+  assert.equal((await assetRequest()).status, 404);
+  sql
+    .prepare(
+      "UPDATE sandbox_orders SET data_json=json_set(data_json,'$.design.front.assetId',?) WHERE id='order-a'",
+    )
+    .run(assetId);
+  assert.equal((await assetRequest()).status, 200);
+  globalThis.__agentTest.user = { ...user, userId: 'agent-b' };
+  assert.equal((await assetRequest()).status, 404);
+  globalThis.__agentTest.user = user;
   const read = async () =>
     await (await api.GET(new Request(origin + '/api/agent'))).json();
   let data = await read();

@@ -1,7 +1,8 @@
 'use client';
+import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
 import Link from '@/components/hard-link';
 import { Check, Package, MapPin, ArrowUpRight } from 'lucide-react';
-import { orderLabels, type SandboxOrder } from '@/lib/domain';
+import { orderLabels } from '@/lib/domain';
 import { money } from '@/lib/catalog';
 import { submissionTime } from '@/lib/order-progress';
 const stages = [
@@ -25,6 +26,7 @@ const descriptions: Record<string, string> = {
 type Event = { id: string; orderId: string; action: string; createdAt: string };
 const eventNames: Record<string, string> = {
   created: 'Pedido recebido',
+  'reservation-expired': 'Reserva expirada — pedido cancelado',
   'delivery-address': 'Local de entrega actualizado',
   pay: 'Pagamento confirmado',
   assign: 'Agente atribuído',

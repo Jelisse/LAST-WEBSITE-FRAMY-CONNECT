@@ -14,7 +14,7 @@ const useStaging = process.env.FRAMY_STAGING === 'true';
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === 'seatbelt';
 
 const localBindingConfig = {
-  main: 'vinext/server/fetch-handler',
+  main: './worker.ts',
   compatibility_date: '2026-05-15',
   compatibility_flags: ['nodejs_compat'],
   d1_databases: d1
@@ -54,6 +54,9 @@ export default defineConfig(async () => {
     plugins: [
       vinext(),
       cloudflare({
+        ...(process.env.FRAMY_QA === 'true'
+          ? { persistState: { path: '.wrangler/launch-qa' } }
+          : {}),
         viteEnvironment: { name: 'rsc', childEnvironments: ['ssr'] },
         configPath: 'wrangler.jsonc',
         // Mutate the resolved config: partial config objects concatenate binding arrays.

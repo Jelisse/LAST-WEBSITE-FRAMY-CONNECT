@@ -5,7 +5,7 @@ import Link from '@/components/hard-link';
 import './manager.css';
 export const dynamic = 'force-dynamic';
 export const metadata = {
-  title: 'Manager',
+  title: 'Gestor',
   robots: { index: false, follow: false },
 };
 export default async function Page() {
@@ -14,9 +14,9 @@ export default async function Page() {
     return (
       <main className="manager-main">
         <h1>Acesso reservado</h1>
-        <p>Esta conta não tem acesso ao Manager.</p>
+        <p>Esta conta não tem acesso ao Gestor.</p>
         <Link href="/dashboard">Abrir a minha conta</Link>
       </main>
     );
-  return <ManagerWorkspace displayName={user.fullName ?? 'Manager'} />;
+  return <ManagerWorkspace displayName={user.fullName ?? 'Gestor'} />;
 }

@@ -14,7 +14,10 @@ export function ProfileHandoff({
   const [origin, setOrigin] = useState(''),
     [message, setMessage] = useState('');
   useEffect(() => {
-    setOrigin(window.location.origin);
+    const update = () => setOrigin(window.location.origin);
+    window.addEventListener('popstate', update);
+    queueMicrotask(update);
+    return () => window.removeEventListener('popstate', update);
   }, []);
   const url =
     username && origin ? `${origin}/${encodeURIComponent(username)}` : '';

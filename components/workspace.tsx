@@ -1,6 +1,7 @@
 'use client';
+import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
 import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import Link from '@/components/hard-link';
 import {
   ArrowUpRight,
@@ -11,7 +12,6 @@ import {
   Settings2,
   BriefcaseBusiness,
   ChartNoAxesCombined,
-  Wallet,
   RefreshCw,
   Plus,
   Save,
@@ -68,12 +68,12 @@ import {
   financials,
   orderLabels,
   type Profile,
-  type SandboxOrder,
   type PlanId,
   validatePlanContent,
   publicProfile,
 } from '@/lib/domain';
 import { validateDelivery } from '@/lib/delivery';
+import { OrderPayment } from './order-payment';
 import { CustomerOrders, OrderProgressLine } from './customer-orders';
 import { DeliveryEditor } from './delivery-editor';
 import { usernameFromName } from '@/lib/domain';
@@ -99,7 +99,7 @@ const date = (value: string) =>
     timeZone: 'Africa/Maputo',
   }).format(new Date(value));
 const payment = (o: SandboxOrder) =>
-  o.refunded ? 'Reembolsado' : o.paid ? 'Pago (simulado)' : 'Por pagar';
+  o.refunded ? 'Reembolsado' : o.paid ? 'Pagamento registado' : 'Por pagar';
 function initials(name: string) {
   return (
     name
@@ -128,7 +128,7 @@ export function Workspace({ displayName }: { displayName: string }) {
     [testToolsOpen, setTestToolsOpen] = useState(false),
     [plansOpen, setPlansOpen] = useState(false),
     [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const products = data?.products ?? [];
+  const products = useMemo(() => data?.products ?? [], [data?.products]);
   const pendingCreate = useRef<string | null>(null);
   const load = useCallback(async (resetProfile = false) => {
     const r = await fetch('/api/workspace', { cache: 'no-store' });
@@ -305,7 +305,7 @@ export function Workspace({ displayName }: { displayName: string }) {
       ).catch(() => {});
     } catch {}
     return () => lifecycle.abort();
-  }, [create, canEditOrders]);
+  }, [create, canEditOrders, products]);
   async function run(
     fn: () => Promise<unknown>,
     message = 'Alteração guardada.',
@@ -586,7 +586,7 @@ export function Workspace({ displayName }: { displayName: string }) {
             disabled={loading || busy || uploadingPhoto || !data}
             onClick={openPlans}
           >
-            Upgrade plan <ArrowUpRight size={17} />
+            Escolher plano <ArrowUpRight size={17} />
           </Button>
         </header>
         <main
@@ -596,8 +596,8 @@ export function Workspace({ displayName }: { displayName: string }) {
           <div className="sandbox-banner">
             <ShieldCheck size={19} />
             <span>
-              <strong>Prévia privada</strong> · Pedidos, pagamentos e entregas
-              são simulados. Sem cobranças.
+              <strong>A sua conta</strong> · Acompanhe o perfil e as encomendas.
+              O pagamento do produto é confirmado pela equipa.
             </span>
           </div>
           <div className="workspace-title">
@@ -924,9 +924,13 @@ export function Workspace({ displayName }: { displayName: string }) {
                     )}
                   </div>
                   {canEditOrders && (
-                    <label className="field">
+                    <label
+                      htmlFor="field-componentsworkspacetsx-0"
+                      className="field"
+                    >
                       Local de entrega obrigatório
                       <Input
+                        id="field-componentsworkspacetsx-0"
                         value={orderCity}
                         minLength={2}
                         maxLength={90}
@@ -1118,6 +1122,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                 <strong>{money(selected.amount)}</strong>
               </div>
               <p>{payment(selected)}</p>
+              <OrderPayment orderId={selected.id} />
               <DeliveryEditor
                 key={selected.id}
                 order={selected}

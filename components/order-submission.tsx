@@ -1,4 +1,5 @@
 'use client';
+import { SourceImage } from '@/components/source-image';
 import { useState, useEffect } from 'react';
 import Link from '@/components/hard-link';
 import { money, type PublicProduct } from '@/lib/catalog';
@@ -15,11 +16,11 @@ import { MobileProfile } from './mobile-profile';
 import { IPhonePreview } from './iphone-preview';
 import { ProfilePhotoUpload } from './profile-photo-upload';
 import { ProfileLinksEditor } from './profile-links-editor';
+import { OrderPayment } from './order-payment';
 import { ProductDesigner } from './product-designer';
 import { artworkFile } from '@/lib/artwork-storage';
 import {
   FREE_PLAN_ID,
-  PAYMENT_URL,
   supportsDesign,
   blankOption,
   keychainChoices,
@@ -28,6 +29,7 @@ import {
 type Data = {
   profile: Profile | null;
   profileVersion: number;
+  orders: import('@/lib/customer-order').CustomerOrder[];
   membership: { version: number; planId: string; terms: ManagedPlan };
 };
 const steps = ['Produto', 'Plano', 'Conta', 'Perfil', 'Entrega', 'Confirmar'];
@@ -56,7 +58,9 @@ export function OrderSubmission({
     [orderId, setOrderId] = useState(''),
     [done, setDone] = useState(false);
   const [design, setDesign] = useState<ProductDesign>({
-    ...(product.category === 'Cartões' ? { cardTheme: 'navy-gold' as const, editorVersion: 2 } : {}),
+    ...(product.category === 'Cartões'
+      ? { cardTheme: 'navy-gold' as const, editorVersion: 2 }
+      : {}),
     optionId: product.id === 'keychain' ? 'tiktok' : blankOption(product),
   });
   const plan = plans.find((p) => p.id === planId);
@@ -69,20 +73,26 @@ export function OrderSubmission({
   }
   useEffect(() => {
     let active = true;
-    (async () => {
+    void (async () => {
       try {
         const raw =
-          localStorage.getItem(key) ??
-          localStorage.getItem('framy-checkout:visitor:' + product.id);
+          sessionStorage.getItem(key) ??
+          sessionStorage.getItem('framy-checkout:visitor:' + product.id);
         const saved = raw ? JSON.parse(raw) : null;
         const d = account ? await load() : null;
         if (!active) return;
         if (saved?.design) {
           const restored = saved.design;
-          if (product.category === 'Cartões' && restored.editorVersion !== 2 && !saved.done) {
+          if (
+            product.category === 'Cartões' &&
+            restored.editorVersion !== 2 &&
+            !saved.done
+          ) {
             // Start the new editor without the previously uploaded preview logos.
-            if (!restored.front?.name?.toLowerCase().endsWith('.pdf')) restored.front = undefined;
-            if (!restored.back?.name?.toLowerCase().endsWith('.pdf')) restored.back = undefined;
+            if (!restored.front?.name?.toLowerCase().endsWith('.pdf'))
+              restored.front = undefined;
+            if (!restored.back?.name?.toLowerCase().endsWith('.pdf'))
+              restored.back = undefined;
             restored.editorVersion = 2;
           }
           setDesign(restored);
@@ -92,7 +102,9 @@ export function OrderSubmission({
         setAddress(saved?.address ?? '');
         setContact(saved?.contact ?? '');
         setOrderId(saved?.orderId ?? crypto.randomUUID());
-        setDone(saved?.done === true);
+        setDone(
+          !!(saved?.orderId && d?.orders.some((o) => o.id === saved.orderId)),
+        );
         setPlanId(FREE_PLAN_ID);
         setStep(
           Math.min(
@@ -116,13 +128,13 @@ export function OrderSubmission({
     return () => {
       active = false;
     };
-  }, [key]);
+  }, [key, product.id, product.category, account]);
   useEffect(() => {
     if (!ready) return;
     try {
       sessionStorage.setItem('framy-purchase-plan:' + product.id, planId);
       if (account)
-        localStorage.setItem(
+        sessionStorage.setItem(
           key,
           JSON.stringify({
             step,
@@ -137,7 +149,7 @@ export function OrderSubmission({
           }),
         );
       else
-        localStorage.setItem(
+        sessionStorage.setItem(
           key,
           JSON.stringify({ step, planId, orderId, design }),
         );
@@ -156,6 +168,8 @@ export function OrderSubmission({
     orderId,
     done,
     key,
+    product.id,
+    account,
   ]);
   async function post(body: Record<string, unknown>) {
     const r = await fetch('/api/workspace', {
@@ -244,11 +258,6 @@ export function OrderSubmission({
     try {
       if (!approved || !data || !plan)
         throw Error('Aprove o perfil e as condições antes de confirmar.');
-      await post({
-        action: 'publish-profile',
-        profile,
-        version: data.profileVersion,
-      });
       const latest = await load();
       const savedDesign = { ...design };
       if (supportsDesign(product))
@@ -274,6 +283,7 @@ export function OrderSubmission({
         id: orderId,
         productId: product.id,
         checkout: true,
+        approveProfile: true,
         planId: plan.id,
         planVersion: plan.version,
         profileVersion: latest.profileVersion,
@@ -281,6 +291,7 @@ export function OrderSubmission({
         ...validateDelivery({ deliveryCity: city, deliveryAddress: address }),
       });
       setDone(true);
+      await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Não foi possível confirmar.');
       await load().catch(() => {});
@@ -288,7 +299,7 @@ export function OrderSubmission({
       setBusy(false);
     }
   }
-  if (!ready) return <p role="status">A recuperar o seu percurso…</p>;
+  if (!ready) return <output>A recuperar o seu percurso…</output>;
   if (done)
     return (
       <section className="panel">
@@ -298,16 +309,19 @@ export function OrderSubmission({
           O produto, plano, perfil e local de entrega estão associados ao seu
           pedido. Nenhuma cobrança foi efectuada. O pagamento continua pendente.
         </p>
-        {product.id === 'keychain' && (
-          <a
-            className="btn btn-primary"
-            href={PAYMENT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Pagar 500 MT
-          </a>
-        )}
+        <OrderPayment orderId={orderId} />
+        <button
+          className="btn"
+          onClick={() => {
+            sessionStorage.removeItem(key);
+            setOrderId(crypto.randomUUID());
+            setDone(false);
+            setApproved(false);
+            setStep(0);
+          }}
+        >
+          Fazer outra encomenda
+        </button>
         <Link className="btn btn-primary" href={'/dashboard?order=' + orderId}>
           Acompanhar o pedido
         </Link>
@@ -322,7 +336,7 @@ export function OrderSubmission({
       <p className="muted">
         {step === 0 ? 'Escolha o modelo ou crie o seu design. ' : ''}
         {account
-          ? 'O progresso fica guardado neste dispositivo.'
+          ? 'O progresso fica guardado durante esta sessão do navegador.'
           : 'Pode guardar a sua escolha e continuar com a conta.'}
       </p>
       <ol className="purchase-steps">
@@ -358,7 +372,7 @@ export function OrderSubmission({
                   onBusy={setUploading}
                 />
               ) : (
-                <img
+                <SourceImage
                   className="purchase-product"
                   src={product.imageUrl}
                   alt={product.name}

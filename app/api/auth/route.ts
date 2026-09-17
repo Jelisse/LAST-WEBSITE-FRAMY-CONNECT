@@ -134,12 +134,20 @@ export async function POST(request: Request) {
     const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) =>
       b.toString(16).padStart(2, '0'),
     ).join('');
-    await db
+    const session = await db
       .prepare(
-        'INSERT INTO auth_sessions(token_hash,account_id,expires_at) VALUES(?,?,?)',
+        'INSERT INTO auth_sessions(token_hash,account_id,expires_at) SELECT ?,?,? WHERE EXISTS(SELECT 1 FROM auth_accounts WHERE id=? AND active=1 AND password_hash=?)',
       )
-      .bind(await tokenHash(token), account.id, now + 86400000)
+      .bind(
+        await tokenHash(token),
+        account.id,
+        now + 86400000,
+        account.id,
+        account.password_hash,
+      )
       .run();
+    if (!session.meta.changes)
+      return json({ error: 'A conta mudou. Inicie sessão novamente.' }, 409);
     return json(
       {
         next: loginDestination(

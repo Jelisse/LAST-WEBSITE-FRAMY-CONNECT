@@ -1,5 +1,5 @@
 import type { PublicProduct } from './catalog';
-import type { Profile, SandboxOrder, PlanId, ManagedPlan } from './domain';
+import type { Profile, PlanId, ManagedPlan } from './domain';
 export type WorkspaceData = {
   products: PublicProduct[];
   plans: ManagedPlan[];
@@ -13,8 +13,10 @@ export type WorkspaceData = {
     terms: ManagedPlan;
     planId: PlanId;
     version: number;
-    mode: 'sandbox';
+    mode: 'trial';
+    active: boolean;
+    expiresAt: string | null;
   };
-  orders: SandboxOrder[];
+  orders: import('./customer-order').CustomerOrder[];
   events: { id: string; orderId: string; action: string; createdAt: string }[];
 };

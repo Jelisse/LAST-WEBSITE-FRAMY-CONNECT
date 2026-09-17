@@ -47,7 +47,7 @@ export function ProfileLinksEditor({
           disabled={disabled}
           onClick={onUpgrade}
         >
-          Upgrade plan
+          Escolher plano
         </Button>
       </div>
       <p className="link-editor-note">

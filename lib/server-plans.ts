@@ -22,6 +22,6 @@ export function membershipTerms(
 ): ManagedPlan {
   if (row?.terms_json) return JSON.parse(row.terms_json);
   const seed =
-    plans.find((p) => p.id === (row?.plan_id ?? 'individual')) ?? plans[0];
+    plans.find((p) => p.id === (row?.plan_id ?? 'free-30')) ?? plans[0];
   return { ...seed, active: true, version: 0 };
 }

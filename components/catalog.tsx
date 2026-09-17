@@ -1,4 +1,5 @@
 'use client';
+import { SourceImage } from '@/components/source-image';
 import { useState } from 'react';
 import Link from '@/components/hard-link';
 import { ArrowUpRight, Search } from 'lucide-react';
@@ -46,7 +47,7 @@ export function Catalog({ products }: { products: PublicProduct[] }) {
           <Link className="product-card" key={p.id} href={`/produtos/${p.id}`}>
             <div className={`product-visual tone-${i % 3}`}>
               <span className="product-category">{p.category}</span>
-              <img
+              <SourceImage
                 className="catalog-product-image"
                 src={p.imageUrl}
                 alt={p.name}

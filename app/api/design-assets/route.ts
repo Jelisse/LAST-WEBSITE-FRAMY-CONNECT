@@ -1,3 +1,4 @@
+import { reserveUpload, releaseUpload } from '@/lib/server-upload-quota';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { env } from 'cloudflare:workers';
 export async function POST(request: Request) {
@@ -39,12 +40,29 @@ export async function POST(request: Request) {
     if (!png && !jpg && !pdf)
       return Response.json({ error: 'Use PNG, JPG ou PDF.' }, { status: 422 });
     const id = crypto.randomUUID();
-    await env.PROFILE_PHOTOS.put(`designs/${id}`, bytes, {
-      httpMetadata: {
-        contentType: pdf ? 'application/pdf' : png ? 'image/png' : 'image/jpeg',
-      },
-      customMetadata: { ownerId: user.userId },
-    });
+    if (!(await reserveUpload(id, user.userId, 'designs', size)))
+      return Response.json(
+        {
+          error:
+            'Limite de armazenamento atingido (50 MB ou 100 ficheiros). Contacte o apoio.',
+        },
+        { status: 429 },
+      );
+    try {
+      await env.PROFILE_PHOTOS.put(`designs/${id}`, bytes, {
+        httpMetadata: {
+          contentType: pdf
+            ? 'application/pdf'
+            : png
+              ? 'image/png'
+              : 'image/jpeg',
+        },
+        customMetadata: { ownerId: user.userId },
+      });
+    } catch (e) {
+      await releaseUpload(id, user.userId);
+      throw e;
+    }
     return Response.json({ id }, { headers: { 'Cache-Control': 'no-store' } });
   } catch {
     return Response.json(

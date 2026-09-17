@@ -5,9 +5,9 @@ import { HomeNfcKeychain } from './home-nfc-keychain';
 /** Independent transform layers, ready for future motion. The screen is static. */
 export function HomeHeroScene() {
   return (
-    <div
+    <section
       className="home-hero-scene"
-      role="img"
+
       aria-label="iPhone com um exemplo de perfil Framy, cartões NFC laranja e preto e porta-chaves NFC sobre uma base"
     >
       <div className="home-scene-base" data-motion-layer="base">
@@ -21,10 +21,24 @@ export function HomeHeroScene() {
         />
       </div>
       {(['black'] as const).map((color) => (
-        <div key={color} className={`home-back-card home-back-card-${color}`} data-motion-layer={`card-${color}`}>
+        <div
+          key={color}
+          className={`home-back-card home-back-card-${color}`}
+          data-motion-layer={`card-${color}`}
+        >
           <Nfc />
-          <Image src="/brand/logo.svg" alt="" width={220} height={100} unoptimized />
-          <p>O Seu Mundo<br />num Toque.</p>
+          <Image
+            src="/brand/logo.svg"
+            alt=""
+            width={220}
+            height={100}
+            unoptimized
+          />
+          <p>
+            O Seu Mundo
+            <br />
+            num Toque.
+          </p>
         </div>
       ))}
       <div className="home-scene-card" data-motion-layer="card">
@@ -78,6 +92,6 @@ export function HomeHeroScene() {
           <span className="home-phone-homebar" />
         </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,3 +1,11 @@
+import { customerOrder } from '@/lib/customer-order';
+import { hasActiveTrial } from '@/lib/entitlement';
+import {
+  expireReservations,
+  RESERVATION_MS,
+  MAX_PENDING_ORDERS,
+} from '@/lib/server-reservations';
+import { tokenHash } from '@/lib/server-auth';
 import {
   FREE_PLAN_ID,
   validateDesign,
@@ -26,6 +34,7 @@ export async function GET() {
   const user = await getChatGPTUser();
   if (!user) return json({ error: 'Inicie sessão para continuar.' }, 401);
   try {
+    await expireReservations();
     const db = database();
     const [p, orders, events, membership] = await Promise.all([
       db
@@ -50,13 +59,15 @@ export async function GET() {
         .all(),
       db
         .prepare(
-          'SELECT plan_id,version,terms_json FROM sandbox_memberships WHERE owner_id=?',
+          'SELECT plan_id,version,terms_json,trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
         )
         .bind(user.userId)
         .first<{
           plan_id: string;
           version: number;
           terms_json: string | null;
+          trial_started_at: string | null;
+          trial_expires_at: string | null;
         }>(),
     ]);
     return json({
@@ -64,19 +75,22 @@ export async function GET() {
       canManageProducts: await canManageCatalog(user.userId),
       canManageOrders: await canManageOrders(user.userId),
       profile: p ? JSON.parse(p.draft_json) : null,
-      published: !!p?.published_json,
-      publishedUsername: p?.published_json
-        ? JSON.parse(p.published_json).username
-        : null,
+      published: !!p?.published_json && hasActiveTrial(membership),
+      publishedUsername:
+        p?.published_json && hasActiveTrial(membership)
+          ? JSON.parse(p.published_json).username
+          : null,
       profileVersion: p?.version ?? 0,
       plans: (await getManagedPlans()).filter((p) => p.active),
       membership: {
         terms: membershipTerms(membership),
-        planId: membership?.plan_id ?? 'individual',
+        planId: membership?.plan_id ?? '',
         version: membership?.version ?? 0,
-        mode: 'sandbox',
+        mode: 'trial',
+        active: hasActiveTrial(membership),
+        expiresAt: membership?.trial_expires_at ?? null,
       },
-      orders: orders.results.map((o) => JSON.parse(o.data_json)),
+      orders: orders.results.map((o) => customerOrder(JSON.parse(o.data_json))),
       events: events.results,
     });
   } catch {
@@ -299,18 +313,17 @@ export async function POST(request: Request) {
       if (body.action === 'publish-profile') {
         const trial = await db
           .prepare(
-            'SELECT plan_id,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
+            'SELECT plan_id,trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
           )
           .bind(user.userId)
-          .first<{ plan_id: string; trial_expires_at: string | null }>();
-        if (
-          trial?.plan_id === FREE_PLAN_ID &&
-          trial.trial_expires_at &&
-          trial.trial_expires_at <= now
-        )
+          .first<import('@/lib/entitlement').Membership>();
+        if (!hasActiveTrial(trial))
           return json(
-            { error: 'O período gratuito terminou. Contacte a equipa.' },
-            422,
+            {
+              error:
+                'Active os 30 dias gratuitos antes de publicar. Se o período terminou, contacte a equipa.',
+            },
+            403,
           );
       }
       const profile = validateProfile(profileInput);
@@ -326,13 +339,15 @@ export async function POST(request: Request) {
       }
       const membership = await db
         .prepare(
-          'SELECT plan_id,version,terms_json FROM sandbox_memberships WHERE owner_id=?',
+          'SELECT plan_id,version,terms_json,trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
         )
         .bind(user.userId)
         .first<{
           plan_id: string;
           version: number;
           terms_json: string | null;
+          trial_started_at: string | null;
+          trial_expires_at: string | null;
         }>();
       validatePlanContent(profile, membershipTerms(membership));
       const published =
@@ -420,6 +435,12 @@ export async function POST(request: Request) {
       );
     }
     if (body.action === 'create-order' || body.action === 'submit-order') {
+      if (body.checkout !== true || body.approveProfile !== true)
+        return json(
+          { error: 'Confirme o perfil e utilize o percurso de compra.' },
+          422,
+        );
+      await expireReservations();
       const delivery = validateDelivery(body);
       if (typeof body.id !== 'string' || !/^[0-9a-f-]{36}$/.test(body.id))
         return json({ error: 'Referência inválida.' }, 422);
@@ -431,78 +452,95 @@ export async function POST(request: Request) {
           { error: 'Este produto está disponível apenas sob consulta.' },
           422,
         );
+      const fingerprint = await tokenHash(
+        JSON.stringify({
+          productId: body.productId,
+          planId: body.planId,
+          design: body.design ?? null,
+          delivery,
+          contact: body.deliveryContact,
+        }),
+      );
       const existing = await db
         .prepare('SELECT owner_id,data_json FROM sandbox_orders WHERE id=?')
         .bind(body.id)
         .first<{ owner_id: string; data_json: string }>();
       if (existing) {
+        const previous = JSON.parse(existing.data_json) as SandboxOrder;
         if (
           existing.owner_id !== user.userId ||
-          JSON.parse(existing.data_json).productId !== body.productId ||
-          JSON.parse(existing.data_json).design?.optionId !==
-            (body.design as { optionId?: string } | undefined)?.optionId ||
-          JSON.parse(existing.data_json).deliveryCity !==
-            delivery.deliveryCity ||
-          (JSON.parse(existing.data_json).deliveryAddress ?? '') !==
-            delivery.deliveryAddress
+          previous.checkoutFingerprint !== fingerprint
         )
           return json(
             {
               error:
-                'Esta referência pertence a outro pedido. Use uma nova referência.',
+                'Esta referência pertence a outro pedido. Inicie uma nova encomenda.',
             },
             409,
           );
-        return json({ ok: true, id: body.id });
+        return json({ ok: true, id: body.id, order: customerOrder(previous) });
       }
-      const count = await db
-        .prepare('SELECT COUNT(*) AS n FROM sandbox_orders WHERE owner_id=?')
-        .bind(user.userId)
-        .first<{ n: number }>();
-      if ((count?.n ?? 0) >= 100)
-        return json({ error: 'Limite de 100 pedidos de teste atingido.' }, 422);
+      const rateKey = await tokenHash(
+        'checkout-ip:' + (request.headers.get('cf-connecting-ip') ?? 'local'),
+      );
+      const rateNow = Date.now();
+      const rate = await db
+        .prepare(
+          'INSERT INTO auth_attempts(key,count,expires_at) VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN expires_at<? THEN 1 ELSE count+1 END,expires_at=CASE WHEN expires_at<? THEN excluded.expires_at ELSE expires_at END RETURNING count',
+        )
+        .bind(rateKey, rateNow + 3600000, rateNow, rateNow)
+        .first<{ count: number }>();
+      if ((rate?.count ?? 99) > 20)
+        return json(
+          {
+            error:
+              'Demasiados pedidos nesta ligação. Aguarde uma hora ou contacte a equipa.',
+          },
+          429,
+        );
+      let membershipVersion = 0;
       let checkout: Partial<SandboxOrder> = {};
       if (body.checkout === true) {
         const profileRow = await db
           .prepare(
-            'SELECT username,published_json,version FROM profiles WHERE owner_id=?',
+            'SELECT username,draft_json,published_json,version FROM profiles WHERE owner_id=?',
           )
           .bind(user.userId)
           .first<{
             username: string;
+            draft_json: string;
             published_json: string | null;
             version: number;
           }>();
         const member = await db
           .prepare(
-            'SELECT plan_id,terms_json,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
+            'SELECT plan_id,version,terms_json,trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
           )
           .bind(user.userId)
           .first<{
             plan_id: string;
+            version: number;
             terms_json: string | null;
+            trial_started_at: string | null;
             trial_expires_at: string | null;
           }>();
-        if (
-          member?.plan_id === FREE_PLAN_ID &&
-          member.trial_expires_at &&
-          member.trial_expires_at <= now
-        )
+        if (!hasActiveTrial(member))
           return json(
-            { error: 'O período gratuito terminou. Contacte a equipa.' },
-            422,
+            { error: 'Active um período gratuito válido antes de confirmar.' },
+            403,
           );
+        membershipVersion = member!.version;
         const terms = membershipTerms(member);
         const currentPlan = (await getManagedPlans()).find(
           (p) => p.id === FREE_PLAN_ID && p.id === body.planId && p.active,
         );
         if (
-          !profileRow?.published_json ||
+          !profileRow?.draft_json ||
           profileRow.version !== body.profileVersion
         )
           return json(
             {
-              error: 'Aprove e publique o perfil antes de confirmar o pedido.',
+              error: 'Guarde e aprove o perfil antes de confirmar o pedido.',
             },
             409,
           );
@@ -524,16 +562,33 @@ export async function POST(request: Request) {
           typeof body.deliveryContact !== 'string' ||
           body.deliveryContact.trim().length < 6 ||
           body.deliveryContact.length > 40 ||
-          /[\u0000-\u001f]/.test(body.deliveryContact)
+          Array.from(body.deliveryContact).some((c) => c.charCodeAt(0) < 32)
         )
           return json({ error: 'Indique um contacto de entrega válido.' }, 422);
         checkout = {
           checkoutPlan: terms,
           profileUsername: profileRow.username,
-          approvedProfileVersion: profileRow.version,
+          approvedProfileVersion: profileRow.version + 1,
+          approvedProfileSnapshot: publicProfile(
+            validateProfile(JSON.parse(profileRow.draft_json)),
+          ),
           deliveryContact: body.deliveryContact.trim(),
         };
       }
+      const inventory = await db
+        .prepare(
+          "SELECT COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)-(SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('PENDING_PAYMENT','QUEUED','IN_PRODUCTION','READY')) AS available",
+        )
+        .bind(product.id, product.id)
+        .first<{ available: number }>();
+      if ((inventory?.available ?? 0) < 1)
+        return json(
+          {
+            error:
+              'Sem stock físico disponível para reserva. Contacte a equipa.',
+          },
+          409,
+        );
       const design = validateDesign(body.design, product);
       if (supportsDesign(product) && !body.checkout)
         return json(
@@ -589,6 +644,10 @@ export async function POST(request: Request) {
       }
       const o: SandboxOrder = {
         design,
+        checkoutFingerprint: fingerprint,
+        reservationExpiresAt: new Date(
+          Date.now() + RESERVATION_MS,
+        ).toISOString(),
         ...checkout,
         ...delivery,
         id: body.id,
@@ -607,10 +666,11 @@ export async function POST(request: Request) {
         updatedAt: now,
         journal: [],
       };
+      const createdEvent = crypto.randomUUID();
       await db.batch([
         db
           .prepare(
-            'INSERT OR IGNORE INTO sandbox_orders (id,owner_id,data_json,version,created_at) SELECT ?,?,?,1,? WHERE ? IS NULL OR EXISTS(SELECT 1 FROM product_options WHERE id=? AND quantity>0 AND enabled=1)',
+            "INSERT OR IGNORE INTO sandbox_orders (id,owner_id,data_json,version,created_at) SELECT ?,?,?,1,? WHERE (? IS NULL OR EXISTS(SELECT 1 FROM product_options WHERE id=? AND quantity>0 AND enabled=1)) AND (SELECT COUNT(*) FROM sandbox_orders WHERE owner_id=? AND json_extract(data_json,'$.status')='PENDING_PAYMENT')<? AND EXISTS(SELECT 1 FROM profiles WHERE owner_id=? AND version=?) AND EXISTS(SELECT 1 FROM sandbox_memberships WHERE owner_id=? AND plan_id='free-30' AND trial_started_at<=? AND trial_expires_at>? AND version=?) AND COALESCE((SELECT version FROM manager_records WHERE id=? AND kind='plan'),0)=? AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)>(SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('PENDING_PAYMENT','QUEUED','IN_PRODUCTION','READY'))",
           )
           .bind(
             o.id,
@@ -619,6 +679,18 @@ export async function POST(request: Request) {
             now,
             design?.optionId ?? null,
             design?.optionId ?? null,
+            user.userId,
+            MAX_PENDING_ORDERS,
+            user.userId,
+            body.profileVersion,
+            user.userId,
+            now,
+            now,
+            membershipVersion,
+            body.planId,
+            body.planVersion,
+            product.id,
+            product.id,
           ),
         ...(design
           ? [
@@ -633,14 +705,25 @@ export async function POST(request: Request) {
           .prepare(
             'INSERT INTO sandbox_events (id,owner_id,order_id,action,created_at) SELECT ?,?,?,?,? WHERE changes()=1',
           )
-          .bind(crypto.randomUUID(), user.userId, o.id, 'created', now),
+          .bind(createdEvent, user.userId, o.id, 'created', now),
+        db
+          .prepare(
+            'UPDATE profiles SET published_json=?,version=version+1,updated_at=? WHERE owner_id=? AND version=? AND EXISTS(SELECT 1 FROM sandbox_events WHERE id=?)',
+          )
+          .bind(
+            JSON.stringify(o.approvedProfileSnapshot),
+            now,
+            user.userId,
+            body.profileVersion,
+            createdEvent,
+          ),
       ]);
       const saved = await db
         .prepare('SELECT id FROM sandbox_orders WHERE id=? AND owner_id=?')
         .bind(o.id, user.userId)
         .first();
       if (!saved) return json({ error: 'Referência indisponível.' }, 409);
-      return json({ ok: true, id: o.id });
+      return json({ ok: true, id: o.id, order: customerOrder(o) });
     }
     if (
       typeof body.orderId !== 'string' ||

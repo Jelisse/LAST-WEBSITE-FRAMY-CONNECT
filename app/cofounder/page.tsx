@@ -1,3 +1,4 @@
+import { AccountManager } from '@/components/account-manager';
 import Link from '@/components/hard-link';
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
@@ -24,7 +25,7 @@ export default async function Page() {
           <h1>Direcção · {user.displayName}</h1>
           <p>
             Visão geral do negócio. As operações e as finanças são geridas pelo
-            Manager.
+            Gestor.
           </p>
         </div>
         <Link href="/sair">Terminar sessão</Link>
@@ -33,6 +34,7 @@ export default async function Page() {
         <h2>Agentes activos</h2>
         <p>{agents?.total ?? 0}</p>
       </article>
+      <AccountManager />
       <h2>Pedidos por etapa</h2>
       {counts.results.length ? (
         counts.results.map((c) => (

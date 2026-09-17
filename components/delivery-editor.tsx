@@ -1,6 +1,7 @@
 'use client';
+import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
 import { useState } from 'react';
-import type { SandboxOrder } from '@/lib/domain';
+
 import { canEditDelivery } from '@/lib/delivery';
 export function DeliveryEditor({
   order,
@@ -73,7 +74,9 @@ export function DeliveryEditor({
             <datalist id="delivery-cities">
               {['Maputo', 'Matola', 'Beira', 'Nhamatanda', 'Chimoio'].map(
                 (v) => (
-                  <option key={v} value={v} />
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
                 ),
               )}
             </datalist>
@@ -105,7 +108,7 @@ export function DeliveryEditor({
         </>
       )}
       {error && <p role="alert">{error}</p>}
-      {notice && <p role="status">{notice}</p>}
+      {notice && <output>{notice}</output>}
     </section>
   );
 }

@@ -48,7 +48,9 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
     setData(d);
   }, []);
   useEffect(() => {
-    void load().catch((e) => setError(e.message));
+    void Promise.resolve()
+      .then(load)
+      .catch((e) => setError(e.message));
   }, [load]);
   useEffect(() => {
     if (busy) return;
@@ -163,12 +165,8 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
           {error}
         </p>
       )}
-      {notice && (
-        <p role="status" className="agent-notice">
-          {notice}
-        </p>
-      )}
-      {!data && !error && <p role="status">A carregar as suas operações…</p>}
+      {notice && <output className="agent-notice">{notice}</output>}
+      {!data && !error && <output>A carregar as suas operações…</output>}
       {tab === 'orders' && (
         <section className="agent-panel">
           <div className="agent-section-heading">

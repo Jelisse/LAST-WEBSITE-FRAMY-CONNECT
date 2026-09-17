@@ -1,3 +1,4 @@
+import { publicError } from '@/lib/public-error';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
 export const dynamic = 'force-dynamic';
@@ -67,9 +68,6 @@ export async function POST(request: Request) {
           409,
         );
   } catch (e) {
-    return json(
-      { error: e instanceof Error ? e.message : 'Não foi possível guardar.' },
-      422,
-    );
+    return json({ error: publicError(e) }, 422);
   }
 }

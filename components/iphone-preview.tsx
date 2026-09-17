@@ -19,13 +19,13 @@ export function IPhonePreview({ children }: { children: ReactNode }) {
               <BatteryFull />
             </span>
           </div>
-          <div
+          <section
             className="iphone-screen"
-            role="region"
+
             aria-label="Pré-visualização do perfil no iPhone 17"
           >
             {children}
-          </div>
+          </section>
           <div className="iphone-home-area" aria-hidden="true">
             <span />
           </div>

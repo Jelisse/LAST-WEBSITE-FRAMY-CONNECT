@@ -89,13 +89,13 @@ export function PlanPicker({
               </li>
               <li>
                 <Check />
-                Partilha do perfil e download do contacto
+                Partilha do perfil e guardar o contacto
               </li>
             </ul>
             <p className="plan-disclosure">
-              Prévia sem cobrança. Os preços mensais são propostos; esta acção
-              apenas activa o plano de teste. Cartões NFC, entrega e contas
-              adicionais não estão incluídos.
+              O período gratuito dura 30 dias e não renova automaticamente.
+              Produtos NFC e entrega são pagos separadamente. Os planos mensais
+              ainda não estão disponíveis.
             </p>
             {error && (
               <p role="alert" className="plan-error">
@@ -107,7 +107,7 @@ export function PlanPicker({
               disabled={busy}
               onClick={() => onSelect(choice.id)}
             >
-              {busy ? 'A activar…' : 'Activar plano de teste'}{' '}
+              {busy ? 'A activar…' : 'Activar 30 dias gratuitos'}{' '}
               <ArrowRight size={18} />
             </Button>
           </>
@@ -129,7 +129,7 @@ export function PlanPicker({
                 >
                   <span className="plan-recommendation">
                     {plan.id === current
-                      ? 'O seu plano de teste'
+                      ? 'O seu plano'
                       : plan.id === 'professional'
                         ? 'A nossa sugestão'
                         : plan.audience}
@@ -190,10 +190,9 @@ export function PlanPicker({
               ))}
             </div>
             <p className="plan-disclosure">
-              Todos incluem uma identidade digital, links editáveis e download
-              do contacto. Instituições e organizações: preço por perfil, sem
-              gestão de equipas. Prévia sem cobrança; subscrições reais ainda
-              não disponíveis.
+              Todos incluem uma identidade digital, links editáveis e opção de
+              guardar o contacto. Instituições e organizações: preço por perfil,
+              sem gestão de equipas. Subscrições mensais ainda não disponíveis.
             </p>
           </>
         )}

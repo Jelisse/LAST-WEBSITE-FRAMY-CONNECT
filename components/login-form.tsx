@@ -13,7 +13,7 @@ export function LoginForm() {
         <p>
           {register
             ? 'Guarde o seu perfil e acompanhe os seus pedidos.'
-            : 'Entre para abrir o seu dashboard.'}
+            : 'Entre para abrir o seu painel.'}
         </p>
         <form
           onSubmit={async (e) => {
@@ -87,6 +87,13 @@ export function LoginForm() {
                 : 'Entrar'}
           </button>
         </form>
+        {!register && (
+          <p>
+            <a href="mailto:support@framyconnect.co.mz?subject=Recuperar%20acesso">
+              Esqueci-me da palavra-passe — contactar apoio
+            </a>
+          </p>
+        )}
         <button
           className="auth-switch"
           disabled={busy}

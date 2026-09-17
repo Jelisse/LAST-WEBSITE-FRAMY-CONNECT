@@ -3970,3 +3970,14 @@ summary {
 .logo-background-controls { display: grid; gap: 10px; border-top: 1px solid #e8e8e6; padding-top: 14px; }
 .logo-background-controls button { border: 1px solid #ddd; border-radius: 6px; padding: 9px 14px; text-align: left; font-size: 14px; }
 .editor-inputs:disabled { opacity: .65; }
+
+.account-management { min-width: 0; }
+.account-management > p { max-width: 75ch; }
+.account-management form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.5rem 0 2rem; }
+.account-management label { display: flex; flex-direction: column; gap: .45rem; font-size: .9rem; min-width: 0; }
+.account-management input, .account-management select { width: 100%; min-width: 0; min-height: 2.75rem; padding: .65rem .75rem; border: 1px solid #d5dae1; border-radius: .55rem; background: white; color: #172130; font: inherit; }
+.account-management form > button { grid-column: 1 / -1; justify-self: start; }
+.account-management td button { display: block; margin: .4rem 0; padding: .5rem .7rem; border: 1px solid #d5dae1; border-radius: .4rem; font: inherit; }
+.account-management output { display: block; padding: 1rem; background: #fff2e8; border-radius: .6rem; }
+output { display: block; }
+@media(max-width: 640px) { .account-management form { grid-template-columns: minmax(0, 1fr); } }

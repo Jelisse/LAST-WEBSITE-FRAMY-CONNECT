@@ -1,5 +1,14 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+const source = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'));
+if (
+  !source.r2_buckets?.some(
+    (bucket) => bucket.binding === 'PROFILE_PHOTOS' && bucket.bucket_name,
+  )
+)
+  throw Error(
+    'Configure the actual PROFILE_PHOTOS R2 bucket in wrangler.jsonc before a direct Cloudflare deployment. Sites manages this binding separately.',
+  );
 const build = spawnSync(
   process.execPath,
   ['node_modules/vinext/dist/cli.js', 'build'],

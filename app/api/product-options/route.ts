@@ -1,3 +1,4 @@
+import { expireReservations } from '@/lib/server-reservations';
 import { database } from '@/lib/server-db';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { canManageCatalog } from '@/lib/server-catalog';
@@ -6,6 +7,7 @@ const json = (v: unknown, status = 200) =>
   Response.json(v, { status, headers: { 'Cache-Control': 'no-store' } });
 export async function GET() {
   try {
+    await expireReservations();
     return json({
       options: (
         await database()
