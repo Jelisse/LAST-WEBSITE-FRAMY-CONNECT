@@ -40,8 +40,10 @@ export function PersonalisationManager() {
       <h2>Modelos e personalização</h2>
       <p>
         As quantidades por modelo não aumentam o stock físico total. A contagem
-        inicial confirmada é de 500 porta-chaves no conjunto; novas entradas e
-        atribuições são geridas em Operações → Stock.
+        inicial confirmada em Maputo, Moçambique, é de 500 porta-chaves:
+        175 Instagram, 175 TikTok e 150 Padrão artístico. Novas entradas e
+        atribuições são geridas em Operações → Stock. As quantidades abaixo
+        mostram o saldo disponível após reservas e alterações do gestor.
       </p>
       <p>
         Stock disponível para novas encomendas. Ao chegar a zero, a opção fica

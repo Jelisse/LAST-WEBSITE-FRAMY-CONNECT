@@ -161,6 +161,30 @@ const post = async (route, body) => {
   return { status: response.status, body: await response.json() };
 };
 
+test('Maputo inventory records 175 Instagram, 175 TikTok and 150 Pattern without duplicating physical stock', () => {
+  const sql = fixture();
+  const quantities = () => Object.fromEntries(sql.prepare("SELECT id,quantity FROM product_options WHERE id IN ('instagram','tiktok','pattern')").all().map(r => [r.id,r.quantity]));
+  assert.deepEqual(quantities(), { instagram: 175, pattern: 150, tiktok: 175 });
+  assert.equal(sql.prepare("SELECT enabled FROM product_options WHERE id='blank-keychain'").get().enabled, 0);
+  const migration = readFileSync(resolve(root, 'drizzle/0011_maputo_keychain_stock.sql'), 'utf8');
+  const physicalBefore = sql.prepare("SELECT SUM(quantity) n FROM stock_movements WHERE product_id='keychain'").get().n;
+  // Simulate a reservation present before the physical count is first recorded.
+  sql.exec("DELETE FROM manager_audit WHERE id='owner-maputo-keychain-count-20260919'");
+  sql.prepare('INSERT INTO sandbox_orders(id,owner_id,data_json,version,created_at) VALUES(?,?,?,?,?)').run(
+    'existing-reservation','customer-a', JSON.stringify({ productId:'keychain', design:{optionId:'instagram'}, status:'PENDING_PAYMENT' }), 1, new Date().toISOString(),
+  );
+  sql.exec(migration);
+  assert.equal(quantities().instagram, 174);
+  // Later sales and explicit manager deactivation must survive a retry/redeploy.
+  sql.exec("UPDATE product_options SET quantity=149,enabled=0 WHERE id='pattern'");
+  sql.exec(migration);
+  assert.equal(quantities().pattern, 149);
+  assert.equal(sql.prepare("SELECT enabled FROM product_options WHERE id='pattern'").get().enabled, 0);
+  assert.equal(sql.prepare("SELECT SUM(quantity) n FROM stock_movements WHERE product_id='keychain'").get().n, physicalBefore);
+  assert.equal(sql.prepare("SELECT COUNT(*) n FROM manager_audit WHERE id='owner-maputo-keychain-count-20260919'").get().n, 1);
+  sql.close();
+});
+
 test('catalogue: only keychains sell initially, stock count runs once, managers control publication and galleries', async () => {
   const sql = fixture();
   const catalog = await api('lib/server-catalog.ts');
@@ -486,7 +510,7 @@ test('customer data and all three keychain purchases work with the complete sche
     const storedOrder = JSON.parse(sql.prepare('SELECT data_json FROM sandbox_orders WHERE id=?').get(body.id).data_json);
     assert.equal(storedOrder.design.optionId, optionId);
     assert.equal(data.orders[0].amount, 50000);
-    assert.equal(sql.prepare('SELECT quantity FROM product_options WHERE id=?').get(optionId).quantity, 499);
+    assert.equal(sql.prepare('SELECT quantity FROM product_options WHERE id=?').get(optionId).quantity, optionId === 'pattern' ? 149 : 174);
     sql.close();
   }
 });
@@ -541,7 +565,7 @@ test('launch: publication requires a valid trial, checkout is atomic, retries ar
   assert.equal(
     sql.prepare("SELECT quantity FROM product_options WHERE id='tiktok'").get()
       .quantity,
-    499,
+    174,
   );
   assert.equal((await post(workspace, body)).status, 200);
   assert.equal(
@@ -552,7 +576,7 @@ test('launch: publication requires a valid trial, checkout is atomic, retries ar
   assert.equal(
     sql.prepare("SELECT quantity FROM product_options WHERE id='tiktok'").get()
       .quantity,
-    499,
+    174,
   );
   const data = await (await workspace.GET()).json();
   for (const key of [

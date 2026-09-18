@@ -27,7 +27,7 @@ Products and plans display meticais. New plan edits store `meticais`. Legacy USD
 
 Source: https://www.bancomoc.mz/en/areas-of-expertise/markets/foreign-exchange-market/
 
-Physical launch inventory is 500 keychains total, not 500 per model. Aggregate reservation checks enforce this limit. Option quantities and enablement remain under manager control. Deployment must not reset sales, depleted options or manager changes.
+Physical launch inventory in Maputo, Mozambique is 175 Instagram, 175 TikTok and 150 Pattern keychains: 500 total. Migration 0011 records this breakdown once, subtracts outstanding reservations from option availability and disables unstocked blank keychains. The deployment check requires its audit marker. Aggregate reservation checks enforce the total limit. Later quantities and enablement remain under manager control; retries do not reset subsequent sales or manager changes.
 
 ## Access and payments
 

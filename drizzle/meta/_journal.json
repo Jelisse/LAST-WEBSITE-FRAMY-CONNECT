@@ -78,6 +78,13 @@
       "when": 1789670560953,
       "tag": "0010_catalog_applications",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1789776000000,
+      "tag": "0011_maputo_keychain_stock",
+      "breakpoints": true
     }
   ]
 }
