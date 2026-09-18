@@ -13,6 +13,13 @@
     }
   ],
 
+"r2_buckets": [
+  {
+    "binding": "PROFILE_PHOTOS",
+    "bucket_name": "framy-connect-profile-photos"
+  }
+],
+
   "observability": {
     "logs": {
       "enabled": true,
