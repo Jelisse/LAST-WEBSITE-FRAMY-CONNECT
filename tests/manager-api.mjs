@@ -215,7 +215,7 @@ const plan = {
   name: 'QA ' + suffix,
   audience: 'QA',
   description: 'Test',
-  dollars: 2.5,
+  meticais: 2.5,
   links: 8,
   bio: 100,
   active: true,
@@ -224,7 +224,7 @@ const plan = {
 assert.equal((await request('/api/manager', plan)).status, 200);
 assert.ok(
   (await request('/api/workspace')).data.plans.some(
-    (p) => p.id === planId && p.dollars === 2.5,
+    (p) => p.id === planId && p.meticais === 2.5,
   ),
 );
 assert.equal(

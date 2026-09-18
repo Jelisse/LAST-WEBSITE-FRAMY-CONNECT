@@ -1,4 +1,6 @@
 'use client';
+import { planPrice } from '@/lib/plan-pricing';
+
 import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
 import { ArrowRight, ArrowUpRight, Link2, Plus, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -88,7 +90,7 @@ export function CustomerOverview({
             {data.membership.version ? plan.name : 'Comece com 30 dias grátis'}
           </h2>
           <p className="essential-price">
-            {plan.id === 'free-30' ? '0 MT' : `US$${plan.dollars}`}
+            {plan.id === 'free-30' ? '0 MT' : planPrice(plan)}
             <span>
               {plan.id === 'free-30' ? ' / 30 dias' : ' / mês · por perfil'}
             </span>

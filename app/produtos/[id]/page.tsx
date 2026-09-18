@@ -36,7 +36,7 @@ export default async function Page({
         <Link className="back-link" href="/produtos">
           <ChevronLeft size={18} /> Todos os produtos
         </Link>
-        <div className="product-detail">
+        <div className={`product-detail ${p.available ? 'is-available' : 'is-coming-soon'}`}>
           <div className="product-detail-art">
             <ProductGallery
               id={p.id}

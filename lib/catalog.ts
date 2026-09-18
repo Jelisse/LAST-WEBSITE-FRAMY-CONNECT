@@ -179,6 +179,9 @@ export const products: Product[] = seedProducts.map((p) => ({
   imageUrl: `/products/${p.id}.png`,
   version: 0,
 }));
+export function productOrder(a: Pick<Product, 'id' | 'available'>, b: Pick<Product, 'id' | 'available'>) {
+  return Number(b.available) - Number(a.available) || Number(b.id === 'keychain') - Number(a.id === 'keychain');
+}
 export type PublicProduct = Omit<Product, 'cost'>;
 export function publicProduct({
   cost: _cost,

@@ -126,13 +126,13 @@ export async function POST(request: Request) {
           active: b.active,
         };
       else {
-        const dollars = Number(b.dollars);
+        const meticais = Number(b.meticais);
         if (
-          !Number.isFinite(dollars) ||
-          dollars < (id === 'free-30' ? 0 : 1) ||
-          (id === 'free-30' && dollars !== 0) ||
-          dollars > 10000 ||
-          Math.abs(dollars * 100 - Math.round(dollars * 100)) > 0.0001
+          !Number.isFinite(meticais) ||
+          meticais < (id === 'free-30' ? 0 : 1) ||
+          (id === 'free-30' && meticais !== 0) ||
+          meticais > 10000 ||
+          Math.abs(meticais * 100 - Math.round(meticais * 100)) > 0.0001
         )
           throw Error('Preço mensal inválido.');
         record = {
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
           name: text('name', 90),
           audience: text('audience', 90),
           description: text('description', 2000),
-          dollars,
+          meticais,
           links: integer('links', 1, 50),
           bio: integer('bio', 0, 1200),
           active: b.active,

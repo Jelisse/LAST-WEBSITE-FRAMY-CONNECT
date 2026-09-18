@@ -1835,3 +1835,9 @@
     left: 54%;
   }
 }
+
+.framy-home .home-product.is-coming-soon { background: #f2f2f1; box-shadow: none; }
+.framy-home .home-product.is-coming-soon .home-product-art { background: #eaeae7; }
+.framy-home .home-product.is-coming-soon .home-product-art img { filter: grayscale(.85) saturate(.3); opacity: .6; }
+.framy-home .home-product.is-coming-soon .home-product-price { color: #626662; }
+.framy-home .home-product.is-coming-soon:hover { box-shadow: none; }

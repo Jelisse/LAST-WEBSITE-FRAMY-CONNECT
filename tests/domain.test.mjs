@@ -82,8 +82,8 @@ test('private fields never enter publication; unsafe links and reserved names re
 
 test('free trial and five monthly plans enforce their content allowances', () => {
   assert.deepEqual(
-    plans.map((p) => p.dollars),
-    [0, 1, 3, 5, 9, 15],
+    plans.map((p) => p.meticais),
+    [0, 63.91, 191.73, 319.55, 575.19, 958.65],
   );
   for (const plan of plans) {
     assert.doesNotThrow(() =>

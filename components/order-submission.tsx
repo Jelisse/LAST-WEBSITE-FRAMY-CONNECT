@@ -1,4 +1,6 @@
 'use client';
+import { planPrice } from '@/lib/plan-pricing';
+
 import { SourceImage } from '@/components/source-image';
 import { useState, useEffect } from 'react';
 import Link from '@/components/hard-link';
@@ -400,7 +402,7 @@ export function OrderSubmission({
                     <strong>
                       {p.id === FREE_PLAN_ID
                         ? '30 dias grátis · 0 MT'
-                        : `${p.name} · US$ ${p.dollars}/mês · Em breve`}
+                        : `${p.name} · ${planPrice(p)}/mês · Em breve`}
                     </strong>
                     <span>
                       Até {p.links} links · {p.description}

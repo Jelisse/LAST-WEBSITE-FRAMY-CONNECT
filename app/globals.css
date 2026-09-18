@@ -4022,3 +4022,20 @@ summary {
 .account-management output { display: block; padding: 1rem; background: #fff2e8; border-radius: .6rem; }
 output { display: block; }
 @media(max-width: 640px) { .account-management form { grid-template-columns: minmax(0, 1fr); } }
+
+/* Keep upcoming products readable and discoverable, with quieter photography. */
+.product-card.is-coming-soon .product-visual,
+.product-detail.is-coming-soon .product-detail-art {
+  background: #f2f2f1;
+}
+.product-card.is-coming-soon img,
+.product-detail.is-coming-soon .product-detail-art img {
+  filter: grayscale(.85) saturate(.3);
+  opacity: .6;
+}
+.product-card.is-coming-soon .product-arrow {
+  background: #e8e8e6;
+  color: #5f625f;
+}
+.product-card.is-coming-soon .product-info > span { color: #626662; }
+.product-card.is-available { border-color: #fa5724; }

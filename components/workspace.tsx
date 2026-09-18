@@ -124,7 +124,7 @@ export function Workspace({ displayName }: { displayName: string }) {
     [agent, setAgent] = useState(''),
     [proof, setProof] = useState(''),
     [checks, setChecks] = useState<boolean[]>([false, false, false, false]),
-    [chosenProduct, setChosenProduct] = useState('metal'),
+    [chosenProduct, setChosenProduct] = useState('keychain'),
     [testToolsOpen, setTestToolsOpen] = useState(false),
     [plansOpen, setPlansOpen] = useState(false),
     [uploadingPhoto, setUploadingPhoto] = useState(false);

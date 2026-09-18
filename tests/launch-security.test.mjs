@@ -167,6 +167,7 @@ test('catalogue: only keychains sell initially, stock count runs once, managers 
   const manage = await api('app/api/manage-products/route.ts');
   const publicApi = await api('app/api/products/route.ts');
   let products = await catalog.getProducts();
+  assert.equal(products[0].id, 'keychain');
   assert.deepEqual(
     products.filter((p) => p.available).map((p) => p.id),
     ['keychain'],
@@ -460,6 +461,56 @@ async function checkoutFixture(workspace) {
     deliveryContact: '+258840000000',
   };
 }
+
+test('customer data and all three keychain purchases work with the complete schema', async () => {
+  const workspace = await api('app/api/workspace/route.ts');
+  const optionsApi = await api('app/api/product-options/route.ts');
+  for (const optionId of ['tiktok', 'instagram', 'pattern']) {
+    const sql = fixture();
+    const initial = await workspace.GET();
+    assert.equal(initial.status, 200);
+    assert.equal((await initial.json()).profile, null);
+    const optionsResponse = await optionsApi.GET();
+    assert.equal(optionsResponse.status, 200);
+    const { options } = await optionsResponse.json();
+    assert.equal(options.find(o => o.id === optionId).enabled, 1);
+    const body = await checkoutFixture(workspace);
+    body.design = { optionId };
+    const result = await post(workspace, body);
+    assert.equal(result.status, 200, JSON.stringify(result));
+    const loaded = await workspace.GET();
+    assert.equal(loaded.status, 200);
+    const data = await loaded.json();
+    assert.equal(data.profile.name, profile.name);
+    assert.equal(data.orders.length, 1);
+    const storedOrder = JSON.parse(sql.prepare('SELECT data_json FROM sandbox_orders WHERE id=?').get(body.id).data_json);
+    assert.equal(storedOrder.design.optionId, optionId);
+    assert.equal(data.orders[0].amount, 50000);
+    assert.equal(sql.prepare('SELECT quantity FROM product_options WHERE id=?').get(optionId).quantity, 499);
+    sql.close();
+  }
+});
+
+test('manager edits store meticais without reconverting saved plan prices', async () => {
+  const sql = fixture();
+  globalThis.__launch.user = { userId: 'manager-a', role: 'manager' };
+  const manager = await api('app/api/manager/route.ts');
+  const plansApi = await api('lib/server-plans.ts');
+  sql.prepare('INSERT INTO manager_records VALUES(?,?,?,?,?)').run(
+    'legacy', 'plan', JSON.stringify({ name: 'Legado', dollars: 3, active: true }), 1, new Date().toISOString(),
+  );
+  assert.equal((await plansApi.getManagedPlans()).find(p => p.id === 'legacy').meticais, 191.73);
+  const result = await post(manager, {
+    action: 'plan', id: 'legacy', version: 1, name: 'Plano', audience: 'Todos',
+    description: 'Plano em meticais', meticais: 200, links: 3, bio: 100, active: true,
+  });
+  assert.equal(result.status, 200, JSON.stringify(result));
+  const stored = JSON.parse(sql.prepare("SELECT data_json FROM manager_records WHERE id='legacy'").get().data_json);
+  assert.equal(stored.meticais, 200);
+  assert.equal(stored.dollars, undefined);
+  assert.equal((await plansApi.getManagedPlans()).find(p => p.id === 'legacy').meticais, 200);
+  sql.close();
+});
 test('launch: publication requires a valid trial, checkout is atomic, retries are safe, costs stay private', async () => {
   const sql = fixture(),
     workspace = await api('app/api/workspace/route.ts');

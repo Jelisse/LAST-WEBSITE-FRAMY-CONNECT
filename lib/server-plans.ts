@@ -1,3 +1,4 @@
+import { planMeticais } from './plan-pricing';
 import { database } from './server-db';
 import { plans, type ManagedPlan } from './domain';
 export async function getManagedPlans(): Promise<ManagedPlan[]> {
@@ -15,7 +16,7 @@ export async function getManagedPlans(): Promise<ManagedPlan[]> {
       id: row.id,
       version: row.version,
     });
-  return [...all.values()];
+  return [...all.values()].map((plan) => ({ ...plan, meticais: planMeticais(plan) }));
 }
 export function membershipTerms(
   row: { plan_id: string; terms_json?: string | null } | null,

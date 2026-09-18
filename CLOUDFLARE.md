@@ -1,20 +1,36 @@
 # Cloudflare staging
 
-Build command: `npm run build:cloudflare`
-Deploy command: `npx wrangler deploy --config dist/server/wrangler.json`
+Staging: https://framy-connect-staging.jelisselanga.workers.dev/
 
-The build explicitly selects `wrangler.jsonc`, checks that exactly one real D1 binding is present, and includes the generated client assets. Do not deploy the source entrypoint or only `dist/client`.
+This deployment is separate from Sites hosting. A GitHub push or Sites publish does not itself update this Worker.
 
-Local preview: `npm run dev`. It uses the local database, photo bucket and runtime compatibility date, independently of staging.
+## Safe deployment
 
-Account access:
-- `/entrar` supports email/password registration and login. Registration only creates customers. Manager, agent and director roles must be provisioned by the operator. No separate finance role exists.
-- Apply `drizzle/0006_account_access.sql` to the existing database before deploying this version: `npx wrangler d1 execute DB --remote --config wrangler.jsonc --file drizzle/0006_account_access.sql`.
-- Run `node scripts/prepare-test-accounts.mjs` to generate private test credentials and idempotent provisioning SQL in ignored `outputs/`. Then apply `outputs/test-accounts.sql` with the same D1 command. Never commit these generated files.
-- Passwords use bcrypt cost 12; session tokens are random, stored as SHA-256 hashes, expire in 24 hours and are sent in HttpOnly/SameSite cookies (Secure on HTTPS). Login attempts are limited by email and IP. No trusted request headers grant identity.
-- Agent deactivation in Manager blocks further requests, including existing sessions. Finance is accessible only from Manager. Legacy finance links redirect there.
-- Email verification and password recovery by email are not configured; `.example` test addresses are login identifiers, not mailboxes.
-- Bind the actual photo bucket as `PROFILE_PHOTOS` and apply the reviewed D1 migrations. Do not use local placeholder resources in staging.
-- `/exemplo` is a bundled demonstration profile; it does not require a customer record in D1.
+1. Sign in with `npx wrangler login` using the account that owns staging.
+2. Inspect existing Worker bindings. Preserve the D1 database ID and configure its real photo bucket as `PROFILE_PHOTOS` in `wrangler.jsonc`. Never use placeholder or unrelated resources.
+3. Run `npm run check:cloudflare-db`. This reads schema metadata only, never customer records. It compares remote schema with all migrations in `drizzle/` and refuses publication if a required table or column is missing.
+4. If incomplete, inspect migration history and back up privately. Apply only missing migrations in order. Some deployments have manually applied migrations: never blindly reapply everything, reset the database, or seed test accounts remotely.
+5. Run `npm run deploy:cloudflare`. It checks schema, builds with real staging bindings and deploys `dist/server/wrangler.json` with generated assets. Never deploy the source entrypoint or a previous Sites build to staging.
+6. Verify the account menu, authenticated customer profile/orders, and `/api/product-options`. Verify TikTok, Instagram and Padrão artístico checkout using test data without making a real payment.
 
-Payments remain simulated. No real charges are enabled by deployment.
+`npm run build:cloudflare` remains available for build-only use. Local preview uses separate resources.
+
+## Customer data and stock failures
+
+On 19 September 2026 staging options returned HTTP 503; anonymous workspace requests correctly returned HTTP 401. Cloudflare authentication was unavailable, so the remote schema and authenticated customer error remain unverified. Missing migration 0007 is one possible cause: it provides product_options and membership trial columns used by these screens. Check before applying it. Later security and application migrations are also required.
+
+Purchase controls stay disabled when stock cannot be verified. The editor distinguishes a failed stock lookup from an unavailable model and offers a retry. Never substitute invented stock/customer records for a failing query.
+
+## Prices and inventory
+
+Products and plans display meticais. New plan edits store `meticais`. Legacy USD plans and historical terms convert for display at a fixed 1 USD = 63.91 MZN, the Banco de Moçambique reference dated 17 September 2026. Saved MT prices are never reconverted. Monthly seed prices: 63.91, 191.73, 319.55, 575.19 and 958.65 MT; the trial stays free. Managers edit commercial prices directly in MT.
+
+Source: https://www.bancomoc.mz/en/areas-of-expertise/markets/foreign-exchange-market/
+
+Physical launch inventory is 500 keychains total, not 500 per model. Aggregate reservation checks enforce this limit. Option quantities and enablement remain under manager control. Deployment must not reset sales, depleted options or manager changes.
+
+## Access and payments
+
+Registration creates customers only. Staff provisioning requires authorized management; accounts open their own permitted dashboard. Email verification and password recovery delivery are not configured.
+
+The external Opsellio link applies to the 500 MT keychain order. Staff verify the provider transaction, currency, amount and unique reference before recording payment. Automatic webhook verification and paid monthly subscriptions remain unavailable.

@@ -1,5 +1,5 @@
 import { database } from './server-db';
-import { products, type Product } from './catalog';
+import { products, productOrder, type Product } from './catalog';
 
 export async function canManageCatalog(userId: string) {
   return !!(await database()
@@ -45,5 +45,5 @@ export async function getProducts(): Promise<Product[]> {
     published: p.published !== false,
     available: p.availabilityConfigured ? p.available : p.id === 'keychain',
     images: p.images?.length ? p.images : [p.imageUrl],
-  }));
+  })).sort(productOrder);
 }

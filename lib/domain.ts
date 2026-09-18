@@ -3,7 +3,7 @@ export const plans = [
     id: 'free-30',
     name: '30 dias grátis',
     audience: 'Todos',
-    dollars: 0,
+    meticais: 0,
     links: 15,
     bio: 400,
     description:
@@ -13,7 +13,7 @@ export const plans = [
     id: 'individual',
     name: 'Individual',
     audience: 'Indivíduos',
-    dollars: 1,
+    meticais: 63.91,
     links: 3,
     bio: 0,
     description: 'Os seus contactos essenciais.',
@@ -22,7 +22,7 @@ export const plans = [
     id: 'creator',
     name: 'Criador',
     audience: 'Criadores',
-    dollars: 3,
+    meticais: 191.73,
     links: 8,
     bio: 160,
     description: 'O seu conteúdo, num só lugar.',
@@ -31,7 +31,7 @@ export const plans = [
     id: 'professional',
     name: 'Profissional',
     audience: 'Profissionais',
-    dollars: 5,
+    meticais: 319.55,
     links: 15,
     bio: 400,
     description: 'Mais espaço para o seu trabalho.',
@@ -40,7 +40,7 @@ export const plans = [
     id: 'institution',
     name: 'Instituição',
     audience: 'Instituições',
-    dollars: 9,
+    meticais: 575.19,
     links: 30,
     bio: 800,
     description: 'Recursos e informação da instituição.',
@@ -49,7 +49,7 @@ export const plans = [
     id: 'organisation',
     name: 'Organização',
     audience: 'Organizações',
-    dollars: 15,
+    meticais: 958.65,
     links: 50,
     bio: 1200,
     description: 'Uma presença completa para a organização.',
@@ -60,7 +60,9 @@ export type ManagedPlan = {
   id: string;
   name: string;
   audience: string;
-  dollars: number;
+  meticais?: number;
+  /** Legacy stored terms, converted only for display. */
+  dollars?: number;
   links: number;
   bio: number;
   description: string;

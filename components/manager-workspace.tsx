@@ -1,4 +1,6 @@
 'use client';
+import { planMeticais, planPrice } from '@/lib/plan-pricing';
+
 import { SourceImage } from '@/components/source-image';
 import { useEffect, useState, useCallback } from 'react';
 import Link from '@/components/hard-link';
@@ -401,7 +403,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
           </div>
           <p className="manager-sandbox">
             Gestão de encomendas · Confirme cada transacção no prestador antes
-            de a registar. Valores de produtos em MZN; planos mensais em USD.
+            de a registar. Valores de produtos em MZN; planos mensais em meticais.
           </p>
           {error && (
             <p role="alert" className="manager-error">
@@ -889,7 +891,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                               name: '',
                               audience: '',
                               description: '',
-                              dollars: 1,
+                              meticais: 63.91,
                               links: 3,
                               bio: 0,
                               active: true,
@@ -908,8 +910,8 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                             </span>
                             <h2>{p.name}</h2>
                             <p className="manager-plan-price">
-                              ${p.dollars}
-                              <small> USD / mês</small>
+                              {planPrice(p)}
+                              <small> / mês</small>
                             </p>
                             <p>{p.description}</p>
                             <p>
@@ -1023,8 +1025,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
               )}
               {selected.checkoutPlan && (
                 <p>
-                  Plano associado: {selected.checkoutPlan.name} · US${' '}
-                  {selected.checkoutPlan.dollars}/mês · até{' '}
+                  Plano associado: {selected.checkoutPlan.name} · {planPrice(selected.checkoutPlan)}/mês · até{' '}
                   {selected.checkoutPlan.links} links
                 </p>
               )}
@@ -1230,7 +1231,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
           <DialogDescription>
             {editKind === 'agent'
               ? 'Dados da equipa e disponibilidade.'
-              : 'Condições para novas adesões, em USD por mês.'}
+              : 'Condições para novas adesões, em meticais por mês.'}
           </DialogDescription>
           {editing && (
             <form
@@ -1247,7 +1248,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   active: form.has('active'),
                   ...(editKind === 'plan'
                     ? {
-                        dollars: Number(values.dollars),
+                        meticais: Number(values.meticais),
                         links: Number(values.links),
                         bio: Number(values.bio),
                       }
@@ -1311,15 +1312,15 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                       />
                     </label>
                     <label>
-                      USD / mês
+                      MT / mês
                       <input
                         type="number"
-                        name="dollars"
-                        min="1"
+                        name="meticais"
+                        min={(editing as ManagedPlan).id === 'free-30' ? '0' : '1'}
                         max="10000"
                         step="0.01"
                         required
-                        defaultValue={(editing as ManagedPlan).dollars}
+                        defaultValue={planMeticais(editing as ManagedPlan)}
                       />
                     </label>
                     <label>

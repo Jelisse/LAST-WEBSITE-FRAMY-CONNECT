@@ -1,4 +1,6 @@
 'use client';
+import { planPrice } from '@/lib/plan-pricing';
+
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -64,7 +66,7 @@ export function PlanPicker({
                 </small>
               </span>
               <strong>
-                US${choice.dollars}
+                {planPrice(choice)}
                 <small>{choice.id === 'free-30' ? '/ 30 dias' : '/mês'}</small>
               </strong>
             </div>
@@ -138,8 +140,7 @@ export function PlanPicker({
                   <p>{plan.description}</p>
                   <div className="plan-price">
                     <strong>
-                      <span>US$</span>
-                      {plan.dollars}
+                      {planPrice(plan)}
                     </strong>
                     <span>{plan.id === 'free-30' ? '/ 30 dias' : '/mês'}</span>
                   </div>

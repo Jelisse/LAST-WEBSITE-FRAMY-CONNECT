@@ -3,14 +3,14 @@ import { SourceImage } from '@/components/source-image';
 import { useState } from 'react';
 import Link from '@/components/hard-link';
 import { ArrowUpRight, Search } from 'lucide-react';
-import { money, type PublicProduct } from '@/lib/catalog';
+import { money, productOrder, type PublicProduct } from '@/lib/catalog';
 
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 export function Catalog({ products }: { products: PublicProduct[] }) {
   const [category, setCategory] = useState('Todos');
   const [query, setQuery] = useState('');
-  const shown = products.filter(
+  const shown = [...products].sort(productOrder).filter(
     (p) =>
       (category === 'Todos' || p.category === category) &&
       `${p.name} ${p.description}`
@@ -44,7 +44,7 @@ export function Catalog({ products }: { products: PublicProduct[] }) {
       </div>
       <div className="product-grid">
         {shown.map((p, i) => (
-          <Link className="product-card" key={p.id} href={`/produtos/${p.id}`}>
+          <Link className={`product-card ${p.available ? 'is-available' : 'is-coming-soon'}`} key={p.id} href={`/produtos/${p.id}`}>
             <div className={`product-visual tone-${i % 3}`}>
               <span className="product-category">{p.category}</span>
               <SourceImage

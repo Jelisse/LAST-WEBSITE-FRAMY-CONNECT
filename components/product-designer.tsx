@@ -110,6 +110,9 @@ export function ProductDesigner({
     [qr, setQr] = useState(''),
     [art, setArt] = useState({ front: '', back: '' });
   const [processing, setProcessing] = useState(false);
+  const [stockAttempt, setStockAttempt] = useState(0);
+  const [stockLoading, setStockLoading] = useState(true);
+  const [stockError, setStockError] = useState('');
   const [tolerance, setTolerance] = useState(30);
   const [originals, setOriginals] = useState<
     Partial<Record<'front' | 'back', Artwork>>
@@ -142,6 +145,8 @@ export function ProductDesigner({
   }, [card, readOnly, design, onChange]);
   useEffect(() => {
     let alive = true;
+    setStockLoading(true);
+    setStockError('');
     fetch('/api/product-options', { cache: 'no-store' })
       .then(async (r) => {
         const d = (await r.json()) as {
@@ -152,12 +157,15 @@ export function ProductDesigner({
         if (alive) setOptions(d.options);
       })
       .catch((e) => {
-        if (alive) setError(e.message);
+        if (alive) setStockError(e.message || 'Não foi possível consultar o stock.');
+      })
+      .finally(() => {
+        if (alive) setStockLoading(false);
       });
     return () => {
       alive = false;
     };
-  }, []);
+  }, [stockAttempt]);
   useEffect(() => {
     let active = true;
     if (profile.username)
@@ -543,6 +551,14 @@ export function ProductDesigner({
         disabled={processing}
         aria-busy={processing}
       >
+        {!readOnly && stockError && (
+          <div role="alert">
+            <p>{stockError} As opções serão activadas após confirmar o stock.</p>
+            <button type="button" disabled={stockLoading} onClick={() => setStockAttempt(n => n + 1)}>
+              Consultar stock novamente
+            </button>
+          </div>
+        )}
         {!readOnly && !card && (
           <>
             <h3>Escolha o seu porta-chaves</h3>
@@ -556,7 +572,7 @@ export function ProductDesigner({
                     key={choice.id}
                     aria-pressed={design.optionId === choice.id}
                     className={design.optionId === choice.id ? 'chosen' : ''}
-                    disabled={!stock?.enabled || !stock.quantity}
+                    disabled={stockLoading || !!stockError || !stock?.enabled || !stock.quantity}
                     onClick={() => onChange({ optionId: choice.id })}
                   >
                     <strong>{choice.name}</strong>
@@ -571,7 +587,7 @@ export function ProductDesigner({
                       </div>
                     </div>
                     <span>
-                      {stock?.enabled && stock.quantity
+                      {stockLoading ? 'A consultar stock…' : stockError ? 'Stock por confirmar' : stock?.enabled && stock.quantity
                         ? 'Seleccionar · 500 MT'
                         : 'Indisponível'}
                     </span>
@@ -586,7 +602,7 @@ export function ProductDesigner({
             className={`custom-choice ${custom ? 'chosen' : ''}`}
             aria-pressed={custom}
             type="button"
-            disabled={!available?.enabled || !available.quantity}
+            disabled={stockLoading || !!stockError || !available?.enabled || !available.quantity}
             onClick={() => onChange({ ...design, optionId: blank })}
           >
             <strong>

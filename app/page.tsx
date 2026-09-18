@@ -1,3 +1,4 @@
+import { planMeticais, planPrice } from '@/lib/plan-pricing';
 import { SourceImage } from '@/components/source-image';
 import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
@@ -15,7 +16,7 @@ import { HomeHeroScene } from '@/components/home-hero-scene';
 import { HomeSharingScene } from '@/components/home-sharing-scene';
 import { getProducts } from '@/lib/server-catalog';
 import { getManagedPlans } from '@/lib/server-plans';
-import { money } from '@/lib/catalog';
+import { money, productOrder } from '@/lib/catalog';
 import './home.css';
 
 const productNames: Record<string, string> = {
@@ -84,11 +85,11 @@ export default async function Home() {
   ]);
   const featured = products
     .filter((p) => p.published !== false)
-    .sort((a, b) => Number(b.available) - Number(a.available))
+    .sort(productOrder)
     .slice(0, 4);
   const plans = allPlans
     .filter((p) => p.active)
-    .sort((a, b) => a.dollars - b.dollars);
+    .sort((a, b) => planMeticais(a) - planMeticais(b));
   return (
     <div className="framy-home">
       <header className="home-nav">
@@ -188,7 +189,7 @@ export default async function Home() {
           <div className="home-products-grid">
             {featured.map((p) => (
               <Link
-                className="home-product"
+                className={`home-product ${p.available ? 'is-available' : 'is-coming-soon'}`}
                 key={p.id}
                 href={`/produtos/${p.id}`}
               >
@@ -223,7 +224,7 @@ export default async function Home() {
             <div>
               <h2>Mais espaço para o seu perfil.</h2>
               <p>
-                Planos digitais mensais em USD. Compare o número de links e o
+                Planos digitais mensais em meticais. Compare o número de links e o
                 espaço de apresentação.
               </p>
             </div>
@@ -238,10 +239,7 @@ export default async function Home() {
                 <h3>{p.name}</h3>
                 <p>{p.description}</p>
                 <div className="home-plan-price">
-                  US${' '}
-                  {new Intl.NumberFormat('pt-MZ', {
-                    maximumFractionDigits: 2,
-                  }).format(p.dollars)}
+                  {planPrice(p)}
                   <span>{p.id === 'free-30' ? ' / 30 dias' : ' / mês'}</span>
                 </div>
                 <ul>
