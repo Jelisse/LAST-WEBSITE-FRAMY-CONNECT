@@ -1,8 +1,11 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useEffect, useState } from 'react';
 import { applicationAge, applicationLabels } from '@/lib/agent-application';
 import type { ApplicationView } from './agent-application-form';
 export function ApplicationManager() {
+  const { t } = useI18n();
   const [items, setItems] = useState<ApplicationView[]>([]),
     [selected, setSelected] = useState<ApplicationView | null>(null),
     [note, setNote] = useState(''),
@@ -58,14 +61,15 @@ export function ApplicationManager() {
   }
   return (
     <section className="panel application-manager">
-      <h2>Candidaturas a agente</h2>
+      <h2>{t('Candidaturas a agente')}</h2>
       <p>
-        Analise os dados e documentos antes de decidir. As decisões e consultas
-        de documentos ficam registadas.
+        {t(
+          'Analise os dados e documentos antes de decidir. As decisões e consultas de documentos ficam registadas.',
+        )}
       </p>
-      {error && <p role="alert">{error}</p>}
+      {error && <p role="alert">{t(error)}</p>}
       {loading ? (
-        <p>A carregar…</p>
+        <p>{t('A carregar…')}</p>
       ) : selected ? (
         <div>
           <button
@@ -73,7 +77,7 @@ export function ApplicationManager() {
             disabled={busy}
             onClick={() => setSelected(null)}
           >
-            Voltar às candidaturas
+            {t('Voltar às candidaturas')}
           </button>
           <h3>{selected.data.name}</h3>
           <dl>
@@ -93,7 +97,7 @@ export function ApplicationManager() {
               ['Actividade', selected.data.occupation],
             ].map(([label, value]) => (
               <div key={label}>
-                <dt>{label}</dt>
+                <dt>{t(label)}</dt>
                 <dd>{value}</dd>
               </div>
             ))}
@@ -109,17 +113,17 @@ export function ApplicationManager() {
                 rel="noreferrer"
               >
                 {f.kind === 'portrait'
-                  ? 'Fotografia'
+                  ? t('Fotografia')
                   : f.kind === 'id-front'
-                    ? 'BI — frente'
-                    : 'BI — verso'}
+                    ? t('BI — frente')
+                    : t('BI — verso')}
               </a>
             ))}
           </div>
           {selected.status === 'SUBMITTED' && (
             <fieldset disabled={busy}>
               <label>
-                Mensagem para o candidato
+                {t('Mensagem para o candidato')}
                 <textarea
                   rows={4}
                   maxLength={1500}
@@ -133,12 +137,12 @@ export function ApplicationManager() {
                   checked={verified}
                   onChange={(e) => setVerified(e.target.checked)}
                 />
-                Verifiquei o BI, os dados e a idade mínima de 18 anos.
+                {t('Verifiquei o BI, os dados e a idade mínima de 18 anos.')}
               </label>
               <p>
-                A aprovação activa o acesso de agente nesta conta e termina as
-                sessões existentes. O candidato entra novamente com a sua
-                palavra-passe; os seus dados de cliente são preservados.
+                {t(
+                  'A aprovação activa o acesso de agente nesta conta e termina as sessões existentes. O candidato entra novamente com a sua palavra-passe; os seus dados de cliente são preservados.',
+                )}
               </p>
               <div className="product-form-actions">
                 <button
@@ -146,25 +150,28 @@ export function ApplicationManager() {
                   disabled={!verified}
                   onClick={() => void review('APPROVED')}
                 >
-                  Aprovar e activar agente
+                  {t('Aprovar e activar agente')}
                 </button>
                 <button
                   className="btn btn-outline"
                   onClick={() => void review('NEEDS_INFO')}
                 >
-                  Pedir informação
+                  {t('Pedir informação')}
                 </button>
                 <button
                   className="btn btn-outline"
                   onClick={() => void review('REJECTED')}
                 >
-                  Não aprovar
+                  {t('Não aprovar')}
                 </button>
               </div>
             </fieldset>
           )}
           {selected.review_note && (
-            <p>Mensagem enviada: {selected.review_note}</p>
+            <p>
+              {t('Mensagem enviada: ')}
+              {selected.review_note}
+            </p>
           )}
         </div>
       ) : (
@@ -178,7 +185,7 @@ export function ApplicationManager() {
                 .finally(() => setLoading(false));
             }}
           >
-            Actualizar
+            {t('Actualizar')}
           </button>
           <div className="application-list">
             {items.length ? (
@@ -194,19 +201,21 @@ export function ApplicationManager() {
                   }}
                 >
                   <strong>{item.data.name}</strong>
-                  <span>{applicationLabels[item.status]}</span>
+                  <span>{t(applicationLabels[item.status])}</span>
                   <small>
                     {item.data.city} ·{' '}
-                    {new Date(item.updated_at).toLocaleDateString('pt-MZ')}
+                    {new Date(item.updated_at).toLocaleDateString(t.locale)}
                   </small>
                 </button>
               ))
             ) : (
-              <p>Ainda não existem candidaturas submetidas.</p>
+              <p>{t('Ainda não existem candidaturas submetidas.')}</p>
             )}
           </div>
           <small>
-            São apresentadas as 100 candidaturas mais recentemente actualizadas.
+            {t(
+              'São apresentadas as 100 candidaturas mais recentemente actualizadas.',
+            )}
           </small>
         </>
       )}

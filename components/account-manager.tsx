@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useState, useEffect, useCallback } from 'react';
 import { roleLabels } from '@/lib/staff-policy';
 type Account = {
@@ -10,6 +12,7 @@ type Account = {
   version: number;
 };
 export function AccountManager() {
+  const { t } = useI18n();
   const [data, setData] = useState<{
       accounts: Account[];
       agents: { id: string; name: string }[];
@@ -54,21 +57,22 @@ export function AccountManager() {
   }
   return (
     <section className="panel account-management">
-      <h2>Contas e acessos</h2>
+      <h2>{t('Contas e acessos')}</h2>
       <p>
-        Crie acessos para a equipa. Entregue o convite pessoalmente ao
-        destinatário por um canal seguro. A recuperação suspende o acesso actual
-        e termina todas as sessões.
+        {t(
+          'Crie acessos para a equipa. Entregue o convite pessoalmente ao destinatário por um canal seguro. A recuperação suspende o acesso actual e termina todas as sessões.',
+        )}
       </p>
-      {error && <p role="alert">{error}</p>}
+      {error && <p role="alert">{t(error)}</p>}
       {invite && (
         <output>
           <p>
-            Convite criado. Válido por 24 horas; guarde-o antes de sair desta
-            página.
+            {t(
+              'Convite criado. Válido por 24 horas; guarde-o antes de sair desta página.',
+            )}
           </p>
           <label>
-            Ligação privada de activação
+            {t('Ligação privada de activação')}
             <input readOnly value={invite} onFocus={(e) => e.target.select()} />
           </label>
         </output>
@@ -91,27 +95,27 @@ export function AccountManager() {
         }}
       >
         <label>
-          Nome
+          {t('Nome')}
           <input name="name" required minLength={2} maxLength={100} />
         </label>
         <label>
-          Email
+          {t('Email')}
           <input name="email" type="email" required maxLength={254} />
         </label>
         <label>
-          Nível de acesso
+          {t('Nível de acesso')}
           <select name="role">
-            <option value="agent">Agente</option>
-            <option value="manager">Gestor</option>
+            <option value="agent">{t('Agente')}</option>
+            <option value="manager">{t('Gestor')}</option>
             {data?.canCreateDirector && (
-              <option value="director">Direcção</option>
+              <option value="director">{t('Direcção')}</option>
             )}
           </select>
         </label>
         <label>
-          Ligar a um agente já cadastrado (opcional)
+          {t('Ligar a um agente já cadastrado (opcional)')}
           <select name="agentId">
-            <option value="">Criar novo registo</option>
+            <option value="">{t('Criar novo registo')}</option>
             {data?.agents.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}
@@ -120,18 +124,18 @@ export function AccountManager() {
           </select>
         </label>
         <button className="btn btn-primary" disabled={busy}>
-          Criar conta e convite
+          {t('Criar conta e convite')}
         </button>
       </form>
       <div className="manager-table-scroll">
         <table>
           <thead>
             <tr>
-              <th>Nome</th>
-              <th>Email</th>
-              <th>Acesso</th>
-              <th>Estado</th>
-              <th>Acções</th>
+              <th>{t('Nome')}</th>
+              <th>{t('Email')}</th>
+              <th>{t('Acesso')}</th>
+              <th>{t('Estado')}</th>
+              <th>{t('Acções')}</th>
             </tr>
           </thead>
           <tbody>
@@ -139,8 +143,8 @@ export function AccountManager() {
               <tr key={a.id}>
                 <td>{a.name}</td>
                 <td>{a.email}</td>
-                <td>{roleLabels[a.role]}</td>
-                <td>{a.active ? 'Activo' : 'Inactivo / por activar'}</td>
+                <td>{t(roleLabels[a.role])}</td>
+                <td>{a.active ? t('Activo') : t('Inactivo / por activar')}</td>
                 <td>
                   {a.id !== data.selfId && (
                     <>
@@ -156,7 +160,7 @@ export function AccountManager() {
                           })
                         }
                       >
-                        {a.active ? 'Desactivar' : 'Activar'}
+                        {a.active ? t('Desactivar') : t('Activar')}
                       </button>
                       <button
                         disabled={busy}
@@ -168,7 +172,7 @@ export function AccountManager() {
                           })
                         }
                       >
-                        Novo convite / recuperar acesso
+                        {t('Novo convite / recuperar acesso')}
                       </button>
                     </>
                   )}

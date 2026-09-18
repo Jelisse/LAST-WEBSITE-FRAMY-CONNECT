@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { SourceImage } from '@/components/source-image';
 import { useState } from 'react';
 import Link from '@/components/hard-link';
@@ -8,15 +10,18 @@ import { money, productOrder, type PublicProduct } from '@/lib/catalog';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 export function Catalog({ products }: { products: PublicProduct[] }) {
+  const { t } = useI18n();
   const [category, setCategory] = useState('Todos');
   const [query, setQuery] = useState('');
-  const shown = [...products].sort(productOrder).filter(
-    (p) =>
-      (category === 'Todos' || p.category === category) &&
-      `${p.name} ${p.description}`
-        .toLocaleLowerCase()
-        .includes(query.toLocaleLowerCase()),
-  );
+  const shown = [...products]
+    .sort(productOrder)
+    .filter(
+      (p) =>
+        (category === 'Todos' || p.category === category) &&
+        `${p.name} ${p.description} ${t(p.name)} ${t(p.description)}`
+          .toLocaleLowerCase()
+          .includes(query.toLocaleLowerCase()),
+    );
   return (
     <>
       <div className="catalog-tools">
@@ -25,7 +30,7 @@ export function Catalog({ products }: { products: PublicProduct[] }) {
             {['Todos', 'Cartões', 'Acessórios', 'Para organizações'].map(
               (c) => (
                 <TabsTrigger key={c} value={c}>
-                  {c}
+                  {t(c)}
                 </TabsTrigger>
               ),
             )}
@@ -35,22 +40,26 @@ export function Catalog({ products }: { products: PublicProduct[] }) {
           <Search size={18} />
           <Input
             id="catalog-search"
-            aria-label="Pesquisar produtos"
+            aria-label={t('Pesquisar produtos')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Encontre o seu produto"
+            placeholder={t('Encontre o seu produto')}
           />
         </label>
       </div>
       <div className="product-grid">
         {shown.map((p, i) => (
-          <Link className={`product-card ${p.available ? 'is-available' : 'is-coming-soon'}`} key={p.id} href={`/produtos/${p.id}`}>
+          <Link
+            className={`product-card ${p.available ? 'is-available' : 'is-coming-soon'}`}
+            key={p.id}
+            href={`/produtos/${p.id}`}
+          >
             <div className={`product-visual tone-${i % 3}`}>
-              <span className="product-category">{p.category}</span>
+              <span className="product-category">{t(p.category)}</span>
               <SourceImage
                 className="catalog-product-image"
                 src={p.imageUrl}
-                alt={p.name}
+                alt={t(p.name)}
                 width={1254}
                 height={1254}
                 loading="lazy"
@@ -60,10 +69,10 @@ export function Catalog({ products }: { products: PublicProduct[] }) {
               </span>
             </div>
             <div className="product-info">
-              <h2>{p.name}</h2>
-              <p>{p.tagline}</p>
+              <h2>{t(p.name)}</h2>
+              <p>{t(p.tagline)}</p>
               <span>
-                {p.available ? money(p.amount) : 'Brevemente'}{' '}
+                {p.available ? money(p.amount, t.locale) : t('Brevemente')}{' '}
                 <ArrowUpRight size={15} />
               </span>
             </div>
@@ -72,12 +81,13 @@ export function Catalog({ products }: { products: PublicProduct[] }) {
       </div>
       {!shown.length && (
         <p className="empty-panel">
-          Nenhum produto encontrado. Experimente outro termo.
+          {t('Nenhum produto encontrado. Experimente outro termo.')}
         </p>
       )}
       <div className="quiet-note">
-        Os produtos assinalados como Brevemente ainda não estão disponíveis para
-        compra.
+        {t(
+          'Os produtos assinalados como Brevemente ainda não estão disponíveis para compra.',
+        )}
       </div>
     </>
   );

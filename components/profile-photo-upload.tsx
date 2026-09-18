@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { Camera, Upload, X } from 'lucide-react';
@@ -16,6 +18,7 @@ export function ProfilePhotoUpload({
   onChange: (profile: Profile) => void;
   onUploading: (uploading: boolean) => void;
 }) {
+  const { t } = useI18n();
   const input = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false),
     [error, setError] = useState('');
@@ -58,7 +61,7 @@ export function ProfilePhotoUpload({
         {profile.photoUrl ? (
           <Image
             src={profile.photoUrl}
-            alt="A sua fotografia"
+            alt={t('A sua fotografia')}
             fill
             unoptimized
             sizes="100px"
@@ -72,15 +75,17 @@ export function ProfilePhotoUpload({
         )}
       </div>
       <div className="photo-editor-controls">
-        <h3 id="photo-editor-title">Fotografia de perfil</h3>
+        <h3 id="photo-editor-title">{t('Fotografia de perfil')}</h3>
         <p>
-          Use um retrato vertical. A fotografia preenche o topo do seu perfil.
+          {t(
+            'Use um retrato vertical. A fotografia preenche o topo do seu perfil.',
+          )}
         </p>
         <input
           ref={input}
           type="file"
           className="sr-only"
-          aria-label="Escolher fotografia de perfil"
+          aria-label={t('Escolher fotografia de perfil')}
           accept="image/jpeg,image/png,image/webp"
           disabled={disabled || uploading}
           onChange={(event) => {
@@ -96,10 +101,10 @@ export function ProfilePhotoUpload({
           >
             <Upload size={17} />
             {uploading
-              ? 'A carregar…'
+              ? t('A carregar…')
               : profile.photoUrl
-                ? 'Alterar fotografia'
-                : 'Carregar fotografia'}
+                ? t('Alterar fotografia')
+                : t('Carregar fotografia')}
           </Button>
           {profile.photoUrl && (
             <Button
@@ -110,14 +115,15 @@ export function ProfilePhotoUpload({
                 onChange({ ...profile, photoUrl: '', photoPosition: 35 })
               }
             >
-              <X size={16} /> Remover
+              <X size={16} />
+              {t(' Remover')}
             </Button>
           )}
         </div>
-        <small>JPG, PNG ou WebP · até 5 MB</small>
+        <small>{t('JPG, PNG ou WebP · até 5 MB')}</small>
         {profile.photoUrl && (
           <div>
-            <span id="photo-position-label">Enquadramento vertical</span>
+            <span id="photo-position-label">{t('Enquadramento vertical')}</span>
             <Slider
               aria-labelledby="photo-position-label"
               min={0}
@@ -136,7 +142,7 @@ export function ProfilePhotoUpload({
         )}
         {error && (
           <p role="alert" className="photo-error">
-            {error}
+            {t(error)}
           </p>
         )}
       </div>

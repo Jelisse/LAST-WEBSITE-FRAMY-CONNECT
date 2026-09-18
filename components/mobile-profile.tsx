@@ -1,4 +1,6 @@
 'use client';
+import { useI18n, LanguageSelector } from '@/components/language-provider';
+
 import Image from 'next/image';
 import { useState } from 'react';
 import {
@@ -20,6 +22,7 @@ import type { Profile } from '@/lib/domain';
 import { socialPlatform } from '@/lib/social-platform';
 
 function SocialIcon({ url }: { url: string }) {
+  const { t } = useI18n();
   const brand = socialPlatform(url);
   if (brand)
     return (
@@ -52,6 +55,7 @@ export function MobileProfile({
   published?: boolean;
   preview?: boolean;
 }) {
+  const { t } = useI18n();
   const [message, setMessage] = useState(''),
     [qr, setQr] = useState(''),
     [qrOpen, setQrOpen] = useState(false),
@@ -105,12 +109,11 @@ export function MobileProfile({
       if (navigator.share)
         await navigator.share({ title: profile.name, url: profileUrl() });
       else {
-        await navigator.clipboard.writeText(profileUrl());
-        setMessage('Link copiado.');
+        setMessage('A partilha não está disponível neste navegador.');
       }
     } catch (e) {
       if (!(e instanceof Error && e.name === 'AbortError'))
-        setMessage(`O seu link: ${profileUrl()}`);
+        setMessage('Não foi possível partilhar o perfil.');
     }
   }
   async function showQr() {
@@ -135,14 +138,15 @@ export function MobileProfile({
   return (
     <div className="mobile-profile-frame">
       <article className="mobile-identity-page">
+        {!preview && <div className="public-profile-language"><LanguageSelector /></div>}
         <div className="mobile-portrait">
           {profile.photoUrl ? (
             <Image
               src={profile.photoUrl}
               alt={
                 profile.name
-                  ? `Fotografia de ${profile.name}`
-                  : 'Fotografia de perfil'
+                  ? t('Fotografia de {0}', [profile.name])
+                  : t('Fotografia de perfil')
               }
               fill
               unoptimized
@@ -155,20 +159,20 @@ export function MobileProfile({
           ) : (
             <div className="mobile-photo-placeholder">
               <Camera />
-              <span>A sua fotografia aparece aqui</span>
+              <span>{t('A sua fotografia aparece aqui')}</span>
             </div>
           )}
         </div>
         <div className="mobile-profile-wave" aria-hidden="true" />
         <div className="mobile-profile-body">
-          <Heading>{profile.name || 'O seu nome'}</Heading>
+          <Heading>{profile.name || t('O seu nome')}</Heading>
           <p className="mobile-profile-title">
-            {profile.title || 'O seu título ou profissão'}
+            {profile.title || t('O seu título ou profissão')}
           </p>
           {profile.bio && <p className="mobile-profile-bio">{profile.bio}</p>}
           <nav
             className="mobile-profile-links"
-            aria-label="Links do perfil — deslize para ver mais"
+            aria-label={t('Links do perfil — deslize para ver mais')}
           >
             {links.map((link, index) => (
               <a
@@ -183,20 +187,20 @@ export function MobileProfile({
                 aria-disabled={!/^(https:\/\/|mailto:|tel:)/i.test(link.url)}
               >
                 <SocialIcon url={link.url} />
-                <span>{link.label || 'Título do link'}</span>
+                <span>{link.label || t('Título do link')}</span>
               </a>
             ))}
             {!links.length && preview && (
               <p className="mobile-links-placeholder">
-                Adicione os seus links no editor.
+                {t('Adicione os seus links no editor.')}
               </p>
             )}
           </nav>
           <div className="mobile-profile-actions">
             <button
               type="button"
-              aria-label="Adicionar aos contactos"
-              title="Adicionar aos contactos"
+              aria-label={t('Adicionar aos contactos')}
+              title={t('Adicionar aos contactos')}
               disabled={!profile.name}
               onClick={download}
             >
@@ -204,63 +208,70 @@ export function MobileProfile({
             </button>
             <button
               type="button"
-              aria-label="Mostrar QR do perfil"
+              aria-label={t('Mostrar QR do perfil')}
               title={
                 published
-                  ? 'Mostrar QR do perfil'
-                  : 'Publique o perfil para activar o QR'
+                  ? t('Mostrar QR do perfil')
+                  : t('Publique o perfil para activar o QR')
               }
               disabled={!published || qrBusy}
               onClick={showQr}
             >
               <QrCode />
             </button>
-            <button
-              type="button"
-              aria-label="Partilhar perfil"
-              title={
-                published
-                  ? 'Partilhar perfil'
-                  : 'Publique o perfil para partilhar'
-              }
-              disabled={!published}
-              onClick={share}
-            >
-              <Share2 />
-            </button>
+            {!preview && (
+              <button
+                type="button"
+                aria-label={t('Partilhar perfil')}
+                title={
+                  published
+                    ? t('Partilhar perfil')
+                    : t('Publique o perfil para partilhar')
+                }
+                disabled={!published}
+                onClick={share}
+              >
+                <Share2 />
+              </button>
+            )}
           </div>
           {message && (
-            <output className="mobile-profile-message">{message}</output>
+            <output className="mobile-profile-message">{t(message)}</output>
           )}
           <footer className="mobile-profile-footer">
             <a
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Visitar o site Framy Connect (abre num novo separador)"
+              aria-label={t(
+                'Visitar o site Framy Connect (abre num novo separador)',
+              )}
             >
               <Image
                 src="/brand/logo.svg"
-                alt="Framy Connect"
+                alt={t('Framy Connect')}
                 width={220}
                 height={100}
                 unoptimized
               />
             </a>
-            <small>Todos direitos reservados {new Date().getFullYear()}</small>
+            <small>
+              {t('Todos direitos reservados ')}
+              {new Date().getFullYear()}
+            </small>
           </footer>
         </div>
       </article>
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
         <DialogContent className="profile-qr-dialog">
-          <DialogTitle>O seu QR Framy</DialogTitle>
+          <DialogTitle>{t('O seu QR Framy')}</DialogTitle>
           <DialogDescription>
-            Digitalize para abrir o perfil publicado.
+            {t('Digitalize para abrir o perfil publicado.')}
           </DialogDescription>
           {qr && (
             <Image
               src={qr}
-              alt={`QR do perfil ${profile.name}`}
+              alt={t('QR do perfil {0}', [profile.name])}
               width={400}
               height={400}
               unoptimized

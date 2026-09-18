@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { SourceImage } from '@/components/source-image';
 import { useEffect, useState, useEffectEvent } from 'react';
 import QRCode from 'qrcode';
@@ -29,6 +31,7 @@ export function InventoryPhoto({
   index: number;
   back?: boolean;
 }) {
+  const { t } = useI18n();
   return (
     <svg
       className="inventory-photo"
@@ -36,8 +39,8 @@ export function InventoryPhoto({
 
       aria-label={
         back
-          ? 'Verso com logótipo Framy Connect'
-          : 'Fotografia do porta-chaves em stock'
+          ? t('Verso com logótipo Framy Connect')
+          : t('Fotografia do porta-chaves em stock')
       }
     >
       <image
@@ -100,6 +103,7 @@ export function ProductDesigner({
   readOnly?: boolean;
   onBusy?: (b: boolean) => void;
 }) {
+  const { t } = useI18n();
   const card = product.id !== 'keychain';
   const blank = blankOption(product);
   const [options, setOptions] = useState<StockOption[]>([]),
@@ -157,7 +161,8 @@ export function ProductDesigner({
         if (alive) setOptions(d.options);
       })
       .catch((e) => {
-        if (alive) setStockError(e.message || 'Não foi possível consultar o stock.');
+        if (alive)
+          setStockError(e.message || 'Não foi possível consultar o stock.');
       })
       .finally(() => {
         if (alive) setStockLoading(false);
@@ -361,8 +366,8 @@ export function ProductDesigner({
             className="card-composition"
             alt={
               s === 'front'
-                ? 'Frente personalizada do cartão'
-                : 'Verso com nome, email e QR do perfil'
+                ? t('Frente personalizada do cartão')
+                : t('Verso com nome, email e QR do perfil')
             }
             src={cardArtworkUrl(
               cardArtwork({
@@ -396,7 +401,7 @@ export function ProductDesigner({
           <SourceImage
             className="customer-art"
             src={art[s]}
-            alt={`Design ${s === 'front' ? 'da frente' : 'do verso'}`}
+            alt={t('Design {0}', [s === 'front' ? 'da frente' : 'do verso'])}
             style={{
               width: `${a?.scale ?? 80}%`,
               height: `${a?.scale ?? 80}%`,
@@ -409,27 +414,27 @@ export function ProductDesigner({
           <SourceImage
             className="fixed-brand"
             src="/brand/logo.svg"
-            alt="Framy Connect"
+            alt={t('Framy Connect')}
           />
         )}
         {card && s === 'back' && (
           <div className="card-identity">
             <div>
-              <strong>{profile.name || 'Nome do titular'}</strong>
-              <span>{profile.email || 'Email do titular'}</span>
+              <strong>{profile.name || t('Nome do titular')}</strong>
+              <span>{profile.email || t('Email do titular')}</span>
             </div>
             {qr ? (
               <SourceImage
                 src={profile.username ? qr : ''}
-                alt="QR do perfil final"
+                alt={t('QR do perfil final')}
               />
             ) : (
-              <span className="qr-pending">QR após criar o perfil</span>
+              <span className="qr-pending">{t('QR após criar o perfil')}</span>
             )}
           </div>
         )}
         {!art[s] && s === 'front' && (
-          <span className="design-placeholder">O seu logótipo aqui</span>
+          <span className="design-placeholder">{t('O seu logótipo aqui')}</span>
         )}
       </div>
     );
@@ -553,16 +558,23 @@ export function ProductDesigner({
       >
         {!readOnly && stockError && (
           <div role="alert">
-            <p>{stockError} As opções serão activadas após confirmar o stock.</p>
-            <button type="button" disabled={stockLoading} onClick={() => setStockAttempt(n => n + 1)}>
-              Consultar stock novamente
+            <p>
+              {stockError}
+              {t(' As opções serão activadas após confirmar o stock.')}
+            </p>
+            <button
+              type="button"
+              disabled={stockLoading}
+              onClick={() => setStockAttempt((n) => n + 1)}
+            >
+              {t('Consultar stock novamente')}
             </button>
           </div>
         )}
         {!readOnly && !card && (
           <>
-            <h3>Escolha o seu porta-chaves</h3>
-            <p>500 MT por unidade · Frente e verso de cada modelo.</p>
+            <h3>{t('Escolha o seu porta-chaves')}</h3>
+            <p>{t('500 MT por unidade · Frente e verso de cada modelo.')}</p>
             <div className="inventory-choices">
               {keychainChoices.map((choice) => {
                 const stock = options.find((o) => o.id === choice.id);
@@ -572,24 +584,33 @@ export function ProductDesigner({
                     key={choice.id}
                     aria-pressed={design.optionId === choice.id}
                     className={design.optionId === choice.id ? 'chosen' : ''}
-                    disabled={stockLoading || !!stockError || !stock?.enabled || !stock.quantity}
+                    disabled={
+                      stockLoading ||
+                      !!stockError ||
+                      !stock?.enabled ||
+                      !stock.quantity
+                    }
                     onClick={() => onChange({ optionId: choice.id })}
                   >
-                    <strong>{choice.name}</strong>
+                    <strong>{t(choice.name)}</strong>
                     <div className="inventory-pair">
                       <div>
                         <InventoryPhoto index={choice.index} />
-                        <span>Frente</span>
+                        <span>{t('Frente')}</span>
                       </div>
                       <div>
                         <InventoryPhoto index={choice.index} back />
-                        <span>Verso</span>
+                        <span>{t('Verso')}</span>
                       </div>
                     </div>
                     <span>
-                      {stockLoading ? 'A consultar stock…' : stockError ? 'Stock por confirmar' : stock?.enabled && stock.quantity
-                        ? 'Seleccionar · 500 MT'
-                        : 'Indisponível'}
+                      {stockLoading
+                        ? t('A consultar stock…')
+                        : stockError
+                          ? t('Stock por confirmar')
+                          : stock?.enabled && stock.quantity
+                            ? t('Seleccionar · 500 MT')
+                            : t('Indisponível')}
                     </span>
                   </button>
                 );
@@ -602,18 +623,25 @@ export function ProductDesigner({
             className={`custom-choice ${custom ? 'chosen' : ''}`}
             aria-pressed={custom}
             type="button"
-            disabled={stockLoading || !!stockError || !available?.enabled || !available.quantity}
+            disabled={
+              stockLoading ||
+              !!stockError ||
+              !available?.enabled ||
+              !available.quantity
+            }
             onClick={() => onChange({ ...design, optionId: blank })}
           >
             <strong>
-              {card ? 'Personalizar o cartão' : 'Criar o meu porta-chaves'}
+              {card
+                ? t('Personalizar o cartão')
+                : t('Criar o meu porta-chaves')}
             </strong>
             <span>
               {available?.enabled && available.quantity
                 ? card
-                  ? 'Frente e verso · 85,5 × 54 mm'
-                  : 'O seu logótipo na frente · 28 mm'
-                : 'Personalização indisponível'}
+                  ? t('Frente e verso · 85,5 × 54 mm')
+                  : t('O seu logótipo na frente · 28 mm')
+                : t('Personalização indisponível')}
             </span>
           </button>
         )}
@@ -623,54 +651,64 @@ export function ProductDesigner({
               <div className="editor-settings">
                 {card && !readOnly && (
                   <div className="card-style-picker">
-                    <h3>Modelo</h3>
-                    <p>O texto «Logo» indica onde ficará o seu logótipo.</p>
+                    <h3>{t('Modelo')}</h3>
+                    <p>
+                      {t('O texto «Logo» indica onde ficará o seu logótipo.')}
+                    </p>
                     <div>
-                      {cardThemes.map((t) => (
+                      {cardThemes.map((theme) => (
                         <button
                           type="button"
-                          key={t.id}
-                          aria-pressed={(design.cardTheme ?? 'plain') === t.id}
+                          key={theme.id}
+                          aria-pressed={
+                            (design.cardTheme ?? 'plain') === theme.id
+                          }
                           onClick={() =>
                             onChange({
                               ...design,
-                              cardTheme: t.id,
+                              cardTheme: theme.id,
                               cardColors: undefined,
                             })
                           }
                         >
                           <span
-                            className={`template-preview ${cardIsPortrait(t.id) ? 'template-portrait' : ''}`}
+                            className={`template-preview ${cardIsPortrait(theme.id) ? 'template-portrait' : ''}`}
                           >
                             <SourceImage
                               alt=""
                               src={cardArtworkUrl(
-                                cardArtwork({ theme: t.id, side: 'front' }),
+                                cardArtwork({ theme: theme.id, side: 'front' }),
                               )}
                             />
                           </span>
-                          {t.name}
+                          {t(theme.name)}
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
                 {card && !readOnly && (
-                  <section className="card-colors" aria-label="Cores do cartão">
+                  <section
+                    className="card-colors"
+                    aria-label={t('Cores do cartão')}
+                  >
                     <div className="color-heading">
-                      <h3>Cores</h3>
+                      <h3>{t('Cores')}</h3>
                       <button
                         type="button"
                         onClick={resetDesign}
-                        title="Remover ficheiros e repor textos e cores de ambos os lados"
+                        title={t(
+                          'Remover ficheiros e repor textos e cores de ambos os lados',
+                        )}
                       >
-                        Repor
+                        {t('Repor')}
                       </button>
                     </div>
-                    <p>Selector de cor ou código HEX.</p>
+                    <p>{t('Selector de cor ou código HEX.')}</p>
                     <p>
-                      Repor remove os ficheiros e as edições de texto e cor dos
-                      dois lados. Mantém o modelo escolhido e o QR do perfil.
+                      {t(
+                        'Repor remove os ficheiros e as edições de texto e cor dos dois lados. Mantém o modelo escolhido e o QR do perfil.',
+                      )}
                     </p>
                     <div className="color-grid">
                       {(
@@ -683,7 +721,7 @@ export function ProductDesigner({
                       ).map(([key, label]) => (
                         <CardColorField
                           key={key}
-                          label={label}
+                          label={t(label)}
                           value={
                             cardPalette(design.cardTheme, design.cardColors)[
                               key
@@ -705,19 +743,22 @@ export function ProductDesigner({
                       ))}
                     </div>
                     <small>
-                      Para um fundo liso, use o mesmo código nas duas cores do
-                      degradé. Imagens e PDFs mantêm as suas cores originais.
+                      {t(
+                        'Para um fundo liso, use o mesmo código nas duas cores do degradé. Imagens e PDFs mantêm as suas cores originais.',
+                      )}
                     </small>
                   </section>
                 )}
               </div>
               <div className="editor-preview">
                 <div className="designer-heading">
-                  <h3>{card ? 'O seu cartão' : 'O seu porta-chaves'}</h3>
+                  <h3>{card ? t('O seu cartão') : t('O seu porta-chaves')}</h3>
                   <p>
                     {card
-                      ? 'Logótipo e marca na frente. Nome, email e QR apenas no verso.'
-                      : 'O verso mantém o logótipo Framy Connect.'}
+                      ? t(
+                          'Logótipo e marca na frente. Nome, email e QR apenas no verso.',
+                        )
+                      : t('O verso mantém o logótipo Framy Connect.')}
                   </p>
                 </div>
                 <div className="designer-layout">
@@ -737,11 +778,11 @@ export function ProductDesigner({
                 </div>
               </div>
               <div className="designer-controls">
-                <strong>Pré-visualização 3D</strong>
+                <strong>{t('Pré-visualização 3D')}</strong>
                 <label>
-                  Rodar
+                  {t('Rodar')}
                   <input
-                    aria-label="Rodar modelo 3D"
+                    aria-label={t('Rodar modelo 3D')}
                     type="range"
                     min="-180"
                     max="180"
@@ -750,7 +791,7 @@ export function ProductDesigner({
                   />
                 </label>
                 <label>
-                  Inclinar
+                  {t('Inclinar')}
                   <input
                     type="range"
                     min="-35"
@@ -770,16 +811,21 @@ export function ProductDesigner({
                         setRotation(s === 'back' ? 180 : -18);
                       }}
                     >
-                      {s === 'front' ? 'Frente' : 'Verso'}
+                      {s === 'front' ? t('Frente') : t('Verso')}
                     </button>
                   ))}
                 </div>
                 {!readOnly && card && (
                   <section
                     className="card-text-fields"
-                    aria-label={`Textos ${side === 'front' ? 'da frente' : 'do verso'}`}
+                    aria-label={t('Textos {0}', [
+                      t(side === 'front' ? 'da frente' : 'do verso'),
+                    ])}
                   >
-                    <h3>Textos · {side === 'front' ? 'Frente' : 'Verso'}</h3>
+                    <h3>
+                      {t('Textos · ')}
+                      {side === 'front' ? t('Frente') : t('Verso')}
+                    </h3>
                     {cardCopyFields(design.cardTheme, side).map((key) => {
                       const defaults = {
                         brand: 'Logo',
@@ -800,7 +846,7 @@ export function ProductDesigner({
                       };
                       return (
                         <label key={key}>
-                          {labels[key]}
+                          {t(labels[key])}
                           <input
                             type="text"
                             value={
@@ -824,8 +870,9 @@ export function ProductDesigner({
                       );
                     })}
                     <small>
-                      A frente apresenta a marca; o verso reúne os contactos e o
-                      QR do perfil.
+                      {t(
+                        'A frente apresenta a marca; o verso reúne os contactos e o QR do perfil.',
+                      )}
                     </small>
                   </section>
                 )}
@@ -833,8 +880,8 @@ export function ProductDesigner({
                   <>
                     <label>
                       {card && side === 'back'
-                        ? 'Design próprio (PDF)'
-                        : 'Logótipo ou design próprio'}
+                        ? t('Design próprio (PDF)')
+                        : t('Logótipo ou design próprio')}
                       <input
                         type="file"
                         accept={
@@ -850,8 +897,12 @@ export function ProductDesigner({
                     </label>
                     <small>
                       {card && side === 'back'
-                        ? 'O logótipo aparece apenas na frente. PDF para design completo · até 8 MB.'
-                        : 'PNG ou JPG substitui «Logo» no local indicado. PDF para design completo · até 8 MB.'}
+                        ? t(
+                            'O logótipo aparece apenas na frente. PDF para design completo · até 8 MB.',
+                          )
+                        : t(
+                            'PNG ou JPG substitui «Logo» no local indicado. PDF para design completo · até 8 MB.',
+                          )}
                     </small>
                     {selected && (
                       <>
@@ -860,7 +911,7 @@ export function ProductDesigner({
                           !selected.name.toLowerCase().endsWith('.pdf') && (
                             <div className="logo-background-controls">
                               <label>
-                                Intensidade da remoção
+                                {t('Intensidade da remoção')}
                                 <input
                                   type="range"
                                   min="0"
@@ -875,7 +926,7 @@ export function ProductDesigner({
                                 type="button"
                                 onClick={() => void removeBackground()}
                               >
-                                Remover fundo
+                                {t('Remover fundo')}
                               </button>
                               {originals[side] && (
                                 <button
@@ -896,19 +947,19 @@ export function ProductDesigner({
                                     }));
                                   }}
                                 >
-                                  Restaurar original
+                                  {t('Restaurar original')}
                                 </button>
                               )}
                               <small>
-                                Para fundos lisos. A remoção é feita neste
-                                dispositivo. Para fundos complexos, use um PNG
-                                transparente.
+                                {t(
+                                  'Para fundos lisos. A remoção é feita neste dispositivo. Para fundos complexos, use um PNG transparente.',
+                                )}
                               </small>
                             </div>
                           )}
                         {selected.name.toLowerCase().endsWith('.pdf') && (
                           <label>
-                            Página do PDF
+                            {t('Página do PDF')}
                             <input
                               type="number"
                               min="1"
@@ -923,10 +974,10 @@ export function ProductDesigner({
                         {(['scale', 'x', 'y'] as const).map((k) => (
                           <label key={k}>
                             {k === 'scale'
-                              ? 'Tamanho'
+                              ? t('Tamanho')
                               : k === 'x'
-                                ? 'Posição horizontal'
-                                : 'Posição vertical'}
+                                ? t('Posição horizontal')
+                                : t('Posição vertical')}
                             <input
                               type="range"
                               min={k === 'scale' ? 20 : -40}
@@ -948,7 +999,7 @@ export function ProductDesigner({
                             onChange({ ...design, [side]: undefined })
                           )}
                         >
-                          Remover ficheiro
+                          {t('Remover ficheiro')}
                         </button>
                       </>
                     )}
@@ -958,24 +1009,24 @@ export function ProductDesigner({
             </div>
             <details className="print-disclosure">
               <summary>
-                Arte para impressão{' '}
+                {t('Arte para impressão')}{' '}
                 <span>
                   {card
                     ? portrait
-                      ? '54 × 85,5 mm'
-                      : '85,5 × 54 mm'
-                    : 'Ø 28 mm'}{' '}
-                  · Ver 2D e descarregar
+                      ? t('54 × 85,5 mm')
+                      : t('85,5 × 54 mm')
+                    : t('Ø 28 mm')}{' '}
+                  {t('· Ver 2D e descarregar')}
                 </span>
               </summary>
               <div className="flat-designs">
                 <figure>
                   {face('front', true)}
-                  <figcaption>Frente</figcaption>
+                  <figcaption>{t('Frente')}</figcaption>
                 </figure>
                 <figure>
                   {face('back', true)}
-                  <figcaption>Verso</figcaption>
+                  <figcaption>{t('Verso')}</figcaption>
                 </figure>
               </div>
               <button
@@ -987,25 +1038,27 @@ export function ProductDesigner({
                   )
                 }
               >
-                Descarregar vista 2D ({side === 'front' ? 'frente' : 'verso'})
+                {t('Descarregar vista 2D (')}
+                {side === 'front' ? t('frente') : t('verso')})
               </button>
               <p className="muted">
-                Exportação à escala de 300 ppp, sem sangria. Confirmar margens e
-                acabamento com a gráfica. A prévia é ilustrativa.
+                {t(
+                  'Exportação à escala de 300 ppp, sem sangria. Confirmar margens e acabamento com a gráfica. A prévia é ilustrativa.',
+                )}
               </p>
             </details>
           </>
         )}
         {readOnly && !custom && (
           <p>
-            Modelo:{' '}
+            {t('Modelo:')}{' '}
             {keychainChoices.find((c) => c.id === design.optionId)?.name ??
               design.optionId}
           </p>
         )}
-        {processing && <output>A processar o logótipo…</output>}
+        {processing && <output>{t('A processar o logótipo…')}</output>}
       </fieldset>
-      {error && <p role="alert">{error}</p>}
+      {error && <p role="alert">{t(error)}</p>}
     </div>
   );
 }
@@ -1019,6 +1072,7 @@ function CardColorField({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const { t } = useI18n();
   const [hex, setHex] = useState(value);
   const [previous, setPrevious] = useState(value);
   if (previous !== value) {
@@ -1038,17 +1092,17 @@ function CardColorField({
   const valid = /^#[0-9a-f]{6}$/i.test(normalise(hex));
   return (
     <div className="card-color-field">
-      <span>{label}</span>
+      <span>{t(label)}</span>
       <div>
         <input
           type="color"
-          aria-label={`${label}: seleccionar cor`}
+          aria-label={t('{0}: seleccionar cor', [label])}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
         <input
           type="text"
-          aria-label={`${label}: código HEX`}
+          aria-label={t('{0}: código HEX', [label])}
           value={hex}
           maxLength={7}
           spellCheck={false}
@@ -1065,10 +1119,10 @@ function CardColorField({
               onChange(next);
             }
           }}
-          placeholder="#FF6600"
+          placeholder={t('#FF6600')}
         />
       </div>
-      {!valid && <output>Use 3 ou 6 caracteres: 0–9 e A–F.</output>}
+      {!valid && <output>{t('Use 3 ou 6 caracteres: 0–9 e A–F.')}</output>}
     </div>
   );
 }

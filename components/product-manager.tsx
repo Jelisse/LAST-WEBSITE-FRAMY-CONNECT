@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { SourceImage } from '@/components/source-image';
 import { useEffect, useState } from 'react';
 import type { Product } from '@/lib/catalog';
@@ -9,6 +11,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 
 export function ProductManager({ onSaved }: { onSaved?: () => void }) {
+  const { t } = useI18n();
   const [items, setItems] = useState<Product[]>([]),
     [draft, setDraft] = useState<Product | null>(null),
     [error, setError] = useState(''),
@@ -143,12 +146,14 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
             })
           }
         >
-          Novo produto
+          {t('Novo produto')}
         </Button>
         <div>
-          <h2 id="product-management-title">Gestão de produtos</h2>
+          <h2 id="product-management-title">{t('Gestão de produtos')}</h2>
           <p className="muted">
-            Edite o catálogo apresentado no site. Valores em meticais (MZN).
+            {t(
+              'Edite o catálogo apresentado no site. Valores em meticais (MZN).',
+            )}
           </p>
         </div>
         <Button
@@ -156,23 +161,23 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
           onClick={() => void load()}
           disabled={busy || loading || !!draft}
         >
-          Actualizar
+          {t('Actualizar')}
         </Button>
       </header>
-      {notice && <output className="product-save-notice">{notice}</output>}
+      {notice && <output className="product-save-notice">{t(notice)}</output>}
       {error && (
         <p role="alert" className="product-save-error">
-          {error}
+          {t(error)}
         </p>
       )}
       {loading ? (
-        <p>A carregar…</p>
+        <p>{t('A carregar…')}</p>
       ) : draft ? (
         <form onSubmit={save} className="product-management-form">
           <div className="product-image-editor">
             <SourceImage src={draft.imageUrl} alt={draft.name} />
             <label>
-              Adicionar fotografias
+              {t('Adicionar fotografias')}
               <input
                 type="file"
                 multiple
@@ -181,7 +186,9 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                 onChange={(e) => void upload(Array.from(e.target.files ?? []))}
               />
             </label>
-            <small>Até 8 fotografias. PNG, JPG ou WebP, até 8 MB cada.</small>
+            <small>
+              {t('Até 8 fotografias. PNG, JPG ou WebP, até 8 MB cada.')}
+            </small>
             <div className="gallery-editor">
               {(draft.images ?? [draft.imageUrl]).map((src, i) => (
                 <div key={src}>
@@ -200,7 +207,9 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                       })
                     }
                   >
-                    {src === draft.imageUrl ? 'Principal' : 'Tornar principal'}
+                    {src === draft.imageUrl
+                      ? t('Principal')
+                      : t('Tornar principal')}
                   </button>
                   <button
                     type="button"
@@ -217,7 +226,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                       });
                     }}
                   >
-                    Retirar
+                    {t('Retirar')}
                   </button>
                 </div>
               ))}
@@ -226,7 +235,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
           <fieldset disabled={busy}>
             <div className="product-fields">
               <label htmlFor="field-componentsproductmanagertsx-0">
-                Nome
+                {t('Nome')}
                 <Input
                   id="field-componentsproductmanagertsx-0"
                   required
@@ -236,7 +245,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                 />
               </label>
               <label>
-                Categoria
+                {t('Categoria')}
                 <select
                   value={draft.category}
                   onChange={(e) =>
@@ -252,7 +261,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                 htmlFor="field-componentsproductmanagertsx-1"
                 className="product-field-wide"
               >
-                Frase curta
+                {t('Frase curta')}
                 <Input
                   id="field-componentsproductmanagertsx-1"
                   required
@@ -264,7 +273,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                 />
               </label>
               <label className="product-field-wide">
-                Descrição
+                {t('Descrição')}
                 <textarea
                   required
                   maxLength={2000}
@@ -276,7 +285,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                 />
               </label>
               <label htmlFor="field-componentsproductmanagertsx-2">
-                Preço (MZN)
+                {t('Preço (MZN)')}
                 <Input
                   id="field-componentsproductmanagertsx-2"
                   required
@@ -286,7 +295,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                 />
               </label>
               <label htmlFor="field-componentsproductmanagertsx-3">
-                Custo interno (MZN)
+                {t('Custo interno (MZN)')}
                 <Input
                   id="field-componentsproductmanagertsx-3"
                   required
@@ -296,7 +305,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                 />
               </label>
               <label htmlFor="field-componentsproductmanagertsx-4">
-                Público
+                {t('Público')}
                 <Input
                   id="field-componentsproductmanagertsx-4"
                   required
@@ -315,7 +324,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                     setDraft({ ...draft, published: e.target.checked })
                   }
                 />
-                Publicado no catálogo
+                {t('Publicado no catálogo')}
               </label>
               <label className="product-availability">
                 <input
@@ -325,24 +334,24 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                     setDraft({ ...draft, available: e.target.checked })
                   }
                 />
-                Vendas activas
+                {t('Vendas activas')}
               </label>
             </div>
             <p className="muted">
-              Publicado e sem vendas: aparece como Brevemente, sem preço. Não
-              publicado: fica oculto. Para vender, active as vendas, defina o
-              preço e registe stock em Operações.
+              {t(
+                'Publicado e sem vendas: aparece como Brevemente, sem preço. Não publicado: fica oculto. Para vender, active as vendas, defina o preço e registe stock em Operações.',
+              )}
             </p>
             <div className="product-form-actions">
               <Button type="submit">
-                {busy ? 'A guardar…' : 'Guardar produto'}
+                {busy ? t('A guardar…') : t('Guardar produto')}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setDraft(null)}
               >
-                Cancelar
+                {t('Cancelar')}
               </Button>
             </div>
           </fieldset>
@@ -351,19 +360,19 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
         <div className="managed-products">
           {items.map((p) => (
             <article key={p.id}>
-              <SourceImage src={p.imageUrl} alt={p.name} />
+              <SourceImage src={p.imageUrl} alt={t(p.name)} />
               <div>
-                <h3>{p.name}</h3>
+                <h3>{t(p.name)}</h3>
                 <p>
                   {p.published === false
-                    ? 'Oculto'
+                    ? t('Oculto')
                     : p.available
-                      ? money(p.amount)
-                      : 'Brevemente'}
+                      ? money(p.amount, t.locale)
+                      : t('Brevemente')}
                 </p>
               </div>
               <Button variant="outline" onClick={() => edit(p)}>
-                Editar
+                {t('Editar')}
               </Button>
             </article>
           ))}

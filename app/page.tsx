@@ -1,3 +1,5 @@
+import { getTranslations } from '@/lib/server-i18n';
+import { LanguageSelector } from '@/components/language-provider';
 import { planMeticais, planPrice } from '@/lib/plan-pricing';
 import { publicPageRobots } from '@/lib/server-site';
 import { SourceImage } from '@/components/source-image';
@@ -81,6 +83,7 @@ const questions = [
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: publicPageRobots() };
 export default async function Home() {
+  const t = await getTranslations();
   const [products, allPlans] = await Promise.all([
     getProducts(),
     getManagedPlans(),
@@ -95,26 +98,31 @@ export default async function Home() {
   return (
     <div className="framy-home">
       <header className="home-nav">
-        <Link href="/" aria-label="Framy Connect — início">
+        <Link href="/" aria-label={t('Framy Connect — início')}>
           <Image
             src="/brand/logo.svg"
-            alt="Framy Connect"
+            alt={t('Framy Connect')}
             width={220}
             height={100}
             unoptimized
             className="home-brand"
           />
         </Link>
-        <nav aria-label="Navegação principal">
-          <a href="#como-funciona">Como funciona</a>
-          <a href="#produtos">Produtos</a>
-          <a href="#planos">Planos</a>
-          <a href="#sobre">Sobre nós</a>
+        <nav aria-label={t('Navegação principal')}>
+          <a href="#como-funciona">{t('Como funciona')}</a>
+          <a href="#produtos">{t('Produtos')}</a>
+          <a href="#planos">{t('Planos')}</a>
+          <a href="#sobre">{t('Sobre nós')}</a>
         </nav>
         <div className="home-nav-actions">
+          <LanguageSelector />
+          <Link className="home-agent" href="/aplicar">
+            {t('Tornar-se agente')}
+          </Link>
           <AccountMenu className="home-account" />
           <Link className="home-buy" href="/produtos">
-            Ver produtos <ArrowUpRight size={16} />
+            {t('Ver produtos ')}
+            <ArrowUpRight size={16} />
           </Link>
         </div>
       </header>
@@ -123,70 +131,68 @@ export default async function Home() {
           <div className="home-hero-inner">
             <div className="home-hero-copy">
               <h1>
-                O Seu Mundo,
+                {t('O Seu Mundo,')}
                 <br />
-                Num Toque.
+                {t('Num Toque.')}
               </h1>
               <p className="home-offer">
-                Cartões e acessórios NFC que partilham o seu perfil digital por
-                toque ou QR.
+                {t(
+                  'Cartões e acessórios NFC que partilham o seu perfil digital por toque ou QR.',
+                )}
               </p>
               <p>
-                Os seus contactos, redes sociais e trabalho num só lugar.
-                Escolha o formato que o acompanha e actualize o perfil sempre
-                que precisar.
+                {t(
+                  'Os seus contactos, redes sociais e trabalho num só lugar. Escolha o formato que o acompanha e actualize o perfil sempre que precisar.',
+                )}
               </p>
               <div className="home-hero-actions">
                 <Link className="home-primary" href="/produtos">
-                  Escolher o meu produto <ArrowUpRight size={18} />
+                  {t('Escolher o meu produto ')}
+                  <ArrowUpRight size={18} />
                 </Link>
                 <a className="home-secondary" href="#como-funciona">
-                  Como funciona <Nfc size={19} />
+                  {t('Como funciona ')}
+                  <Nfc size={19} />
                 </a>
               </div>
               <div className="home-hero-benefits">
                 <span>
                   <Nfc />
-                  Toque ou QR
+                  {t('Toque ou QR')}
                 </span>
                 <span>
                   <Smartphone />
-                  Abre no navegador
+                  {t('Abre no navegador')}
                 </span>
                 <span>
                   <RefreshCw />
-                  Perfil actualizável
+                  {t('Perfil actualizável')}
                 </span>
               </div>
             </div>
             <HomeHeroScene />
           </div>
         </section>
-        <section className="home-agent-callout">
-          <div>
-            <h2>Faça parte da equipa Framy.</h2>
-            <p>Apresente a sua actividade e candidate-se a agente.</p>
-          </div>
-          <Link className="home-primary" href="/aplicar">
-            Tornar-se agente <ArrowUpRight size={18} />
-          </Link>
-        </section>
         <HomeSharingScene />
         <section className="home-products" id="produtos">
           <div className="home-section-heading">
             <div>
-              <h2>Um formato para o seu dia.</h2>
+              <h2>{t('Um formato para o seu dia.')}</h2>
               <p>
-                Explore os produtos em destaque e encontre o seu próximo toque.
+                {t(
+                  'Explore os produtos em destaque e encontre o seu próximo toque.',
+                )}
               </p>
             </div>
             <Link className="home-text-link" href="/produtos">
-              Ver todos os produtos <ArrowUpRight size={18} />
+              {t('Ver todos os produtos ')}
+              <ArrowUpRight size={18} />
             </Link>
           </div>
           <p className="home-disclosure">
-            Porta-chaves NFC disponíveis. Os restantes produtos chegam
-            brevemente.
+            {t(
+              'Porta-chaves NFC disponíveis. Os restantes produtos chegam brevemente.',
+            )}
           </p>
           <div className="home-products-grid">
             {featured.map((p) => (
@@ -205,15 +211,15 @@ export default async function Home() {
                   />
                 </div>
                 <div className="home-product-copy">
-                  <h3>{productNames[p.name] ?? p.name}</h3>
-                  <p>{p.tagline}</p>
+                  <h3>{t(productNames[p.name] ?? p.name)}</h3>
+                  <p>{t(p.tagline)}</p>
                   <strong className="home-product-price">
-                    {p.available ? money(p.amount) : 'Brevemente'}
+                    {p.available ? money(p.amount, t.locale) : t('Brevemente')}
                   </strong>
                   <span className="home-product-status">
                     {p.available
-                      ? 'Produto físico · disponível para encomenda'
-                      : 'Brevemente · compra ainda indisponível'}
+                      ? t('Produto físico · disponível para encomenda')
+                      : t('Brevemente · compra ainda indisponível')}
                   </span>
                   <ArrowUpRight size={18} />
                 </div>
@@ -224,32 +230,40 @@ export default async function Home() {
         <section className="home-plans" id="planos">
           <div className="home-section-heading">
             <div>
-              <h2>Mais espaço para o seu perfil.</h2>
+              <h2>{t('Mais espaço para o seu perfil.')}</h2>
               <p>
-                Planos digitais mensais em meticais. Compare o número de links e o
-                espaço de apresentação.
+                {t(
+                  'Planos digitais mensais em meticais. Compare o número de links e o espaço de apresentação.',
+                )}
               </p>
             </div>
           </div>
           <p className="home-disclosure">
-            Comece com 30 dias gratuitos, sem renovação automática. Os planos
-            mensais ainda não aceitam adesões. O produto físico é pago separadamente.
+            {t(
+              'Comece com 30 dias gratuitos, sem renovação automática. Os planos mensais ainda não aceitam adesões. O produto físico é pago separadamente.',
+            )}
           </p>
           <div className="home-plans-grid">
             {plans.map((p) => (
               <article className="home-plan" key={p.id}>
-                <h3>{p.name}</h3>
-                <p>{p.description}</p>
+                <h3>{t(p.name)}</h3>
+                <p>{t(p.description)}</p>
                 <div className="home-plan-price">
-                  {planPrice(p)}
-                  <span>{p.id === 'free-30' ? ' / 30 dias' : ' / mês'}</span>
+                  {planPrice(p, t.locale)}
+                  <span>
+                    {p.id === 'free-30' ? t(' / 30 dias') : t(' / mês')}
+                  </span>
                 </div>
                 <ul>
-                  <li>Até {p.links} links no perfil</li>
+                  <li>
+                    {t('Até ')}
+                    {p.links}
+                    {t(' links no perfil')}
+                  </li>
                   <li>
                     {p.bio > 0
-                      ? `Biografia até ${p.bio} caracteres`
-                      : 'Contactos essenciais, sem biografia'}
+                      ? t('Biografia até {0} caracteres', [p.bio])
+                      : t('Contactos essenciais, sem biografia')}
                   </li>
                 </ul>
               </article>
@@ -257,85 +271,90 @@ export default async function Home() {
           </div>
           {plans.length === 0 ? (
             <p>
-              Os planos estão a ser actualizados. Contacte-nos para mais
-              informações.
+              {t(
+                'Os planos estão a ser actualizados. Contacte-nos para mais informações.',
+              )}
             </p>
           ) : (
             <Link className="home-text-link" href="/perfil?plans=1">
-              Explorar planos na minha conta <ArrowUpRight size={18} />
+              {t('Explorar planos na minha conta ')}
+              <ArrowUpRight size={18} />
             </Link>
           )}
         </section>
         <section className="home-audience" id="quem-atendemos">
-          <h2>Uma conexão à sua medida.</h2>
+          <h2>{t('Uma conexão à sua medida.')}</h2>
           <div className="home-audience-grid">
             {audiences.map(([name, text]) => (
               <article className="home-audience-card" key={name}>
-                <h3>{name}</h3>
-                <p>{text}</p>
+                <h3>{t(name)}</h3>
+                <p>{t(text)}</p>
               </article>
             ))}
           </div>
         </section>
         <section className="home-about" id="sobre">
           <h2>
-            Quem somos<span aria-hidden="true">.</span>
+            {t('Quem somos')}
+            <span aria-hidden="true">.</span>
           </h2>
           <div className="home-about-content">
             <p className="home-about-intro">
-              A Framy Connect transforma cartões, etiquetas e pulseiras em
-              identidades digitais instantâneas. Com um simples toque, pessoas e
-              organizações podem partilhar e comprovar quem são, o que
-              conquistaram e o que representam, de forma simples, confiável e
-              acessível.
+              {t(
+                'A Framy Connect transforma cartões, etiquetas e pulseiras em identidades digitais instantâneas. Com um simples toque, pessoas e organizações podem partilhar e comprovar quem são, o que conquistaram e o que representam, de forma simples, confiável e acessível.',
+              )}
             </p>
             <div className="home-purpose-grid">
               <article>
                 <span className="home-purpose-icon">
                   <Eye />
                 </span>
-                <h3>Visão</h3>
+                <h3>{t('Visão')}</h3>
                 <p>
-                  Fazer do toque a linguagem universal da identidade, para cada
-                  pessoa e cada instituição à qual pertencem.
+                  {t(
+                    'Fazer do toque a linguagem universal da identidade, para cada pessoa e cada instituição à qual pertencem.',
+                  )}
                 </p>
               </article>
               <article>
                 <span className="home-purpose-icon">
                   <Target />
                 </span>
-                <h3>Missão</h3>
+                <h3>{t('Missão')}</h3>
                 <p>
-                  Transformar cada toque numa conexão de confiança, tornando
-                  identidades, conquistas e pertenças instantaneamente
-                  acessíveis, verificáveis e universais.
+                  {t(
+                    'Transformar cada toque numa conexão de confiança, tornando identidades, conquistas e pertenças instantaneamente acessíveis, verificáveis e universais.',
+                  )}
                 </p>
               </article>
             </div>
           </div>
         </section>
         <section className="home-faq" id="perguntas">
-          <h2>Antes do primeiro toque.</h2>
+          <h2>{t('Antes do primeiro toque.')}</h2>
           <div>
             {questions.map(([q, a]) => (
               <details key={q}>
-                <summary>{q}</summary>
-                <p>{a}</p>
+                <summary>{t(q)}</summary>
+                <p>{t(a)}</p>
               </details>
             ))}
           </div>
           <Link className="home-text-link" href="/contacto">
-            Falar com a Framy <ArrowUpRight size={18} />
+            {t('Falar com a Framy ')}
+            <ArrowUpRight size={18} />
           </Link>
         </section>
         <section className="home-how" id="primeiros-passos">
-          <h2>Pronto para a próxima conexão?</h2>
+          <h2>{t('Pronto para a próxima conexão?')}</h2>
           <p>
-            Escolha o seu produto. Depois, seleccione o plano e personalize o
-            seu perfil.
+            {t(
+              'Escolha o seu produto. Depois, seleccione o plano e personalize o seu perfil.',
+            )}
           </p>
           <Link className="home-primary" href="/produtos">
-            Escolher o meu produto <ArrowUpRight size={18} />
+            {t('Escolher o meu produto ')}
+            <ArrowUpRight size={18} />
           </Link>
         </section>
       </main>

@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useEffect, useState } from 'react';
 import { SourceImage } from './source-image';
 export function ProductGallery({
@@ -10,6 +12,7 @@ export function ProductGallery({
   name: string;
   images: string[];
 }) {
+  const { t } = useI18n();
   const [selected, setSelected] = useState(0);
   useEffect(() => {
     let session = '';
@@ -30,17 +33,20 @@ export function ProductGallery({
     <div className="product-gallery">
       <SourceImage
         src={images[selected] || images[0]}
-        alt={`${name} — fotografia ${selected + 1}`}
+        alt={t('{0} — fotografia {1}', [name, selected + 1])}
         width={1254}
         height={1254}
       />
       {images.length > 1 && (
-        <div className="gallery-thumbnails" aria-label="Fotografias do produto">
+        <div
+          className="gallery-thumbnails"
+          aria-label={t('Fotografias do produto')}
+        >
           {images.map((src, i) => (
             <button
               type="button"
               key={src}
-              aria-label={`Ver fotografia ${i + 1}`}
+              aria-label={t('Ver fotografia {0}', [i + 1])}
               aria-pressed={i === selected}
               onClick={() => setSelected(i)}
             >

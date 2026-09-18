@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { planPrice } from '@/lib/plan-pricing';
 
 import { SourceImage } from '@/components/source-image';
@@ -44,6 +46,7 @@ export function OrderSubmission({
   plans: ManagedPlan[];
   account: { id: string; name: string } | null;
 }) {
+  const { t } = useI18n();
   const key = 'framy-checkout:' + (account?.id ?? 'visitor') + ':' + product.id;
   const [step, setStep] = useState(0),
     [planId, setPlanId] = useState(FREE_PLAN_ID),
@@ -301,15 +304,19 @@ export function OrderSubmission({
       setBusy(false);
     }
   }
-  if (!ready) return <output>A recuperar o seu percurso…</output>;
+  if (!ready) return <output>{t('A recuperar o seu percurso…')}</output>;
   if (done)
     return (
       <section className="panel">
-        <h1>Pedido registado.</h1>
-        <p>Referência: {orderId}</p>
+        <h1>{t('Pedido registado.')}</h1>
         <p>
-          O produto, plano, perfil e local de entrega estão associados ao seu
-          pedido. Nenhuma cobrança foi efectuada. O pagamento continua pendente.
+          {t('Referência: ')}
+          {orderId}
+        </p>
+        <p>
+          {t(
+            'O produto, plano, perfil e local de entrega estão associados ao seu pedido. Nenhuma cobrança foi efectuada. O pagamento continua pendente.',
+          )}
         </p>
         <OrderPayment orderId={orderId} />
         <button
@@ -322,28 +329,28 @@ export function OrderSubmission({
             setStep(0);
           }}
         >
-          Fazer outra encomenda
+          {t('Fazer outra encomenda')}
         </button>
         <Link className="btn btn-primary" href={'/dashboard?order=' + orderId}>
-          Acompanhar o pedido
+          {t('Acompanhar o pedido')}
         </Link>
         <Link className="btn" href={'/' + profile.username}>
-          Abrir o meu perfil
+          {t('Abrir o meu perfil')}
         </Link>
       </section>
     );
   return (
     <div className="purchase-flow">
-      <h1>O seu próximo toque.</h1>
+      <h1>{t('O seu próximo toque.')}</h1>
       <p className="muted">
-        {step === 0 ? 'Escolha o modelo ou crie o seu design. ' : ''}
+        {step === 0 ? t('Escolha o modelo ou crie o seu design. ') : ''}
         {account
-          ? 'O progresso fica guardado durante esta sessão do navegador.'
-          : 'Pode guardar a sua escolha e continuar com a conta.'}
+          ? t('O progresso fica guardado durante esta sessão do navegador.')
+          : t('Pode guardar a sua escolha e continuar com a conta.')}
       </p>
       <ol className="purchase-steps">
         {steps.map((s, i) => (
-          <li key={s} aria-current={step === i ? 'step' : undefined}>
+          <li key={t(s)} aria-current={step === i ? 'step' : undefined}>
             <button
               disabled={busy || i > step}
               onClick={() => {
@@ -351,20 +358,23 @@ export function OrderSubmission({
                 setError('');
               }}
             >
-              {i + 1}. {s}
+              {i + 1}. {t(s)}
             </button>
           </li>
         ))}
       </ol>
       <div className="purchase-layout">
         <section className="panel">
-          <h2>{steps[step]}</h2>
+          <h2>{t(steps[step])}</h2>
           {step === 0 && (
             <>
-              <h3>{product.name}</h3>
-              <p>{product.description}</p>
-              <strong>{money(product.amount)} · 1 unidade</strong>
-              <p>Preço do produto físico. Entrega a confirmar.</p>
+              <h3>{t(product.name)}</h3>
+              <p>{t(product.description)}</p>
+              <strong>
+                {money(product.amount, t.locale)}
+                {t(' · 1 unidade')}
+              </strong>
+              <p>{t('Preço do produto físico. Entrega a confirmar.')}</p>
               {supportsDesign(product) ? (
                 <ProductDesigner
                   product={product}
@@ -377,17 +387,18 @@ export function OrderSubmission({
                 <SourceImage
                   className="purchase-product"
                   src={product.imageUrl}
-                  alt={product.name}
+                  alt={t(product.name)}
                 />
               )}
-              <Link href="/produtos">Escolher outro produto</Link>
+              <Link href="/produtos">{t('Escolher outro produto')}</Link>
             </>
           )}
           {step === 1 && (
             <>
               <p>
-                Comece com 30 dias grátis. Os restantes planos estão em breve
-                disponíveis.
+                {t(
+                  'Comece com 30 dias grátis. Os restantes planos estão em breve disponíveis.',
+                )}
               </p>
               <div className="purchase-plans">
                 {plans.map((p) => (
@@ -401,11 +412,17 @@ export function OrderSubmission({
                     />
                     <strong>
                       {p.id === FREE_PLAN_ID
-                        ? '30 dias grátis · 0 MT'
-                        : `${p.name} · ${planPrice(p)}/mês · Em breve`}
+                        ? t('30 dias grátis · 0 MT')
+                        : t('{0} · {1}/mês · Em breve', [
+                            t(p.name),
+                            planPrice(p, t.locale),
+                          ])}
                     </strong>
                     <span>
-                      Até {p.links} links · {p.description}
+                      {t('Até ')}
+                      {p.links}
+                      {t(' links · ')}
+                      {t(p.description)}
                     </span>
                   </label>
                 ))}
@@ -415,13 +432,16 @@ export function OrderSubmission({
           {step === 2 &&
             (account ? (
               <p>
-                Ligado como <strong>{account.name}</strong>. O perfil e o pedido
-                ficam associados à sua conta.
+                {t('Ligado como ')}
+                <strong>{account.name}</strong>
+                {t('. O perfil e o pedido ficam associados à sua conta.')}
               </p>
             ) : (
               <>
                 <p>
-                  Guarde o seu perfil e acompanhe o pedido com acesso seguro.
+                  {t(
+                    'Guarde o seu perfil e acompanhe o pedido com acesso seguro.',
+                  )}
                 </p>
                 <a
                   className="btn btn-primary"
@@ -430,7 +450,7 @@ export function OrderSubmission({
                     encodeURIComponent('/encomendar/' + product.id)
                   }
                 >
-                  Entrar
+                  {t('Entrar')}
                 </a>
                 <a
                   className="btn btn-outline"
@@ -439,11 +459,12 @@ export function OrderSubmission({
                     encodeURIComponent('/encomendar/' + product.id)
                   }
                 >
-                  Criar conta
+                  {t('Criar conta')}
                 </a>
                 <p>
-                  Entre ou crie uma conta com email e palavra-passe. A sua
-                  escolha de produto e plano será mantida no regresso.
+                  {t(
+                    'Entre ou crie uma conta com email e palavra-passe. A sua escolha de produto e plano será mantida no regresso.',
+                  )}
                 </p>
               </>
             ))}
@@ -457,7 +478,7 @@ export function OrderSubmission({
                   onUploading={setUploading}
                 />
                 <label>
-                  Nome completo *
+                  {t('Nome completo *')}
                   <input
                     value={profile.name}
                     onChange={(e) =>
@@ -467,7 +488,7 @@ export function OrderSubmission({
                   />
                 </label>
                 <label>
-                  Profissão ou título (opcional)
+                  {t('Profissão ou título (opcional)')}
                   <input
                     value={profile.title}
                     onChange={(e) =>
@@ -476,12 +497,13 @@ export function OrderSubmission({
                   />
                 </label>
                 <p>
-                  O endereço será criado a partir do seu nome. Fotografia e
-                  links podem ser completados mais tarde.
+                  {t(
+                    'O endereço será criado a partir do seu nome. Fotografia e links podem ser completados mais tarde.',
+                  )}
                 </p>
                 {product.category === 'Cartões' && (
                   <label>
-                    Email a imprimir no cartão *
+                    {t('Email a imprimir no cartão *')}
                     <input
                       type="email"
                       value={profile.email}
@@ -490,7 +512,7 @@ export function OrderSubmission({
                       }
                       required
                     />
-                    <small>Este email será impresso no cartão.</small>
+                    <small>{t('Este email será impresso no cartão.')}</small>
                   </label>
                 )}
                 <ProfileLinksEditor
@@ -510,19 +532,19 @@ export function OrderSubmission({
           {step === 4 && (
             <>
               <label>
-                Cidade / localidade de entrega *
+                {t('Cidade / localidade de entrega *')}
                 <input
                   required
                   minLength={2}
                   maxLength={90}
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  placeholder="Maputo, Matola, Beira, Nhamatanda…"
+                  placeholder={t('Maputo, Matola, Beira, Nhamatanda…')}
                   autoComplete="address-level2"
                 />
               </label>
               <label>
-                Bairro ou ponto de referência (opcional)
+                {t('Bairro ou ponto de referência (opcional)')}
                 <textarea
                   maxLength={300}
                   value={address}
@@ -531,7 +553,7 @@ export function OrderSubmission({
                 />
               </label>
               <label>
-                Telefone de contacto para entrega *
+                {t('Telefone de contacto para entrega *')}
                 <input
                   type="tel"
                   maxLength={40}
@@ -541,26 +563,32 @@ export function OrderSubmission({
                 />
               </label>
               <p>
-                Estes dados são privados e destinam-se à organização da entrega.
+                {t(
+                  'Estes dados são privados e destinam-se à organização da entrega.',
+                )}
               </p>
             </>
           )}
           {step === 5 && (
             <>
-              <h3>Confira antes de submeter</h3>
+              <h3>{t('Confira antes de submeter')}</h3>
               <p>
                 {profile.name} · /{profile.username}
               </p>
               <p>
-                Entrega: {city}
+                {t('Entrega: ')}
+                {city}
                 {address ? ' — ' + address : ''}
                 <br />
-                Contacto: {contact}
+                {t('Contacto: ')}
+                {contact}
               </p>
               <p>
-                Produto: <strong>{money(product.amount)}</strong>. O pedido fica
-                a aguardar pagamento. O plano digital é gratuito durante 30
-                dias, sem renovação automática. Entrega a confirmar.
+                {t('Produto: ')}
+                <strong>{money(product.amount, t.locale)}</strong>
+                {t(
+                  '. O pedido fica a aguardar pagamento. O plano digital é gratuito durante 30 dias, sem renovação automática. Entrega a confirmar.',
+                )}
               </p>
               {supportsDesign(product) && (
                 <ProductDesigner
@@ -578,13 +606,13 @@ export function OrderSubmission({
                   checked={approved}
                   onChange={(e) => setApproved(e.target.checked)}
                 />
-                Aprovo a publicação do meu perfil e do respectivo link para
-                codificação e aprovo o modelo e o design de impressão
-                apresentados.
+                {t(
+                  'Aprovo a publicação do meu perfil e do respectivo link para codificação e aprovo o modelo e o design de impressão apresentados.',
+                )}
               </label>
             </>
           )}
-          {error && <p role="alert">{error}</p>}
+          {error && <p role="alert">{t(error)}</p>}
           <div className="purchase-actions">
             {step > 0 && (
               <button
@@ -592,7 +620,7 @@ export function OrderSubmission({
                 disabled={busy}
                 onClick={() => setStep(step - 1)}
               >
-                Voltar
+                {t('Voltar')}
               </button>
             )}
             {step < 5 ? (
@@ -601,7 +629,7 @@ export function OrderSubmission({
                 disabled={busy || uploading || (step === 2 && !account)}
                 onClick={next}
               >
-                {busy ? 'A guardar…' : 'Guardar e continuar'}
+                {busy ? t('A guardar…') : t('Guardar e continuar')}
               </button>
             ) : (
               <button
@@ -609,26 +637,28 @@ export function OrderSubmission({
                 disabled={busy || uploading || !approved}
                 onClick={finish}
               >
-                {busy ? 'A confirmar…' : 'Confirmar pedido'}
+                {busy ? t('A confirmar…') : t('Confirmar pedido')}
               </button>
             )}
           </div>
         </section>
         <aside className="panel purchase-summary">
-          <h2>O seu pedido</h2>
-          <p>{product.name}</p>
-          <strong>{money(product.amount)}</strong>
+          <h2>{t('O seu pedido')}</h2>
+          <p>{t(product.name)}</p>
+          <strong>{money(product.amount, t.locale)}</strong>
           {supportsDesign(product) && (
             <p>
-              {keychainChoices.find((c) => c.id === design.optionId)?.name ??
-                'Personalizado'}
+              {t(
+                keychainChoices.find((c) => c.id === design.optionId)?.name ??
+                  'Personalizado',
+              )}
             </p>
           )}
-          {step > 0 && <p>Plano: 30 dias grátis · 0 MT</p>}
-          <p>Entrega: a confirmar</p>
+          {step > 0 && <p>{t('Plano: 30 dias grátis · 0 MT')}</p>}
+          <p>{t('Entrega: a confirmar')}</p>
           <hr />
-          <p>Preço por unidade. A entrega é confirmada separadamente.</p>
-          <Link href="/contacto">Precisa de ajuda?</Link>
+          <p>{t('Preço por unidade. A entrega é confirmada separadamente.')}</p>
+          <Link href="/contacto">{t('Precisa de ajuda?')}</Link>
         </aside>
       </div>
     </div>

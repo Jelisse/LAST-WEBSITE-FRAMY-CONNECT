@@ -2,7 +2,7 @@ import { publicError } from '@/lib/public-error';
 import { serviceFailure } from '@/lib/service-failure';
 import { expireReservations } from '@/lib/server-reservations';
 import { validatePaymentEvidence } from '@/lib/payment-policy';
-import { agentTransition } from '@/lib/agent-workflow';
+import { agentTransition, approvedAgentUrl } from '@/lib/agent-workflow';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { canManageOrders } from '@/lib/server-order-access';
 import { database } from '@/lib/server-db';
@@ -16,7 +16,7 @@ async function authorized() {
   const user = await getChatGPTUser();
   return user && (await canManageOrders(user.userId)) ? user : null;
 }
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await authorized();
     if (!user) return json({ error: 'Acesso reservado ao Manager.' }, 403);
@@ -54,7 +54,15 @@ export async function GET() {
       orders: orders.results.map((r) => ({
         ...JSON.parse(r.data_json),
         ownerId: r.owner_id,
-        profileUsername: r.username,
+        profileUsername: JSON.parse(r.data_json).profileUsername ?? r.username,
+        approvedUrl: approvedAgentUrl(
+          {
+            ...JSON.parse(r.data_json),
+            profileUsername:
+              JSON.parse(r.data_json).profileUsername ?? r.username,
+          },
+          new URL(request.url).origin,
+        ),
         profile:
           JSON.parse(r.data_json).approvedProfileSnapshot ??
           (r.published_json ? JSON.parse(r.published_json) : null),
@@ -70,7 +78,11 @@ export async function GET() {
       plans,
     });
   } catch (error) {
-    return serviceFailure(error, 'manager', 'Não foi possível carregar a gestão. Tente novamente.');
+    return serviceFailure(
+      error,
+      'manager',
+      'Não foi possível carregar a gestão. Tente novamente.',
+    );
   }
 }
 const allReservedSQL =

@@ -1,4 +1,6 @@
 'use client';
+import { useI18n, LanguageSelector } from '@/components/language-provider';
+
 import { useState } from 'react';
 import Link from '@/components/hard-link';
 export function LoginForm({
@@ -6,18 +8,20 @@ export function LoginForm({
 }: {
   initialRegister?: boolean;
 }) {
+  const { t } = useI18n();
   const [register, setRegister] = useState(initialRegister),
     [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   return (
     <main id="main" className="auth-page">
       <section className="auth-card">
-        <Link href="/">Framy Connect</Link>
-        <h1>{register ? 'Criar a minha conta' : 'Bem-vindo à Framy'}</h1>
+        <LanguageSelector />
+        <Link href="/">{t('Framy Connect')}</Link>
+        <h1>{register ? t('Criar a minha conta') : t('Bem-vindo à Framy')}</h1>
         <p>
           {register
-            ? 'Guarde o seu perfil e acompanhe os seus pedidos.'
-            : 'Entre para abrir o seu painel.'}
+            ? t('Guarde o seu perfil e acompanhe os seus pedidos.')
+            : t('Entre para abrir o seu painel.')}
         </p>
         <form
           onSubmit={async (e) => {
@@ -50,7 +54,7 @@ export function LoginForm({
         >
           {register && (
             <label>
-              Nome completo
+              {t('Nome completo')}
               <input
                 name="name"
                 required
@@ -61,7 +65,7 @@ export function LoginForm({
             </label>
           )}
           <label>
-            Email
+            {t('Email')}
             <input
               name="email"
               type="email"
@@ -71,7 +75,7 @@ export function LoginForm({
             />
           </label>
           <label>
-            Palavra-passe
+            {t('Palavra-passe')}
             <input
               name="password"
               type="password"
@@ -81,20 +85,20 @@ export function LoginForm({
               autoComplete={register ? 'new-password' : 'current-password'}
             />
           </label>
-          {register && <small>Use pelo menos 12 caracteres.</small>}
-          {error && <p role="alert">{error}</p>}
+          {register && <small>{t('Use pelo menos 12 caracteres.')}</small>}
+          {error && <p role="alert">{t(error)}</p>}
           <button disabled={busy} type="submit">
             {busy
-              ? 'Aguarde…'
+              ? t('Aguarde…')
               : register
-                ? 'Criar conta e continuar'
-                : 'Entrar'}
+                ? t('Criar conta e continuar')
+                : t('Entrar')}
           </button>
         </form>
         {!register && (
           <p>
             <a href="mailto:support@framyconnect.co.mz?subject=Recuperar%20acesso">
-              Esqueci-me da palavra-passe — contactar apoio
+              {t('Esqueci-me da palavra-passe — contactar apoio')}
             </a>
           </p>
         )}
@@ -106,7 +110,7 @@ export function LoginForm({
             setError('');
           }}
         >
-          {register ? 'Já tenho conta' : 'Sou novo — criar conta'}
+          {register ? t('Já tenho conta') : t('Sou novo — criar conta')}
         </button>
       </section>
     </main>

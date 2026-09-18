@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
 import { useState } from 'react';
 
@@ -10,6 +12,7 @@ export function DeliveryEditor({
   order: SandboxOrder;
   onSaved: () => Promise<void>;
 }) {
+  const { t } = useI18n();
   const [city, setCity] = useState(order.deliveryCity ?? ''),
     [address, setAddress] = useState(order.deliveryAddress ?? ''),
     [busy, setBusy] = useState(false),
@@ -18,10 +21,11 @@ export function DeliveryEditor({
   const editable = canEditDelivery(order);
   return (
     <section className="delivery-editor" aria-labelledby="delivery-heading">
-      <h3 id="delivery-heading">Onde pretende receber o produto?</h3>
+      <h3 id="delivery-heading">{t('Onde pretende receber o produto?')}</h3>
       <p>
-        Indique a cidade ou localidade para atribuirmos o agente da sua zona.
-        Esta informação não aparece no seu perfil público.
+        {t(
+          'Indique a cidade ou localidade para atribuirmos o agente da sua zona. Esta informação não aparece no seu perfil público.',
+        )}
       </p>
       {editable ? (
         <form
@@ -57,7 +61,8 @@ export function DeliveryEditor({
         >
           <fieldset disabled={busy}>
             <label htmlFor="delivery-city">
-              Cidade / localidade de entrega <span>*</span>
+              {t('Cidade / localidade de entrega ')}
+              <span>*</span>
             </label>
             <input
               id="delivery-city"
@@ -68,20 +73,23 @@ export function DeliveryEditor({
               minLength={2}
               maxLength={90}
               list="delivery-cities"
-              placeholder="Ex.: Maputo, Matola, Beira, Nhamatanda ou Chimoio"
+              placeholder={t(
+                'Ex.: Maputo, Matola, Beira, Nhamatanda ou Chimoio',
+              )}
               autoComplete="address-level2"
             />
             <datalist id="delivery-cities">
               {['Maputo', 'Matola', 'Beira', 'Nhamatanda', 'Chimoio'].map(
                 (v) => (
                   <option key={v} value={v}>
-                    {v}
+                    {t(v)}
                   </option>
                 ),
               )}
             </datalist>
             <label htmlFor="delivery-address">
-              Bairro, endereço ou ponto de referência <small>(opcional)</small>
+              {t('Bairro, endereço ou ponto de referência ')}
+              <small>{t('(opcional)')}</small>
             </label>
             <textarea
               id="delivery-address"
@@ -90,25 +98,29 @@ export function DeliveryEditor({
               onChange={(e) => setAddress(e.target.value)}
               maxLength={300}
               rows={2}
-              placeholder="Pode indicar apenas a cidade ou acrescentar detalhes."
+              placeholder={t(
+                'Pode indicar apenas a cidade ou acrescentar detalhes.',
+              )}
               autoComplete="street-address"
             />
             <button className="btn btn-primary" type="submit">
-              {busy ? 'A guardar…' : 'Guardar local de entrega'}
+              {busy ? t('A guardar…') : t('Guardar local de entrega')}
             </button>
           </fieldset>
         </form>
       ) : (
         <>
-          <strong>{order.deliveryCity || 'Local não indicado'}</strong>
+          <strong>{order.deliveryCity || t('Local não indicado')}</strong>
           {order.deliveryAddress && <p>{order.deliveryAddress}</p>}
           <p>
-            Para alterar o local de um pedido já atribuído, contacte a equipa.
+            {t(
+              'Para alterar o local de um pedido já atribuído, contacte a equipa.',
+            )}
           </p>
         </>
       )}
-      {error && <p role="alert">{error}</p>}
-      {notice && <output>{notice}</output>}
+      {error && <p role="alert">{t(error)}</p>}
+      {notice && <output>{t(notice)}</output>}
     </section>
   );
 }

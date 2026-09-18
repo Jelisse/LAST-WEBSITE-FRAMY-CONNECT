@@ -1,3 +1,5 @@
+import { getTranslations } from '@/lib/server-i18n';
+import { LanguageSelector } from '@/components/language-provider';
 import { ApplicationManager } from '@/components/application-manager';
 import { ProductManager } from '@/components/product-manager';
 import { AccountManager } from '@/components/account-manager';
@@ -8,6 +10,7 @@ import { orderLabels } from '@/lib/domain';
 import '../entrar/style.css';
 export const dynamic = 'force-dynamic';
 export default async function Page() {
+  const t = await getTranslations();
   const user = await requireChatGPTUser('/cofounder');
   const counts = await database()
     .prepare(
@@ -22,33 +25,41 @@ export default async function Page() {
   return (
     <main id="main" className="staff-page">
       <header>
+        <LanguageSelector />
         <div>
-          <Link href="/">Framy Connect</Link>
-          <h1>Direcção · {user.displayName}</h1>
+          <Link href="/">{t('Framy Connect')}</Link>
+          <h1>
+            {t('Direcção · ')}
+            {user.displayName}
+          </h1>
           <p>
-            Visão geral do negócio. As operações e as finanças são geridas pelo
-            Gestor.
+            {t(
+              'Visão geral do negócio. As operações e as finanças são geridas pelo Gestor.',
+            )}
           </p>
         </div>
-        <Link href="/sair">Terminar sessão</Link>
+        <Link href="/sair">{t('Terminar sessão')}</Link>
       </header>
       <article>
-        <h2>Agentes activos</h2>
+        <h2>{t('Agentes activos')}</h2>
         <p>{agents?.total ?? 0}</p>
       </article>
       <AccountManager />
       <ApplicationManager />
       <ProductManager />
-      <h2>Pedidos por etapa</h2>
+      <h2>{t('Pedidos por etapa')}</h2>
       {counts.results.length ? (
         counts.results.map((c) => (
           <article key={c.status}>
-            <h2>{orderLabels[c.status] ?? c.status}</h2>
-            <p>{c.total} pedidos</p>
+            <h2>{t(orderLabels[c.status] ?? c.status)}</h2>
+            <p>
+              {c.total}
+              {t(' pedidos')}
+            </p>
           </article>
         ))
       ) : (
-        <p>Ainda não existem pedidos.</p>
+        <p>{t('Ainda não existem pedidos.')}</p>
       )}
     </main>
   );

@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useState } from 'react';
 import {
   availableAgentActions,
@@ -16,6 +18,7 @@ export function AgentAction({
   onSave: (data: Record<string, unknown>) => Promise<boolean>;
   busy: boolean;
 }) {
+  const { t } = useI18n();
   const [note, setNote] = useState(order.fulfilment?.note ?? '');
   const actions = availableAgentActions(order);
   return (
@@ -46,24 +49,25 @@ export function AgentAction({
             <fieldset disabled={busy}>
               {step === 'start' && (
                 <p>
-                  Confirme o produto e o link aprovado antes de iniciar. O
-                  pagamento foi confirmado por Operações.
+                  {t(
+                    'Confirme o produto e o link aprovado antes de iniciar. O pagamento foi confirmado por Operações.',
+                  )}
                 </p>
               )}
               {step === 'program' && (
                 <>
                   <label>
-                    Link lido no teste NFC
+                    {t('Link lido no teste NFC')}
                     <input
                       name="verifiedUrl"
                       type="url"
                       required
-                      placeholder="Cole o link aberto pelo NFC"
+                      placeholder={t('Cole o link aberto pelo NFC')}
                     />
                   </label>
                   <label className="agent-check">
                     <input type="checkbox" name="tested" required />
-                    Programei e testei o NFC no produto físico.
+                    {t('Programei e testei o NFC no produto físico.')}
                   </label>
                 </>
               )}
@@ -71,29 +75,30 @@ export function AgentAction({
                 Object.entries(qualityChecks).map(([key, label]) => (
                   <label className="agent-check" key={key}>
                     <input type="checkbox" name={key} required />
-                    {label}
+                    {t(label)}
                   </label>
                 ))}
               {step === 'package' && (
                 <label className="agent-check">
                   <input type="checkbox" name="packaged" required />
-                  Produto protegido, embalado e identificado para o cliente
-                  correcto.
+                  {t(
+                    'Produto protegido, embalado e identificado para o cliente correcto.',
+                  )}
                 </label>
               )}
               {step === 'dispatch' && (
                 <>
                   <label>
-                    Transportadora / método aprovado
+                    {t('Transportadora / método aprovado')}
                     <input
                       name="courier"
                       required
                       maxLength={100}
-                      placeholder="Transportadora ou recolha em Maputo"
+                      placeholder={t('Transportadora ou recolha em Maputo')}
                     />
                   </label>
                   <label>
-                    Referência / código de rastreio
+                    {t('Referência / código de rastreio')}
                     <input name="tracking" required maxLength={150} />
                   </label>
                 </>
@@ -101,7 +106,7 @@ export function AgentAction({
               {step === 'deliver' && (
                 <>
                   <label>
-                    Comprovativo / confirmação de recepção
+                    {t('Comprovativo / confirmação de recepção')}
                     <input
                       name="proof"
                       required
@@ -110,13 +115,13 @@ export function AgentAction({
                     />
                   </label>
                   <label className="agent-check">
-                    <input type="checkbox" name="customerConfirmed" required />O
-                    cliente confirmou a recepção.
+                    <input type="checkbox" name="customerConfirmed" required />
+                    {t('O cliente confirmou a recepção.')}
                   </label>
                 </>
               )}
               <button className="agent-primary" type="submit">
-                {busy ? 'A guardar…' : agentActionLabels[step]}
+                {busy ? t('A guardar…') : t(agentActionLabels[step])}
               </button>
             </fieldset>
           </form>
@@ -136,7 +141,7 @@ export function AgentAction({
         >
           <fieldset disabled={busy}>
             <label>
-              Nota operacional
+              {t('Nota operacional')}
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -144,17 +149,19 @@ export function AgentAction({
                 maxLength={1500}
               />
             </label>
-            <button className="agent-secondary">Guardar nota</button>
+            <button className="agent-secondary">{t('Guardar nota')}</button>
           </fieldset>
         </form>
       )}
       {!actions.length && (
         <p>
           {order.status === 'DELIVERED'
-            ? 'Entrega concluída.'
+            ? t('Entrega concluída.')
             : order.status === 'CANCELLED'
-              ? 'Pedido cancelado por Operações.'
-              : 'Produção bloqueada. Peça a Operações para confirmar o pagamento e o link aprovado.'}
+              ? t('Pedido cancelado por Operações.')
+              : t(
+                  'Produção bloqueada. Peça a Operações para confirmar o pagamento e o link aprovado.',
+                )}
         </p>
       )}
     </div>

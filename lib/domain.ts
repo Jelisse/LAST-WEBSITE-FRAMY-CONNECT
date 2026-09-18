@@ -147,7 +147,9 @@ export function usernameFromName(name: string): string {
     .replace(/^_+|_+$/g, '')
     .slice(0, 40)
     .replace(/_+$/, '');
-  if (!base) return '';
+  // Keep ASCII URLs while allowing people with non-Latin names to check out.
+  // The server still checks ownership and allocates a unique suffix on collision.
+  if (!base) return /\p{L}/u.test(name) ? 'perfil_cliente' : '';
   return base.length < 3 || reserved.has(base)
     ? `${base.slice(0, 33)}_perfil`
     : base;

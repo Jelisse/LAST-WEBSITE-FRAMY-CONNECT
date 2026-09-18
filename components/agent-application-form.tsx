@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useEffect, useState } from 'react';
 import Link from './hard-link';
 import { SourceImage } from './source-image';
@@ -29,6 +31,7 @@ export function AgentApplicationForm({
   name: string;
   email: string;
 }) {
+  const { t } = useI18n();
   const [app, setApp] = useState<ApplicationView | null>(null),
     [data, setData] = useState<ApplicationData>({
       name,
@@ -116,23 +119,31 @@ export function AgentApplicationForm({
   }
   const editable = !app || ['DRAFT', 'NEEDS_INFO'].includes(app.status);
   const unsaved = !!app && JSON.stringify(data) !== JSON.stringify(app.data);
-  if (loading) return <p>A carregar a sua candidatura…</p>;
+  if (loading) return <p>{t('A carregar a sua candidatura…')}</p>;
   return (
     <div className="application-form">
       {error && (
         <p role="alert" className="product-save-error">
-          {error}
+          {t(error)}
         </p>
       )}
-      {notice && <output className="product-save-notice">{notice}</output>}
+      {notice && <output className="product-save-notice">{t(notice)}</output>}
       {app && (
         <div className="application-status">
-          <strong>{applicationLabels[app.status]}</strong>
-          <p>Referência: {app.id}</p>
-          {app.review_note && <p>Mensagem da gestão: {app.review_note}</p>}
+          <strong>{t(applicationLabels[app.status])}</strong>
+          <p>
+            {t('Referência: ')}
+            {app.id}
+          </p>
+          {app.review_note && (
+            <p>
+              {t('Mensagem da gestão: ')}
+              {app.review_note}
+            </p>
+          )}
           {app.status === 'APPROVED' && (
             <Link className="btn btn-primary" href="/entrar">
-              Entrar no painel de agente
+              {t('Entrar no painel de agente')}
             </Link>
           )}
         </div>
@@ -146,9 +157,9 @@ export function AgentApplicationForm({
             }}
           >
             <fieldset disabled={busy} className="application-fields">
-              <legend>1. Dados pessoais e actividade</legend>
+              <legend>{t('1. Dados pessoais e actividade')}</legend>
               <label>
-                Nome completo
+                {t('Nome completo')}
                 <input
                   required
                   maxLength={100}
@@ -158,14 +169,14 @@ export function AgentApplicationForm({
                 />
               </label>
               <label>
-                Email da conta
+                {t('Email da conta')}
                 <input type="email" value={email} readOnly />
                 <small>
-                  O contacto da candidatura fica associado à sua conta.
+                  {t('O contacto da candidatura fica associado à sua conta.')}
                 </small>
               </label>
               <label>
-                Data de nascimento
+                {t('Data de nascimento')}
                 <input
                   required
                   type="date"
@@ -174,10 +185,10 @@ export function AgentApplicationForm({
                     setData({ ...data, birthDate: e.target.value })
                   }
                 />
-                <small>Mínimo de 18 anos para se candidatar.</small>
+                <small>{t('Mínimo de 18 anos para se candidatar.')}</small>
               </label>
               <label>
-                Cidade ou localidade
+                {t('Cidade ou localidade')}
                 <input
                   required
                   maxLength={120}
@@ -187,24 +198,24 @@ export function AgentApplicationForm({
                 />
               </label>
               <label>
-                Contacto telefónico
+                {t('Contacto telefónico')}
                 <input
                   required
                   type="tel"
                   maxLength={25}
-                  placeholder="+258 …"
+                  placeholder={t('+258 …')}
                   autoComplete="tel"
                   value={data.phone}
                   onChange={(e) => setData({ ...data, phone: e.target.value })}
                 />
               </label>
               <label>
-                WhatsApp
+                {t('WhatsApp')}
                 <input
                   required
                   type="tel"
                   maxLength={25}
-                  placeholder="+258 …"
+                  placeholder={t('+258 …')}
                   value={data.whatsapp}
                   onChange={(e) =>
                     setData({ ...data, whatsapp: e.target.value })
@@ -212,7 +223,7 @@ export function AgentApplicationForm({
                 />
               </label>
               <label className="application-wide">
-                Profissão ou actividade
+                {t('Profissão ou actividade')}
                 <input
                   required
                   maxLength={160}
@@ -223,7 +234,9 @@ export function AgentApplicationForm({
                 />
               </label>
               <label className="application-wide">
-                Conte-nos o que faz e como gostaria de representar a Framy
+                {t(
+                  'Conte-nos o que faz e como gostaria de representar a Framy',
+                )}
                 <textarea
                   required
                   minLength={20}
@@ -244,50 +257,50 @@ export function AgentApplicationForm({
                     setData({ ...data, consent: e.target.checked })
                   }
                 />
-                Autorizo a utilização dos meus dados e documentos pela gestão da
-                Framy para analisar esta candidatura. Li a política de
-                privacidade.
+                {t(
+                  'Autorizo a utilização dos meus dados e documentos pela gestão da Framy para analisar esta candidatura. Li a política de privacidade.',
+                )}
               </label>
               <p className="application-wide">
-                <Link href="/privacidade">Consultar privacidade</Link>. A
-                fotografia e o BI não são publicados no perfil. A aprovação
-                depende da análise da gestão e não constitui contrato de
-                trabalho.
+                <Link href="/privacidade">{t('Consultar privacidade')}</Link>
+                {t(
+                  '. A fotografia e o BI não são publicados no perfil. A aprovação depende da análise da gestão e não constitui contrato de trabalho.',
+                )}
               </p>
               {data.birthDate && applicationAge(data.birthDate) < 18 && (
                 <p className="application-wide" role="alert">
-                  Só pode avançar quando tiver pelo menos 18 anos.
+                  {t('Só pode avançar quando tiver pelo menos 18 anos.')}
                 </p>
               )}
               <button className="btn btn-primary" disabled={busy} type="submit">
-                {busy ? 'A guardar…' : 'Guardar e continuar'}
+                {busy ? t('A guardar…') : t('Guardar e continuar')}
               </button>
             </fieldset>
           </form>
           {app && (
             <section className="application-documents">
-              <h2>2. Fotografias e identificação</h2>
+              <h2>{t('2. Fotografias e identificação')}</h2>
               <p>
-                Envie imagens legíveis, sem cortar os dados do documento. PNG,
-                JPG ou WebP, até 8 MB por fotografia. Num telemóvel compatível,
-                pode usar a câmara directamente.
+                {t(
+                  'Envie imagens legíveis, sem cortar os dados do documento. PNG, JPG ou WebP, até 8 MB por fotografia. Num telemóvel compatível, pode usar a câmara directamente.',
+                )}
               </p>
               <div className="application-files-grid">
                 {fileKinds.map(([kind, label]) => {
                   const file = app.files.find((f) => f.kind === kind);
                   return (
                     <div key={kind}>
-                      <h3>{label}</h3>
+                      <h3>{t(label)}</h3>
                       {file && (
                         <SourceImage
                           src={'/api/application-files/' + file.id}
-                          alt={label}
+                          alt={t(label)}
                           width={260}
                           height={180}
                         />
                       )}
                       <label>
-                        Escolher ficheiro
+                        {t('Escolher ficheiro')}
                         <input
                           type="file"
                           accept="image/png,image/jpeg,image/webp"
@@ -298,7 +311,7 @@ export function AgentApplicationForm({
                         />
                       </label>
                       <label>
-                        Tirar fotografia
+                        {t('Tirar fotografia')}
                         <input
                           type="file"
                           accept="image/*"
@@ -313,11 +326,18 @@ export function AgentApplicationForm({
                   );
                 })}
               </div>
-                <h2>3. Confirmar candidatura</h2>
-                {unsaved && <p role="alert">Guarde as alterações dos dados pessoais antes de carregar fotografias ou submeter.</p>}
+              <h2>{t('3. Confirmar candidatura')}</h2>
+              {unsaved && (
+                <p role="alert">
+                  {t(
+                    'Guarde as alterações dos dados pessoais antes de carregar fotografias ou submeter.',
+                  )}
+                </p>
+              )}
               <p>
-                Depois de submeter, os dados ficam bloqueados durante a análise.
-                Guarde quaisquer alterações antes de continuar.
+                {t(
+                  'Depois de submeter, os dados ficam bloqueados durante a análise. Guarde quaisquer alterações antes de continuar.',
+                )}
               </p>
               <button
                 className="btn btn-primary"
@@ -328,17 +348,18 @@ export function AgentApplicationForm({
                 }
                 onClick={() => void action('submit')}
               >
-                Submeter candidatura
+                {t('Submeter candidatura')}
               </button>
             </section>
           )}
         </>
       ) : (
         <p>
-          Acompanhe o resultado nesta página. Para esclarecimentos ou eliminação
-          de documentos, contacte{' '}
+          {t(
+            'Acompanhe o resultado nesta página. Para esclarecimentos ou eliminação de documentos, contacte',
+          )}{' '}
           <a href="mailto:support@framyconnect.co.mz">
-            support@framyconnect.co.mz
+            {t('support@framyconnect.co.mz')}
           </a>
           .
         </p>

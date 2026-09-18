@@ -5,8 +5,11 @@ export const LEGACY_USD_TO_MZN = 63.91;
 export function planMeticais(plan: { meticais?: number; dollars?: number }) {
   return plan.meticais ?? Math.round((plan.dollars ?? 0) * 6391) / 100;
 }
-export function planPrice(plan: { meticais?: number; dollars?: number }) {
-  return `${new Intl.NumberFormat('pt-MZ', {
+export function planPrice(
+  plan: { meticais?: number; dollars?: number },
+  locale = 'pt-MZ',
+) {
+  return `${new Intl.NumberFormat(locale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(planMeticais(plan))} MT`;

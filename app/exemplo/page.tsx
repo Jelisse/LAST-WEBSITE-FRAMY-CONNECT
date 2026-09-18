@@ -1,10 +1,15 @@
+import { getTranslations } from '@/lib/server-i18n';
 import { MobileProfile } from '@/components/mobile-profile';
 import { blankProfile } from '@/lib/domain';
-export const metadata = {
-  title: 'Perfil de demonstração',
-  robots: { index: false, follow: false },
-};
-export default function ExampleProfile() {
+export async function generateMetadata() {
+  const t = await getTranslations();
+  return {
+    title: t('Perfil de demonstração'),
+    robots: { index: false, follow: false },
+  };
+}
+export default async function ExampleProfile() {
+  const t = await getTranslations();
   return (
     <main id="main" className="standalone-mobile-profile">
       <MobileProfile
@@ -13,15 +18,15 @@ export default function ExampleProfile() {
           ...blankProfile,
           name: 'Firmino Chambale',
           username: 'exemplo',
-          title: 'Arquitecto e Planeador Físico',
+          title: t('Arquitecto e Planeador Físico'),
           photoUrl: '/home/demo-portrait.jpg',
           photoPosition: 35,
           links: [
-            { label: 'Conhecer a Framy', url: '/' },
-            { label: 'Ver produtos', url: '/produtos' },
-            { label: 'Fale connosco', url: '/contacto' },
+            { label: t('Conhecer a Framy'), url: '/' },
+            { label: t('Ver produtos'), url: '/produtos' },
+            { label: t('Fale connosco'), url: '/contacto' },
           ],
-          bio: 'Perfil de demonstração Framy Connect.',
+          bio: t('Perfil de demonstração Framy Connect.'),
         }}
       />
     </main>

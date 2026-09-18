@@ -1,4 +1,6 @@
 'use client';
+import { useI18n, LanguageSelector } from '@/components/language-provider';
+
 import { useCallback, useEffect, useState } from 'react';
 import Link from '@/components/hard-link';
 import { orderLabels } from '@/lib/domain';
@@ -28,8 +30,10 @@ type Data = {
   }[];
   reports: AgentReport[];
 };
-const date = (value: string) => new Date(value).toLocaleString('pt-PT');
 export function AgentWorkspace({ displayName }: { displayName: string }) {
+  const { t } = useI18n();
+  const date = (value: string) =>
+    new Date(value).toLocaleString(t.locale, { timeZone: 'Africa/Maputo' });
   const [data, setData] = useState<Data | null>(null),
     [error, setError] = useState(''),
     [notice, setNotice] = useState(''),
@@ -89,7 +93,7 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
         (filter === 'active' &&
           !['DELIVERED', 'CANCELLED'].includes(o.status)) ||
         o.status === filter) &&
-      `${o.id} ${o.customerName} ${o.productName} ${o.deliveryCity}`
+      `${o.id} ${o.customerName} ${t(o.productName)} ${o.deliveryCity}`
         .toLowerCase()
         .includes(search.toLowerCase()),
   );
@@ -107,15 +111,21 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
   return (
     <main id="main" className="agent-workspace">
       <header className="agent-header">
+        <LanguageSelector />
         <div>
-          <Link href="/">Framy Connect</Link>
-          <p className="agent-eyebrow">Operações · Agente de execução</p>
-          <h1>Olá, {displayName}</h1>
-          <p>Os seus pedidos, produção, entregas e stock num só lugar.</p>
+          <Link href="/">{t('Framy Connect')}</Link>
+          <p className="agent-eyebrow">{t('Operações · Agente de execução')}</p>
+          <h1>
+            {t('Olá, ')}
+            {displayName}
+          </h1>
+          <p>
+            {t('Os seus pedidos, produção, entregas e stock num só lugar.')}
+          </p>
         </div>
-        <Link href="/sair">Terminar sessão</Link>
+        <Link href="/sair">{t('Terminar sessão')}</Link>
       </header>
-      <section className="agent-metrics" aria-label="Resumo de trabalho">
+      <section className="agent-metrics" aria-label={t('Resumo de trabalho')}>
         {[
           ['Por produzir', orders.filter((o) => o.status === 'QUEUED').length],
           [
@@ -126,13 +136,13 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
           ['Entregues', orders.filter((o) => o.status === 'DELIVERED').length],
         ].map(([label, total]) => (
           <article key={label}>
-            <span>{label}</span>
+            <span>{t(label)}</span>
             <strong>{total}</strong>
           </article>
         ))}
       </section>
       <div className="agent-toolbar">
-        <nav aria-label="Área do agente">
+        <nav aria-label={t('Área do agente')}>
           {[
             ['orders', 'Pedidos'],
             ['stock', 'O meu stock'],
@@ -144,7 +154,7 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
               aria-pressed={tab === id}
               onClick={() => setTab(id)}
             >
-              {label}
+              {t(label)}
               {id === 'reports' &&
               data?.reports.some((r) => r.status === 'open')
                 ? ' •'
@@ -157,42 +167,44 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
           disabled={busy}
           onClick={() => void load().catch((e) => setError(e.message))}
         >
-          Actualizar
+          {t('Actualizar')}
         </button>
       </div>
       {error && (
         <p role="alert" className="agent-error">
-          {error}
+          {t(error)}
         </p>
       )}
-      {notice && <output className="agent-notice">{notice}</output>}
-      {!data && !error && <output>A carregar as suas operações…</output>}
+      {notice && <output className="agent-notice">{t(notice)}</output>}
+      {!data && !error && <output>{t('A carregar as suas operações…')}</output>}
       {tab === 'orders' && (
         <section className="agent-panel">
           <div className="agent-section-heading">
             <div>
-              <h2>Os meus pedidos</h2>
+              <h2>{t('Os meus pedidos')}</h2>
               <p>
-                Trabalhe apenas nos pedidos pagos e atribuídos por Operações.
+                {t(
+                  'Trabalhe apenas nos pedidos pagos e atribuídos por Operações.',
+                )}
               </p>
             </div>
             <div className="agent-filters">
               <input
-                aria-label="Pesquisar pedidos"
-                placeholder="Pedido, cliente ou cidade"
+                aria-label={t('Pesquisar pedidos')}
+                placeholder={t('Pedido, cliente ou cidade')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
               <select
-                aria-label="Estado dos pedidos"
+                aria-label={t('Estado dos pedidos')}
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
               >
-                <option value="active">Em curso</option>
-                <option value="all">Todos</option>
+                <option value="active">{t('Em curso')}</option>
+                <option value="all">{t('Todos')}</option>
                 {Object.entries(orderLabels).map(([k, v]) => (
                   <option key={k} value={k}>
-                    {v}
+                    {t(v)}
                   </option>
                 ))}
               </select>
@@ -202,12 +214,13 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
             <div className="agent-empty">
               <h3>
                 {orders.length
-                  ? 'Nenhum pedido neste filtro'
-                  : 'Pronto para receber pedidos'}
+                  ? t('Nenhum pedido neste filtro')
+                  : t('Pronto para receber pedidos')}
               </h3>
               <p>
-                Quando Operações atribuir um pedido, encontrará aqui o produto,
-                o link aprovado e as próximas acções.
+                {t(
+                  'Quando Operações atribuir um pedido, encontrará aqui o produto, o link aprovado e as próximas acções.',
+                )}
               </p>
             </div>
           )}
@@ -215,49 +228,49 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
             <details className="agent-order" key={o.id}>
               <summary>
                 <span>
-                  <strong>{o.productName}</strong>
+                  <strong>{t(o.productName)}</strong>
                   <small>
                     #{o.id.slice(0, 8)} · {o.customerName} ·{' '}
-                    {o.deliveryCity || 'Local por confirmar'}
+                    {o.deliveryCity || t('Local por confirmar')}
                   </small>
                 </span>
                 <span className="agent-badge">
-                  {orderLabels[o.status] ?? o.status}
+                  {t(orderLabels[o.status] ?? o.status)}
                 </span>
               </summary>
               <div className="agent-order-body">
                 <dl className="agent-facts">
                   <div>
-                    <dt>Pagamento</dt>
+                    <dt>{t('Pagamento')}</dt>
                     <dd>
                       {o.paid
-                        ? 'Confirmado por Operações'
-                        : 'Sem confirmação — não produzir'}
+                        ? t('Confirmado por Operações')
+                        : t('Sem confirmação — não produzir')}
                       {o.paymentReference && ` · Ref. ${o.paymentReference}`}
                     </dd>
                   </div>
                   <div>
-                    <dt>Quantidade</dt>
+                    <dt>{t('Quantidade')}</dt>
                     <dd>{o.quantity}</dd>
                   </div>
                   <div>
-                    <dt>Contacto de entrega</dt>
-                    <dd>{o.deliveryContact || 'Por indicar'}</dd>
+                    <dt>{t('Contacto de entrega')}</dt>
+                    <dd>{o.deliveryContact || t('Por indicar')}</dd>
                   </div>
                   <div>
-                    <dt>Destino</dt>
+                    <dt>{t('Destino')}</dt>
                     <dd>
                       {o.deliveryCity} {o.deliveryAddress}
                     </dd>
                   </div>
                   <div>
-                    <dt>Actualizado</dt>
+                    <dt>{t('Actualizado')}</dt>
                     <dd>{date(o.updatedAt)}</dd>
                   </div>
                 </dl>
                 {o.approvedUrl && (
                   <div className="agent-approved-link">
-                    <strong>Link aprovado para programar</strong>
+                    <strong>{t('Link aprovado para programar')}</strong>
                     <a href={o.approvedUrl} target="_blank" rel="noreferrer">
                       {o.approvedUrl}
                     </a>
@@ -274,11 +287,12 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
                           )
                       }
                     >
-                      Copiar link
+                      {t('Copiar link')}
                     </button>
                     <small>
-                      Use exactamente este endereço. Alterações são feitas por
-                      Operações.
+                      {t(
+                        'Use exactamente este endereço. Alterações são feitas por Operações.',
+                      )}
                     </small>
                   </div>
                 )}
@@ -291,21 +305,28 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
                     ['Entrega', o.fulfilment?.deliveredAt],
                   ].map(([label, time]) => (
                     <div key={label}>
-                      <dt>{label}</dt>
-                      <dd>{time ? date(time) : 'Pendente'}</dd>
+                      <dt>{t(label)}</dt>
+                      <dd>{time ? date(time) : t('Pendente')}</dd>
                     </div>
                   ))}
                 </dl>
                 {o.fulfilment?.courier && (
                   <p>
-                    {o.fulfilment.courier} · Referência: {o.fulfilment.tracking}
+                    {o.fulfilment.courier}
+                    {t(' · Referência: ')}
+                    {o.fulfilment.tracking}
                   </p>
                 )}
-                {o.proof && <p>Comprovativo: {o.proof}</p>}
+                {o.proof && (
+                  <p>
+                    {t('Comprovativo: ')}
+                    {o.proof}
+                  </p>
+                )}
                 {o.design && (
                   <details>
                     <summary>
-                      Ver design aprovado e ficheiros de produção
+                      {t('Ver design aprovado e ficheiros de produção')}
                     </summary>
                     <OrderArtwork order={o} />
                   </details>
@@ -321,7 +342,7 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
                   className="agent-secondary"
                   onClick={() => report(o.id)}
                 >
-                  Reportar problema / feedback
+                  {t('Reportar problema / feedback')}
                 </button>
               </div>
             </details>
@@ -330,16 +351,20 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
       )}
       {tab === 'stock' && (
         <section className="agent-panel">
-          <h2>Stock atribuído</h2>
+          <h2>{t('Stock atribuído')}</h2>
           <p>
-            As entradas são registadas por Operações. As entregas confirmadas
-            descontam automaticamente uma unidade. Reporte contagens e danos
-            para reconciliação.
+            {t(
+              'As entradas são registadas por Operações. As entregas confirmadas descontam automaticamente uma unidade. Reporte contagens e danos para reconciliação.',
+            )}
           </p>
           {!data?.stock.length && (
             <div className="agent-empty">
-              <h3>Ainda sem stock atribuído</h3>
-              <p>As transferências aprovadas por Operações aparecerão aqui.</p>
+              <h3>{t('Ainda sem stock atribuído')}</h3>
+              <p>
+                {t(
+                  'As transferências aprovadas por Operações aparecerão aqui.',
+                )}
+              </p>
             </div>
           )}
           {!!data?.stock.length && (
@@ -347,16 +372,16 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
               <table>
                 <thead>
                   <tr>
-                    <th>Produto</th>
-                    <th>Saldo</th>
-                    <th>Reservado</th>
-                    <th>Disponível</th>
+                    <th>{t('Produto')}</th>
+                    <th>{t('Saldo')}</th>
+                    <th>{t('Reservado')}</th>
+                    <th>{t('Disponível')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.stock.map((s) => (
                     <tr key={s.id}>
-                      <td>{s.name}</td>
+                      <td>{t(s.name)}</td>
                       <td>{s.balance}</td>
                       <td>{s.reserved}</td>
                       <td>{s.available}</td>
@@ -375,17 +400,17 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
               setTab('reports');
             }}
           >
-            Registar contagem / alertar Operações
+            {t('Registar contagem / alertar Operações')}
           </button>
-          <h3>Movimentos recentes</h3>
+          <h3>{t('Movimentos recentes')}</h3>
           <div className="agent-table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Data</th>
-                  <th>Produto</th>
-                  <th>Unidades</th>
-                  <th>Motivo</th>
+                  <th>{t('Data')}</th>
+                  <th>{t('Produto')}</th>
+                  <th>{t('Unidades')}</th>
+                  <th>{t('Motivo')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -410,11 +435,11 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
       )}
       {tab === 'reports' && (
         <section className="agent-panel">
-          <h2>Relatórios e alertas</h2>
+          <h2>{t('Relatórios e alertas')}</h2>
           <p>
-            Envie incidentes, feedback e relatórios directamente para Operações.
-            Nunca recolha pagamentos; reporte qualquer tentativa de pagamento
-            directo.
+            {t(
+              'Envie incidentes, feedback e relatórios directamente para Operações. Nunca recolha pagamentos; reporte qualquer tentativa de pagamento directo.',
+            )}
           </p>
           <form
             className="agent-report-form"
@@ -439,7 +464,7 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
           >
             <fieldset disabled={busy}>
               <label>
-                Tipo
+                {t('Tipo')}
                 <select
                   value={reportType}
                   onChange={(e) =>
@@ -448,21 +473,21 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
                 >
                   {Object.entries(reportTypes).map(([k, v]) => (
                     <option key={k} value={k}>
-                      {v}
+                      {t(v)}
                     </option>
                   ))}
                 </select>
               </label>
               <label>
-                Pedido relacionado (opcional)
+                {t('Pedido relacionado (opcional)')}
                 <select
                   value={reportOrder}
                   onChange={(e) => setReportOrder(e.target.value)}
                 >
-                  <option value="">Sem pedido associado</option>
+                  <option value="">{t('Sem pedido associado')}</option>
                   {orders.map((o) => (
                     <option key={o.id} value={o.id}>
-                      #{o.id.slice(0, 8)} · {o.productName}
+                      #{o.id.slice(0, 8)} · {t(o.productName)}
                     </option>
                   ))}
                 </select>
@@ -470,27 +495,27 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
               {stockReport && (
                 <>
                   <label>
-                    Produto
+                    {t('Produto')}
                     <select name="productId" required defaultValue="">
                       <option value="" disabled>
-                        Seleccione o produto atribuído
+                        {t('Seleccione o produto atribuído')}
                       </option>
                       {data?.stock.map((s) => (
                         <option key={s.id} value={s.id}>
-                          {s.name}
+                          {t(s.name)}
                         </option>
                       ))}
                     </select>
                   </label>
                   <label>
-                    Quantidade{' '}
+                    {t('Quantidade')}{' '}
                     {reportType === 'stock_count'
-                      ? 'contada'
+                      ? t('contada')
                       : reportType === 'damage'
-                        ? 'danificada'
+                        ? t('danificada')
                         : reportType === 'receipt'
-                          ? 'recebida'
-                          : 'disponível'}
+                          ? t('recebida')
+                          : t('disponível')}
                     <input
                       type="number"
                       name="quantity"
@@ -503,7 +528,7 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
                 </>
               )}
               <label>
-                Descrição / notas
+                {t('Descrição / notas')}
                 <textarea
                   name="message"
                   required
@@ -513,44 +538,49 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
               </label>
               {['daily', 'weekly'].includes(reportType) && (
                 <small>
-                  Inclui automaticamente a contagem por estado dos pedidos
-                  actualizados nas últimas{' '}
-                  {reportType === 'daily' ? '24 horas' : '7 dias'}.
+                  {t(
+                    'Inclui automaticamente a contagem por estado dos pedidos actualizados nas últimas',
+                  )}{' '}
+                  {reportType === 'daily' ? t('24 horas') : t('7 dias')}.
                 </small>
               )}
               <button className="agent-primary">
-                {busy ? 'A enviar…' : 'Enviar a Operações'}
+                {busy ? t('A enviar…') : t('Enviar a Operações')}
               </button>
             </fieldset>
           </form>
-          <h3>Histórico e respostas</h3>
-          {!data?.reports.length && <p>Ainda não enviou relatórios.</p>}
+          <h3>{t('Histórico e respostas')}</h3>
+          {!data?.reports.length && <p>{t('Ainda não enviou relatórios.')}</p>}
           {data?.reports.map((r) => (
             <article className="agent-report" key={r.id}>
               <strong>
-                {reportTypes[r.type]} ·{' '}
-                {r.status === 'open' ? 'A aguardar Operações' : 'Resolvido'}
+                {t(reportTypes[r.type])} ·{' '}
+                {r.status === 'open'
+                  ? t('A aguardar Operações')
+                  : t('Resolvido')}
               </strong>
               <small>
                 {date(r.createdAt)}{' '}
-                {r.orderId && `· Pedido #${r.orderId.slice(0, 8)}`}
+                {r.orderId && t('· Pedido #{0}', [r.orderId.slice(0, 8)])}
               </small>
               <p>{r.message}</p>
               {r.productId && (
                 <p>
-                  {r.productId} · Quantidade: {r.quantity}
+                  {r.productId}
+                  {t(' · Quantidade: ')}
+                  {r.quantity}
                 </p>
               )}
               {r.summary && (
                 <p>
                   {Object.entries(r.summary)
-                    .map(([k, v]) => `${orderLabels[k] ?? k}: ${v}`)
+                    .map(([k, v]) => `${t(orderLabels[k] ?? k)}: ${v}`)
                     .join(' · ')}
                 </p>
               )}
               {r.response && (
                 <p>
-                  <strong>Operações:</strong> {r.response}
+                  <strong>{t('Operações:')}</strong> {r.response}
                 </p>
               )}
             </article>

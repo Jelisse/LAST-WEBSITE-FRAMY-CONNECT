@@ -1,4 +1,5 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 
 import { SourceImage } from '@/components/source-image';
 import Image from 'next/image';
@@ -8,32 +9,37 @@ import { Nfc, ScanLine, Globe, Camera, Zap } from 'lucide-react';
 const exampleProfile = '/exemplo';
 
 function DemoCard({ qr }: { qr?: string }) {
+  const { t } = useI18n();
   return (
     <div className="sharing-card">
       <Image
         src="/brand/logo.svg"
-        alt="Framy Connect"
+        alt={t('Framy Connect')}
         width={160}
         height={73}
         unoptimized
       />
       <div className="sharing-card-identity">
-        <strong>FIRMINO CHAMBALE</strong>
-        <span>Arquitecto e Planeador Fisico</span>
+        <strong>{t('FIRMINO CHAMBALE')}</strong>
+        <span>{t('Arquitecto e Planeador Fisico')}</span>
         <i />
         <small>
-          <SourceImage src="/social/instagram.svg" alt="" /> Instagram
+          <SourceImage src="/social/instagram.svg" alt="" />
+          {t(' Instagram')}
         </small>
         <small>
-          <Globe /> Perfil Framy Connect
+          <Globe />
+          {t(' Perfil Framy Connect')}
         </small>
       </div>
-      <span className="sharing-card-tagline">O Seu Mundo num Toque.</span>
+      <span className="sharing-card-tagline">
+        {t('O Seu Mundo num Toque.')}
+      </span>
       {qr ? (
         <SourceImage
           className="sharing-qr"
           src={qr}
-          alt="QR para abrir o perfil de exemplo"
+          alt={t('QR para abrir o perfil de exemplo')}
         />
       ) : (
         <Nfc className="sharing-nfc" />
@@ -43,6 +49,7 @@ function DemoCard({ qr }: { qr?: string }) {
 }
 
 function DemoPhone({ scan, qr }: { scan?: boolean; qr?: string }) {
+  const { t } = useI18n();
   return (
     <div className={`sharing-phone${scan ? ' sharing-phone-scan' : ''}`}>
       <Image
@@ -56,7 +63,7 @@ function DemoPhone({ scan, qr }: { scan?: boolean; qr?: string }) {
       <div className="sharing-screen">
         {scan ? (
           <div className="sharing-camera">
-            <span>Ler código QR</span>
+            <span>{t('Ler código QR')}</span>
             <DemoCard qr={qr} />
             <div className="sharing-scan-frame" />
             <div className="sharing-camera-controls">
@@ -68,7 +75,7 @@ function DemoPhone({ scan, qr }: { scan?: boolean; qr?: string }) {
         ) : (
           <Image
             src="/home/profile-screen.jpg"
-            alt="Perfil Framy de Firmino Chambale"
+            alt={t('Perfil Framy de Firmino Chambale')}
             fill
             unoptimized
             sizes="260px"
@@ -81,6 +88,7 @@ function DemoPhone({ scan, qr }: { scan?: boolean; qr?: string }) {
 }
 
 export function HomeSharingScene() {
+  const { t } = useI18n();
   const [qr, setQr] = useState<string>();
   useEffect(() => {
     let active = true;
@@ -107,14 +115,15 @@ export function HomeSharingScene() {
       aria-labelledby="sharing-title"
     >
       <header>
-        <p>DUAS FORMAS DE SE CONECTAR</p>
-        <h2 id="sharing-title">Um toque. Um scan. O seu perfil.</h2>
-        <span>Partilhe a sua identidade por NFC ou código QR.</span>
+        <p>{t('DUAS FORMAS DE SE CONECTAR')}</p>
+        <h2 id="sharing-title">{t('Um toque. Um scan. O seu perfil.')}</h2>
+        <span>{t('Partilhe a sua identidade por NFC ou código QR.')}</span>
       </header>
       <div className="sharing-stage">
         <div className="sharing-method sharing-tap">
           <h3>
-            <Nfc size={18} /> Partilhe por toque
+            <Nfc size={18} />
+            {t(' Partilhe por toque')}
           </h3>
           <svg
             className="sharing-wave"
@@ -129,17 +138,17 @@ export function HomeSharingScene() {
           </svg>
           <DemoCard />
           <DemoPhone />
-          <p>Aproxime o cartão de um telemóvel compatível.</p>
+          <p>{t('Aproxime o cartão de um telemóvel compatível.')}</p>
         </div>
         <a
           href={exampleProfile}
           className="sharing-result"
-          aria-label="Abrir o perfil de exemplo de Firmino Chambale"
+          aria-label={t('Abrir o perfil de exemplo de Firmino Chambale')}
         >
           <div>
             <Image
               src="/home/profile-screen.jpg"
-              alt="O mesmo perfil Framy, com fotografia e links"
+              alt={t('O mesmo perfil Framy, com fotografia e links')}
               width={390}
               height={848}
               unoptimized
@@ -148,11 +157,12 @@ export function HomeSharingScene() {
         </a>
         <div className="sharing-method sharing-scan">
           <h3>
-            <ScanLine size={18} /> Ou leia o QR
+            <ScanLine size={18} />
+            {t(' Ou leia o QR')}
           </h3>
           <DemoCard qr={qr} />
           <DemoPhone scan qr={qr} />
-          <p>Abra a câmara e leia o código do cartão.</p>
+          <p>{t('Abra a câmara e leia o código do cartão.')}</p>
         </div>
         <svg
           className="sharing-arrows"
@@ -174,7 +184,8 @@ export function HomeSharingScene() {
         </svg>
       </div>
       <a className="home-text-link sharing-demo-link" href={exampleProfile}>
-        Ver perfil de exemplo <Globe size={18} />
+        {t('Ver perfil de exemplo ')}
+        <Globe size={18} />
       </a>
     </section>
   );

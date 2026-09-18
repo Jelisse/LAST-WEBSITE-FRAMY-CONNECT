@@ -1,7 +1,10 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useEffect, useState } from 'react';
 import type { StockOption } from '@/lib/customisation';
 export function PersonalisationManager() {
+  const { t } = useI18n();
   const [rows, setRows] = useState<StockOption[]>([]),
     [message, setMessage] = useState(''),
     [busy, setBusy] = useState(false);
@@ -37,32 +40,30 @@ export function PersonalisationManager() {
   }
   return (
     <section className="panel">
-      <h2>Modelos e personalização</h2>
+      <h2>{t('Modelos e personalização')}</h2>
       <p>
-        As quantidades por modelo não aumentam o stock físico total. A contagem
-        inicial confirmada em Maputo, Moçambique, é de 500 porta-chaves:
-        175 Instagram, 175 TikTok e 150 Padrão artístico. Novas entradas e
-        atribuições são geridas em Operações → Stock. As quantidades abaixo
-        mostram o saldo disponível após reservas e alterações do gestor.
+        {t(
+          'As quantidades por modelo não aumentam o stock físico total. A contagem inicial confirmada em Maputo, Moçambique, é de 500 porta-chaves: 175 Instagram, 175 TikTok e 150 Padrão artístico. Novas entradas e atribuições são geridas em Operações → Stock. As quantidades abaixo mostram o saldo disponível após reservas e alterações do gestor.',
+        )}
       </p>
       <p>
-        Stock disponível para novas encomendas. Ao chegar a zero, a opção fica
-        indisponível automaticamente. As unidades são reservadas ao confirmar o
-        pedido e devolvidas ao cancelar.
+        {t(
+          'Stock disponível para novas encomendas. Ao chegar a zero, a opção fica indisponível automaticamente. As unidades são reservadas ao confirmar o pedido e devolvidas ao cancelar.',
+        )}
       </p>
       <button
         className="btn"
         disabled={busy}
         onClick={() => void load().catch((e) => setMessage(e.message))}
       >
-        Actualizar stock
+        {t('Actualizar stock')}
       </button>
       <div className="stock-options">
         {rows.map((row) => (
           <div key={row.id}>
-            <strong>{row.label}</strong>
+            <strong>{t(row.label)}</strong>
             <label>
-              Unidades disponíveis
+              {t('Unidades disponíveis')}
               <input
                 type="number"
                 min="0"
@@ -94,27 +95,27 @@ export function PersonalisationManager() {
                 }
               />{' '}
               {row.id.startsWith('blank-')
-                ? 'Permitir personalização'
-                : 'Disponibilizar modelo'}
+                ? t('Permitir personalização')
+                : t('Disponibilizar modelo')}
             </label>
             <small>
               {row.quantity === 0
-                ? 'Sem stock: desactivado para clientes'
+                ? t('Sem stock: desactivado para clientes')
                 : row.enabled
-                  ? 'Disponível'
-                  : 'Desactivado pelo gestor'}
+                  ? t('Disponível')
+                  : t('Desactivado pelo gestor')}
             </small>
             <button
               className="btn"
               disabled={busy}
               onClick={() => void save(row)}
             >
-              Guardar
+              {t('Guardar')}
             </button>
           </div>
         ))}
       </div>
-      {message && <output>{message}</output>}
+      {message && <output>{t(message)}</output>}
     </section>
   );
 }

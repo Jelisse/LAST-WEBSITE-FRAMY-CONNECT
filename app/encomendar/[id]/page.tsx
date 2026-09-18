@@ -1,3 +1,4 @@
+import { getTranslations } from '@/lib/server-i18n';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { getProducts } from '@/lib/server-catalog';
 import { getManagedPlans } from '@/lib/server-plans';
@@ -6,10 +7,13 @@ import { notFound } from 'next/navigation';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { OrderSubmission } from '@/components/order-submission';
 export const dynamic = 'force-dynamic';
-export const metadata = {
-  title: 'Submeter pedido',
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata() {
+  const t = await getTranslations();
+  return {
+    title: t('Submeter pedido'),
+    robots: { index: false, follow: false },
+  };
+}
 export default async function Page({
   params,
 }: {

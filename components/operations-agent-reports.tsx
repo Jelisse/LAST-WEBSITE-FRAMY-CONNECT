@@ -1,7 +1,10 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useCallback, useEffect, useState } from 'react';
 import { reportTypes, type AgentReport } from '@/lib/agent-workflow';
 export function OperationsAgentReports() {
+  const { t } = useI18n();
   const [reports, setReports] = useState<AgentReport[]>([]),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false);
@@ -24,36 +27,37 @@ export function OperationsAgentReports() {
   }, [load]);
   return (
     <section className="manager-card">
-      <h2>Relatórios e alertas dos agentes</h2>
+      <h2>{t('Relatórios e alertas dos agentes')}</h2>
       <p>
-        Contagens, danos, stock baixo, incidentes e relatórios de actividade. As
-        correcções de stock são registadas por Operações no separador Stock.
+        {t(
+          'Contagens, danos, stock baixo, incidentes e relatórios de actividade. As correcções de stock são registadas por Operações no separador Stock.',
+        )}
       </p>
       <button
         type="button"
         className="manager-secondary"
         onClick={() => void load().catch((e) => setError(e.message))}
       >
-        Actualizar relatórios
+        {t('Actualizar relatórios')}
       </button>
-      {error && <p role="alert">{error}</p>}
-      {!reports.length && <p>Ainda não há relatórios dos agentes.</p>}
+      {error && <p role="alert">{t(error)}</p>}
+      {!reports.length && <p>{t('Ainda não há relatórios dos agentes.')}</p>}
       {reports.map((r) => (
         <details key={r.id}>
           <summary>
-            {r.status === 'open' ? 'Por tratar' : 'Resolvido'} ·{' '}
-            {reportTypes[r.type]} · {r.agentName} ·{' '}
-            {new Date(r.createdAt).toLocaleString('pt-PT')}
+            {r.status === 'open' ? t('Por tratar') : t('Resolvido')} ·{' '}
+            {t(reportTypes[r.type])} · {r.agentName} ·{' '}
+            {new Date(r.createdAt).toLocaleString(t.locale)}
           </summary>
           <p>{r.message}</p>
           <p>
-            {r.orderId && `Pedido #${r.orderId} `}
+            {r.orderId && t('Pedido #{0}', [r.orderId])}
             {r.productId &&
               `Produto: ${r.productId} · Quantidade: ${r.quantity}`}
           </p>
           {r.summary && (
             <p>
-              Pedidos actualizados no período:{' '}
+              {t('Pedidos actualizados no período:')}{' '}
               {Object.entries(r.summary)
                 .map(([k, v]) => `${k}: ${v}`)
                 .join(' · ')}
@@ -61,7 +65,7 @@ export function OperationsAgentReports() {
           )}
           {r.response ? (
             <p>
-              <strong>Resposta de Operações:</strong> {r.response}
+              <strong>{t('Resposta de Operações:')}</strong> {r.response}
             </p>
           ) : (
             <form
@@ -95,7 +99,7 @@ export function OperationsAgentReports() {
               }}
             >
               <label>
-                Resposta ao agente
+                {t('Resposta ao agente')}
                 <textarea
                   name="response"
                   required
@@ -104,7 +108,7 @@ export function OperationsAgentReports() {
                 />
               </label>
               <button className="manager-primary" disabled={busy}>
-                Responder e resolver
+                {t('Responder e resolver')}
               </button>
             </form>
           )}

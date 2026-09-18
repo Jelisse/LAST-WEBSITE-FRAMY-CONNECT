@@ -179,8 +179,14 @@ export const products: Product[] = seedProducts.map((p) => ({
   imageUrl: `/products/${p.id}.png`,
   version: 0,
 }));
-export function productOrder(a: Pick<Product, 'id' | 'available'>, b: Pick<Product, 'id' | 'available'>) {
-  return Number(b.available) - Number(a.available) || Number(b.id === 'keychain') - Number(a.id === 'keychain');
+export function productOrder(
+  a: Pick<Product, 'id' | 'available'>,
+  b: Pick<Product, 'id' | 'available'>,
+) {
+  return (
+    Number(b.available) - Number(a.available) ||
+    Number(b.id === 'keychain') - Number(a.id === 'keychain')
+  );
 }
 export type PublicProduct = Omit<Product, 'cost'>;
 export function publicProduct({
@@ -189,8 +195,8 @@ export function publicProduct({
 }: Product): PublicProduct {
   return { ...product, amount: product.available ? product.amount : 0 };
 }
-export function money(minor: number) {
-  return new Intl.NumberFormat('pt-MZ', {
+export function money(minor: number, locale = 'pt-MZ') {
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'MZN',
   }).format(minor / 100);

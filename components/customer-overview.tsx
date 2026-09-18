@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { planPrice } from '@/lib/plan-pricing';
 
 import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
@@ -21,6 +23,7 @@ export function CustomerOverview({
   onInspect: (order: SandboxOrder) => void;
   onUpgrade: () => void;
 }) {
+  const { t } = useI18n();
   const plan = data.membership.terms;
   const profile = data.profile;
   const links = profile?.links ?? [];
@@ -43,26 +46,26 @@ export function CustomerOverview({
           className="essential-identity"
           aria-labelledby="identity-title"
         >
-          <span className="essential-kicker">A SUA IDENTIDADE</span>
+          <span className="essential-kicker">{t('A SUA IDENTIDADE')}</span>
           <div className="essential-person">
             <span className="essential-avatar">{initials}</span>
             <div>
               <h2 id="identity-title">{name}</h2>
-              <p>{profile?.title || 'Comece por se apresentar.'}</p>
+              <p>{profile?.title || t('Comece por se apresentar.')}</p>
             </div>
           </div>
           <p className="essential-handle">
             {profile
               ? `/${profile.username}`
-              : 'O seu endereço Framy começa aqui.'}
-            <span>{data.published ? 'Publicada' : 'Rascunho'}</span>
+              : t('O seu endereço Framy começa aqui.')}
+            <span>{data.published ? t('Publicada') : t('Rascunho')}</span>
           </p>
           <div className="essential-actions">
             <Button
               className="essential-dark-button"
               onClick={() => onNavigate('profile')}
             >
-              {profile ? 'Editar perfil' : 'Criar perfil'}{' '}
+              {profile ? t('Editar perfil') : t('Criar perfil')}{' '}
               <ArrowRight size={17} />
             </Button>
             {data.published && data.publishedUsername && (
@@ -71,7 +74,8 @@ export function CustomerOverview({
                 target="_blank"
                 rel="noreferrer"
               >
-                Ver perfil <ArrowUpRight size={16} />
+                {t('Ver perfil ')}
+                <ArrowUpRight size={16} />
               </a>
             )}
           </div>
@@ -81,48 +85,70 @@ export function CustomerOverview({
           aria-labelledby="current-plan-title"
         >
           <div className="essential-plan-heading">
-            <span className="essential-kicker">O SEU PLANO</span>
+            <span className="essential-kicker">{t('O SEU PLANO')}</span>
             <span className="essential-test-badge">
-              {data.membership.active ? 'Activo' : 'Por activar / expirado'}
+              {data.membership.active
+                ? t('Activo')
+                : t('Por activar / expirado')}
             </span>
           </div>
           <h2 id="current-plan-title">
-            {data.membership.version ? plan.name : 'Comece com 30 dias grátis'}
+            {data.membership.version
+              ? t(plan.name)
+              : t('Comece com 30 dias grátis')}
           </h2>
           <p className="essential-price">
-            {plan.id === 'free-30' ? '0 MT' : planPrice(plan)}
+            {plan.id === 'free-30' ? t('0 MT') : planPrice(plan, t.locale)}
             <span>
-              {plan.id === 'free-30' ? ' / 30 dias' : ' / mês · por perfil'}
+              {plan.id === 'free-30'
+                ? t(' / 30 dias')
+                : t(' / mês · por perfil')}
             </span>
           </p>
           <div className="essential-usage">
             <span>
-              {links.length} de {plan.links} links
+              {links.length}
+              {t(' de ')}
+              {plan.links}
+              {t(' links')}
             </span>
-            <span>{plan.links - links.length} disponíveis</span>
+            <span>
+              {plan.links - links.length}
+              {t(' disponíveis')}
+            </span>
           </div>
           <Progress
             value={Math.min(100, (links.length / plan.links) * 100)}
-            aria-label={`${links.length} de ${plan.links} links utilizados`}
+            aria-label={t('{0} de {1} links utilizados', [
+              links.length,
+              plan.links,
+            ])}
           />
           <Button className="plan-upgrade" onClick={onUpgrade}>
-            Escolher plano <ArrowUpRight size={18} />
+            {t('Escolher plano ')}
+            <ArrowUpRight size={18} />
           </Button>
           <p className="essential-plan-note">
             {data.membership.expiresAt
-              ? `Período gratuito até ${new Date(data.membership.expiresAt).toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo' })}. Sem renovação automática.`
-              : 'Active o período gratuito para publicar o perfil.'}
+              ? t('Período gratuito até {0}. Sem renovação automática.', [
+                  new Date(data.membership.expiresAt).toLocaleDateString(
+                    t.locale,
+                    { timeZone: 'Africa/Maputo' },
+                  ),
+                ])
+              : t('Active o período gratuito para publicar o perfil.')}
           </p>
         </section>
       </div>
       <section className="essential-links" aria-labelledby="saved-links-title">
         <div className="essential-section-heading">
           <div>
-            <h2 id="saved-links-title">Os seus links.</h2>
-            <p>Um lugar para tudo o que importa.</p>
+            <h2 id="saved-links-title">{t('Os seus links.')}</h2>
+            <p>{t('Um lugar para tudo o que importa.')}</p>
           </div>
           <Button variant="ghost" onClick={() => onNavigate('profile')}>
-            Gerir links <ArrowRight size={17} />
+            {t('Gerir links ')}
+            <ArrowRight size={17} />
           </Button>
         </div>
         <div className="essential-link-grid">
@@ -144,16 +170,20 @@ export function CustomerOverview({
               onClick={() => onNavigate('profile')}
             >
               <Plus size={24} />
-              <strong>Adicionar link</strong>
-              <span>{plan.links - links.length} caixas disponíveis</span>
+              <strong>{t('Adicionar link')}</strong>
+              <span>
+                {plan.links - links.length}
+                {t(' caixas disponíveis')}
+              </span>
             </button>
           )}
           {!links.length && (
             <div className="essential-link-tip">
               <UserRound size={21} />
               <p>
-                As suas redes, o seu trabalho, os seus contactos. Adicione um
-                link para começar.
+                {t(
+                  'As suas redes, o seu trabalho, os seus contactos. Adicione um link para começar.',
+                )}
               </p>
             </div>
           )}
@@ -163,16 +193,20 @@ export function CustomerOverview({
             className="plan-text-button"
             onClick={() => onNavigate('profile')}
           >
-            Ver todos os {links.length} links <ArrowRight size={16} />
+            {t('Ver todos os ')}
+            {links.length}
+            {t(' links ')}
+            <ArrowRight size={16} />
           </button>
         )}
       </section>
       {recent.length > 0 && (
         <section className="essential-order-section">
           <div className="essential-section-heading">
-            <h2>Pedidos recentes.</h2>
+            <h2>{t('Pedidos recentes.')}</h2>
             <Button variant="ghost" onClick={() => onNavigate('orders')}>
-              Ver todos <ArrowRight size={17} />
+              {t('Ver todos ')}
+              <ArrowRight size={17} />
             </Button>
           </div>
           {recent.map((order) => (
@@ -182,10 +216,10 @@ export function CustomerOverview({
               onClick={() => onInspect(order)}
             >
               <span>
-                <strong>{order.productName}</strong>
+                <strong>{t(order.productName)}</strong>
                 <small>#{order.id.slice(0, 8).toUpperCase()}</small>
               </span>
-              <span>{orderLabels[order.status]}</span>
+              <span>{t(orderLabels[order.status])}</span>
               <ArrowUpRight size={17} />
             </button>
           ))}

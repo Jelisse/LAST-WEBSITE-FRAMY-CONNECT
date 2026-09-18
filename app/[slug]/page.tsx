@@ -1,3 +1,4 @@
+import { getTranslations } from '@/lib/server-i18n';
 import { activeProfileSQL } from '@/lib/entitlement';
 import { publicPageRobots } from '@/lib/server-site';
 import { notFound } from 'next/navigation';
@@ -33,7 +34,7 @@ const pages: Record<
       },
       {
         title: 'Moçambique primeiro',
-        text: 'Desenhamos uma experiência em português, orientada às pessoas, aos criadores e às organizações do nosso mercado.',
+        text: 'Desenhamos uma experiência em português, inglês e chinês tradicional, orientada às pessoas, aos criadores e às organizações do nosso mercado.',
       },
     ],
   },
@@ -151,8 +152,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const t = await getTranslations();
   return {
-    title: pages[slug]?.title ?? 'Identidade digital',
+    title: t(pages[slug]?.title ?? 'Identidade digital'),
     robots: pages[slug] ? publicPageRobots() : { index: false, follow: false },
   };
 }
@@ -161,6 +163,7 @@ export default async function Page({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const t = await getTranslations();
   const { slug } = await params;
   const page = pages[slug];
   if (page)
@@ -168,14 +171,14 @@ export default async function Page({
       <>
         <SiteHeader />
         <main id="main" className="section-wrap information-page">
-          <span className="eyebrow">{page.eyebrow}</span>
-          <h1>{page.title}</h1>
-          <p className="page-intro">{page.intro}</p>
+          <span className="eyebrow">{t(page.eyebrow)}</span>
+          <h1>{t(page.title)}</h1>
+          <p className="page-intro">{t(page.intro)}</p>
           <div className="information-blocks">
             {page.blocks.map((b) => (
               <section key={b.title}>
-                <h2>{b.title}</h2>
-                <p>{b.text}</p>
+                <h2>{t(b.title)}</h2>
+                <p>{t(b.text)}</p>
               </section>
             ))}
           </div>
@@ -184,11 +187,14 @@ export default async function Page({
               className="btn btn-primary"
               href={`mailto:info@framyconnect.co.mz?subject=${encodeURIComponent(slug === 'aplicar' ? 'Interesse em ser agente Framy Connect' : 'Informações Framy Connect')}`}
             >
-              <Mail size={20} /> Escrever um email <ArrowUpRight size={20} />
+              <Mail size={20} />
+              {t(' Escrever um email ')}
+              <ArrowUpRight size={20} />
             </a>
           )}
           <Link className="text-link" href="/produtos">
-            Descobrir produtos <ArrowUpRight size={19} />
+            {t('Descobrir produtos ')}
+            <ArrowUpRight size={19} />
           </Link>
         </main>
         <SiteFooter />

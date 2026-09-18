@@ -1,4 +1,5 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 
 import * as React from 'react';
 import { mergeProps } from '@base-ui/react/merge-props';
@@ -162,6 +163,7 @@ function Sidebar({
   variant?: 'sidebar' | 'floating' | 'inset';
   collapsible?: 'offcanvas' | 'icon' | 'none';
 }) {
+  const { t } = useI18n();
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
   if (collapsible === 'none') {
@@ -196,8 +198,10 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+            <SheetTitle>{t('Menu lateral')}</SheetTitle>
+            <SheetDescription>
+              {t('Navegação da conta no telemóvel.')}
+            </SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
@@ -256,6 +260,7 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
+  const { t } = useI18n();
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -272,22 +277,23 @@ function SidebarTrigger({
       {...props}
     >
       <PanelLeftIcon className="cn-rtl-flip" />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">{t('Abrir ou fechar menu')}</span>
     </Button>
   );
 }
 
 function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
+  const { t } = useI18n();
   const { toggleSidebar } = useSidebar();
 
   return (
     <button
       data-sidebar="rail"
       data-slot="sidebar-rail"
-      aria-label="Toggle Sidebar"
+      aria-label={t('Abrir ou fechar menu')}
       tabIndex={-1}
       onClick={toggleSidebar}
-      title="Toggle Sidebar"
+      title={t('Abrir ou fechar menu')}
       className={cn(
         'hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2',
         'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',

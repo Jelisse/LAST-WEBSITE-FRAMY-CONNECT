@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { ArrowDown, ArrowUp, LockKeyhole, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +26,7 @@ export function ProfileLinksEditor({
   onChange: (profile: Profile) => void;
   onUpgrade: () => void;
 }) {
+  const { t } = useI18n();
   const plan = terms ?? getPlan(planId),
     links = profile.links ?? [];
   function move(index: number, delta: number) {
@@ -35,9 +38,13 @@ export function ProfileLinksEditor({
     <section className="link-editor" aria-labelledby="links-editor-title">
       <div className="link-editor-heading">
         <div>
-          <h3 id="links-editor-title">Os seus links</h3>
+          <h3 id="links-editor-title">{t('Os seus links')}</h3>
           <p>
-            {links.length} de {plan.links} caixas utilizadas · {plan.name}
+            {links.length}
+            {t(' de ')}
+            {plan.links}
+            {t(' caixas utilizadas · ')}
+            {t(plan.name)}
           </p>
         </div>
         <Button
@@ -47,25 +54,29 @@ export function ProfileLinksEditor({
           disabled={disabled}
           onClick={onUpgrade}
         >
-          Escolher plano
+          {t('Escolher plano')}
         </Button>
       </div>
       <p className="link-editor-note">
-        Adicione redes sociais, portefólio ou outros destinos. Os links aparecem
-        no perfil quando publicar.
+        {t(
+          'Adicione redes sociais, portefólio ou outros destinos. Os links aparecem no perfil quando publicar.',
+        )}
       </p>
       <div className="link-editor-list">
         {links.map((link, index) => (
           <fieldset className="link-edit-box" key={index} disabled={disabled}>
-            <legend>Link {index + 1}</legend>
+            <legend>
+              {t('Link ')}
+              {index + 1}
+            </legend>
             <label htmlFor={`link-label-${index}`}>
-              Título
+              {t('Título')}
               <Input
                 id={`link-label-${index}`}
                 value={link.label}
                 maxLength={60}
                 required
-                placeholder="Ex.: Instagram"
+                placeholder={t('Ex.: Instagram')}
                 onChange={(event) =>
                   onChange({
                     ...profile,
@@ -79,14 +90,14 @@ export function ProfileLinksEditor({
               />
             </label>
             <label htmlFor={`link-url-${index}`}>
-              Endereço
+              {t('Endereço')}
               <Input
                 id={`link-url-${index}`}
                 value={link.url}
                 type="url"
                 maxLength={300}
                 required
-                placeholder="https://…"
+                placeholder={t('https://…')}
                 onChange={(event) =>
                   onChange({
                     ...profile,
@@ -102,7 +113,7 @@ export function ProfileLinksEditor({
                 type="button"
                 variant="ghost"
                 disabled={disabled || index === 0}
-                aria-label={`Mover link ${index + 1} para cima`}
+                aria-label={t('Mover link {0} para cima', [index + 1])}
                 onClick={() => move(index, -1)}
               >
                 <ArrowUp size={17} />
@@ -111,7 +122,7 @@ export function ProfileLinksEditor({
                 type="button"
                 variant="ghost"
                 disabled={disabled || index === links.length - 1}
-                aria-label={`Mover link ${index + 1} para baixo`}
+                aria-label={t('Mover link {0} para baixo', [index + 1])}
                 onClick={() => move(index, 1)}
               >
                 <ArrowDown size={17} />
@@ -120,7 +131,7 @@ export function ProfileLinksEditor({
                 type="button"
                 variant="ghost"
                 disabled={disabled}
-                aria-label={`Remover link ${index + 1}`}
+                aria-label={t('Remover link {0}', [index + 1])}
                 onClick={() =>
                   onChange({
                     ...profile,
@@ -144,8 +155,12 @@ export function ProfileLinksEditor({
             onChange({ ...profile, links: [...links, { label: '', url: '' }] })
           }
         >
-          <Plus size={20} /> Adicionar link{' '}
-          <span>{plan.links - links.length} disponíveis</span>
+          <Plus size={20} />
+          {t(' Adicionar link')}{' '}
+          <span>
+            {plan.links - links.length}
+            {t(' disponíveis')}
+          </span>
         </Button>
       ) : (
         <Button
@@ -157,13 +172,13 @@ export function ProfileLinksEditor({
         >
           <LockKeyhole size={18} />
           {plan.links === 50
-            ? 'Todas as 50 caixas estão em uso'
-            : 'Desbloquear mais caixas'}
+            ? t('Todas as 50 caixas estão em uso')
+            : t('Desbloquear mais caixas')}
         </Button>
       )}
       {plan.bio > 0 ? (
         <label className="link-bio" htmlFor="profile-bio">
-          Biografia{' '}
+          {t('Biografia')}{' '}
           <span>
             {profile.bio?.length ?? 0}/{plan.bio}
           </span>
@@ -173,7 +188,9 @@ export function ProfileLinksEditor({
             maxLength={plan.bio}
             value={profile.bio ?? ''}
             rows={4}
-            placeholder="Conte um pouco sobre si ou sobre a sua organização."
+            placeholder={t(
+              'Conte um pouco sobre si ou sobre a sua organização.',
+            )}
             onChange={(event) =>
               onChange({ ...profile, bio: event.target.value })
             }
@@ -181,8 +198,8 @@ export function ProfileLinksEditor({
         </label>
       ) : (
         <p className="link-bio-locked">
-          <LockKeyhole size={16} /> Biografia disponível a partir do plano
-          Criador.
+          <LockKeyhole size={16} />
+          {t(' Biografia disponível a partir do plano Criador.')}
         </p>
       )}
     </section>

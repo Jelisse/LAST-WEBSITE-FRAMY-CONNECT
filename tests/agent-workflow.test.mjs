@@ -190,7 +190,10 @@ const dataModule = (code) =>
   'data:text/javascript;base64,' + Buffer.from(code).toString('base64');
 async function route(file) {
   const dependencies = {
-    '@/lib/service-failure': new URL('../lib/service-failure.ts', import.meta.url).href,
+    '@/lib/service-failure': new URL(
+      '../lib/service-failure.ts',
+      import.meta.url,
+    ).href,
     '@/lib/server-reservations': dataModule(
       'export async function expireReservations(){}',
     ),
@@ -380,6 +383,28 @@ test('database routes isolate agents, persist operations reports, and deliver ex
   assert.equal((await api.POST(req(payload))).status, 409);
   assert.equal((await reports.GET()).status, 403);
   globalThis.__agentTest.user = { userId: 'manager', role: 'manager' };
+  sql
+    .prepare(
+      'INSERT INTO profiles(owner_id,username,draft_json,published_json,updated_at) VALUES(?,?,?,?,?)',
+    )
+    .run(
+      'customer-owner',
+      'changed-current-profile',
+      '{}',
+      '{}',
+      new Date().toISOString(),
+    );
+  const managed = await (
+    await manager.GET(new Request(origin + '/api/manager'))
+  ).json();
+  const managedOrder = managed.orders.find((o) => o.id === 'order-a');
+  assert.equal(managedOrder.approvedUrl, origin + '/customer');
+  assert.equal(managedOrder.approvedUrl, data.orders[0].approvedUrl);
+  assert.equal(
+    managedOrder.profileUsername,
+    'customer',
+    'preserve the order profile instead of replacing it with the current profile',
+  );
   const managerReports = await (await reports.GET()).json();
   assert.equal(managerReports.reports[0].id, reportId);
   assert.equal(

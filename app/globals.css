@@ -4039,3 +4039,92 @@ output { display: block; }
 }
 .product-card.is-coming-soon .product-info > span { color: #626662; }
 .product-card.is-available { border-color: #fa5724; }
+
+/* All navigation actions remain reachable as translated labels grow. */
+.language-selector {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.language-selector select {
+  color: #292626;
+  background: #fff;
+  border: 1px solid #d7d1cc;
+  border-radius: 10px;
+  min-height: 42px;
+  padding: 8px 28px 8px 10px;
+  font: inherit;
+  font-size: 14px;
+  max-width: 160px;
+  cursor: pointer;
+}
+.language-selector select:focus-visible {
+  outline: 3px solid #fb5725;
+  outline-offset: 3px;
+}
+.site-header {
+  height: auto;
+  min-height: 102px;
+  padding-block: 12px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.site-header nav,
+.header-actions {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.header-actions {
+  margin-left: auto;
+}
+.header-actions .btn {
+  font-size: 14px;
+  padding: 10px 12px;
+}
+.workspace-header,
+.manager-top,
+.agent-header,
+.staff-page > header {
+  height: auto;
+  min-height: 72px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.auth-card > .language-selector {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+html[lang='zh-Hant'] body {
+  font-family:
+    var(--font-poppins), 'Noto Sans TC', 'Microsoft JhengHei', 'PingFang TC',
+    sans-serif;
+}
+html[lang='zh-Hant'] h1,
+html[lang='zh-Hant'] h2 {
+  letter-spacing: normal;
+  line-height: 1.35;
+}
+@media (max-width: 760px) {
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    margin: 0;
+  }
+  .site-header nav {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .workspace-header {
+    padding: 12px 16px;
+  }
+  .workspace-header > div {
+    min-width: 0;
+  }
+  .workspace-header .header-upgrade {
+    margin-left: auto;
+  }
+}
+
+.public-profile-language { display: flex; justify-content: flex-end; padding: 8px 12px; background: #fff; }

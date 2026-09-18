@@ -1,14 +1,18 @@
+import { getTranslations } from '@/lib/server-i18n';
 import Image from 'next/image';
 import { Nfc } from 'lucide-react';
 import { HomeNfcKeychain } from './home-nfc-keychain';
 
 /** Independent transform layers, ready for future motion. The screen is static. */
-export function HomeHeroScene() {
+export async function HomeHeroScene() {
+  const t = await getTranslations();
   return (
     <section
       className="home-hero-scene"
 
-      aria-label="iPhone com um exemplo de perfil Framy, cartões NFC laranja e preto e porta-chaves NFC sobre uma base"
+      aria-label={t(
+        'iPhone com um exemplo de perfil Framy, cartões NFC laranja e preto e porta-chaves NFC sobre uma base',
+      )}
     >
       <div className="home-scene-base" data-motion-layer="base">
         <Image
@@ -35,9 +39,9 @@ export function HomeHeroScene() {
             unoptimized
           />
           <p>
-            O Seu Mundo
+            {t('O Seu Mundo')}
             <br />
-            num Toque.
+            {t('num Toque.')}
           </p>
         </div>
       ))}
@@ -62,9 +66,9 @@ export function HomeHeroScene() {
             unoptimized
           />
           <p>
-            O Seu Mundo
+            {t('O Seu Mundo')}
             <br />
-            num Toque.
+            {t('num Toque.')}
           </p>
         </div>
       </div>

@@ -1,7 +1,10 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useEffect, useState } from 'react';
 import type { Product } from '@/lib/catalog';
 export function ProductAnalytics({ products }: { products: Product[] }) {
+  const { t } = useI18n();
   const [data, setData] = useState<{
       visits: { product_id: string; visits: number }[];
       orders: { product_id: string; orders: number }[];
@@ -36,38 +39,38 @@ export function ProductAnalytics({ products }: { products: Product[] }) {
     <section className="product-analytics">
       <header>
         <div>
-          <h2>Interesse nos produtos</h2>
-          <p>Últimos 30 dias · visitas às páginas, mesmo sem compra</p>
+          <h2>{t('Interesse nos produtos')}</h2>
+          <p>{t('Últimos 30 dias · visitas às páginas, mesmo sem compra')}</p>
         </div>
         <button type="button" onClick={() => void load()}>
-          Actualizar estatísticas
+          {t('Actualizar estatísticas')}
         </button>
       </header>
       {error ? (
-        <p role="alert">{error}</p>
+        <p role="alert">{t(error)}</p>
       ) : !data ? (
-        <p>A carregar…</p>
+        <p>{t('A carregar…')}</p>
       ) : (
         <div className="table-scroll">
           <table>
             <thead>
               <tr>
-                <th>Produto</th>
-                <th>Estado</th>
-                <th>Visitas</th>
-                <th>Encomendas</th>
+                <th>{t('Produto')}</th>
+                <th>{t('Estado')}</th>
+                <th>{t('Visitas')}</th>
+                <th>{t('Encomendas')}</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((p) => (
                 <tr key={p.id}>
-                  <td>{p.name}</td>
+                  <td>{t(p.name)}</td>
                   <td>
                     {p.published === false
-                      ? 'Oculto'
+                      ? t('Oculto')
                       : p.available
-                        ? 'Vendas activas'
-                        : 'Brevemente'}
+                        ? t('Vendas activas')
+                        : t('Brevemente')}
                   </td>
                   <td>{p.visits}</td>
                   <td>{p.orders}</td>
@@ -78,9 +81,9 @@ export function ProductAnalytics({ products }: { products: Product[] }) {
         </div>
       )}
       <small>
-        Uma visita por produto, sessão e dia UTC. Contas da equipa são
-        excluídas. Não representa pessoas únicas nem pagamentos confirmados; a
-        medição começou com esta funcionalidade.
+        {t(
+          'Uma visita por produto, sessão e dia UTC. Contas da equipa são excluídas. Não representa pessoas únicas nem pagamentos confirmados; a medição começou com esta funcionalidade.',
+        )}
       </small>
     </section>
   );

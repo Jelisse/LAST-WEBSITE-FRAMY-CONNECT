@@ -1,9 +1,12 @@
 'use client';
+import { useI18n, LanguageSelector } from '@/components/language-provider';
+
 import { useState } from 'react';
 import Link from '@/components/hard-link';
 import { clearPrivateDeviceData } from '@/lib/client-privacy';
 import '../entrar/style.css';
 export default function Page() {
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   async function post(body: Record<string, unknown>) {
@@ -31,9 +34,14 @@ export default function Page() {
   return (
     <main id="main" className="auth-page">
       <section className="auth-card">
-        <Link href="/dashboard">A minha conta</Link>
-        <h1>Segurança da conta</h1>
-        <p>Alterar a palavra-passe termina todas as sessões, incluindo esta.</p>
+        <LanguageSelector />
+        <Link href="/dashboard">{t('A minha conta')}</Link>
+        <h1>{t('Segurança da conta')}</h1>
+        <p>
+          {t(
+            'Alterar a palavra-passe termina todas as sessões, incluindo esta.',
+          )}
+        </p>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -50,7 +58,7 @@ export default function Page() {
           }}
         >
           <label>
-            Palavra-passe actual
+            {t('Palavra-passe actual')}
             <input
               type="password"
               name="current"
@@ -60,7 +68,7 @@ export default function Page() {
             />
           </label>
           <label>
-            Nova palavra-passe
+            {t('Nova palavra-passe')}
             <input
               type="password"
               name="password"
@@ -71,7 +79,7 @@ export default function Page() {
             />
           </label>
           <label>
-            Repetir nova palavra-passe
+            {t('Repetir nova palavra-passe')}
             <input
               type="password"
               name="confirm"
@@ -81,14 +89,14 @@ export default function Page() {
               autoComplete="new-password"
             />
           </label>
-          <button disabled={busy}>Alterar palavra-passe</button>
+          <button disabled={busy}>{t('Alterar palavra-passe')}</button>
         </form>
-        {error && <p role="alert">{error}</p>}
+        {error && <p role="alert">{t(error)}</p>}
         <button
           disabled={busy}
           onClick={() => void post({ action: 'logout-all' })}
         >
-          Terminar sessão em todos os dispositivos
+          {t('Terminar sessão em todos os dispositivos')}
         </button>
       </section>
     </main>

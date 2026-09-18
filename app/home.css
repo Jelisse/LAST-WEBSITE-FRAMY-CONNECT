@@ -1841,3 +1841,39 @@
 .framy-home .home-product.is-coming-soon .home-product-art img { filter: grayscale(.85) saturate(.3); opacity: .6; }
 .framy-home .home-product.is-coming-soon .home-product-price { color: #626662; }
 .framy-home .home-product.is-coming-soon:hover { box-shadow: none; }
+
+/* Language and agent actions stay visible on narrow screens. */
+.home-nav {
+  height: auto;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.home-nav-actions {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.home-nav-actions .home-agent {
+  display: inline-flex;
+  background: #fff0e8;
+  color: #93320f;
+  border: 1px solid #e9c7b5;
+}
+@media (max-width: 760px) {
+  .home-nav-actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+  .home-nav-actions > a,
+  .home-nav-actions > button {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  .home-nav .language-selector select {
+    max-width: 140px;
+  }
+  .home-nav nav {
+    width: 100%;
+    order: 3;
+  }
+}

@@ -1,0 +1,5886 @@
+{
+  "Activar o meu acesso": [
+    "Activate my access",
+    "啟用我的存取權限"
+  ],
+  "Conta activada. Já pode iniciar sessão com o seu email e a nova palavra-passe.": [
+    "Account activated. You can now sign in with your email and new password.",
+    "帳戶已啟用。您現在可以使用電子郵件和新密碼登入。"
+  ],
+  "Iniciar sessão": [
+    "Sign in",
+    "登入"
+  ],
+  "Defina a sua palavra-passe. O convite é pessoal, válido por 24 horas e só pode ser usado uma vez.": [
+    "Set your password. This personal invitation is valid for 24 hours and can only be used once.",
+    "請設定密碼。此邀請僅供本人使用，有效期為 24 小時，只能使用一次。"
+  ],
+  "Nova palavra-passe": [
+    "New password",
+    "新密碼"
+  ],
+  "Repetir palavra-passe": [
+    "Repeat password",
+    "再次輸入密碼"
+  ],
+  "A activar…": [
+    "Activating…",
+    "正在啟用…"
+  ],
+  "Activar conta": [
+    "Activate account",
+    "啟用帳戶"
+  ],
+  "EQUIPA FRAMY": [
+    "FRAMY TEAM",
+    "FRAMY 團隊"
+  ],
+  "Tornar-se agente": [
+    "Become an agent",
+    "成為代理員"
+  ],
+  "Apresente-se à nossa equipa. Precisará dos seus contactos, de uma fotografia e das duas faces do BI. Candidaturas a partir dos 18 anos, sujeitas a análise.": [
+    "Introduce yourself to our team. You will need your contact details, a photo and both sides of your identity document. Applicants must be at least 18; applications are subject to review.",
+    "向我們的團隊介紹自己。請準備聯絡資料、個人照片及身分證正反面照片。申請者須年滿 18 歲，所有申請均須經過審核。"
+  ],
+  "Comece pela sua conta": [
+    "Start with your account",
+    "先建立帳戶"
+  ],
+  "Crie uma conta para guardar a candidatura e acompanhar a resposta da gestão.": [
+    "Create an account to save your application and follow the management team's response.",
+    "建立帳戶以儲存申請並查看管理團隊的回覆。"
+  ],
+  "Criar conta e candidatar-me": [
+    "Create an account and apply",
+    "建立帳戶並申請"
+  ],
+  "Já tenho conta — entrar": [
+    "I already have an account — sign in",
+    "我已有帳戶 — 登入"
+  ],
+  "Framy Connect": [
+    "Framy Connect",
+    "Framy Connect"
+  ],
+  "Direcção ·": [
+    "Directors ·",
+    "董事 ·"
+  ],
+  "Visão geral do negócio. As operações e as finanças são geridas pelo Gestor.": [
+    "Business overview. Operations and finances are handled by the manager.",
+    "業務總覽。營運和財務由管理員負責。"
+  ],
+  "Terminar sessão": [
+    "Sign out",
+    "登出"
+  ],
+  "Agentes activos": [
+    "Active agents",
+    "有效代理員"
+  ],
+  "Pedidos por etapa": [
+    "Orders by stage",
+    "各階段訂單"
+  ],
+  "pedidos": [
+    "orders",
+    "筆訂單"
+  ],
+  "Ainda não existem pedidos.": [
+    "There are no orders yet.",
+    "目前尚無訂單。"
+  ],
+  "Não foi possível carregar.": [
+    "Unable to load.",
+    "無法載入。"
+  ],
+  "Tente novamente dentro de instantes. Os seus dados guardados não foram alterados.": [
+    "Please try again shortly. Your saved data has not changed.",
+    "請稍後再試。已儲存的資料沒有變更。"
+  ],
+  "Tentar novamente": [
+    "Try again",
+    "再試一次"
+  ],
+  "Saltar para o conteúdo": [
+    "Skip to content",
+    "跳至主要內容"
+  ],
+  "Acesso reservado": [
+    "Restricted access",
+    "存取受限"
+  ],
+  "Esta conta não tem acesso ao Gestor.": [
+    "This account cannot access the management dashboard.",
+    "此帳戶無法存取管理後台。"
+  ],
+  "Abrir a minha conta": [
+    "Open my account",
+    "開啟我的帳戶"
+  ],
+  "404 / LIGAÇÃO INDISPONÍVEL": [
+    "404 / LINK UNAVAILABLE",
+    "404 / 連結無法使用"
+  ],
+  "Esta ligação ainda": [
+    "This link",
+    "此連結"
+  ],
+  "não nos conecta.": [
+    "does not connect us yet.",
+    "目前無法連線。"
+  ],
+  "A página não existe ou o perfil não está publicado.": [
+    "The page does not exist or the profile is not published.",
+    "此頁面不存在，或個人檔案尚未發佈。"
+  ],
+  "Voltar ao início": [
+    "Back to home",
+    "返回首頁"
+  ],
+  "Framy Connect — início": [
+    "Framy Connect — home",
+    "Framy Connect — 首頁"
+  ],
+  "Navegação principal": [
+    "Main navigation",
+    "主要導覽"
+  ],
+  "Como funciona": [
+    "How it works",
+    "使用方式"
+  ],
+  "Produtos": [
+    "Products",
+    "產品"
+  ],
+  "Planos": [
+    "Plans",
+    "方案"
+  ],
+  "Sobre nós": [
+    "About us",
+    "關於我們"
+  ],
+  "Ver produtos": [
+    "View products",
+    "查看產品"
+  ],
+  "O Seu Mundo,": [
+    "Your World,",
+    "您的世界，"
+  ],
+  "Num Toque.": [
+    "In One Tap.",
+    "一觸即達。"
+  ],
+  "Cartões e acessórios NFC que partilham o seu perfil digital por toque ou QR.": [
+    "NFC cards and accessories that share your digital profile with a tap or QR code.",
+    "透過輕觸或 QR 碼分享數位個人檔案的 NFC 卡片與配件。"
+  ],
+  "Os seus contactos, redes sociais e trabalho num só lugar. Escolha o formato que o acompanha e actualize o perfil sempre que precisar.": [
+    "Your contacts, social networks and work in one place. Choose the format that suits you and update your profile whenever you need.",
+    "將聯絡資料、社群平台和工作資訊集中於一處。選擇適合您的產品，並隨時更新個人檔案。"
+  ],
+  "Escolher o meu produto": [
+    "Choose my product",
+    "選擇我的產品"
+  ],
+  "Toque ou QR": [
+    "Tap or QR",
+    "輕觸或 QR 碼"
+  ],
+  "Abre no navegador": [
+    "Opens in your browser",
+    "在瀏覽器中開啟"
+  ],
+  "Perfil actualizável": [
+    "Updatable profile",
+    "可更新的個人檔案"
+  ],
+  "Um formato para o seu dia.": [
+    "A format for your day.",
+    "適合日常使用的產品。"
+  ],
+  "Explore os produtos em destaque e encontre o seu próximo toque.": [
+    "Explore our featured products and find your next connection.",
+    "探索精選產品，開啟下一次連結。"
+  ],
+  "Ver todos os produtos": [
+    "View all products",
+    "查看所有產品"
+  ],
+  "Porta-chaves NFC disponíveis. Os restantes produtos chegam brevemente.": [
+    "NFC keychains are available. Other products are coming soon.",
+    "NFC 鑰匙圈現已供應。其他產品即將推出。"
+  ],
+  "Brevemente": [
+    "Coming soon",
+    "即將推出"
+  ],
+  "Produto físico · disponível para encomenda": [
+    "Physical product · available to order",
+    "實體產品 · 可訂購"
+  ],
+  "Brevemente · compra ainda indisponível": [
+    "Coming soon · not yet available to buy",
+    "即將推出 · 暫不可購買"
+  ],
+  "Mais espaço para o seu perfil.": [
+    "More room for your profile.",
+    "為您的個人檔案提供更多空間。"
+  ],
+  "Planos digitais mensais em meticais. Compare o número de links e o espaço de apresentação.": [
+    "Monthly digital plans in meticais. Compare link limits and introduction space.",
+    "以莫三比克梅蒂卡爾計價的數位月費方案。比較連結數量和自我介紹空間。"
+  ],
+  "Comece com 30 dias gratuitos, sem renovação automática. Os planos mensais ainda não aceitam adesões. O produto físico é pago separadamente.": [
+    "Start with 30 free days, with no automatic renewal. Monthly plans are not yet open for registration. The physical product is paid for separately.",
+    "先享用 30 天免費試用，不會自動續訂。月費方案尚未開放申請。實體產品需另行付款。"
+  ],
+  "/ 30 dias": [
+    "/ 30 days",
+    "/ 30 天"
+  ],
+  "/ mês": [
+    "/ month",
+    "/ 月"
+  ],
+  "Até": [
+    "Up to",
+    "最多"
+  ],
+  "links no perfil": [
+    "profile links",
+    "個檔案連結"
+  ],
+  "Contactos essenciais, sem biografia": [
+    "Essential contacts, without a biography",
+    "基本聯絡資料，不含個人簡介"
+  ],
+  "Os planos estão a ser actualizados. Contacte-nos para mais informações.": [
+    "Plans are being updated. Contact us for more information.",
+    "方案更新中。詳情請聯絡我們。"
+  ],
+  "Explorar planos na minha conta": [
+    "Explore plans in my account",
+    "在我的帳戶中查看方案"
+  ],
+  "Uma conexão à sua medida.": [
+    "A connection that fits you.",
+    "專屬於您的連結。"
+  ],
+  "Quem somos": [
+    "Who we are",
+    "我們是誰"
+  ],
+  "A Framy Connect transforma cartões, etiquetas e pulseiras em identidades digitais instantâneas. Com um simples toque, pessoas e organizações podem partilhar e comprovar quem são, o que conquistaram e o que representam, de forma simples, confiável e acessível.": [
+    "Framy Connect turns cards, tags and wristbands into instant digital identities. With a simple tap, people and organisations can share and demonstrate who they are, what they have achieved and what they represent, simply, reliably and accessibly.",
+    "Framy Connect 將卡片、標籤和手環轉化為即時數位身分。只需輕觸一下，個人與組織即可簡便、可靠且輕鬆地分享及展示自己的身分、成就與所代表的事物。"
+  ],
+  "Visão": [
+    "Vision",
+    "願景"
+  ],
+  "Fazer do toque a linguagem universal da identidade, para cada pessoa e cada instituição à qual pertencem.": [
+    "Make a tap the universal language of identity, for every person and every institution they belong to.",
+    "讓輕觸成為每個人及其所屬機構都能使用的通用身分語言。"
+  ],
+  "Missão": [
+    "Mission",
+    "使命"
+  ],
+  "Transformar cada toque numa conexão de confiança, tornando identidades, conquistas e pertenças instantaneamente acessíveis, verificáveis e universais.": [
+    "Turn every tap into a trusted connection, making identities, achievements and affiliations instantly accessible, verifiable and universal.",
+    "將每次輕觸化為可信任的連結，讓身分、成就及所屬關係即時可供存取、驗證並普遍使用。"
+  ],
+  "Antes do primeiro toque.": [
+    "Before your first tap.",
+    "第一次輕觸之前。"
+  ],
+  "Falar com a Framy": [
+    "Talk to Framy",
+    "聯絡 Framy"
+  ],
+  "Pronto para a próxima conexão?": [
+    "Ready for your next connection?",
+    "準備好建立下一個連結了嗎？"
+  ],
+  "Escolha o seu produto. Depois, seleccione o plano e personalize o seu perfil.": [
+    "Choose your product. Then select a plan and personalise your profile.",
+    "先選擇產品，再選取方案並打造個人檔案。"
+  ],
+  "UM FORMATO PARA CADA CONEXÃO": [
+    "A FORMAT FOR EVERY CONNECTION",
+    "適合每種連結的產品"
+  ],
+  "O seu mundo.": [
+    "Your world.",
+    "您的世界。"
+  ],
+  "À sua maneira.": [
+    "Your way.",
+    "您的方式。"
+  ],
+  "Do cartão que o apresenta ao acessório que o acompanha. Encontre o seu próximo toque.": [
+    "From the card that introduces you to the accessory that goes with you. Find your next connection.",
+    "從介紹自己的卡片，到隨身攜帶的配件，探索下一次連結。"
+  ],
+  "Todos os produtos": [
+    "All products",
+    "所有產品"
+  ],
+  "Design alinhado à sua identidade": [
+    "Design that matches your identity",
+    "符合您形象的設計"
+  ],
+  "Partilha simples por link": [
+    "Easy sharing by link",
+    "透過連結輕鬆分享"
+  ],
+  "Configuração orientada ao seu uso": [
+    "Setup tailored to your use",
+    "依您的用途設定"
+  ],
+  "A encomenda reserva o produto durante 24 horas. O pagamento é confirmado após verificação pela equipa.": [
+    "Your order reserves the product for 24 hours. Payment is confirmed after verification by the team.",
+    "提交訂單後，產品將保留 24 小時。付款須經團隊核實後才會確認。"
+  ],
+  "Este produto está em preparação. A compra será activada quando estiver disponível.": [
+    "This product is being prepared. Purchasing will be enabled when it becomes available.",
+    "此產品正在籌備中，供應後即可購買。"
+  ],
+  "Personalizar e comprar": [
+    "Personalise and buy",
+    "自訂並購買"
+  ],
+  "Tentar terminar sessão novamente": [
+    "Try signing out again",
+    "再次嘗試登出"
+  ],
+  "A minha conta": [
+    "My account",
+    "我的帳戶"
+  ],
+  "Segurança da conta": [
+    "Account security",
+    "帳戶安全"
+  ],
+  "Alterar a palavra-passe termina todas as sessões, incluindo esta.": [
+    "Changing your password ends all sessions, including this one.",
+    "變更密碼將登出所有工作階段，包括目前的工作階段。"
+  ],
+  "Palavra-passe actual": [
+    "Current password",
+    "目前密碼"
+  ],
+  "Repetir nova palavra-passe": [
+    "Repeat new password",
+    "再次輸入新密碼"
+  ],
+  "Alterar palavra-passe": [
+    "Change password",
+    "變更密碼"
+  ],
+  "Terminar sessão em todos os dispositivos": [
+    "Sign out on all devices",
+    "登出所有裝置"
+  ],
+  "Escrever um email": [
+    "Write an email",
+    "撰寫電子郵件"
+  ],
+  "Descobrir produtos": [
+    "Discover products",
+    "探索產品"
+  ],
+  "Contas e acessos": [
+    "Accounts and access",
+    "帳戶與權限"
+  ],
+  "Crie acessos para a equipa. Entregue o convite pessoalmente ao destinatário por um canal seguro. A recuperação suspende o acesso actual e termina todas as sessões.": [
+    "Create access for your team. Deliver the invitation personally to its recipient through a secure channel. Recovery suspends current access and ends all sessions.",
+    "為團隊建立帳戶權限。請透過安全管道將邀請直接交給收件者。復原操作會暫停目前的存取權限並登出所有工作階段。"
+  ],
+  "Convite criado. Válido por 24 horas; guarde-o antes de sair desta página.": [
+    "Invitation created. Valid for 24 hours; save it before leaving this page.",
+    "邀請已建立，有效期為 24 小時。離開此頁面前請先儲存。"
+  ],
+  "Ligação privada de activação": [
+    "Private activation link",
+    "私人啟用連結"
+  ],
+  "Nome": [
+    "Name",
+    "姓名"
+  ],
+  "Email": [
+    "Email",
+    "電子郵件"
+  ],
+  "Nível de acesso": [
+    "Access level",
+    "存取層級"
+  ],
+  "Agente": [
+    "Agent",
+    "代理員"
+  ],
+  "Gestor": [
+    "Manager",
+    "管理員"
+  ],
+  "Direcção": [
+    "Directors",
+    "董事"
+  ],
+  "Ligar a um agente já cadastrado (opcional)": [
+    "Link to an existing agent (optional)",
+    "連結至現有代理員（選填）"
+  ],
+  "Criar novo registo": [
+    "Create new record",
+    "建立新紀錄"
+  ],
+  "Criar conta e convite": [
+    "Create account and invitation",
+    "建立帳戶及邀請"
+  ],
+  "Acesso": [
+    "Access",
+    "權限"
+  ],
+  "Estado": [
+    "Status",
+    "狀態"
+  ],
+  "Acções": [
+    "Actions",
+    "操作"
+  ],
+  "Activo": [
+    "Active",
+    "已啟用"
+  ],
+  "Inactivo / por activar": [
+    "Inactive / pending activation",
+    "未啟用／待啟用"
+  ],
+  "Desactivar": [
+    "Deactivate",
+    "停用"
+  ],
+  "Activar": [
+    "Activate",
+    "啟用"
+  ],
+  "Novo convite / recuperar acesso": [
+    "New invitation / recover access",
+    "重新邀請／復原存取權限"
+  ],
+  "Minha Conta": [
+    "My Account",
+    "我的帳戶"
+  ],
+  "Abrir o meu painel": [
+    "Open my dashboard",
+    "開啟我的控制台"
+  ],
+  "Os meus pedidos e perfil": [
+    "My orders and profile",
+    "我的訂單與個人檔案"
+  ],
+  "A minha candidatura": [
+    "My application",
+    "我的申請"
+  ],
+  "Entrar": [
+    "Sign in",
+    "登入"
+  ],
+  "Criar conta": [
+    "Create account",
+    "建立帳戶"
+  ],
+  "Confirme o produto e o link aprovado antes de iniciar. O pagamento foi confirmado por Operações.": [
+    "Confirm the product and approved link before starting. Operations has confirmed payment.",
+    "開始前請確認產品及核准的連結。營運團隊已確認付款。"
+  ],
+  "Link lido no teste NFC": [
+    "Link read during NFC test",
+    "NFC 測試讀取的連結"
+  ],
+  "Cole o link aberto pelo NFC": [
+    "Paste the link opened by NFC",
+    "貼上 NFC 開啟的連結"
+  ],
+  "Programei e testei o NFC no produto físico.": [
+    "I have programmed and tested the NFC on the physical product.",
+    "我已在實體產品上完成 NFC 寫入及測試。"
+  ],
+  "Produto protegido, embalado e identificado para o cliente correcto.": [
+    "Product protected, packaged and labelled for the correct customer.",
+    "產品已妥善保護、包裝，並標示正確的客戶資料。"
+  ],
+  "Transportadora / método aprovado": [
+    "Carrier / approved method",
+    "承運商／核准的方式"
+  ],
+  "Transportadora ou recolha em Maputo": [
+    "Carrier or collection in Maputo",
+    "承運商或馬普托自取"
+  ],
+  "Referência / código de rastreio": [
+    "Reference / tracking code",
+    "參考編號／追蹤碼"
+  ],
+  "Comprovativo / confirmação de recepção": [
+    "Proof / receipt confirmation",
+    "憑證／收貨確認"
+  ],
+  "O cliente confirmou a recepção.": [
+    "The customer has confirmed receipt.",
+    "客戶已確認收貨。"
+  ],
+  "A guardar…": [
+    "Saving…",
+    "正在儲存…"
+  ],
+  "Nota operacional": [
+    "Operational note",
+    "營運備註"
+  ],
+  "Guardar nota": [
+    "Save note",
+    "儲存備註"
+  ],
+  "Entrega concluída.": [
+    "Delivery completed.",
+    "配送已完成。"
+  ],
+  "Pedido cancelado por Operações.": [
+    "Order cancelled by Operations.",
+    "營運團隊已取消訂單。"
+  ],
+  "Produção bloqueada. Peça a Operações para confirmar o pagamento e o link aprovado.": [
+    "Production blocked. Ask Operations to confirm payment and the approved link.",
+    "生產已暫停。請營運團隊確認付款及核准的連結。"
+  ],
+  "A carregar a sua candidatura…": [
+    "Loading your application…",
+    "正在載入您的申請…"
+  ],
+  "Referência:": [
+    "Reference:",
+    "參考編號："
+  ],
+  "Mensagem da gestão:": [
+    "Message from management:",
+    "管理團隊訊息："
+  ],
+  "Entrar no painel de agente": [
+    "Open agent dashboard",
+    "開啟代理員控制台"
+  ],
+  "1. Dados pessoais e actividade": [
+    "1. Personal details and occupation",
+    "1. 個人資料與職業"
+  ],
+  "Nome completo": [
+    "Full name",
+    "全名"
+  ],
+  "Email da conta": [
+    "Account email",
+    "帳戶電子郵件"
+  ],
+  "O contacto da candidatura fica associado à sua conta.": [
+    "The application's contact details are linked to your account.",
+    "申請的聯絡資料會與您的帳戶連結。"
+  ],
+  "Data de nascimento": [
+    "Date of birth",
+    "出生日期"
+  ],
+  "Mínimo de 18 anos para se candidatar.": [
+    "You must be at least 18 to apply.",
+    "申請者須年滿 18 歲。"
+  ],
+  "Cidade ou localidade": [
+    "City or locality",
+    "城市或地區"
+  ],
+  "Contacto telefónico": [
+    "Phone number",
+    "電話號碼"
+  ],
+  "WhatsApp": [
+    "WhatsApp",
+    "WhatsApp"
+  ],
+  "Profissão ou actividade": [
+    "Occupation or activity",
+    "職業或工作內容"
+  ],
+  "Conte-nos o que faz e como gostaria de representar a Framy": [
+    "Tell us what you do and how you would like to represent Framy",
+    "請說明您的工作內容，以及您希望如何代表 Framy"
+  ],
+  "Autorizo a utilização dos meus dados e documentos pela gestão da Framy para analisar esta candidatura. Li a política de privacidade.": [
+    "I authorise Framy management to use my data and documents to review this application. I have read the privacy policy.",
+    "我同意 Framy 管理團隊使用我的資料及文件審核此申請。我已閱讀隱私權政策。"
+  ],
+  "Consultar privacidade": [
+    "View privacy policy",
+    "查看隱私權政策"
+  ],
+  ". A fotografia e o BI não são publicados no perfil. A aprovação depende da análise da gestão e não constitui contrato de trabalho.": [
+    ". Your photo and identity document are not published on your profile. Approval is subject to management review and does not constitute an employment contract.",
+    "。您的照片及身分證不會公開於個人檔案。核准須經管理團隊審核，並不構成僱傭合約。"
+  ],
+  "Só pode avançar quando tiver pelo menos 18 anos.": [
+    "You can only continue if you are at least 18.",
+    "您須年滿 18 歲才能繼續。"
+  ],
+  "Guardar e continuar": [
+    "Save and continue",
+    "儲存並繼續"
+  ],
+  "2. Fotografias e identificação": [
+    "2. Photos and identification",
+    "2. 照片與身分證明"
+  ],
+  "Envie imagens legíveis, sem cortar os dados do documento. PNG, JPG ou WebP, até 8 MB por fotografia. Num telemóvel compatível, pode usar a câmara directamente.": [
+    "Upload clear images without cropping document details. PNG, JPG or WebP, up to 8 MB per photo. On a compatible phone, you can use the camera directly.",
+    "請上傳清晰圖片，不可裁切文件資料。支援 PNG、JPG 或 WebP，每張照片上限 8 MB。相容的手機可直接使用相機拍攝。"
+  ],
+  "Escolher ficheiro": [
+    "Choose file",
+    "選擇檔案"
+  ],
+  "Tirar fotografia": [
+    "Take photo",
+    "拍攝照片"
+  ],
+  "3. Confirmar candidatura": [
+    "3. Confirm application",
+    "3. 確認申請"
+  ],
+  "Guarde as alterações dos dados pessoais antes de carregar fotografias ou submeter.": [
+    "Save changes to personal details before uploading photos or submitting.",
+    "上傳照片或提交前，請先儲存個人資料的變更。"
+  ],
+  "Depois de submeter, os dados ficam bloqueados durante a análise. Guarde quaisquer alterações antes de continuar.": [
+    "After submission, details are locked during review. Save any changes before continuing.",
+    "提交後，資料在審核期間將無法修改。繼續前請先儲存所有變更。"
+  ],
+  "Submeter candidatura": [
+    "Submit application",
+    "提交申請"
+  ],
+  "Acompanhe o resultado nesta página. Para esclarecimentos ou eliminação de documentos, contacte": [
+    "Follow the result on this page. For questions or document deletion, contact",
+    "請在此頁面查看結果。如有疑問或需要刪除文件，請聯絡"
+  ],
+  "support@framyconnect.co.mz": [
+    "support@framyconnect.co.mz",
+    "support@framyconnect.co.mz"
+  ],
+  "Operações · Agente de execução": [
+    "Operations · Fulfilment agent",
+    "營運 · 執行代理員"
+  ],
+  "Olá,": [
+    "Hello,",
+    "您好，"
+  ],
+  "Os seus pedidos, produção, entregas e stock num só lugar.": [
+    "Your orders, production, deliveries and stock in one place.",
+    "集中管理您的訂單、生產、配送及庫存。"
+  ],
+  "Resumo de trabalho": [
+    "Work summary",
+    "工作摘要"
+  ],
+  "Área do agente": [
+    "Agent area",
+    "代理員專區"
+  ],
+  "Actualizar": [
+    "Refresh",
+    "重新整理"
+  ],
+  "A carregar as suas operações…": [
+    "Loading your operations…",
+    "正在載入您的營運資料…"
+  ],
+  "Os meus pedidos": [
+    "My orders",
+    "我的訂單"
+  ],
+  "Trabalhe apenas nos pedidos pagos e atribuídos por Operações.": [
+    "Only work on paid orders assigned by Operations.",
+    "僅處理營運團隊指派且已付款的訂單。"
+  ],
+  "Pesquisar pedidos": [
+    "Search orders",
+    "搜尋訂單"
+  ],
+  "Pedido, cliente ou cidade": [
+    "Order, customer or city",
+    "訂單、客戶或城市"
+  ],
+  "Estado dos pedidos": [
+    "Order status",
+    "訂單狀態"
+  ],
+  "Em curso": [
+    "In progress",
+    "進行中"
+  ],
+  "Todos": [
+    "All",
+    "全部"
+  ],
+  "Nenhum pedido neste filtro": [
+    "No orders match this filter",
+    "此篩選條件下沒有訂單"
+  ],
+  "Pronto para receber pedidos": [
+    "Ready to receive orders",
+    "準備接收訂單"
+  ],
+  "Quando Operações atribuir um pedido, encontrará aqui o produto, o link aprovado e as próximas acções.": [
+    "When Operations assigns an order, you will find the product, approved link and next actions here.",
+    "營運團隊指派訂單後，您可在此查看產品、核准的連結及後續操作。"
+  ],
+  "Local por confirmar": [
+    "Location to be confirmed",
+    "地點待確認"
+  ],
+  "Pagamento": [
+    "Payment",
+    "付款"
+  ],
+  "Confirmado por Operações": [
+    "Confirmed by Operations",
+    "營運團隊已確認"
+  ],
+  "Sem confirmação — não produzir": [
+    "Unconfirmed — do not produce",
+    "尚未確認 — 請勿生產"
+  ],
+  "Quantidade": [
+    "Quantity",
+    "數量"
+  ],
+  "Contacto de entrega": [
+    "Delivery contact",
+    "配送聯絡資料"
+  ],
+  "Por indicar": [
+    "Not provided",
+    "尚未提供"
+  ],
+  "Destino": [
+    "Destination",
+    "目的地"
+  ],
+  "Actualizado": [
+    "Updated",
+    "已更新"
+  ],
+  "Link aprovado para programar": [
+    "Approved link for programming",
+    "核准的寫入連結"
+  ],
+  "Copiar link": [
+    "Copy link",
+    "複製連結"
+  ],
+  "Use exactamente este endereço. Alterações são feitas por Operações.": [
+    "Use this exact address. Changes are made by Operations.",
+    "請使用此確切網址。任何變更由營運團隊處理。"
+  ],
+  "Pendente": [
+    "Pending",
+    "待處理"
+  ],
+  "· Referência:": [
+    "· Reference:",
+    "· 參考編號："
+  ],
+  "Comprovativo:": [
+    "Proof:",
+    "憑證："
+  ],
+  "Ver design aprovado e ficheiros de produção": [
+    "View approved design and production files",
+    "查看核准設計及生產檔案"
+  ],
+  "Reportar problema / feedback": [
+    "Report an issue / feedback",
+    "回報問題／意見"
+  ],
+  "Stock atribuído": [
+    "Assigned stock",
+    "已分配庫存"
+  ],
+  "As entradas são registadas por Operações. As entregas confirmadas descontam automaticamente uma unidade. Reporte contagens e danos para reconciliação.": [
+    "Receipts are recorded by Operations. Confirmed deliveries automatically deduct one unit. Report counts and damage for reconciliation.",
+    "入庫由營運團隊登記。確認交付後會自動扣除一件。請回報盤點數量及損壞情況以核對庫存。"
+  ],
+  "Ainda sem stock atribuído": [
+    "No stock assigned yet",
+    "尚未分配庫存"
+  ],
+  "As transferências aprovadas por Operações aparecerão aqui.": [
+    "Transfers approved by Operations will appear here.",
+    "營運團隊核准的調撥將顯示於此。"
+  ],
+  "Produto": [
+    "Product",
+    "產品"
+  ],
+  "Saldo": [
+    "Balance",
+    "餘額"
+  ],
+  "Reservado": [
+    "Reserved",
+    "已預留"
+  ],
+  "Disponível": [
+    "Available",
+    "可用"
+  ],
+  "Registar contagem / alertar Operações": [
+    "Record count / alert Operations",
+    "登記盤點／通知營運團隊"
+  ],
+  "Movimentos recentes": [
+    "Recent movements",
+    "近期異動"
+  ],
+  "Data": [
+    "Date",
+    "日期"
+  ],
+  "Unidades": [
+    "Units",
+    "件數"
+  ],
+  "Motivo": [
+    "Reason",
+    "原因"
+  ],
+  "Relatórios e alertas": [
+    "Reports and alerts",
+    "報告與通知"
+  ],
+  "Envie incidentes, feedback e relatórios directamente para Operações. Nunca recolha pagamentos; reporte qualquer tentativa de pagamento directo.": [
+    "Send incidents, feedback and reports directly to Operations. Never collect payments; report any attempt to pay you directly.",
+    "請直接向營運團隊提交事件、意見及報告。切勿收取款項；如有人嘗試直接向您付款，請立即回報。"
+  ],
+  "Tipo": [
+    "Type",
+    "類型"
+  ],
+  "Pedido relacionado (opcional)": [
+    "Related order (optional)",
+    "相關訂單（選填）"
+  ],
+  "Sem pedido associado": [
+    "No associated order",
+    "無相關訂單"
+  ],
+  "Seleccione o produto atribuído": [
+    "Select the assigned product",
+    "選擇已分配的產品"
+  ],
+  "contada": [
+    "counted",
+    "已盤點"
+  ],
+  "danificada": [
+    "damaged",
+    "損壞"
+  ],
+  "recebida": [
+    "received",
+    "已收到"
+  ],
+  "disponível": [
+    "available",
+    "可用"
+  ],
+  "Descrição / notas": [
+    "Description / notes",
+    "說明／備註"
+  ],
+  "Inclui automaticamente a contagem por estado dos pedidos actualizados nas últimas": [
+    "Automatically includes counts by status for orders updated in the last",
+    "自動包含以下期間更新的訂單狀態統計："
+  ],
+  "24 horas": [
+    "24 hours",
+    "24 小時"
+  ],
+  "7 dias": [
+    "7 days",
+    "7 天"
+  ],
+  "A enviar…": [
+    "Sending…",
+    "正在傳送…"
+  ],
+  "Enviar a Operações": [
+    "Send to Operations",
+    "傳送至營運團隊"
+  ],
+  "Histórico e respostas": [
+    "History and responses",
+    "紀錄與回覆"
+  ],
+  "Ainda não enviou relatórios.": [
+    "You have not sent any reports yet.",
+    "您尚未提交任何報告。"
+  ],
+  "A aguardar Operações": [
+    "Awaiting Operations",
+    "等待營運團隊處理"
+  ],
+  "Resolvido": [
+    "Resolved",
+    "已解決"
+  ],
+  "· Quantidade:": [
+    "· Quantity:",
+    "· 數量："
+  ],
+  "Operações:": [
+    "Operations:",
+    "營運團隊："
+  ],
+  "Candidaturas a agente": [
+    "Agent applications",
+    "代理員申請"
+  ],
+  "Analise os dados e documentos antes de decidir. As decisões e consultas de documentos ficam registadas.": [
+    "Review the details and documents before deciding. Decisions and document access are logged.",
+    "決定前請審核資料與文件。所有決定及文件查閱均會留下紀錄。"
+  ],
+  "A carregar…": [
+    "Loading…",
+    "載入中…"
+  ],
+  "Voltar às candidaturas": [
+    "Back to applications",
+    "返回申請清單"
+  ],
+  "Fotografia": [
+    "Photo",
+    "照片"
+  ],
+  "BI — frente": [
+    "Identity document — front",
+    "身分證 — 正面"
+  ],
+  "BI — verso": [
+    "Identity document — back",
+    "身分證 — 背面"
+  ],
+  "Mensagem para o candidato": [
+    "Message to the applicant",
+    "傳送給申請人的訊息"
+  ],
+  "Verifiquei o BI, os dados e a idade mínima de 18 anos.": [
+    "I have checked the identity document, details and minimum age of 18.",
+    "我已核對身分證、資料及年滿 18 歲的條件。"
+  ],
+  "A aprovação activa o acesso de agente nesta conta e termina as sessões existentes. O candidato entra novamente com a sua palavra-passe; os seus dados de cliente são preservados.": [
+    "Approval activates agent access on this account and ends existing sessions. The applicant signs in again with their password; their customer data is preserved.",
+    "核准後會啟用此帳戶的代理員權限，並登出現有工作階段。申請人須使用原密碼重新登入；客戶資料將予以保留。"
+  ],
+  "Aprovar e activar agente": [
+    "Approve and activate agent",
+    "核准並啟用代理員"
+  ],
+  "Pedir informação": [
+    "Request information",
+    "要求補充資料"
+  ],
+  "Não aprovar": [
+    "Reject",
+    "不予核准"
+  ],
+  "Mensagem enviada:": [
+    "Message sent:",
+    "已傳送訊息："
+  ],
+  "Ainda não existem candidaturas submetidas.": [
+    "No applications have been submitted yet.",
+    "尚無已提交的申請。"
+  ],
+  "São apresentadas as 100 candidaturas mais recentemente actualizadas.": [
+    "Showing the 100 most recently updated applications.",
+    "顯示最近更新的 100 份申請。"
+  ],
+  "Frente do cartão Framy em azul-marinho e dourado": [
+    "Front of the Framy card in navy blue and gold",
+    "深藍色與金色的 Framy 卡片正面"
+  ],
+  "Verso do cartão com espaço para nome, email e QR do perfil": [
+    "Back of the card with space for name, email and profile QR code",
+    "卡片背面，可放置姓名、電子郵件與個人檔案 QR 碼"
+  ],
+  "Pesquisar produtos": [
+    "Search products",
+    "搜尋產品"
+  ],
+  "Encontre o seu produto": [
+    "Find your product",
+    "尋找您的產品"
+  ],
+  "Nenhum produto encontrado. Experimente outro termo.": [
+    "No products found. Try another search term.",
+    "找不到產品。請嘗試其他搜尋字詞。"
+  ],
+  "Os produtos assinalados como Brevemente ainda não estão disponíveis para compra.": [
+    "Products marked Coming soon are not yet available to buy.",
+    "標示為「即將推出」的產品暫不可購買。"
+  ],
+  "Pedido cancelado — percurso interrompido.": [
+    "Order cancelled — progress stopped.",
+    "訂單已取消 — 流程已停止。"
+  ],
+  "Estado em actualização.": [
+    "Status being updated.",
+    "狀態更新中。"
+  ],
+  "Etapas do pedido": [
+    "Order stages",
+    "訂單階段"
+  ],
+  "Concluído": [
+    "Completed",
+    "已完成"
+  ],
+  "Estado actual": [
+    "Current status",
+    "目前狀態"
+  ],
+  "Próxima etapa": [
+    "Next stage",
+    "下一階段"
+  ],
+  "O seu próximo toque começa aqui.": [
+    "Your next connection starts here.",
+    "您的下一次連結從這裡開始。"
+  ],
+  "Depois de submeter o pedido, acompanhe aqui cada etapa.": [
+    "After submitting your order, follow each stage here.",
+    "提交訂單後，可在此追蹤各階段進度。"
+  ],
+  "Pedido #": [
+    "Order #",
+    "訂單 #"
+  ],
+  "Em actualização": [
+    "Updating",
+    "更新中"
+  ],
+  "Consulte os detalhes para mais informações.": [
+    "See the details for more information.",
+    "請查看詳情以獲取更多資訊。"
+  ],
+  "Local de entrega": [
+    "Delivery location",
+    "配送地點"
+  ],
+  "Ainda não indicado": [
+    "Not yet provided",
+    "尚未提供"
+  ],
+  "Submetido em": [
+    "Submitted on",
+    "提交時間"
+  ],
+  "Última actualização": [
+    "Last updated",
+    "最後更新"
+  ],
+  "Reembolsado (simulado)": [
+    "Refunded (simulated)",
+    "已退款（模擬）"
+  ],
+  "Pagamento confirmado (simulado)": [
+    "Payment confirmed (simulated)",
+    "付款已確認（模擬）"
+  ],
+  "Pagamento pendente": [
+    "Payment pending",
+    "等待付款"
+  ],
+  "· Horas de Maputo": [
+    "· Maputo time",
+    "· 馬普托時間"
+  ],
+  "Indicar local de entrega": [
+    "Set delivery location",
+    "設定配送地點"
+  ],
+  "Ver detalhes": [
+    "View details",
+    "查看詳情"
+  ],
+  "Histórico do pedido": [
+    "Order history",
+    "訂單紀錄"
+  ],
+  "Pedido actualizado": [
+    "Order updated",
+    "訂單已更新"
+  ],
+  "Sem actualizações registadas.": [
+    "No updates recorded.",
+    "尚無更新紀錄。"
+  ],
+  "A SUA IDENTIDADE": [
+    "YOUR IDENTITY",
+    "您的身分"
+  ],
+  "Comece por se apresentar.": [
+    "Start by introducing yourself.",
+    "先介紹一下自己。"
+  ],
+  "O seu endereço Framy começa aqui.": [
+    "Your Framy address starts here.",
+    "您的 Framy 網址從這裡開始。"
+  ],
+  "Publicada": [
+    "Published",
+    "已發佈"
+  ],
+  "Rascunho": [
+    "Draft",
+    "草稿"
+  ],
+  "Editar perfil": [
+    "Edit profile",
+    "編輯個人檔案"
+  ],
+  "Criar perfil": [
+    "Create profile",
+    "建立個人檔案"
+  ],
+  "Ver perfil": [
+    "View profile",
+    "查看個人檔案"
+  ],
+  "O SEU PLANO": [
+    "YOUR PLAN",
+    "您的方案"
+  ],
+  "Por activar / expirado": [
+    "Pending activation / expired",
+    "待啟用／已到期"
+  ],
+  "Comece com 30 dias grátis": [
+    "Start with 30 free days",
+    "開始 30 天免費試用"
+  ],
+  "0 MT": [
+    "0 MT",
+    "0 MT"
+  ],
+  "/ mês · por perfil": [
+    "/ month · per profile",
+    "/ 月 · 每個檔案"
+  ],
+  "de": [
+    "of",
+    "／"
+  ],
+  "links": [
+    "links",
+    "連結"
+  ],
+  "disponíveis": [
+    "available",
+    "可用"
+  ],
+  "Escolher plano": [
+    "Choose plan",
+    "選擇方案"
+  ],
+  "Active o período gratuito para publicar o perfil.": [
+    "Activate the free trial to publish your profile.",
+    "啟用免費試用以發佈個人檔案。"
+  ],
+  "Os seus links.": [
+    "Your links.",
+    "您的連結。"
+  ],
+  "Um lugar para tudo o que importa.": [
+    "A place for everything that matters.",
+    "將重要資訊集中於一處。"
+  ],
+  "Gerir links": [
+    "Manage links",
+    "管理連結"
+  ],
+  "Adicionar link": [
+    "Add link",
+    "新增連結"
+  ],
+  "caixas disponíveis": [
+    "slots available",
+    "個可用欄位"
+  ],
+  "As suas redes, o seu trabalho, os seus contactos. Adicione um link para começar.": [
+    "Your networks, your work, your contacts. Add a link to get started.",
+    "您的社群、工作和聯絡資料。新增連結即可開始。"
+  ],
+  "Ver todos os": [
+    "View all",
+    "查看全部"
+  ],
+  "Pedidos recentes.": [
+    "Recent orders.",
+    "近期訂單。"
+  ],
+  "Ver todos": [
+    "View all",
+    "查看全部"
+  ],
+  "Onde pretende receber o produto?": [
+    "Where would you like to receive the product?",
+    "您希望在哪裡收貨？"
+  ],
+  "Indique a cidade ou localidade para atribuirmos o agente da sua zona. Esta informação não aparece no seu perfil público.": [
+    "Enter your city or locality so we can assign an agent in your area. This information does not appear on your public profile.",
+    "請輸入城市或地區，以便指派當地代理員。此資料不會顯示於公開個人檔案。"
+  ],
+  "Cidade / localidade de entrega": [
+    "Delivery city / locality",
+    "配送城市／地區"
+  ],
+  "Ex.: Maputo, Matola, Beira, Nhamatanda ou Chimoio": [
+    "E.g. Maputo, Matola, Beira, Nhamatanda or Chimoio",
+    "例如：Maputo、Matola、Beira、Nhamatanda 或 Chimoio"
+  ],
+  "Bairro, endereço ou ponto de referência": [
+    "Neighbourhood, address or landmark",
+    "社區、地址或地標"
+  ],
+  "(opcional)": [
+    "(optional)",
+    "（選填）"
+  ],
+  "Pode indicar apenas a cidade ou acrescentar detalhes.": [
+    "You can enter just the city or add more details.",
+    "您可只填寫城市，或補充詳細資料。"
+  ],
+  "Guardar local de entrega": [
+    "Save delivery location",
+    "儲存配送地點"
+  ],
+  "Local não indicado": [
+    "Location not provided",
+    "尚未提供地點"
+  ],
+  "Para alterar o local de um pedido já atribuído, contacte a equipa.": [
+    "To change the location of an assigned order, contact the team.",
+    "如需變更已指派訂單的配送地點，請聯絡團隊。"
+  ],
+  "iPhone com um exemplo de perfil Framy, cartões NFC laranja e preto e porta-chaves NFC sobre uma base": [
+    "iPhone with a sample Framy profile, orange and black NFC cards and NFC keychains on a stand",
+    "展示 Framy 檔案範例的 iPhone、橙色和黑色 NFC 卡片，以及底座上的 NFC 鑰匙圈"
+  ],
+  "O Seu Mundo": [
+    "Your World",
+    "您的世界"
+  ],
+  "num Toque.": [
+    "in One Tap.",
+    "一觸即達。"
+  ],
+  "FIRMINO CHAMBALE": [
+    "FIRMINO CHAMBALE",
+    "FIRMINO CHAMBALE"
+  ],
+  "Arquitecto e Planeador Fisico": [
+    "Architect and Physical Planner",
+    "建築師與空間規劃師"
+  ],
+  "Instagram": [
+    "Instagram",
+    "Instagram"
+  ],
+  "Perfil Framy Connect": [
+    "Framy Connect profile",
+    "Framy Connect 個人檔案"
+  ],
+  "O Seu Mundo num Toque.": [
+    "Your World in One Tap.",
+    "您的世界，一觸即達。"
+  ],
+  "QR para abrir o perfil de exemplo": [
+    "QR code to open the sample profile",
+    "開啟檔案範例的 QR 碼"
+  ],
+  "Ler código QR": [
+    "Scan QR code",
+    "掃描 QR 碼"
+  ],
+  "Perfil Framy de Firmino Chambale": [
+    "Firmino Chambale's Framy profile",
+    "Firmino Chambale 的 Framy 檔案"
+  ],
+  "DUAS FORMAS DE SE CONECTAR": [
+    "TWO WAYS TO CONNECT",
+    "兩種連結方式"
+  ],
+  "Um toque. Um scan. O seu perfil.": [
+    "A tap. A scan. Your profile.",
+    "輕觸、掃描，即可查看您的個人檔案。"
+  ],
+  "Partilhe a sua identidade por NFC ou código QR.": [
+    "Share your identity using NFC or a QR code.",
+    "透過 NFC 或 QR 碼分享您的身分資訊。"
+  ],
+  "Partilhe por toque": [
+    "Share with a tap",
+    "輕觸分享"
+  ],
+  "Aproxime o cartão de um telemóvel compatível.": [
+    "Hold the card close to a compatible phone.",
+    "將卡片靠近相容的手機。"
+  ],
+  "Abrir o perfil de exemplo de Firmino Chambale": [
+    "Open Firmino Chambale's sample profile",
+    "開啟 Firmino Chambale 的檔案範例"
+  ],
+  "O mesmo perfil Framy, com fotografia e links": [
+    "The same Framy profile, with a photo and links",
+    "同一個 Framy 檔案，包含照片和連結"
+  ],
+  "Ou leia o QR": [
+    "Or scan the QR code",
+    "或掃描 QR 碼"
+  ],
+  "Abra a câmara e leia o código do cartão.": [
+    "Open your camera and scan the code on the card.",
+    "開啟相機並掃描卡片上的 QR 碼。"
+  ],
+  "Ver perfil de exemplo": [
+    "View sample profile",
+    "查看檔案範例"
+  ],
+  "Pré-visualização do perfil no iPhone 17": [
+    "Profile preview on iPhone 17",
+    "iPhone 17 上的個人檔案預覽"
+  ],
+  "iPhone 17": [
+    "iPhone 17",
+    "iPhone 17"
+  ],
+  "Deslize na lista para ver mais links": [
+    "Scroll the list to see more links",
+    "捲動清單以查看更多連結"
+  ],
+  "Criar a minha conta": [
+    "Create my account",
+    "建立我的帳戶"
+  ],
+  "Bem-vindo à Framy": [
+    "Welcome to Framy",
+    "歡迎使用 Framy"
+  ],
+  "Guarde o seu perfil e acompanhe os seus pedidos.": [
+    "Save your profile and track your orders.",
+    "儲存個人檔案並追蹤訂單。"
+  ],
+  "Entre para abrir o seu painel.": [
+    "Sign in to open your dashboard.",
+    "登入以開啟控制台。"
+  ],
+  "Palavra-passe": [
+    "Password",
+    "密碼"
+  ],
+  "Use pelo menos 12 caracteres.": [
+    "Use at least 12 characters.",
+    "請使用至少 12 個字元。"
+  ],
+  "Aguarde…": [
+    "Please wait…",
+    "請稍候…"
+  ],
+  "Criar conta e continuar": [
+    "Create account and continue",
+    "建立帳戶並繼續"
+  ],
+  "Esqueci-me da palavra-passe — contactar apoio": [
+    "Forgot password — contact support",
+    "忘記密碼 — 聯絡客服"
+  ],
+  "Já tenho conta": [
+    "I already have an account",
+    "我已有帳戶"
+  ],
+  "Sou novo — criar conta": [
+    "I'm new — create account",
+    "首次使用 — 建立帳戶"
+  ],
+  "Pedido / cliente": [
+    "Order / customer",
+    "訂單／客戶"
+  ],
+  "Submetido (Maputo)": [
+    "Submitted (Maputo)",
+    "提交時間（馬普托）"
+  ],
+  "Progresso": [
+    "Progress",
+    "進度"
+  ],
+  "Valor": [
+    "Amount",
+    "金額"
+  ],
+  "Detalhes": [
+    "Details",
+    "詳情"
+  ],
+  "Não indicado": [
+    "Not provided",
+    "尚未提供"
+  ],
+  "Há": [
+    "For",
+    "已經"
+  ],
+  "Reembolsado": [
+    "Refunded",
+    "已退款"
+  ],
+  "Pago": [
+    "Paid",
+    "已付款"
+  ],
+  "Por pagar": [
+    "Unpaid",
+    "未付款"
+  ],
+  "Por atribuir": [
+    "Unassigned",
+    "未指派"
+  ],
+  "Nenhum pedido corresponde à selecção.": [
+    "No orders match your selection.",
+    "沒有符合條件的訂單。"
+  ],
+  "Página inicial": [
+    "Home",
+    "首頁"
+  ],
+  "MANAGER": [
+    "MANAGER",
+    "管理員"
+  ],
+  "Gestão": [
+    "Management",
+    "管理"
+  ],
+  "Gestão Framy Connect": [
+    "Framy Connect management",
+    "Framy Connect 管理"
+  ],
+  "Ver website": [
+    "View website",
+    "查看網站"
+  ],
+  "CENTRO DE GESTÃO": [
+    "MANAGEMENT CENTRE",
+    "管理中心"
+  ],
+  "O que acontece no seu negócio, num só lugar.": [
+    "Everything happening in your business, in one place.",
+    "集中掌握業務動態。"
+  ],
+  "Ligue os pedidos, a equipa e o stock.": [
+    "Connect orders, your team and stock.",
+    "整合訂單、團隊與庫存。"
+  ],
+  "Os produtos e as subscrições que oferece aos seus clientes.": [
+    "The products and subscriptions you offer your customers.",
+    "提供給客戶的產品與訂閱方案。"
+  ],
+  "Analise e acompanhe as candidaturas a agente.": [
+    "Review and track agent applications.",
+    "審核及追蹤代理員申請。"
+  ],
+  "Crie acessos, recupere contas e controle a disponibilidade da equipa.": [
+    "Create access, recover accounts and manage team availability.",
+    "建立權限、復原帳戶及管理團隊啟用狀態。"
+  ],
+  "Acompanhe os valores recebidos, pendentes e reconhecidos.": [
+    "Track received, pending and recognised amounts.",
+    "追蹤已收、待收及已認列金額。"
+  ],
+  "Gestão de encomendas · Confirme cada transacção no prestador antes de a registar. Valores de produtos em MZN; planos mensais em meticais.": [
+    "Order management · Verify each transaction with the provider before recording it. Product amounts in MZN; monthly plans in meticais.",
+    "訂單管理 · 登記前請先向付款服務商核實每筆交易。產品及月費方案均以莫三比克梅蒂卡爾計價。"
+  ],
+  "Não foi possível carregar a gestão. Consulte a mensagem acima e tente actualizar.": [
+    "Unable to load management. Check the message above and try refreshing.",
+    "無法載入管理資料。請查看上方訊息並嘗試重新整理。"
+  ],
+  "A carregar o seu espaço de gestão…": [
+    "Loading your management workspace…",
+    "正在載入管理工作區…"
+  ],
+  "Período": [
+    "Period",
+    "期間"
+  ],
+  "Todo o período": [
+    "All time",
+    "全部期間"
+  ],
+  "Últimos 7 dias": [
+    "Last 7 days",
+    "最近 7 天"
+  ],
+  "Últimos 30 dias": [
+    "Last 30 days",
+    "最近 30 天"
+  ],
+  "Últimos 90 dias": [
+    "Last 90 days",
+    "最近 90 天"
+  ],
+  "Exportar relatório": [
+    "Export report",
+    "匯出報告"
+  ],
+  "pedidos por concluir": [
+    "orders to complete",
+    "筆待完成訂單"
+  ],
+  "Acompanhar as próximas etapas": [
+    "Track the next stages",
+    "追蹤後續階段"
+  ],
+  "produtos com stock baixo": [
+    "products low in stock",
+    "項庫存不足產品"
+  ],
+  "Verificar disponibilidade e entradas": [
+    "Check availability and receipts",
+    "查看可用數量及入庫紀錄"
+  ],
+  "Pedidos recentes": [
+    "Recent orders",
+    "近期訂單"
+  ],
+  "Ver pedidos": [
+    "View orders",
+    "查看訂單"
+  ],
+  "Actividade recente": [
+    "Recent activity",
+    "近期活動"
+  ],
+  "As alterações da equipa aparecerão aqui.": [
+    "Team changes will appear here.",
+    "團隊的變更將顯示於此。"
+  ],
+  "Pesquisar": [
+    "Search",
+    "搜尋"
+  ],
+  "Pesquisar…": [
+    "Search…",
+    "搜尋…"
+  ],
+  "Estado do pedido": [
+    "Order status",
+    "訂單狀態"
+  ],
+  "Todos os estados": [
+    "All statuses",
+    "所有狀態"
+  ],
+  "Por concluir": [
+    "To complete",
+    "待完成"
+  ],
+  "Novo agente": [
+    "New agent",
+    "新增代理員"
+  ],
+  "Disponibilidade de stock": [
+    "Stock availability",
+    "庫存供應情況"
+  ],
+  "Stock baixo (≤ 5)": [
+    "Low stock (≤ 5)",
+    "庫存不足（≤ 5）"
+  ],
+  "Em atraso: pedido por concluir há mais de": [
+    "Overdue: order remains incomplete for more than",
+    "逾期：訂單尚未完成，已超過"
+  ],
+  "horas desde a submissão. Referência de acompanhamento, não prazo de entrega contratado.": [
+    "hours since submission. Tracking reference, not a contractual delivery deadline.",
+    "小時（自提交起算）。此為追蹤參考，並非約定的配送期限。"
+  ],
+  "Prazo de referência": [
+    "Reference timeframe",
+    "參考時限"
+  ],
+  "horas": [
+    "hours",
+    "小時"
+  ],
+  "Contacto": [
+    "Contact",
+    "聯絡方式"
+  ],
+  "Pedidos atribuídos": [
+    "Assigned orders",
+    "已指派訂單"
+  ],
+  "Inactivo": [
+    "Inactive",
+    "未啟用"
+  ],
+  "Editar": [
+    "Edit",
+    "編輯"
+  ],
+  "Reactivar": [
+    "Reactivate",
+    "重新啟用"
+  ],
+  "Adicione o primeiro agente para atribuir pedidos à sua equipa.": [
+    "Add your first agent to assign orders to your team.",
+    "新增第一位代理員，即可向團隊指派訂單。"
+  ],
+  "Disponível = físico − reservado. Pedidos pagos reservam uma unidade; a entrega regista a saída. Registe o stock inicial antes de confirmar novos pagamentos.": [
+    "Available = physical − reserved. Paid orders reserve one unit; delivery records the outgoing movement. Record initial stock before confirming new payments.",
+    "可用庫存＝實際庫存－預留數量。已付款訂單會預留一件，交付時記錄出庫。確認新付款前請登記初始庫存。"
+  ],
+  "Adicionar stock": [
+    "Add stock",
+    "新增庫存"
+  ],
+  "Físico": [
+    "Physical",
+    "實際庫存"
+  ],
+  "Adicionar / atribuir": [
+    "Add / assign",
+    "新增／分配"
+  ],
+  "Stock por agente": [
+    "Stock by agent",
+    "各代理員庫存"
+  ],
+  "As reservas de pedidos sem agente estão incluídas no total do produto. Ao atribuir um pedido, a unidade passa para o agente.": [
+    "Reservations for unassigned orders are included in the product total. Assigning an order transfers the unit to the agent.",
+    "未指派訂單的預留數量包含於產品總量中。指派訂單時，該件產品會轉至代理員名下。"
+  ],
+  "Local / agente": [
+    "Location / agent",
+    "地點／代理員"
+  ],
+  "· Inactivo": [
+    "· Inactive",
+    "· 未啟用"
+  ],
+  "Últimos movimentos": [
+    "Latest movements",
+    "最新異動"
+  ],
+  "Stock central": [
+    "Central stock",
+    "中央庫存"
+  ],
+  "Alterações aplicam-se às novas adesões. Os clientes existentes mantêm as condições acordadas.": [
+    "Changes apply to new subscriptions. Existing customers retain their agreed terms.",
+    "變更適用於新訂閱。現有客戶保留原先約定的條件。"
+  ],
+  "Novo plano": [
+    "New plan",
+    "新增方案"
+  ],
+  "DISPONÍVEL": [
+    "AVAILABLE",
+    "可用"
+  ],
+  "INACTIVO": [
+    "INACTIVE",
+    "未啟用"
+  ],
+  "caracteres de biografia": [
+    "biography characters",
+    "個簡介字元"
+  ],
+  "Editar plano": [
+    "Edit plan",
+    "編輯方案"
+  ],
+  "Pagamentos e reembolsos": [
+    "Payments and refunds",
+    "付款與退款"
+  ],
+  "A receita e o custo são reconhecidos na entrega. Os relatórios usam a data de criação do pedido. Não são demonstrações financeiras oficiais.": [
+    "Revenue and costs are recognised upon delivery. Reports use order creation dates. These are not official financial statements.",
+    "收入與成本於交付時認列。報告依訂單建立日期統計，並非正式財務報表。"
+  ],
+  "· Acompanhamento da encomenda": [
+    "· Order tracking",
+    "· 訂單追蹤"
+  ],
+  "Submetido:": [
+    "Submitted:",
+    "提交時間："
+  ],
+  "(Maputo)": [
+    "(Maputo)",
+    "（馬普托）"
+  ],
+  "Progresso:": [
+    "Progress:",
+    "進度："
+  ],
+  "Local de entrega:": [
+    "Delivery location:",
+    "配送地點："
+  ],
+  "A aguardar informação do cliente": [
+    "Awaiting customer information",
+    "等待客戶提供資料"
+  ],
+  "Contacto de entrega:": [
+    "Delivery contact:",
+    "配送聯絡資料："
+  ],
+  "Plano associado:": [
+    "Associated plan:",
+    "關聯方案："
+  ],
+  "/mês · até": [
+    "/month · up to",
+    "/ 月 · 最多"
+  ],
+  "Agente:": [
+    "Agent:",
+    "代理員："
+  ],
+  "Execução do agente": [
+    "Agent fulfilment",
+    "代理員執行進度"
+  ],
+  "Programação:": [
+    "Programming:",
+    "寫入："
+  ],
+  "· Qualidade:": [
+    "· Quality:",
+    "· 品質："
+  ],
+  "· Embalagem:": [
+    "· Packaging:",
+    "· 包裝："
+  ],
+  "Expedição:": [
+    "Dispatch:",
+    "出貨："
+  ],
+  "Nota:": [
+    "Note:",
+    "備註："
+  ],
+  "Verificação da transacção": [
+    "Transaction verification",
+    "交易核實"
+  ],
+  "Referência única no prestador": [
+    "Unique provider reference",
+    "付款服務商唯一參考編號"
+  ],
+  "Verifiquei no prestador o valor de": [
+    "I have verified the amount of",
+    "我已向付款服務商核實金額"
+  ],
+  ", a moeda MZN e a referência desta encomenda.": [
+    ", the MZN currency and this order's reference.",
+    "、MZN 幣別及此訂單的參考編號。"
+  ],
+  "Registar aqui não cobra nem devolve dinheiro. Confirme a operação no prestador antes de continuar.": [
+    "Recording here does not charge or refund money. Confirm the transaction with the provider before continuing.",
+    "此處僅登記紀錄，不會扣款或退款。繼續前請先向付款服務商確認交易。"
+  ],
+  "Registar pagamento verificado": [
+    "Record verified payment",
+    "登記已核實的付款"
+  ],
+  "Seleccionar agente activo": [
+    "Select active agent",
+    "選擇已啟用的代理員"
+  ],
+  "Guardar atribuição": [
+    "Save assignment",
+    "儲存指派"
+  ],
+  "Entrega concluída:": [
+    "Delivery completed:",
+    "配送完成："
+  ],
+  "Cancelar pedido": [
+    "Cancel order",
+    "取消訂單"
+  ],
+  "Registar reembolso verificado": [
+    "Record verified refund",
+    "登記已核實的退款"
+  ],
+  "Plano mensal": [
+    "Monthly plan",
+    "月費方案"
+  ],
+  "Dados da equipa e disponibilidade.": [
+    "Team details and availability.",
+    "團隊資料與啟用狀態。"
+  ],
+  "Condições para novas adesões, em meticais por mês.": [
+    "Terms for new subscriptions, in meticais per month.",
+    "新訂閱條件，以每月梅蒂卡爾計價。"
+  ],
+  "Telefone": [
+    "Phone",
+    "電話"
+  ],
+  "Público": [
+    "Audience",
+    "適用對象"
+  ],
+  "Descrição": [
+    "Description",
+    "說明"
+  ],
+  "MT / mês": [
+    "MT / month",
+    "MT / 月"
+  ],
+  "Número de links": [
+    "Number of links",
+    "連結數量"
+  ],
+  "Caracteres da biografia": [
+    "Biography characters",
+    "簡介字元數"
+  ],
+  "Guardar": [
+    "Save",
+    "儲存"
+  ],
+  "Adicionar ou atribuir stock": [
+    "Add or assign stock",
+    "新增或分配庫存"
+  ],
+  "Registe novas unidades ou transfira stock existente sem alterar o total.": [
+    "Record new units or transfer existing stock without changing the total.",
+    "登記新增件數，或調撥現有庫存而不改變總量。"
+  ],
+  "Operação": [
+    "Operation",
+    "操作"
+  ],
+  "Entrada de novo stock": [
+    "New stock receipt",
+    "新增庫存入庫"
+  ],
+  "Atribuir stock central a um agente": [
+    "Assign central stock to an agent",
+    "將中央庫存分配給代理員"
+  ],
+  "Devolver stock de agente ao central": [
+    "Return agent stock to central stock",
+    "將代理員庫存退回中央庫存"
+  ],
+  "Agente de origem": [
+    "Source agent",
+    "來源代理員"
+  ],
+  "Seleccionar agente": [
+    "Select agent",
+    "選擇代理員"
+  ],
+  "Stock inicial, reposição ou ajuste": [
+    "Initial stock, replenishment or adjustment",
+    "初始庫存、補貨或調整"
+  ],
+  "Registar movimento": [
+    "Record movement",
+    "登記異動"
+  ],
+  "Secções": [
+    "Sections",
+    "區段"
+  ],
+  "Fotografia de perfil": [
+    "Profile photo",
+    "個人檔案照片"
+  ],
+  "A sua fotografia aparece aqui": [
+    "Your photo appears here",
+    "您的照片將顯示於此"
+  ],
+  "O seu nome": [
+    "Your name",
+    "您的姓名"
+  ],
+  "O seu título ou profissão": [
+    "Your title or occupation",
+    "您的職稱或職業"
+  ],
+  "Links do perfil — deslize para ver mais": [
+    "Profile links — scroll for more",
+    "個人檔案連結 — 捲動查看更多"
+  ],
+  "Título do link": [
+    "Link title",
+    "連結標題"
+  ],
+  "Adicione os seus links no editor.": [
+    "Add your links in the editor.",
+    "在編輯器中新增您的連結。"
+  ],
+  "Adicionar aos contactos": [
+    "Add to contacts",
+    "新增至聯絡人"
+  ],
+  "Mostrar QR do perfil": [
+    "Show profile QR code",
+    "顯示個人檔案 QR 碼"
+  ],
+  "Publique o perfil para activar o QR": [
+    "Publish your profile to activate the QR code",
+    "發佈個人檔案以啟用 QR 碼"
+  ],
+  "Partilhar perfil": [
+    "Share profile",
+    "分享個人檔案"
+  ],
+  "Publique o perfil para partilhar": [
+    "Publish your profile to share",
+    "發佈個人檔案後即可分享"
+  ],
+  "Visitar o site Framy Connect (abre num novo separador)": [
+    "Visit the Framy Connect website (opens in a new tab)",
+    "造訪 Framy Connect 網站（在新分頁開啟）"
+  ],
+  "Todos direitos reservados": [
+    "All rights reserved",
+    "版權所有"
+  ],
+  "O seu QR Framy": [
+    "Your Framy QR code",
+    "您的 Framy QR 碼"
+  ],
+  "Digitalize para abrir o perfil publicado.": [
+    "Scan to open the published profile.",
+    "掃描以開啟已發佈的個人檔案。"
+  ],
+  "Relatórios e alertas dos agentes": [
+    "Agent reports and alerts",
+    "代理員報告與通知"
+  ],
+  "Contagens, danos, stock baixo, incidentes e relatórios de actividade. As correcções de stock são registadas por Operações no separador Stock.": [
+    "Counts, damage, low stock, incidents and activity reports. Stock corrections are recorded by Operations in the Stock tab.",
+    "盤點、損壞、庫存不足、事件及活動報告。庫存修正由營運團隊在庫存分頁中登記。"
+  ],
+  "Actualizar relatórios": [
+    "Refresh reports",
+    "重新整理報告"
+  ],
+  "Ainda não há relatórios dos agentes.": [
+    "No agent reports yet.",
+    "尚無代理員報告。"
+  ],
+  "Por tratar": [
+    "To review",
+    "待處理"
+  ],
+  "Pedidos actualizados no período:": [
+    "Orders updated during the period:",
+    "期間內更新的訂單："
+  ],
+  "Resposta de Operações:": [
+    "Operations response:",
+    "營運團隊回覆："
+  ],
+  "Resposta ao agente": [
+    "Reply to agent",
+    "回覆代理員"
+  ],
+  "Responder e resolver": [
+    "Reply and resolve",
+    "回覆並結案"
+  ],
+  "Modelo e ficheiros de produção": [
+    "Model and production files",
+    "款式與生產檔案"
+  ],
+  "Descarregar original ·": [
+    "Download original ·",
+    "下載原始檔 ·"
+  ],
+  "Frente": [
+    "Front",
+    "正面"
+  ],
+  "Verso": [
+    "Back",
+    "背面"
+  ],
+  "Página": [
+    "Page",
+    "頁面"
+  ],
+  "· tamanho": [
+    "· size",
+    "· 尺寸"
+  ],
+  "% · X": [
+    "% · X",
+    "% · X"
+  ],
+  "% · Y": [
+    "% · Y",
+    "% · Y"
+  ],
+  "QR ligado a:": [
+    "QR linked to:",
+    "QR 碼連結至："
+  ],
+  "A consultar o pagamento…": [
+    "Checking payment…",
+    "正在查詢付款…"
+  ],
+  "Pagamento registado pela equipa.": [
+    "Payment recorded by the team.",
+    "團隊已登記付款。"
+  ],
+  "Este pedido já não aguarda pagamento.": [
+    "This order is no longer awaiting payment.",
+    "此訂單已不再等待付款。"
+  ],
+  "Pagamento do produto": [
+    "Product payment",
+    "產品付款"
+  ],
+  "Referência da encomenda:": [
+    "Order reference:",
+    "訂單參考編號："
+  ],
+  "Pagar": [
+    "Pay",
+    "付款"
+  ],
+  "na Opsellio": [
+    "on Opsellio",
+    "於 Opsellio"
+  ],
+  "Guarde a referência da transacção e indique-a à equipa juntamente com a referência da encomenda. A equipa confirma o pagamento no prestador antes de iniciar a produção.": [
+    "Save your transaction reference and give it to the team along with your order reference. The team verifies payment with the provider before starting production.",
+    "請儲存交易參考編號，並連同訂單編號提供給團隊。團隊會向付款服務商核實付款，確認後才開始生產。"
+  ],
+  "O pagamento online deste produto ainda não está configurado. Contacte a equipa antes de pagar.": [
+    "Online payment for this product has not been configured yet. Contact the team before paying.",
+    "此產品尚未設定線上付款。付款前請聯絡團隊。"
+  ],
+  "Reserva válida até": [
+    "Reservation valid until",
+    "預留有效期限："
+  ],
+  "(Maputo). Depois deste prazo, confirme a disponibilidade com a equipa antes de pagar.": [
+    "(Maputo). After this deadline, confirm availability with the team before paying.",
+    "（馬普托時間）。超過期限後，付款前請向團隊確認供應情況。"
+  ],
+  "Contactar a equipa": [
+    "Contact the team",
+    "聯絡團隊"
+  ],
+  "A recuperar o seu percurso…": [
+    "Restoring your progress…",
+    "正在還原您的進度…"
+  ],
+  "Pedido registado.": [
+    "Order recorded.",
+    "訂單已登記。"
+  ],
+  "O produto, plano, perfil e local de entrega estão associados ao seu pedido. Nenhuma cobrança foi efectuada. O pagamento continua pendente.": [
+    "The product, plan, profile and delivery location are linked to your order. No charge has been made. Payment is still pending.",
+    "產品、方案、個人檔案及配送地點已與訂單連結。尚未扣款，付款仍待處理。"
+  ],
+  "Fazer outra encomenda": [
+    "Place another order",
+    "再次訂購"
+  ],
+  "Acompanhar o pedido": [
+    "Track order",
+    "追蹤訂單"
+  ],
+  "Abrir o meu perfil": [
+    "Open my profile",
+    "開啟我的個人檔案"
+  ],
+  "O seu próximo toque.": [
+    "Your next connection.",
+    "您的下一次連結。"
+  ],
+  "Escolha o modelo ou crie o seu design.": [
+    "Choose a model or create your design.",
+    "選擇款式或建立您的設計。"
+  ],
+  "O progresso fica guardado durante esta sessão do navegador.": [
+    "Your progress is saved during this browser session.",
+    "進度會在此瀏覽器工作階段中儲存。"
+  ],
+  "Pode guardar a sua escolha e continuar com a conta.": [
+    "You can save your choice and continue with your account.",
+    "您可儲存選擇並使用帳戶繼續。"
+  ],
+  "· 1 unidade": [
+    "· 1 unit",
+    "· 1 件"
+  ],
+  "Preço do produto físico. Entrega a confirmar.": [
+    "Physical product price. Delivery to be confirmed.",
+    "實體產品價格。配送另行確認。"
+  ],
+  "Escolher outro produto": [
+    "Choose another product",
+    "選擇其他產品"
+  ],
+  "Comece com 30 dias grátis. Os restantes planos estão em breve disponíveis.": [
+    "Start with 30 free days. Other plans will be available soon.",
+    "先享用 30 天免費試用。其他方案即將推出。"
+  ],
+  "30 dias grátis · 0 MT": [
+    "30 free days · 0 MT",
+    "30 天免費 · 0 MT"
+  ],
+  "links ·": [
+    "links ·",
+    "個連結 ·"
+  ],
+  "Ligado como": [
+    "Signed in as",
+    "目前登入帳戶："
+  ],
+  ". O perfil e o pedido ficam associados à sua conta.": [
+    ". Your profile and order are linked to your account.",
+    "。個人檔案及訂單將與您的帳戶連結。"
+  ],
+  "Guarde o seu perfil e acompanhe o pedido com acesso seguro.": [
+    "Save your profile and track your order with secure access.",
+    "安全登入以儲存個人檔案及追蹤訂單。"
+  ],
+  "Entre ou crie uma conta com email e palavra-passe. A sua escolha de produto e plano será mantida no regresso.": [
+    "Sign in or create an account with email and password. Your product and plan choices will be kept when you return.",
+    "使用電子郵件和密碼登入或建立帳戶。返回後會保留您選擇的產品與方案。"
+  ],
+  "Nome completo *": [
+    "Full name *",
+    "全名 *"
+  ],
+  "Profissão ou título (opcional)": [
+    "Occupation or title (optional)",
+    "職業或職稱（選填）"
+  ],
+  "O endereço será criado a partir do seu nome. Fotografia e links podem ser completados mais tarde.": [
+    "Your address will be created from your name. You can add a photo and links later.",
+    "網址將依您的姓名建立。照片與連結可稍後補充。"
+  ],
+  "Email a imprimir no cartão *": [
+    "Email to print on the card *",
+    "卡片上印製的電子郵件 *"
+  ],
+  "Este email será impresso no cartão.": [
+    "This email will be printed on the card.",
+    "此電子郵件將印在卡片上。"
+  ],
+  "Cidade / localidade de entrega *": [
+    "Delivery city / locality *",
+    "配送城市／地區 *"
+  ],
+  "Maputo, Matola, Beira, Nhamatanda…": [
+    "Maputo, Matola, Beira, Nhamatanda…",
+    "Maputo、Matola、Beira、Nhamatanda…"
+  ],
+  "Bairro ou ponto de referência (opcional)": [
+    "Neighbourhood or landmark (optional)",
+    "社區或地標（選填）"
+  ],
+  "Telefone de contacto para entrega *": [
+    "Delivery contact phone *",
+    "配送聯絡電話 *"
+  ],
+  "Estes dados são privados e destinam-se à organização da entrega.": [
+    "These details are private and used to organise delivery.",
+    "這些資料僅供安排配送使用，不會公開。"
+  ],
+  "Confira antes de submeter": [
+    "Review before submitting",
+    "提交前請確認"
+  ],
+  "Entrega:": [
+    "Delivery:",
+    "配送："
+  ],
+  "Contacto:": [
+    "Contact:",
+    "聯絡方式："
+  ],
+  "Produto:": [
+    "Product:",
+    "產品："
+  ],
+  ". O pedido fica a aguardar pagamento. O plano digital é gratuito durante 30 dias, sem renovação automática. Entrega a confirmar.": [
+    ". The order will await payment. The digital plan is free for 30 days, with no automatic renewal. Delivery to be confirmed.",
+    "。訂單將等待付款。數位方案免費試用 30 天，不會自動續訂。配送另行確認。"
+  ],
+  "Aprovo a publicação do meu perfil e do respectivo link para codificação e aprovo o modelo e o design de impressão apresentados.": [
+    "I approve publishing my profile and its link for encoding, and approve the model and print design shown.",
+    "我同意發佈個人檔案及其連結以供寫入，並核准所顯示的款式與印製設計。"
+  ],
+  "Voltar": [
+    "Back",
+    "返回"
+  ],
+  "A confirmar…": [
+    "Confirming…",
+    "正在確認…"
+  ],
+  "Confirmar pedido": [
+    "Confirm order",
+    "確認訂單"
+  ],
+  "O seu pedido": [
+    "Your order",
+    "您的訂單"
+  ],
+  "Personalizado": [
+    "Customised",
+    "已自訂"
+  ],
+  "Plano: 30 dias grátis · 0 MT": [
+    "Plan: 30 free days · 0 MT",
+    "方案：30 天免費 · 0 MT"
+  ],
+  "Entrega: a confirmar": [
+    "Delivery: to be confirmed",
+    "配送：待確認"
+  ],
+  "Preço por unidade. A entrega é confirmada separadamente.": [
+    "Price per unit. Delivery is confirmed separately.",
+    "單件價格。配送另行確認。"
+  ],
+  "Precisa de ajuda?": [
+    "Need help?",
+    "需要協助？"
+  ],
+  "Modelos e personalização": [
+    "Models and personalisation",
+    "款式與自訂"
+  ],
+  "As quantidades por modelo não aumentam o stock físico total. A contagem inicial confirmada em Maputo, Moçambique, é de 500 porta-chaves: 175 Instagram, 175 TikTok e 150 Padrão artístico. Novas entradas e atribuições são geridas em Operações → Stock. As quantidades abaixo mostram o saldo disponível após reservas e alterações do gestor.": [
+    "Model quantities do not increase the total physical stock. Confirmed initial stock in Maputo, Mozambique is 500 keychains: 175 Instagram, 175 TikTok and 150 Artistic Pattern. New receipts and assignments are managed in Operations → Stock. Quantities below show availability after reservations and manager changes.",
+    "各款式數量不會增加實際庫存總量。莫三比克馬普托已確認的初始庫存共 500 個鑰匙圈：Instagram 175 個、TikTok 175 個、藝術圖案 150 個。新增入庫及分配於「營運 → 庫存」管理。下方數量為扣除預留及管理員調整後的可用庫存。"
+  ],
+  "Stock disponível para novas encomendas. Ao chegar a zero, a opção fica indisponível automaticamente. As unidades são reservadas ao confirmar o pedido e devolvidas ao cancelar.": [
+    "Stock available for new orders. At zero, the option is automatically unavailable. Units are reserved when orders are confirmed and restored on cancellation.",
+    "可供新訂單使用的庫存。數量為零時會自動停止供應。確認訂單時預留，取消時歸還。"
+  ],
+  "Actualizar stock": [
+    "Refresh stock",
+    "重新整理庫存"
+  ],
+  "Unidades disponíveis": [
+    "Available units",
+    "可用件數"
+  ],
+  "Permitir personalização": [
+    "Allow personalisation",
+    "允許自訂"
+  ],
+  "Disponibilizar modelo": [
+    "Enable model",
+    "啟用款式"
+  ],
+  "Sem stock: desactivado para clientes": [
+    "Out of stock: disabled for customers",
+    "無庫存：客戶無法選購"
+  ],
+  "Desactivado pelo gestor": [
+    "Disabled by manager",
+    "已由管理員停用"
+  ],
+  "Todos os planos": [
+    "All plans",
+    "所有方案"
+  ],
+  "Mais espaço. Plano": [
+    "More room. Plan",
+    "更多空間。方案"
+  ],
+  "Uma identidade digital, com": [
+    "A digital identity, with",
+    "數位身分，提供"
+  ],
+  "caixas de links.": [
+    "link slots.",
+    "個連結欄位。"
+  ],
+  "30 dias · sem renovação automática": [
+    "30 days · no automatic renewal",
+    "30 天 · 不會自動續訂"
+  ],
+  "Mensal · por perfil": [
+    "Monthly · per profile",
+    "月費 · 每個檔案"
+  ],
+  "/mês": [
+    "/month",
+    "/ 月"
+  ],
+  "links com títulos personalizados": [
+    "links with custom titles",
+    "個可自訂標題的連結"
+  ],
+  "Nome e título de apresentação": [
+    "Name and introduction title",
+    "姓名與介紹職稱"
+  ],
+  "Email, telefone e website com controlo de privacidade": [
+    "Email, phone and website with privacy controls",
+    "可控制公開狀態的電子郵件、電話及網站"
+  ],
+  "Editar, ordenar e publicar os seus links": [
+    "Edit, reorder and publish your links",
+    "編輯、排序及發佈您的連結"
+  ],
+  "Partilha do perfil e guardar o contacto": [
+    "Profile sharing and saving contacts",
+    "分享檔案及儲存聯絡人"
+  ],
+  "O período gratuito dura 30 dias e não renova automaticamente. Produtos NFC e entrega são pagos separadamente. Os planos mensais ainda não estão disponíveis.": [
+    "The free trial lasts 30 days and does not renew automatically. NFC products and delivery are paid for separately. Monthly plans are not yet available.",
+    "免費試用為 30 天，不會自動續訂。NFC 產品及配送費用另計。月費方案尚未開放。"
+  ],
+  "Activar 30 dias gratuitos": [
+    "Activate 30 free days",
+    "啟用 30 天免費試用"
+  ],
+  "FRAMY CONNECT": [
+    "FRAMY CONNECT",
+    "FRAMY CONNECT"
+  ],
+  "Um plano para cada conexão.": [
+    "A plan for every connection.",
+    "適合各種連結需求的方案。"
+  ],
+  "O seu plano": [
+    "Your plan",
+    "您的方案"
+  ],
+  "A nossa sugestão": [
+    "Our recommendation",
+    "我們的推薦"
+  ],
+  "Sem renovação automática": [
+    "No automatic renewal",
+    "不會自動續訂"
+  ],
+  "Por perfil · mensal": [
+    "Per profile · monthly",
+    "每個檔案 · 月費"
+  ],
+  "Plano actual": [
+    "Current plan",
+    "目前方案"
+  ],
+  "Começar 30 dias grátis": [
+    "Start 30 free days",
+    "開始 30 天免費試用"
+  ],
+  "Em breve": [
+    "Coming soon",
+    "即將推出"
+  ],
+  "caixas de links": [
+    "link slots",
+    "個連結欄位"
+  ],
+  "Nome e título": [
+    "Name and title",
+    "姓名與職稱"
+  ],
+  "Contactos e privacidade": [
+    "Contacts and privacy",
+    "聯絡資料與隱私"
+  ],
+  "Partilha de perfil": [
+    "Profile sharing",
+    "個人檔案分享"
+  ],
+  "Todos incluem uma identidade digital, links editáveis e opção de guardar o contacto. Instituições e organizações: preço por perfil, sem gestão de equipas. Subscrições mensais ainda não disponíveis.": [
+    "All include a digital identity, editable links and contact saving. Institutions and organisations: price per profile, without team management. Monthly subscriptions are not yet available.",
+    "所有方案均包含數位身分、可編輯連結及儲存聯絡人功能。機構與組織按個人檔案計價，不含團隊管理。月費訂閱尚未開放。"
+  ],
+  "Interesse nos produtos": [
+    "Product interest",
+    "產品關注度"
+  ],
+  "Últimos 30 dias · visitas às páginas, mesmo sem compra": [
+    "Last 30 days · page visits, even without a purchase",
+    "最近 30 天 · 網頁瀏覽，即使未購買也計入"
+  ],
+  "Actualizar estatísticas": [
+    "Refresh statistics",
+    "重新整理統計"
+  ],
+  "Visitas": [
+    "Visits",
+    "瀏覽次數"
+  ],
+  "Encomendas": [
+    "Orders",
+    "訂單"
+  ],
+  "Oculto": [
+    "Hidden",
+    "隱藏"
+  ],
+  "Vendas activas": [
+    "Sales enabled",
+    "已開放銷售"
+  ],
+  "Uma visita por produto, sessão e dia UTC. Contas da equipa são excluídas. Não representa pessoas únicas nem pagamentos confirmados; a medição começou com esta funcionalidade.": [
+    "One visit per product, session and UTC day. Team accounts are excluded. This does not represent unique people or confirmed payments; measurement began when this feature was introduced.",
+    "每個產品、工作階段及 UTC 日期計一次瀏覽。不計入團隊帳戶。此數據不代表不重複人數或已確認付款；統計自此功能推出時開始。"
+  ],
+  "Verso com logótipo Framy Connect": [
+    "Back with Framy Connect logo",
+    "印有 Framy Connect 標誌的背面"
+  ],
+  "Fotografia do porta-chaves em stock": [
+    "Photo of the keychain in stock",
+    "現有庫存鑰匙圈照片"
+  ],
+  "Frente personalizada do cartão": [
+    "Custom card front",
+    "自訂卡片正面"
+  ],
+  "Verso com nome, email e QR do perfil": [
+    "Back with name, email and profile QR code",
+    "包含姓名、電子郵件及個人檔案 QR 碼的背面"
+  ],
+  "Nome do titular": [
+    "Holder's name",
+    "持有人姓名"
+  ],
+  "Email do titular": [
+    "Holder's email",
+    "持有人電子郵件"
+  ],
+  "QR do perfil final": [
+    "Final profile QR code",
+    "最終個人檔案 QR 碼"
+  ],
+  "QR após criar o perfil": [
+    "QR code after profile creation",
+    "建立檔案後產生 QR 碼"
+  ],
+  "O seu logótipo aqui": [
+    "Your logo here",
+    "在此放置您的標誌"
+  ],
+  "As opções serão activadas após confirmar o stock.": [
+    "Options will be enabled after stock is confirmed.",
+    "確認庫存後將啟用選項。"
+  ],
+  "Consultar stock novamente": [
+    "Check stock again",
+    "再次查詢庫存"
+  ],
+  "Escolha o seu porta-chaves": [
+    "Choose your keychain",
+    "選擇您的鑰匙圈"
+  ],
+  "500 MT por unidade · Frente e verso de cada modelo.": [
+    "500 MT per unit · Front and back of each model.",
+    "每件 500 MT · 各款式的正反面。"
+  ],
+  "A consultar stock…": [
+    "Checking stock…",
+    "正在查詢庫存…"
+  ],
+  "Stock por confirmar": [
+    "Stock to be confirmed",
+    "庫存待確認"
+  ],
+  "Seleccionar · 500 MT": [
+    "Select · 500 MT",
+    "選擇 · 500 MT"
+  ],
+  "Indisponível": [
+    "Unavailable",
+    "無法供應"
+  ],
+  "Personalizar o cartão": [
+    "Personalise the card",
+    "自訂卡片"
+  ],
+  "Criar o meu porta-chaves": [
+    "Create my keychain",
+    "製作我的鑰匙圈"
+  ],
+  "Frente e verso · 85,5 × 54 mm": [
+    "Front and back · 85.5 × 54 mm",
+    "正反面 · 85.5 × 54 公釐"
+  ],
+  "O seu logótipo na frente · 28 mm": [
+    "Your logo on the front · 28 mm",
+    "正面放置您的標誌 · 28 公釐"
+  ],
+  "Personalização indisponível": [
+    "Personalisation unavailable",
+    "暫不提供自訂"
+  ],
+  "Modelo": [
+    "Model",
+    "款式"
+  ],
+  "O texto «Logo» indica onde ficará o seu logótipo.": [
+    "The word “Logo” marks where your logo will appear.",
+    "「Logo」文字標示您的標誌位置。"
+  ],
+  "Cores do cartão": [
+    "Card colours",
+    "卡片顏色"
+  ],
+  "Cores": [
+    "Colours",
+    "顏色"
+  ],
+  "Remover ficheiros e repor textos e cores de ambos os lados": [
+    "Remove files and reset text and colours on both sides",
+    "移除檔案並重設兩面的文字及顏色"
+  ],
+  "Repor": [
+    "Reset",
+    "重設"
+  ],
+  "Selector de cor ou código HEX.": [
+    "Colour picker or HEX code.",
+    "選色器或 HEX 色碼。"
+  ],
+  "Repor remove os ficheiros e as edições de texto e cor dos dois lados. Mantém o modelo escolhido e o QR do perfil.": [
+    "Reset removes files and text and colour edits on both sides. It keeps the selected model and profile QR code.",
+    "重設會移除兩面的檔案、文字及顏色編輯，保留所選款式與個人檔案 QR 碼。"
+  ],
+  "Para um fundo liso, use o mesmo código nas duas cores do degradé. Imagens e PDFs mantêm as suas cores originais.": [
+    "For a solid background, use the same code for both gradient colours. Images and PDFs keep their original colours.",
+    "如需單色背景，請將兩個漸層色碼設為相同。圖片與 PDF 會保留原始顏色。"
+  ],
+  "O seu cartão": [
+    "Your card",
+    "您的卡片"
+  ],
+  "O seu porta-chaves": [
+    "Your keychain",
+    "您的鑰匙圈"
+  ],
+  "Logótipo e marca na frente. Nome, email e QR apenas no verso.": [
+    "Logo and brand on the front. Name, email and QR code only on the back.",
+    "正面放置標誌與品牌。姓名、電子郵件及 QR 碼僅放置於背面。"
+  ],
+  "O verso mantém o logótipo Framy Connect.": [
+    "The back keeps the Framy Connect logo.",
+    "背面保留 Framy Connect 標誌。"
+  ],
+  "Pré-visualização 3D": [
+    "3D preview",
+    "3D 預覽"
+  ],
+  "Rodar": [
+    "Rotate",
+    "旋轉"
+  ],
+  "Rodar modelo 3D": [
+    "Rotate 3D model",
+    "旋轉 3D 模型"
+  ],
+  "Inclinar": [
+    "Tilt",
+    "傾斜"
+  ],
+  "Textos ·": [
+    "Text ·",
+    "文字 ·"
+  ],
+  "A frente apresenta a marca; o verso reúne os contactos e o QR do perfil.": [
+    "The front shows the brand; the back contains contact details and the profile QR code.",
+    "正面顯示品牌；背面放置聯絡資料及個人檔案 QR 碼。"
+  ],
+  "Design próprio (PDF)": [
+    "Custom design (PDF)",
+    "自訂設計（PDF）"
+  ],
+  "Logótipo ou design próprio": [
+    "Logo or custom design",
+    "標誌或自訂設計"
+  ],
+  "O logótipo aparece apenas na frente. PDF para design completo · até 8 MB.": [
+    "The logo appears only on the front. PDF for a full design · up to 8 MB.",
+    "標誌僅顯示於正面。完整設計請使用 PDF · 上限 8 MB。"
+  ],
+  "PNG ou JPG substitui «Logo» no local indicado. PDF para design completo · até 8 MB.": [
+    "PNG or JPG replaces “Logo” at the marked position. PDF for a full design · up to 8 MB.",
+    "PNG 或 JPG 會取代標示位置的「Logo」。完整設計請使用 PDF · 上限 8 MB。"
+  ],
+  "Intensidade da remoção": [
+    "Removal intensity",
+    "去背強度"
+  ],
+  "Remover fundo": [
+    "Remove background",
+    "移除背景"
+  ],
+  "Restaurar original": [
+    "Restore original",
+    "還原原始圖片"
+  ],
+  "Para fundos lisos. A remoção é feita neste dispositivo. Para fundos complexos, use um PNG transparente.": [
+    "For solid backgrounds. Removal is done on this device. For complex backgrounds, use a transparent PNG.",
+    "適用於單色背景。去背在此裝置上進行。複雜背景請使用透明 PNG。"
+  ],
+  "Página do PDF": [
+    "PDF page",
+    "PDF 頁面"
+  ],
+  "Tamanho": [
+    "Size",
+    "尺寸"
+  ],
+  "Posição horizontal": [
+    "Horizontal position",
+    "水平位置"
+  ],
+  "Posição vertical": [
+    "Vertical position",
+    "垂直位置"
+  ],
+  "Remover ficheiro": [
+    "Remove file",
+    "移除檔案"
+  ],
+  "Arte para impressão": [
+    "Print artwork",
+    "印製圖稿"
+  ],
+  "54 × 85,5 mm": [
+    "54 × 85.5 mm",
+    "54 × 85.5 公釐"
+  ],
+  "85,5 × 54 mm": [
+    "85.5 × 54 mm",
+    "85.5 × 54 公釐"
+  ],
+  "Ø 28 mm": [
+    "Ø 28 mm",
+    "直徑 28 公釐"
+  ],
+  "· Ver 2D e descarregar": [
+    "· View 2D and download",
+    "· 查看 2D 並下載"
+  ],
+  "Descarregar vista 2D (": [
+    "Download 2D view (",
+    "下載 2D 視圖（"
+  ],
+  "frente": [
+    "front",
+    "正面"
+  ],
+  "verso": [
+    "back",
+    "背面"
+  ],
+  "Exportação à escala de 300 ppp, sem sangria. Confirmar margens e acabamento com a gráfica. A prévia é ilustrativa.": [
+    "Export at 300 dpi, without bleed. Confirm margins and finishing with the printer. The preview is illustrative.",
+    "以 300 dpi 匯出，不含出血。請向印刷廠確認邊距及加工方式。預覽僅供示意。"
+  ],
+  "Modelo:": [
+    "Model:",
+    "款式："
+  ],
+  "A processar o logótipo…": [
+    "Processing logo…",
+    "正在處理標誌…"
+  ],
+  "#FF6600": [
+    "#FF6600",
+    "#FF6600"
+  ],
+  "Use 3 ou 6 caracteres: 0–9 e A–F.": [
+    "Use 3 or 6 characters: 0–9 and A–F.",
+    "使用 3 或 6 個字元：0–9 及 A–F。"
+  ],
+  "Fotografias do produto": [
+    "Product photos",
+    "產品照片"
+  ],
+  "Novo produto": [
+    "New product",
+    "新增產品"
+  ],
+  "Gestão de produtos": [
+    "Product management",
+    "產品管理"
+  ],
+  "Edite o catálogo apresentado no site. Valores em meticais (MZN).": [
+    "Edit the catalogue shown on the website. Amounts in meticais (MZN).",
+    "編輯網站上的產品目錄。金額以梅蒂卡爾（MZN）計價。"
+  ],
+  "Adicionar fotografias": [
+    "Add photos",
+    "新增照片"
+  ],
+  "Até 8 fotografias. PNG, JPG ou WebP, até 8 MB cada.": [
+    "Up to 8 photos. PNG, JPG or WebP, up to 8 MB each.",
+    "最多 8 張照片。支援 PNG、JPG 或 WebP，每張上限 8 MB。"
+  ],
+  "Principal": [
+    "Main",
+    "主要"
+  ],
+  "Tornar principal": [
+    "Set as main",
+    "設為主要照片"
+  ],
+  "Retirar": [
+    "Remove",
+    "移除"
+  ],
+  "Categoria": [
+    "Category",
+    "分類"
+  ],
+  "Frase curta": [
+    "Short tagline",
+    "簡短標語"
+  ],
+  "Preço (MZN)": [
+    "Price (MZN)",
+    "價格（MZN）"
+  ],
+  "Custo interno (MZN)": [
+    "Internal cost (MZN)",
+    "內部成本（MZN）"
+  ],
+  "Publicado no catálogo": [
+    "Published in catalogue",
+    "在目錄中發佈"
+  ],
+  "Publicado e sem vendas: aparece como Brevemente, sem preço. Não publicado: fica oculto. Para vender, active as vendas, defina o preço e registe stock em Operações.": [
+    "Published without sales: appears as Coming soon, without a price. Unpublished: hidden. To sell, enable sales, set a price and record stock in Operations.",
+    "已發佈但未開放銷售：顯示「即將推出」，不顯示價格。未發佈：隱藏。若要銷售，請啟用銷售、設定價格，並於營運中登記庫存。"
+  ],
+  "Guardar produto": [
+    "Save product",
+    "儲存產品"
+  ],
+  "Cancelar": [
+    "Cancel",
+    "取消"
+  ],
+  "Link do perfil": [
+    "Profile link",
+    "個人檔案連結"
+  ],
+  "Link do perfil do cliente": [
+    "Customer profile link",
+    "客戶個人檔案連結"
+  ],
+  "Pré-visualizar perfil": [
+    "Preview profile",
+    "預覽個人檔案"
+  ],
+  "Publicado": [
+    "Published",
+    "已發佈"
+  ],
+  "Por publicar": [
+    "Not published",
+    "未發佈"
+  ],
+  "Endereço do perfil": [
+    "Profile address",
+    "個人檔案網址"
+  ],
+  "O cliente ainda não criou o perfil para este pedido.": [
+    "The customer has not created a profile for this order yet.",
+    "客戶尚未為此訂單建立個人檔案。"
+  ],
+  "Guarde o perfil para gerar o link.": [
+    "Save the profile to generate the link.",
+    "儲存個人檔案以產生連結。"
+  ],
+  "O perfil ainda não está publicado. Aguarde a publicação antes de codificar o NFC.": [
+    "The profile is not published yet. Wait for publication before encoding the NFC.",
+    "個人檔案尚未發佈。請待發佈後再寫入 NFC。"
+  ],
+  "Os seus links": [
+    "Your links",
+    "您的連結"
+  ],
+  "caixas utilizadas ·": [
+    "slots used ·",
+    "個欄位已使用 ·"
+  ],
+  "Adicione redes sociais, portefólio ou outros destinos. Os links aparecem no perfil quando publicar.": [
+    "Add social networks, a portfolio or other destinations. Links appear on your profile when published.",
+    "新增社群平台、作品集或其他網址。發佈後連結會顯示於個人檔案。"
+  ],
+  "Link": [
+    "Link",
+    "連結"
+  ],
+  "Título": [
+    "Title",
+    "標題"
+  ],
+  "Ex.: Instagram": [
+    "E.g. Instagram",
+    "例如：Instagram"
+  ],
+  "Endereço": [
+    "Address",
+    "網址"
+  ],
+  "https://…": [
+    "https://…",
+    "https://…"
+  ],
+  "Todas as 50 caixas estão em uso": [
+    "All 50 slots are in use",
+    "全部 50 個欄位已使用"
+  ],
+  "Desbloquear mais caixas": [
+    "Unlock more slots",
+    "解鎖更多欄位"
+  ],
+  "Biografia": [
+    "Biography",
+    "個人簡介"
+  ],
+  "Conte um pouco sobre si ou sobre a sua organização.": [
+    "Tell us a little about yourself or your organisation.",
+    "簡單介紹您自己或您的組織。"
+  ],
+  "Biografia disponível a partir do plano Criador.": [
+    "Biography is available from the Creator plan.",
+    "創作者方案起提供個人簡介功能。"
+  ],
+  "A sua fotografia": [
+    "Your photo",
+    "您的照片"
+  ],
+  "Use um retrato vertical. A fotografia preenche o topo do seu perfil.": [
+    "Use a portrait photo. It fills the top of your profile.",
+    "請使用直式照片。照片會填滿個人檔案頂部。"
+  ],
+  "Escolher fotografia de perfil": [
+    "Choose profile photo",
+    "選擇個人檔案照片"
+  ],
+  "Alterar fotografia": [
+    "Change photo",
+    "變更照片"
+  ],
+  "Carregar fotografia": [
+    "Upload photo",
+    "上傳照片"
+  ],
+  "Remover": [
+    "Remove",
+    "移除"
+  ],
+  "JPG, PNG ou WebP · até 5 MB": [
+    "JPG, PNG or WebP · up to 5 MB",
+    "JPG、PNG 或 WebP · 上限 5 MB"
+  ],
+  "Enquadramento vertical": [
+    "Vertical framing",
+    "垂直裁切位置"
+  ],
+  "Website / portefólio": [
+    "Website / portfolio",
+    "網站／作品集"
+  ],
+  "Adicionar contacto": [
+    "Add contact",
+    "新增聯絡人"
+  ],
+  "Partilhar": [
+    "Share",
+    "分享"
+  ],
+  "Página Inicial": [
+    "Home",
+    "首頁"
+  ],
+  "Compre agora": [
+    "Buy now",
+    "立即購買"
+  ],
+  "A sua identidade, os seus contactos e o seu trabalho. Tudo ligado, num único toque.": [
+    "Your identity, your contacts and your work. All connected, in one tap.",
+    "您的身分、聯絡資料及工作。一觸即連。"
+  ],
+  "Navegação do rodapé": [
+    "Footer navigation",
+    "頁尾導覽"
+  ],
+  "Navegação": [
+    "Navigation",
+    "導覽"
+  ],
+  "Torne-se agente": [
+    "Become an agent",
+    "成為代理員"
+  ],
+  "Fale connosco": [
+    "Contact us",
+    "聯絡我們"
+  ],
+  "Produtos e soluções": [
+    "Products and solutions",
+    "產品與解決方案"
+  ],
+  "info@framyconnect.co.mz": [
+    "info@framyconnect.co.mz",
+    "info@framyconnect.co.mz"
+  ],
+  "Apoio ao cliente": [
+    "Customer support",
+    "客戶支援"
+  ],
+  "Vamos conversar": [
+    "Let's talk",
+    "與我們聯絡"
+  ],
+  "Conta e apoio": [
+    "Account and support",
+    "帳戶與支援"
+  ],
+  "A sua Framy": [
+    "Your Framy",
+    "您的 Framy"
+  ],
+  "A minha identidade": [
+    "My identity",
+    "我的身分"
+  ],
+  "Centro de ajuda": [
+    "Help centre",
+    "說明中心"
+  ],
+  "Privacidade": [
+    "Privacy",
+    "隱私"
+  ],
+  "Framy Connect. Todos os direitos reservados.": [
+    "Framy Connect. All rights reserved.",
+    "Framy Connect。版權所有。"
+  ],
+  "Política de privacidade": [
+    "Privacy policy",
+    "隱私權政策"
+  ],
+  "Termos de utilização": [
+    "Terms of use",
+    "使用條款"
+  ],
+  "Pedido / produto": [
+    "Order / product",
+    "訂單／產品"
+  ],
+  "Valor de teste": [
+    "Test amount",
+    "測試金額"
+  ],
+  "Abrir": [
+    "Open",
+    "開啟"
+  ],
+  "Ainda não há pedidos": [
+    "No orders yet",
+    "尚無訂單"
+  ],
+  "Crie um pedido de teste para explorar o percurso completo.": [
+    "Create a test order to explore the complete journey.",
+    "建立測試訂單以體驗完整流程。"
+  ],
+  "Quando o seu pedido for registado, pode acompanhar aqui todas as etapas.": [
+    "Once your order is recorded, you can track every stage here.",
+    "訂單登記後，可在此追蹤所有階段。"
+  ],
+  "O SEU ESPAÇO": [
+    "YOUR SPACE",
+    "您的專區"
+  ],
+  "Ferramentas de teste": [
+    "Test tools",
+    "測試工具"
+  ],
+  "Vistas de demonstração, sem permissões reais.": [
+    "Demonstration views, without real permissions.",
+    "示範畫面，不具實際權限。"
+  ],
+  "Explorar produtos": [
+    "Explore products",
+    "探索產品"
+  ],
+  "A sua conta Framy Connect": [
+    "Your Framy Connect account",
+    "您的 Framy Connect 帳戶"
+  ],
+  "A sua conta": [
+    "Your account",
+    "您的帳戶"
+  ],
+  "· Acompanhe o perfil e as encomendas. O pagamento do produto é confirmado pela equipa.": [
+    "· Track your profile and orders. Product payment is confirmed by the team.",
+    "· 追蹤個人檔案及訂單。產品付款由團隊確認。"
+  ],
+  "FRAMY CONNECT /": [
+    "FRAMY CONNECT /",
+    "FRAMY CONNECT /"
+  ],
+  "IDENTIDADE": [
+    "IDENTITY",
+    "身分"
+  ],
+  "MINHA CONTA": [
+    "MY ACCOUNT",
+    "我的帳戶"
+  ],
+  "Actualizar dados": [
+    "Refresh data",
+    "重新整理資料"
+  ],
+  "A carregar o seu espaço…": [
+    "Loading your workspace…",
+    "正在載入您的工作區…"
+  ],
+  "O seu espaço está temporariamente indisponível.": [
+    "Your workspace is temporarily unavailable.",
+    "您的工作區暫時無法使用。"
+  ],
+  "A sua identidade": [
+    "Your identity",
+    "您的身分"
+  ],
+  "Alterações por guardar": [
+    "Unsaved changes",
+    "尚未儲存的變更"
+  ],
+  "Escolha os dados que quer partilhar. O nome de utilizador fica reservado na primeira gravação.": [
+    "Choose the details you want to share. Your username is reserved when you first save.",
+    "選擇您想分享的資料。使用者名稱會於首次儲存時保留。"
+  ],
+  "O que aparece no seu perfil?": [
+    "What appears on your profile?",
+    "個人檔案要顯示哪些資料？"
+  ],
+  "Mostrar email ao público": [
+    "Show email publicly",
+    "公開電子郵件"
+  ],
+  "Mostrar telefone ao público": [
+    "Show phone publicly",
+    "公開電話"
+  ],
+  "Guardar rascunho": [
+    "Save draft",
+    "儲存草稿"
+  ],
+  "Publicar perfil": [
+    "Publish profile",
+    "發佈個人檔案"
+  ],
+  "Abrir perfil publicado": [
+    "Open published profile",
+    "開啟已發佈的個人檔案"
+  ],
+  "Retirar publicação": [
+    "Unpublish",
+    "取消發佈"
+  ],
+  "Quem tiver o endereço pode consultar o perfil publicado enquanto o plano estiver activo. Pode retirar a publicação a qualquer momento. O perfil não é indexado em motores de pesquisa.": [
+    "Anyone with the address can view the published profile while the plan is active. You can unpublish at any time. The profile is not indexed by search engines.",
+    "方案有效期間，持有網址的人均可查看已發佈的個人檔案。您可隨時取消發佈。檔案不會被搜尋引擎收錄。"
+  ],
+  "O SEU PERFIL · PRÉ-VISUALIZAÇÃO": [
+    "YOUR PROFILE · PREVIEW",
+    "您的個人檔案 · 預覽"
+  ],
+  "Acompanhe o seu pedido.": [
+    "Track your order.",
+    "追蹤您的訂單。"
+  ],
+  "Cada pedido, no sítio certo.": [
+    "Every order in the right place.",
+    "每筆訂單都妥善安排。"
+  ],
+  "O próximo toque passa por si.": [
+    "The next connection starts with you.",
+    "下一次連結由您開始。"
+  ],
+  "Veja em que etapa está cada pedido e consulte o histórico, do pagamento à entrega.": [
+    "See each order's stage and history, from payment to delivery.",
+    "查看每筆訂單從付款到配送的階段及紀錄。"
+  ],
+  "Atribua um agente e acompanhe os pedidos de teste até à entrega.": [
+    "Assign an agent and track test orders through to delivery.",
+    "指派代理員並追蹤測試訂單直至配送。"
+  ],
+  "Abra um pedido atribuído, inicie a produção e conclua o controlo de qualidade.": [
+    "Open an assigned order, start production and complete quality checks.",
+    "開啟已指派訂單、開始生產並完成品質檢查。"
+  ],
+  "Novo pedido de teste": [
+    "New test order",
+    "新增測試訂單"
+  ],
+  "Local de entrega obrigatório": [
+    "Delivery location required",
+    "須填寫配送地點"
+  ],
+  "Ex.: Maputo ou Beira": [
+    "E.g. Maputo or Beira",
+    "例如：Maputo 或 Beira"
+  ],
+  "Produto para o novo pedido": [
+    "Product for new order",
+    "新訂單的產品"
+  ],
+  "Do pagamento à entrega": [
+    "From payment to delivery",
+    "從付款到配送"
+  ],
+  "Distribuição dos pedidos de teste por etapa.": [
+    "Test orders by stage.",
+    "測試訂單的階段分佈。"
+  ],
+  "Conciliação de teste": [
+    "Test reconciliation",
+    "測試對帳"
+  ],
+  "Capturas": [
+    "Captured payments",
+    "已收款"
+  ],
+  "Reembolsos": [
+    "Refunds",
+    "退款"
+  ],
+  "Saldo no prestador": [
+    "Provider balance",
+    "付款服務商餘額"
+  ],
+  "Custo reconhecido": [
+    "Recognised cost",
+    "已認列成本"
+  ],
+  "Sem taxas, impostos ou liquidações bancárias. Estes resultados não são demonstrações financeiras oficiais.": [
+    "No fees, taxes or bank settlements included. These results are not official financial statements.",
+    "不含手續費、稅金或銀行結算。此結果並非正式財務報表。"
+  ],
+  "Exportar pedidos CSV": [
+    "Export orders as CSV",
+    "匯出訂單 CSV"
+  ],
+  "Histórico de operações": [
+    "Operations history",
+    "營運紀錄"
+  ],
+  "As operações de teste aparecerão aqui.": [
+    "Test operations will appear here.",
+    "測試操作將顯示於此。"
+  ],
+  "Pedido de teste #": [
+    "Test order #",
+    "測試訂單 #"
+  ],
+  "· Nenhuma cobrança ou entrega real.": [
+    "· No real charge or delivery.",
+    "· 不會實際扣款或配送。"
+  ],
+  "· Controlo de qualidade:": [
+    "· Quality check:",
+    "· 品質檢查："
+  ],
+  "Última actualização:": [
+    "Last updated:",
+    "最後更新："
+  ],
+  "Simular pagamento confirmado": [
+    "Simulate confirmed payment",
+    "模擬確認付款"
+  ],
+  "Agente de teste": [
+    "Test agent",
+    "測試代理員"
+  ],
+  "Nome do agente": [
+    "Agent name",
+    "代理員姓名"
+  ],
+  "Iniciar produção": [
+    "Start production",
+    "開始生產"
+  ],
+  "Controlo de qualidade": [
+    "Quality control",
+    "品質檢查"
+  ],
+  "Confirmar QC e marcar pronto": [
+    "Confirm QC and mark ready",
+    "確認品檢並標記為就緒"
+  ],
+  "Evidência de entrega de teste": [
+    "Test delivery evidence",
+    "測試配送憑證"
+  ],
+  "Ex.: confirmação de recolha DEMO-001": [
+    "E.g. collection confirmation DEMO-001",
+    "例如：取貨確認 DEMO-001"
+  ],
+  "Confirmar entrega simulada": [
+    "Confirm simulated delivery",
+    "確認模擬配送"
+  ],
+  "Entrega de teste concluída. Evidência:": [
+    "Test delivery completed. Evidence:",
+    "測試配送已完成。憑證："
+  ],
+  "Cancelar pedido de teste": [
+    "Cancel test order",
+    "取消測試訂單"
+  ],
+  "Simular reembolso integral": [
+    "Simulate full refund",
+    "模擬全額退款"
+  ],
+  "As palavras-passe não coincidem.": [
+    "Passwords do not match.",
+    "兩次輸入的密碼不一致。"
+  ],
+  "Tente novamente.": [
+    "Please try again.",
+    "請再試一次。"
+  ],
+  "Olá": [
+    "Hello",
+    "您好"
+  ],
+  "Submeter pedido": [
+    "Submit order",
+    "提交訂單"
+  ],
+  "Perfil de demonstração": [
+    "Demo profile",
+    "示範檔案"
+  ],
+  "Firmino Chambale": [
+    "Firmino Chambale",
+    "Firmino Chambale"
+  ],
+  "Arquitecto e Planeador Físico": [
+    "Architect and Physical Planner",
+    "建築師與空間規劃師"
+  ],
+  "Conhecer a Framy": [
+    "Discover Framy",
+    "認識 Framy"
+  ],
+  "Perfil de demonstração Framy Connect.": [
+    "Framy Connect demo profile.",
+    "Framy Connect 示範檔案。"
+  ],
+  "Framy Connect — O Seu Mundo, Num Toque.": [
+    "Framy Connect — Your World, In One Tap.",
+    "Framy Connect — 您的世界，一觸即達。"
+  ],
+  "A sua identidade, as suas ligações e o seu trabalho. Descubra os produtos NFC da Framy Connect, feitos para conectar Moçambique.": [
+    "Your identity, your connections and your work. Discover Framy Connect NFC products, made to connect Mozambique.",
+    "您的身分、人脈與工作。探索為連結莫三比克而打造的 Framy Connect NFC 產品。"
+  ],
+  "PVC Business Cards": [
+    "PVC Business Cards",
+    "PVC 名片"
+  ],
+  "Cartão NFC em PVC": [
+    "PVC NFC card",
+    "PVC NFC 卡片"
+  ],
+  "Wooden Business Cards": [
+    "Wooden Business Cards",
+    "木製名片"
+  ],
+  "Cartão NFC em madeira": [
+    "Wooden NFC card",
+    "木製 NFC 卡片"
+  ],
+  "Metal NFC Card": [
+    "Metal NFC Card",
+    "金屬 NFC 卡片"
+  ],
+  "Cartão NFC em metal": [
+    "Metal NFC card",
+    "金屬 NFC 卡片"
+  ],
+  "NFC Keychain": [
+    "NFC Keychain",
+    "NFC 鑰匙圈"
+  ],
+  "Porta-chaves NFC": [
+    "NFC keychain",
+    "NFC 鑰匙圈"
+  ],
+  "NFC Tag": [
+    "NFC Tag",
+    "NFC 標籤"
+  ],
+  "Etiqueta NFC": [
+    "NFC tag",
+    "NFC 標籤"
+  ],
+  "NFC Sticker": [
+    "NFC Sticker",
+    "NFC 貼紙"
+  ],
+  "Autocolante NFC": [
+    "NFC sticker",
+    "NFC 貼紙"
+  ],
+  "NFC Bracelet": [
+    "NFC Bracelet",
+    "NFC 手環"
+  ],
+  "Pulseira NFC": [
+    "NFC wristband",
+    "NFC 手環"
+  ],
+  "Smart Event Badge": [
+    "Smart Event Badge",
+    "智慧活動識別證"
+  ],
+  "Crachá para eventos": [
+    "Event badge",
+    "活動識別證"
+  ],
+  "Restaurant QR Menu": [
+    "Restaurant QR Menu",
+    "餐廳 QR 菜單"
+  ],
+  "Menu digital QR": [
+    "Digital QR menu",
+    "數位 QR 菜單"
+  ],
+  "Google Review Stand": [
+    "Google Review Stand",
+    "Google 評論展示架"
+  ],
+  "Suporte de avaliações Google": [
+    "Google review stand",
+    "Google 評論展示架"
+  ],
+  "Digital Catalog": [
+    "Digital Catalog",
+    "數位目錄"
+  ],
+  "Catálogo digital": [
+    "Digital catalogue",
+    "數位目錄"
+  ],
+  "Employee Card": [
+    "Employee Card",
+    "員工卡"
+  ],
+  "Cartão de colaborador": [
+    "Employee card",
+    "員工卡"
+  ],
+  "Indivíduos": [
+    "Individuals",
+    "個人"
+  ],
+  "Reúna os seus contactos e partilhe-os nas conversas do dia a dia.": [
+    "Bring your contacts together and share them in everyday conversations.",
+    "整合聯絡資料，在日常交流中輕鬆分享。"
+  ],
+  "Dê acesso às suas redes sociais, vídeos e portefólio num único perfil.": [
+    "Give access to your social networks, videos and portfolio in a single profile.",
+    "透過單一個人檔案分享社群平台、影片與作品集。"
+  ],
+  "Apresente o seu trabalho e facilite o contacto depois de cada encontro.": [
+    "Present your work and make it easy to stay in touch after every meeting.",
+    "展示您的工作成果，讓每次見面後都能輕鬆保持聯絡。"
+  ],
+  "Instituições": [
+    "Institutions",
+    "機構"
+  ],
+  "Organize os links e os recursos que quer disponibilizar à sua comunidade.": [
+    "Organise the links and resources you want to share with your community.",
+    "整理您希望與社群分享的連結和資源。"
+  ],
+  "Organizações": [
+    "Organisations",
+    "組織"
+  ],
+  "Apresente a equipa, os serviços e os contactos da sua organização.": [
+    "Present your organisation's team, services and contacts.",
+    "介紹組織的團隊、服務及聯絡資料。"
+  ],
+  "Preciso de instalar uma aplicação?": [
+    "Do I need to install an app?",
+    "需要安裝應用程式嗎？"
+  ],
+  "Quem recebe o seu perfil pode abri-lo no navegador. Para partilhar por toque, o telemóvel precisa de ser compatível com NFC. O código QR oferece outra forma de acesso.": [
+    "Recipients can open your profile in a browser. To share with a tap, the phone must support NFC. The QR code provides another way to access it.",
+    "接收者可在瀏覽器開啟您的檔案。輕觸分享需要支援 NFC 的手機，也可透過 QR 碼存取。"
+  ],
+  "Posso actualizar os meus contactos?": [
+    "Can I update my contacts?",
+    "可以更新聯絡資料嗎？"
+  ],
+  "Sim. Pode editar a fotografia, os contactos e os links em A minha identidade. O endereço do perfil mantém-se, para continuar a usar o mesmo cartão.": [
+    "Yes. You can edit your photo, contacts and links in My identity. The profile address stays the same, so you can keep using the same card.",
+    "可以。在「我的身分」中編輯照片、聯絡資料及連結。檔案網址保持不變，因此可繼續使用同一張卡片。"
+  ],
+  "O produto inclui uma subscrição?": [
+    "Does the product include a subscription?",
+    "產品包含訂閱嗎？"
+  ],
+  "O produto físico é pago separadamente do perfil digital. Pode experimentar o perfil durante 30 dias, sem renovação automática. Consulte as condições do plano antes de comprar.": [
+    "The physical product is paid for separately from the digital profile. You can try the profile for 30 days without automatic renewal. Check plan terms before buying.",
+    "實體產品與數位檔案分開收費。您可免費試用檔案 30 天，不會自動續訂。購買前請查看方案條款。"
+  ],
+  "Como indico o local de entrega?": [
+    "How do I provide the delivery location?",
+    "如何提供配送地點？"
+  ],
+  "Antes de submeter o pedido, indique a cidade ou localidade de entrega. Pode acrescentar o bairro e um ponto de referência. A equipa usa essa informação para organizar a entrega; confirme a cobertura e o prazo antes da compra.": [
+    "Before submitting your order, enter the delivery city or locality. You can add the neighbourhood and a landmark. The team uses this to arrange delivery; confirm coverage and timing before buying.",
+    "提交訂單前，請填寫配送城市或地區，可補充社區及地標。團隊將據此安排配送；購買前請確認配送範圍及時間。"
+  ],
+  "O perfil comprova uma identidade ou credencial?": [
+    "Does the profile verify an identity or credential?",
+    "個人檔案是否驗證身分或資格？"
+  ],
+  "O perfil apresenta a informação partilhada pelo seu titular. A presença de informação no perfil não constitui, por si só, uma verificação de identidade ou certificação de credenciais.": [
+    "The profile displays information shared by its owner. Information appearing on a profile does not by itself verify identity or certify credentials.",
+    "個人檔案顯示持有人分享的資料。檔案中的資訊本身並不構成身分驗證或資格認證。"
+  ],
+  "A terminar sessão…": [
+    "Signing out…",
+    "正在登出…"
+  ],
+  "Conectar começa por si.": [
+    "Connection starts with you.",
+    "連結由您開始。"
+  ],
+  "QUEM SOMOS": [
+    "WHO WE ARE",
+    "關於我們"
+  ],
+  "A Framy Connect nasce para tornar a identidade simples, acessível e pronta para ser partilhada.": [
+    "Framy Connect makes identity simple, accessible and ready to share.",
+    "Framy Connect 讓身分資訊變得簡單、易於存取且隨時可分享。"
+  ],
+  "A nossa visão": [
+    "Our vision",
+    "我們的願景"
+  ],
+  "Fazer do toque a linguagem universal da identidade, para cada pessoa e cada instituição à qual pertence.": [
+    "Make a tap the universal language of identity, for every person and every institution they belong to.",
+    "讓輕觸成為每個人及其所屬機構都能使用的通用身分語言。"
+  ],
+  "A nossa missão": [
+    "Our mission",
+    "我們的使命"
+  ],
+  "Ligar pessoas ao que as representa: os seus contactos, o seu trabalho e as suas conquistas. Um perfil que pode actualizar, ligado aos produtos que o acompanham.": [
+    "Connect people to what represents them: their contacts, work and achievements. An updatable profile, linked to the products that go with you.",
+    "連結人們的聯絡資料、工作與成就。可隨時更新的檔案，與隨身產品相連。"
+  ],
+  "Moçambique primeiro": [
+    "Mozambique first",
+    "以莫三比克為先"
+  ],
+  "Desenhamos uma experiência em português, orientada às pessoas, aos criadores e às organizações do nosso mercado.": [
+    "We design an experience in Portuguese, focused on the people, creators and organisations in our market.",
+    "我們打造以葡萄牙語為主的體驗，服務本地市場的個人、創作者與組織。"
+  ],
+  "Vamos conectar-nos.": [
+    "Let's connect.",
+    "讓我們連結彼此。"
+  ],
+  "Conte-nos o que precisa. Um cartão, uma equipa inteira ou uma nova ideia para o seu negócio.": [
+    "Tell us what you need. A card, an entire team or a new idea for your business.",
+    "告訴我們您的需求。無論是一張卡片、整個團隊，還是業務新構想。"
+  ],
+  "Conversas que abrem possibilidades": [
+    "Conversations that open possibilities",
+    "開啟更多可能的交流"
+  ],
+  "Para informações sobre produtos e soluções, contacte info@framyconnect.co.mz. O envio é feito pela sua aplicação de email.": [
+    "For product and solution information, contact info@framyconnect.co.mz. Your email app will send the message.",
+    "產品與解決方案資訊請聯絡 info@framyconnect.co.mz。訊息將透過您的電子郵件應用程式傳送。"
+  ],
+  "Para questões sobre o seu perfil, use support@framyconnect.co.mz. Indique a referência da encomenda ao contactar a equipa. O pagamento é confirmado após verificação no prestador.": [
+    "For profile questions, use support@framyconnect.co.mz. Include your order reference when contacting the team. Payment is confirmed after verification with the provider.",
+    "個人檔案問題請聯絡 support@framyconnect.co.mz，並提供訂單編號。付款須經付款服務商核實後才會確認。"
+  ],
+  "Um toque mais simples.": [
+    "A simpler tap.",
+    "更簡單的輕觸體驗。"
+  ],
+  "As respostas para começar a partilhar a sua identidade.": [
+    "Answers to help you start sharing your identity.",
+    "協助您開始分享身分資訊的解答。"
+  ],
+  "Preciso de uma aplicação?": [
+    "Do I need an app?",
+    "需要應用程式嗎？"
+  ],
+  "Um perfil publicado abre no navegador através do seu link. A leitura NFC depende de um telemóvel compatível e das respectivas definições.": [
+    "A published profile opens in a browser through its link. NFC reading depends on a compatible phone and its settings.",
+    "已發佈的檔案可透過連結在瀏覽器中開啟。NFC 讀取取決於手機相容性及設定。"
+  ],
+  "Posso alterar os meus contactos?": [
+    "Can I change my contacts?",
+    "可以修改聯絡資料嗎？"
+  ],
+  "Sim. No seu espaço, edite os dados, guarde o rascunho e publique a versão actualizada. O nome de utilizador fica reservado na primeira gravação.": [
+    "Yes. In your workspace, edit your details, save the draft and publish the updated version. Your username is reserved when first saved.",
+    "可以。在個人專區編輯資料、儲存草稿並發佈更新版本。使用者名稱於首次儲存時保留。"
+  ],
+  "Quem vê os meus dados?": [
+    "Who can see my data?",
+    "誰可以查看我的資料？"
+  ],
+  "O perfil apresenta apenas os contactos cuja visibilidade activou. Quem tem o endereço pode consultar um perfil publicado enquanto o período gratuito estiver activo. Pode retirar a publicação no seu painel.": [
+    "The profile shows only contacts you have made visible. Anyone with the address can view a published profile while the free trial is active. You can unpublish it in your dashboard.",
+    "檔案僅顯示您設為公開的聯絡資料。免費試用期間，持有網址的人可查看已發佈的檔案。您可在控制台取消發佈。"
+  ],
+  "Como acompanho uma encomenda?": [
+    "How do I track an order?",
+    "如何追蹤訂單？"
+  ],
+  "Depois de confirmar o pedido, consulte a referência e o estado na sua conta. A produção começa após confirmação do pagamento e atribuição à equipa. Reservas não pagas expiram após 24 horas.": [
+    "After confirming the order, check its reference and status in your account. Production begins after payment confirmation and team assignment. Unpaid reservations expire after 24 hours.",
+    "確認訂單後，可在帳戶中查看編號與狀態。付款確認並指派團隊後開始生產。未付款的預留於 24 小時後失效。"
+  ],
+  "A sua identidade. A sua escolha.": [
+    "Your identity. Your choice.",
+    "您的身分，由您選擇。"
+  ],
+  "Conheça os dados utilizados para gerir a sua conta, publicar o seu perfil e acompanhar as suas encomendas.": [
+    "Learn about the data used to manage your account, publish your profile and track your orders.",
+    "瞭解用於管理帳戶、發佈個人檔案及追蹤訂單的資料。"
+  ],
+  "Dados que escolhe guardar": [
+    "Data you choose to save",
+    "您選擇儲存的資料"
+  ],
+  "Guardamos os dados da conta, o perfil, as fotografias e os designs que envia. O email e o telefone do perfil só são publicados quando activa a respectiva visibilidade.": [
+    "We store account details, your profile, photos and designs you upload. Profile email and phone are published only when you enable their visibility.",
+    "我們儲存帳戶資料、個人檔案、您上傳的照片及設計。檔案中的電子郵件與電話僅在您啟用公開顯示後發佈。"
+  ],
+  "Acesso e publicação": [
+    "Access and publication",
+    "存取與發佈"
+  ],
+  "A conta e os rascunhos exigem sessão. Os perfis publicados são acessíveis pelo seu endereço enquanto o plano estiver activo. Retirar a publicação impede novas consultas; conteúdos já partilhados ou copiados por terceiros podem permanecer fora do serviço.": [
+    "Accounts and drafts require sign-in. Published profiles are accessible at their address while the plan is active. Unpublishing prevents new views; content already shared or copied by third parties may remain outside the service.",
+    "帳戶與草稿須登入才能存取。方案有效期間，可透過網址查看已發佈的檔案。取消發佈會阻止後續瀏覽；第三方已分享或複製的內容仍可能存在於服務之外。"
+  ],
+  "Encomendas e pagamentos": [
+    "Orders and payments",
+    "訂單與付款"
+  ],
+  "Contactos de entrega e encomendas são consultados pelo titular e pela gestão. O agente atribuído recebe os dados necessários à execução e entrega. O pagamento é efectuado no prestador externo; não introduza dados de cartão ou códigos de pagamento em mensagens ou designs.": [
+    "Delivery contacts and orders can be viewed by their owner and management. The assigned agent receives the details needed for fulfilment and delivery. Payment takes place with an external provider; do not include card details or payment codes in messages or designs.",
+    "本人與管理團隊可查閱配送聯絡資料及訂單。被指派的代理員會收到執行及配送所需資料。付款於外部服務商進行；請勿在訊息或設計中填入卡片資料或付款驗證碼。"
+  ],
+  "Candidaturas e documentos privados": [
+    "Applications and private documents",
+    "申請與私人文件"
+  ],
+  "Os dados pessoais, fotografia e BI da candidatura são consultados pelo candidato e pela gestão autorizada para análise. Os documentos não são publicados. Pode pedir correcção ou eliminação pelo apoio. A gestão decide manualmente sobre a candidatura.": [
+    "Application personal details, photos and identity documents can be reviewed by the applicant and authorised management. Documents are not published. You can request correction or deletion through support. Management decides on applications manually.",
+    "申請人的個人資料、照片及身分證僅供本人與獲授權的管理團隊查閱。文件不會公開。您可透過客服要求更正或刪除。申請由管理團隊人工審核。"
+  ],
+  "Visitas aos produtos": [
+    "Product visits",
+    "產品瀏覽"
+  ],
+  "Medimos visitas às páginas dos produtos, incluindo os produtos Brevemente, sem exigir uma compra. Um identificador aleatório por sessão evita repetições no mesmo dia; não guardamos o IP nesta estatística. Ao registar novas visitas, eliminamos os registos com mais de 90 dias. O painel apresenta os últimos 30 dias.": [
+    "We measure product page visits, including Coming soon products, without requiring a purchase. A random session identifier avoids repeats on the same day; IP addresses are not stored in these statistics. When new visits are recorded, records older than 90 days are removed. The dashboard shows the last 30 days.",
+    "我們統計產品頁面瀏覽，包括「即將推出」產品，無須購買。隨機工作階段識別碼可避免同日重複計數；此統計不儲存 IP 位址。記錄新瀏覽時會刪除超過 90 天的紀錄。控制台顯示最近 30 天。"
+  ],
+  "Retirar um perfil": [
+    "Removing a profile",
+    "移除個人檔案"
+  ],
+  "Pode retirar a publicação no editor e terminar sessões em Segurança da conta. Para pedir correcção ou eliminação de dados e esclarecimentos sobre conservação, contacte support@framyconnect.co.mz. Os ficheiros carregados são conservados enquanto necessários ao perfil ou encomenda.": [
+    "You can unpublish in the editor and end sessions in Account security. For data correction or deletion and retention questions, contact support@framyconnect.co.mz. Uploaded files are kept for as long as needed for the profile or order.",
+    "您可在編輯器取消發佈，並於「帳戶安全」登出工作階段。如需更正或刪除資料，或詢問保留期限，請聯絡 support@framyconnect.co.mz。上傳檔案僅於檔案或訂單需要期間保留。"
+  ],
+  "Antes de começar.": [
+    "Before you begin.",
+    "開始之前。"
+  ],
+  "CONDIÇÕES DO SERVIÇO": [
+    "SERVICE TERMS",
+    "服務條款"
+  ],
+  "Consulte as condições do perfil digital e confirme os detalhes da sua encomenda antes de efectuar o pagamento.": [
+    "Review the digital profile terms and confirm your order details before paying.",
+    "付款前請閱讀數位檔案條款並確認訂單詳情。"
+  ],
+  "Perfil digital e produto físico": [
+    "Digital profile and physical product",
+    "數位檔案與實體產品"
+  ],
+  "O perfil digital tem um período gratuito de 30 dias, sem renovação automática. Os produtos físicos são pagos separadamente. O pedido registado aguarda confirmação do pagamento; não constitui recibo de pagamento.": [
+    "The digital profile has a 30-day free trial without automatic renewal. Physical products are paid for separately. A recorded order awaits payment confirmation and is not a payment receipt.",
+    "數位檔案提供 30 天免費試用，不會自動續訂。實體產品另行付費。已登記的訂單仍待確認付款，並非付款收據。"
+  ],
+  "Entrega, cancelamento e apoio": [
+    "Delivery, cancellation and support",
+    "配送、取消與支援"
+  ],
+  "Confirme com a equipa o custo e prazo de entrega e as condições de cancelamento, personalização e devolução antes de pagar. Guarde a referência da encomenda e da transacção. Para apoio, contacte support@framyconnect.co.mz.": [
+    "Before paying, confirm delivery costs and timing, cancellation, customisation and return terms with the team. Keep your order and transaction references. For support, contact support@framyconnect.co.mz.",
+    "付款前請向團隊確認配送費用及時間、取消、自訂與退貨條件。請保留訂單及交易編號。需要協助請聯絡 support@framyconnect.co.mz。"
+  ],
+  "Faça parte da próxima conexão.": [
+    "Be part of the next connection.",
+    "加入下一次連結。"
+  ],
+  "TORNE-SE AGENTE": [
+    "BECOME AN AGENT",
+    "成為代理員"
+  ],
+  "Ajude a levar as identidades Framy Connect às pessoas da sua região.": [
+    "Help bring Framy Connect identities to people in your region.",
+    "協助將 Framy Connect 身分服務帶給您所在地區的人們。"
+  ],
+  "O que fará": [
+    "What you will do",
+    "您的工作內容"
+  ],
+  "Preparar produtos, programar o link correcto, testar cada unidade e acompanhar a entrega ao cliente.": [
+    "Prepare products, program the correct link, test each unit and follow delivery to the customer.",
+    "準備產品、寫入正確連結、測試每件產品，並追蹤交付給客戶的過程。"
+  ],
+  "O que precisa": [
+    "What you need",
+    "所需條件"
+  ],
+  "Um smartphone compatível, atenção ao detalhe e disponibilidade para seguir os procedimentos de qualidade. A região, formação e comissão serão acordadas antes da activação.": [
+    "A compatible smartphone, attention to detail and availability to follow quality procedures. Region, training and commission will be agreed before activation.",
+    "相容的智慧型手機、細心態度，以及遵循品質流程的意願。服務地區、培訓及佣金將在啟用前議定。"
+  ],
+  "Manifeste o seu interesse": [
+    "Express your interest",
+    "表達您的意願"
+  ],
+  "A candidatura com verificação de documentos ainda está em preparação. Pode contactar info@framyconnect.co.mz indicando o seu nome e região. Não envie documentos de identificação nesta prévia.": [
+    "Document-verified applications are still being prepared. You can contact info@framyconnect.co.mz with your name and region. Do not send identity documents in this preview.",
+    "文件驗證申請仍在準備中。您可聯絡 info@framyconnect.co.mz 並提供姓名及地區。請勿在此預覽版本傳送身分證件。"
+  ],
+  "Identidade digital": [
+    "Digital identity",
+    "數位身分"
+  ],
+  "Interesse em ser agente Framy Connect": [
+    "Interest in becoming a Framy Connect agent",
+    "有意成為 Framy Connect 代理員"
+  ],
+  "Informações Framy Connect": [
+    "Framy Connect information",
+    "Framy Connect 資訊"
+  ],
+  "Não foi possível guardar.": [
+    "Unable to save.",
+    "無法儲存。"
+  ],
+  "Candidatura submetida com sucesso. Acompanhe a análise nesta página.": [
+    "Application submitted successfully. Follow its review on this page.",
+    "申請已成功提交。請在此頁面追蹤審核進度。"
+  ],
+  "Dados guardados. Adicione as fotografias e submeta a candidatura.": [
+    "Details saved. Add photos and submit your application.",
+    "資料已儲存。請新增照片並提交申請。"
+  ],
+  "Cada fotografia deve ter até 8 MB.": [
+    "Each photo must be no larger than 8 MB.",
+    "每張照片不得超過 8 MB。"
+  ],
+  "Fotografia guardada de forma privada.": [
+    "Photo saved privately.",
+    "照片已私密儲存。"
+  ],
+  "Guardado e disponível para Operações.": [
+    "Saved and available to Operations.",
+    "已儲存，營運團隊可查看。"
+  ],
+  "Por produzir": [
+    "To produce",
+    "待生產"
+  ],
+  "Em produção": [
+    "In production",
+    "生產中"
+  ],
+  "Para entregar": [
+    "To deliver",
+    "待配送"
+  ],
+  "O meu stock": [
+    "My stock",
+    "我的庫存"
+  ],
+  "Link aprovado copiado.": [
+    "Approved link copied.",
+    "已複製核准的連結。"
+  ],
+  "Não foi possível copiar. Seleccione e copie o link apresentado.": [
+    "Unable to copy. Select and copy the displayed link.",
+    "無法複製。請選取並複製顯示的連結。"
+  ],
+  "Programação e teste": [
+    "Programming and testing",
+    "寫入與測試"
+  ],
+  "Expedição": [
+    "Dispatch",
+    "出貨"
+  ],
+  "anos)": [
+    "years)",
+    "歲）"
+  ],
+  "Cartões": [
+    "Cards",
+    "卡片"
+  ],
+  "Acessórios": [
+    "Accessories",
+    "配件"
+  ],
+  "Para organizações": [
+    "For organisations",
+    "適用於組織"
+  ],
+  "A aguardar pagamento": [
+    "Awaiting payment",
+    "等待付款"
+  ],
+  "Na fila de produção": [
+    "In production queue",
+    "等待生產"
+  ],
+  "Pronto para entrega": [
+    "Ready for delivery",
+    "準備配送"
+  ],
+  "O seu pedido foi recebido. O próximo passo é a confirmação do pagamento.": [
+    "Your order has been received. The next step is payment confirmation.",
+    "已收到您的訂單。下一步是確認付款。"
+  ],
+  "Pagamento confirmado. O seu produto aguarda o início da produção.": [
+    "Payment confirmed. Your product is waiting for production to begin.",
+    "付款已確認。您的產品正等待開始生產。"
+  ],
+  "Estamos a preparar o seu produto e a ligação ao seu perfil.": [
+    "We are preparing your product and its connection to your profile.",
+    "我們正在準備產品及其個人檔案連結。"
+  ],
+  "Preparação e controlo de qualidade concluídos. O produto está pronto para entrega.": [
+    "Preparation and quality checks completed. The product is ready for delivery.",
+    "準備與品質檢查已完成。產品可供配送。"
+  ],
+  "A entrega do seu produto foi concluída.": [
+    "Your product has been delivered.",
+    "您的產品已送達。"
+  ],
+  "Este pedido foi cancelado. O acompanhamento da entrega está encerrado.": [
+    "This order was cancelled. Delivery tracking has ended.",
+    "此訂單已取消。配送追蹤已結束。"
+  ],
+  "Pedido recebido": [
+    "Order received",
+    "已收到訂單"
+  ],
+  "Reserva expirada — pedido cancelado": [
+    "Reservation expired — order cancelled",
+    "預留已到期 — 訂單已取消"
+  ],
+  "Local de entrega actualizado": [
+    "Delivery location updated",
+    "配送地點已更新"
+  ],
+  "Pagamento confirmado": [
+    "Payment confirmed",
+    "付款已確認"
+  ],
+  "Agente atribuído": [
+    "Agent assigned",
+    "已指派代理員"
+  ],
+  "Produção iniciada": [
+    "Production started",
+    "已開始生產"
+  ],
+  "Qualidade verificada · Pronto para entrega": [
+    "Quality verified · Ready for delivery",
+    "品質已確認 · 準備配送"
+  ],
+  "Entrega concluída": [
+    "Delivery completed",
+    "配送已完成"
+  ],
+  "Pedido cancelado": [
+    "Order cancelled",
+    "訂單已取消"
+  ],
+  "Pagamento reembolsado": [
+    "Payment refunded",
+    "款項已退還"
+  ],
+  "Local de entrega guardado.": [
+    "Delivery location saved.",
+    "配送地點已儲存。"
+  ],
+  "Visão geral": [
+    "Overview",
+    "總覽"
+  ],
+  "Operações": [
+    "Operations",
+    "營運"
+  ],
+  "Produtos e planos": [
+    "Products and plans",
+    "產品與方案"
+  ],
+  "Alteração guardada.": [
+    "Change saved.",
+    "變更已儲存。"
+  ],
+  "Valor MZN": [
+    "Amount MZN",
+    "金額 MZN"
+  ],
+  "Custo MZN": [
+    "Cost MZN",
+    "成本 MZN"
+  ],
+  "Data (UTC)": [
+    "Date (UTC)",
+    "日期（UTC）"
+  ],
+  "Detalhes de entrega": [
+    "Delivery details",
+    "配送詳情"
+  ],
+  "Tempo decorrido": [
+    "Elapsed time",
+    "已經過時間"
+  ],
+  "Prazo de referência (horas)": [
+    "Reference timeframe (hours)",
+    "參考時限（小時）"
+  ],
+  "Abrir pedido": [
+    "Open order",
+    "開啟訂單"
+  ],
+  "No período seleccionado": [
+    "In the selected period",
+    "所選期間"
+  ],
+  "Recebido líquido": [
+    "Net received",
+    "淨收款"
+  ],
+  "Pagamentos menos reembolsos": [
+    "Payments minus refunds",
+    "付款減去退款"
+  ],
+  "Pedidos em preparação": [
+    "Orders being prepared",
+    "準備中的訂單"
+  ],
+  "Equipa disponível": [
+    "Available team",
+    "可用團隊"
+  ],
+  "Planos mensais": [
+    "Monthly plans",
+    "月費方案"
+  ],
+  "Por receber": [
+    "Receivable",
+    "待收款"
+  ],
+  "Receita reconhecida": [
+    "Recognised revenue",
+    "已認列收入"
+  ],
+  "Custos reconhecidos": [
+    "Recognised costs",
+    "已認列成本"
+  ],
+  "Margem bruta": [
+    "Gross margin",
+    "毛利"
+  ],
+  "Contacto descarregado.": [
+    "Contact downloaded.",
+    "聯絡人已下載。"
+  ],
+  "Link copiado.": [
+    "Link copied.",
+    "連結已複製。"
+  ],
+  "Não foi possível gerar o QR. Tente novamente.": [
+    "Unable to generate the QR code. Please try again.",
+    "無法產生 QR 碼。請再試一次。"
+  ],
+  "Não foi possível responder.": [
+    "Unable to reply.",
+    "無法回覆。"
+  ],
+  "Pagamento da encomenda": [
+    "Order payment",
+    "訂單付款"
+  ],
+  "Inicie sessão novamente para continuar.": [
+    "Sign in again to continue.",
+    "請重新登入以繼續。"
+  ],
+  "Não foi possível recuperar o progresso. Actualize para tentar novamente.": [
+    "Unable to restore progress. Refresh to try again.",
+    "無法還原進度。請重新整理再試。"
+  ],
+  "Não foi possível continuar.": [
+    "Unable to continue.",
+    "無法繼續。"
+  ],
+  "Modelo indisponível. Escolha outro modelo ou actualize a página.": [
+    "Model unavailable. Choose another model or refresh the page.",
+    "款式無法供應。請選擇其他款式或重新整理頁面。"
+  ],
+  "Adicione o seu logótipo ou design PDF.": [
+    "Add your logo or PDF design.",
+    "請新增標誌或 PDF 設計。"
+  ],
+  "Escolha um plano disponível.": [
+    "Choose an available plan.",
+    "請選擇可用方案。"
+  ],
+  "Inicie sessão para guardar o seu perfil.": [
+    "Sign in to save your profile.",
+    "請登入以儲存個人檔案。"
+  ],
+  "Escolha um plano e inicie sessão.": [
+    "Choose a plan and sign in.",
+    "請選擇方案並登入。"
+  ],
+  "Indique o email a imprimir no cartão.": [
+    "Enter the email to print on the card.",
+    "請填寫卡片上要印製的電子郵件。"
+  ],
+  "Indique um contacto para a entrega.": [
+    "Provide a delivery contact.",
+    "請提供配送聯絡資料。"
+  ],
+  "Aprove o perfil e as condições antes de confirmar.": [
+    "Approve the profile and terms before confirming.",
+    "確認前請核准個人檔案並同意條款。"
+  ],
+  "Volte ao produto e carregue novamente o ficheiro.": [
+    "Return to the product and upload the file again.",
+    "請返回產品頁面並重新上傳檔案。"
+  ],
+  "Não foi possível confirmar.": [
+    "Unable to confirm.",
+    "無法確認。"
+  ],
+  "Stock e disponibilidade guardados.": [
+    "Stock and availability saved.",
+    "庫存及供應狀態已儲存。"
+  ],
+  "Erro ao guardar.": [
+    "Error saving.",
+    "儲存時發生錯誤。"
+  ],
+  "Não foi possível consultar o stock.": [
+    "Unable to check stock.",
+    "無法查詢庫存。"
+  ],
+  "Não foi possível gerar o código QR.": [
+    "Unable to generate the QR code.",
+    "無法產生 QR 碼。"
+  ],
+  "Ficheiro indisponível.": [
+    "File unavailable.",
+    "檔案無法使用。"
+  ],
+  "Seleccione novamente o ficheiro de design.": [
+    "Select the design file again.",
+    "請重新選擇設計檔案。"
+  ],
+  "Não foi possível visualizar o ficheiro.": [
+    "Unable to preview the file.",
+    "無法預覽檔案。"
+  ],
+  "O logótipo só pode ser colocado na frente, no local «Logo».": [
+    "The logo can only be placed on the front, in the “Logo” area.",
+    "標誌只能放置於正面的「Logo」區域。"
+  ],
+  "Use PNG, JPG ou PDF até 8 MB.": [
+    "Use PNG, JPG or PDF up to 8 MB.",
+    "請使用不超過 8 MB 的 PNG、JPG 或 PDF。"
+  ],
+  "Não foi possível abrir o logótipo.": [
+    "Unable to open the logo.",
+    "無法開啟標誌。"
+  ],
+  "Carregue novamente o logótipo.": [
+    "Upload the logo again.",
+    "請重新上傳標誌。"
+  ],
+  "Não foi detectado um fundo liso. Ajuste a intensidade ou use um PNG transparente.": [
+    "No solid background detected. Adjust the intensity or use a transparent PNG.",
+    "未偵測到單色背景。請調整強度或使用透明 PNG。"
+  ],
+  "Não foi possível criar o PNG.": [
+    "Unable to create the PNG.",
+    "無法建立 PNG。"
+  ],
+  "Não foi possível remover o fundo.": [
+    "Unable to remove the background.",
+    "無法移除背景。"
+  ],
+  "da frente": [
+    "front",
+    "正面"
+  ],
+  "do verso": [
+    "back",
+    "背面"
+  ],
+  "Fim do degradé": [
+    "Gradient end",
+    "漸層結束色"
+  ],
+  "Aproxime ou leia o QR": [
+    "Tap or scan the QR code",
+    "輕觸或掃描 QR 碼"
+  ],
+  "Logo / nome da marca": [
+    "Logo / brand name",
+    "標誌／品牌名稱"
+  ],
+  "Subtítulo": [
+    "Subtitle",
+    "副標題"
+  ],
+  "Nome no cartão": [
+    "Name on card",
+    "卡片上的姓名"
+  ],
+  "Email no cartão": [
+    "Email on card",
+    "卡片上的電子郵件"
+  ],
+  "Texto de apoio": [
+    "Supporting text",
+    "輔助文字"
+  ],
+  "Não foi possível exportar a vista.": [
+    "Unable to export the view.",
+    "無法匯出視圖。"
+  ],
+  "A galeria pode ter até 8 fotografias.": [
+    "The gallery can hold up to 8 photos.",
+    "圖庫最多可包含 8 張照片。"
+  ],
+  "Indique um valor positivo com até duas casas decimais.": [
+    "Enter a positive amount with up to two decimal places.",
+    "請輸入最多兩位小數的正數金額。"
+  ],
+  "Produto guardado. O site já usa os novos dados.": [
+    "Product saved. The website now uses the new details.",
+    "產品已儲存。網站已採用新資料。"
+  ],
+  "Seleccione e copie o endereço acima.": [
+    "Select and copy the address above.",
+    "請選取並複製上方網址。"
+  ],
+  "Escolha uma fotografia JPG, PNG ou WebP até 5 MB.": [
+    "Choose a JPG, PNG or WebP photo up to 5 MB.",
+    "請選擇不超過 5 MB 的 JPG、PNG 或 WebP 照片。"
+  ],
+  "Contacto descarregado. Abra o ficheiro para o adicionar aos seus contactos.": [
+    "Contact downloaded. Open the file to add it to your contacts.",
+    "聯絡人已下載。開啟檔案即可加入聯絡人。"
+  ],
+  "Copie o endereço na barra do navegador para partilhar.": [
+    "Copy the address in your browser's address bar to share.",
+    "複製瀏覽器網址列中的網址即可分享。"
+  ],
+  "O meu pedido": [
+    "My order",
+    "我的訂單"
+  ],
+  "Operações · teste": [
+    "Operations · test",
+    "營運 · 測試"
+  ],
+  "Agente · teste": [
+    "Agent · test",
+    "代理員 · 測試"
+  ],
+  "CEO · teste": [
+    "CEO · test",
+    "執行長 · 測試"
+  ],
+  "Pagamento registado": [
+    "Payment recorded",
+    "付款已登記"
+  ],
+  "Produto de teste inválido.": [
+    "Invalid test product.",
+    "測試產品無效。"
+  ],
+  "Pedido de teste criado. Nenhum pagamento foi efectuado.": [
+    "Test order created. No payment was made.",
+    "測試訂單已建立，未進行付款。"
+  ],
+  "Cria um pedido de teste Framy Connect sem cobrança e actualiza a lista visível. Não cria uma compra real.": [
+    "Creates a Framy Connect test order without a charge and refreshes the visible list. Does not create a real purchase.",
+    "建立不收費的 Framy Connect 測試訂單並更新清單，不會產生實際購買。"
+  ],
+  "Indique productId.": [
+    "Provide productId.",
+    "請提供產品識別碼。"
+  ],
+  "Perfil publicado nesta prévia privada.": [
+    "Profile published in this private preview.",
+    "個人檔案已在此私人預覽中發佈。"
+  ],
+  "Perfil retirado da publicação.": [
+    "Profile unpublished.",
+    "個人檔案已取消發佈。"
+  ],
+  "Rascunho guardado.": [
+    "Draft saved.",
+    "草稿已儲存。"
+  ],
+  "Plano de teste activado. As caixas estão disponíveis. Nenhuma cobrança foi efectuada.": [
+    "Test plan activated. Slots are available. No charge was made.",
+    "測試方案已啟用，欄位可使用，未扣款。"
+  ],
+  "· teste": [
+    "· test",
+    "· 測試"
+  ],
+  "Dados actualizados.": [
+    "Data refreshed.",
+    "資料已更新。"
+  ],
+  "Como quer ser conhecido?": [
+    "How would you like to be known?",
+    "您希望如何稱呼自己？"
+  ],
+  "Nome de utilizador": [
+    "Username",
+    "使用者名稱"
+  ],
+  "Título ou profissão": [
+    "Title or occupation",
+    "職稱或職業"
+  ],
+  "O que faz?": [
+    "What do you do?",
+    "您的工作內容是什麼？"
+  ],
+  "Website ou portefólio": [
+    "Website or portfolio",
+    "網站或作品集"
+  ],
+  "Email de contacto": [
+    "Contact email",
+    "聯絡電子郵件"
+  ],
+  "Pedido de teste criado, sem cobrança.": [
+    "Test order created, without a charge.",
+    "測試訂單已建立，未扣款。"
+  ],
+  "Capturas simuladas": [
+    "Simulated captures",
+    "模擬收款"
+  ],
+  "Pagamentos confirmados no teste": [
+    "Payments confirmed in test",
+    "測試中已確認的付款"
+  ],
+  "Apenas entregas simuladas": [
+    "Simulated deliveries only",
+    "僅模擬配送"
+  ],
+  "Resultado bruto": [
+    "Gross result",
+    "毛利結果"
+  ],
+  "Receita menos custo dos produtos": [
+    "Revenue minus product costs",
+    "收入減去產品成本"
+  ],
+  "Recebido, ainda não reconhecido": [
+    "Received, not yet recognised",
+    "已收款，尚未認列"
+  ],
+  "Pedido criado": [
+    "Order created",
+    "訂單已建立"
+  ],
+  "Local de entrega indicado": [
+    "Delivery location provided",
+    "已提供配送地點"
+  ],
+  "Pagamento simulado": [
+    "Simulated payment",
+    "模擬付款"
+  ],
+  "QC concluído": [
+    "QC completed",
+    "品檢已完成"
+  ],
+  "Entrega simulada": [
+    "Simulated delivery",
+    "模擬配送"
+  ],
+  "Reembolso simulado": [
+    "Simulated refund",
+    "模擬退款"
+  ],
+  "Controlo de qualidade concluído · Pronto para entrega": [
+    "Quality checks completed · Ready for delivery",
+    "品檢已完成 · 準備配送"
+  ],
+  "NFC detectado e programado": [
+    "NFC detected and programmed",
+    "NFC 已偵測並完成寫入"
+  ],
+  "Link abre a identidade correcta": [
+    "Link opens the correct identity",
+    "連結開啟正確的身分檔案"
+  ],
+  "Nome e produto correspondem ao pedido": [
+    "Name and product match the order",
+    "姓名與產品符合訂單"
+  ],
+  "Produto sem defeitos e completo": [
+    "Product complete and free of defects",
+    "產品完整且無瑕疵"
+  ],
+  "Em análise": [
+    "Under review",
+    "審核中"
+  ],
+  "Informação adicional solicitada": [
+    "Additional information requested",
+    "要求補充資料"
+  ],
+  "Não aprovada": [
+    "Not approved",
+    "未獲核准"
+  ],
+  "Candidatura inválida.": [
+    "Invalid application.",
+    "申請無效。"
+  ],
+  "descrição": [
+    "description",
+    "說明"
+  ],
+  "A candidatura está disponível a partir dos 18 anos.": [
+    "Applications are available from age 18.",
+    "年滿 18 歲才可申請。"
+  ],
+  "Indique contactos válidos, com indicativo do país.": [
+    "Enter valid contact numbers, including country code.",
+    "請輸入含國碼的有效聯絡電話。"
+  ],
+  "Confirme a utilização dos dados para analisar a candidatura.": [
+    "Confirm use of your data to review the application.",
+    "請確認同意使用資料審核申請。"
+  ],
+  "Produto e identificação do cliente correctos": [
+    "Correct product and customer identification",
+    "產品與客戶身分正確"
+  ],
+  "Nome, logótipo e impressão aprovados": [
+    "Name, logo and print approved",
+    "姓名、標誌及印製內容已核准"
+  ],
+  "Produto limpo, sem danos nem defeitos": [
+    "Product clean, undamaged and free of defects",
+    "產品乾淨、無損壞及瑕疵"
+  ],
+  "Confirmar programação e teste NFC": [
+    "Confirm programming and NFC test",
+    "確認寫入及 NFC 測試"
+  ],
+  "Aprovar qualidade": [
+    "Approve quality",
+    "核准品質"
+  ],
+  "Confirmar embalagem": [
+    "Confirm packaging",
+    "確認包裝"
+  ],
+  "Registar expedição": [
+    "Record dispatch",
+    "登記出貨"
+  ],
+  "Confirmar entrega": [
+    "Confirm delivery",
+    "確認配送"
+  ],
+  "Pedido não atribuído a esta conta.": [
+    "Order not assigned to this account.",
+    "訂單未指派給此帳戶。"
+  ],
+  "Acção indisponível. Confirme o pagamento, o link aprovado e a etapa anterior com Operações.": [
+    "Action unavailable. Confirm payment, approved link and previous stage with Operations.",
+    "操作無法使用。請向營運團隊確認付款、核准的連結及前一階段。"
+  ],
+  "Preencha correctamente:": [
+    "Complete correctly:",
+    "請正確填寫："
+  ],
+  "Teste o NFC e confirme exactamente o link aprovado.": [
+    "Test the NFC and confirm the exact approved link.",
+    "請測試 NFC 並確認與核准連結完全一致。"
+  ],
+  "Conclua todas as verificações de qualidade.": [
+    "Complete all quality checks.",
+    "請完成所有品質檢查。"
+  ],
+  "Confirme a embalagem.": [
+    "Confirm packaging.",
+    "請確認包裝。"
+  ],
+  "Confirme a recepção pelo cliente.": [
+    "Confirm receipt by the customer.",
+    "請確認客戶已收貨。"
+  ],
+  "Problema operacional": [
+    "Operational issue",
+    "營運問題"
+  ],
+  "Tentativa de pagamento directo": [
+    "Attempted direct payment",
+    "嘗試直接付款"
+  ],
+  "Feedback do cliente": [
+    "Customer feedback",
+    "客戶意見"
+  ],
+  "Stock baixo": [
+    "Low stock",
+    "庫存不足"
+  ],
+  "Produto danificado": [
+    "Damaged product",
+    "產品損壞"
+  ],
+  "Contagem de stock": [
+    "Stock count",
+    "庫存盤點"
+  ],
+  "Confirmar recepção de stock": [
+    "Confirm stock receipt",
+    "確認收貨入庫"
+  ],
+  "Relatório diário": [
+    "Daily report",
+    "每日報告"
+  ],
+  "Relatório semanal": [
+    "Weekly report",
+    "每週報告"
+  ],
+  "Verde Connect": [
+    "Connect Green",
+    "Connect 綠"
+  ],
+  "Violeta Digital": [
+    "Digital Violet",
+    "數位紫"
+  ],
+  "Framy Signature": [
+    "Framy Signature",
+    "Framy 經典"
+  ],
+  "Design próprio": [
+    "Custom design",
+    "自訂設計"
+  ],
+  "Ondas Atlântico": [
+    "Atlantic Waves",
+    "大西洋波浪"
+  ],
+  "Diagonal Moderna": [
+    "Modern Diagonal",
+    "現代斜線"
+  ],
+  "Moldura Elegante": [
+    "Elegant Frame",
+    "典雅邊框"
+  ],
+  "Navy & Gold": [
+    "Navy & Gold",
+    "深藍與金色"
+  ],
+  "Preto Essencial": [
+    "Essential Black",
+    "經典黑"
+  ],
+  "Ondas Prata": [
+    "Silver Waves",
+    "銀色波浪"
+  ],
+  "Círculos Cobalto": [
+    "Cobalt Circles",
+    "鈷藍圓形"
+  ],
+  "Branco Studio": [
+    "Studio White",
+    "工作室白"
+  ],
+  "Azul Connect": [
+    "Connect Blue",
+    "Connect 藍"
+  ],
+  "Preto Signature": [
+    "Signature Black",
+    "經典黑"
+  ],
+  "Hexágonos Gold": [
+    "Gold Hexagons",
+    "金色六角形"
+  ],
+  "Grafite Vertical": [
+    "Vertical Graphite",
+    "直式石墨灰"
+  ],
+  "Violeta Vertical": [
+    "Vertical Violet",
+    "直式紫"
+  ],
+  "Cartão NFC PVC Personalizado": [
+    "Personalised PVC NFC Card",
+    "自訂 PVC NFC 卡片"
+  ],
+  "O seu cartão, impresso e personalizado.": [
+    "Your card, printed and personalised.",
+    "專屬於您的印製卡片。"
+  ],
+  "Cartão NFC em PVC de 85,5 × 54 mm. Inclui impressão a cores na frente e no verso, personalização com o seu logótipo, nome e email, e configuração NFC e QR para o seu perfil.": [
+    "85.5 × 54 mm PVC NFC card. Includes colour printing on both sides, personalisation with your logo, name and email, and NFC and QR setup for your profile.",
+    "85.5 × 54 公釐 PVC NFC 卡片，包含雙面彩色印製、自訂標誌、姓名與電子郵件，以及連結至個人檔案的 NFC 和 QR 設定。"
+  ],
+  "Uma apresentação com um toque natural.": [
+    "An introduction with a natural touch.",
+    "自然風格的自我介紹。"
+  ],
+  "Um cartão NFC em madeira que liga uma apresentação natural ao seu perfil digital.": [
+    "A wooden NFC card connecting a natural introduction to your digital profile.",
+    "木製 NFC 卡片，以自然風格連結您的數位個人檔案。"
+  ],
+  "Uma presença que se sente.": [
+    "A presence you can feel.",
+    "令人感受到的質感。"
+  ],
+  "Um cartão de metal para apresentar a sua identidade, os seus contactos e o seu trabalho num único toque.": [
+    "A metal card to present your identity, contacts and work in one tap.",
+    "一觸即可展示身分、聯絡資料與工作的金屬卡片。"
+  ],
+  "As suas conexões. Sempre consigo.": [
+    "Your connections. Always with you.",
+    "您的連結，隨身攜帶。"
+  ],
+  "Leve a sua identidade nas chaves e partilhe o seu perfil quando surgir uma nova oportunidade.": [
+    "Carry your identity on your keys and share your profile whenever a new opportunity arises.",
+    "將身分資訊隨鑰匙攜帶，遇到新機會時隨時分享個人檔案。"
+  ],
+  "Pequeno formato. Novas possibilidades.": [
+    "Small format. New possibilities.",
+    "小巧設計，更多可能。"
+  ],
+  "Uma etiqueta conectada ao seu perfil digital, para integrar nos objectos que o acompanham.": [
+    "A tag connected to your digital profile, to use with the objects you carry.",
+    "連結數位個人檔案的標籤，可搭配隨身物品使用。"
+  ],
+  "Cole. Toque. Partilhe.": [
+    "Stick. Tap. Share.",
+    "貼上、輕觸、分享。"
+  ],
+  "Um autocolante NFC para dar acesso simples à sua identidade digital.": [
+    "An NFC sticker for easy access to your digital identity.",
+    "輕鬆存取數位身分的 NFC 貼紙。"
+  ],
+  "Uma pulseira que mantém o seu perfil ao alcance de um toque.": [
+    "A wristband that keeps your profile a tap away.",
+    "輕觸即可開啟個人檔案的手環。"
+  ],
+  "Encontros com mais possibilidades.": [
+    "Meetings with more possibilities.",
+    "讓相遇有更多可能。"
+  ],
+  "Conte-nos sobre o seu evento para definirmos a experiência de identificação e partilha.": [
+    "Tell us about your event so we can define the identification and sharing experience.",
+    "告訴我們您的活動需求，以規劃身分識別與分享體驗。"
+  ],
+  "O seu menu, à mão.": [
+    "Your menu, at hand.",
+    "菜單隨手可得。"
+  ],
+  "Uma solução de acesso ao menu digital do seu restaurante. Configuração e conteúdo sob consulta.": [
+    "A digital menu access solution for your restaurant. Setup and content by consultation.",
+    "餐廳數位菜單存取方案。設定及內容請洽詢。"
+  ],
+  "Dê espaço à opinião dos seus clientes.": [
+    "Make room for your customers' opinions.",
+    "聆聽客戶的意見。"
+  ],
+  "Um ponto de acesso ao perfil de avaliações do seu negócio, com configuração sob consulta.": [
+    "An access point to your business review profile, with setup by consultation.",
+    "連結至商家評論頁面的展示工具，設定請洽詢。"
+  ],
+  "Apresente a sua oferta num catálogo digital. Estrutura e funcionalidades definidas com a sua equipa.": [
+    "Present your offering in a digital catalogue. Structure and features defined with your team.",
+    "透過數位目錄展示商品與服務，架構及功能由您的團隊共同規劃。"
+  ],
+  "Quem representa a sua organização.": [
+    "Who represents your organisation.",
+    "代表您組織的人。"
+  ],
+  "Identidades para equipas. Gestão, emissão e permissões são definidas para cada organização.": [
+    "Identities for teams. Management, issuance and permissions defined for each organisation.",
+    "團隊身分方案。管理、發行及權限依各組織需求設定。"
+  ],
+  "Padrão artístico": [
+    "Artistic Pattern",
+    "藝術圖案"
+  ],
+  "Escolha um modelo.": [
+    "Choose a model.",
+    "請選擇款式。"
+  ],
+  "Modelo inválido.": [
+    "Invalid model.",
+    "款式無效。"
+  ],
+  "Estilo de cartão inválido.": [
+    "Invalid card style.",
+    "卡片樣式無效。"
+  ],
+  "Texto inválido.": [
+    "Invalid text.",
+    "文字無效。"
+  ],
+  "Texto demasiado longo.": [
+    "Text too long.",
+    "文字過長。"
+  ],
+  "Use cores HEX válidas, por exemplo #FF6600.": [
+    "Use valid HEX colours, e.g. #FF6600.",
+    "請使用有效 HEX 色碼，例如 #FF6600。"
+  ],
+  "Este lado não pode ser personalizado.": [
+    "This side cannot be customised.",
+    "此面無法自訂。"
+  ],
+  "Carregue o ficheiro de impressão.": [
+    "Upload the print file.",
+    "請上傳印製檔案。"
+  ],
+  "Posição ou página inválida.": [
+    "Invalid position or page.",
+    "位置或頁面無效。"
+  ],
+  "Posição de logótipo inválida.": [
+    "Invalid logo position.",
+    "標誌位置無效。"
+  ],
+  "Adicione o seu logótipo ou PDF.": [
+    "Add your logo or PDF.",
+    "請新增標誌或 PDF。"
+  ],
+  "Indique a cidade ou localidade de entrega (2 a 90 caracteres).": [
+    "Enter the delivery city or locality (2–90 characters).",
+    "請填寫配送城市或地區（2–90 個字元）。"
+  ],
+  "Os detalhes da entrega devem ter até 300 caracteres.": [
+    "Delivery details must be no longer than 300 characters.",
+    "配送詳情不得超過 300 個字元。"
+  ],
+  "30 dias grátis": [
+    "30 free days",
+    "30 天免費"
+  ],
+  "Experimente o seu perfil durante 30 dias, sem renovação automática.": [
+    "Try your profile for 30 days, without automatic renewal.",
+    "免費試用個人檔案 30 天，不會自動續訂。"
+  ],
+  "Os seus contactos essenciais.": [
+    "Your essential contacts.",
+    "您的基本聯絡資料。"
+  ],
+  "O seu conteúdo, num só lugar.": [
+    "Your content, in one place.",
+    "將您的內容集中於一處。"
+  ],
+  "Mais espaço para o seu trabalho.": [
+    "More room for your work.",
+    "為您的工作提供更多空間。"
+  ],
+  "Instituição": [
+    "Institution",
+    "機構"
+  ],
+  "Recursos e informação da instituição.": [
+    "Institutional resources and information.",
+    "機構資源與資訊。"
+  ],
+  "Organização": [
+    "Organisation",
+    "組織"
+  ],
+  "Uma presença completa para a organização.": [
+    "A complete presence for your organisation.",
+    "完整展現組織形象。"
+  ],
+  "Plano inválido.": [
+    "Invalid plan.",
+    "方案無效。"
+  ],
+  "Perfil inválido.": [
+    "Invalid profile.",
+    "個人檔案無效。"
+  ],
+  "Indique o seu nome.": [
+    "Enter your name.",
+    "請填寫姓名。"
+  ],
+  "Escolha outro nome de utilizador: 3–40 letras minúsculas, números ou _.": [
+    "Choose another username: 3–40 lowercase letters, numbers or _.",
+    "請選擇其他使用者名稱：3–40 個小寫英文字母、數字或底線。"
+  ],
+  "Indique um email válido.": [
+    "Enter a valid email.",
+    "請輸入有效電子郵件。"
+  ],
+  "Indique um telefone válido.": [
+    "Enter a valid phone number.",
+    "請輸入有效電話號碼。"
+  ],
+  "Reveja a visibilidade dos contactos.": [
+    "Review contact visibility.",
+    "請檢查聯絡資料的公開設定。"
+  ],
+  "Máximo de 50 links por perfil.": [
+    "Maximum 50 links per profile.",
+    "每個個人檔案最多 50 個連結。"
+  ],
+  "Cada link precisa de um título e endereço válidos.": [
+    "Each link needs a valid title and address.",
+    "每個連結須有有效標題及網址。"
+  ],
+  "O endereço do link é demasiado longo.": [
+    "Link address too long.",
+    "連結網址過長。"
+  ],
+  "A biografia deve ter até 1200 caracteres.": [
+    "The biography must be no longer than 1200 characters.",
+    "個人簡介不得超過 1200 個字元。"
+  ],
+  "Carregue uma fotografia válida.": [
+    "Upload a valid photo.",
+    "請上傳有效照片。"
+  ],
+  "Posição da fotografia inválida.": [
+    "Invalid photo position.",
+    "照片位置無效。"
+  ],
+  "Esta acção não é permitida no estado actual. Confirme a atribuição, o controlo de qualidade e os dados obrigatórios.": [
+    "This action is not allowed in the current state. Check assignment, quality control and required details.",
+    "目前狀態不允許此操作。請檢查指派、品檢及必填資料。"
+  ],
+  "Imagem inválida.": [
+    "Invalid image.",
+    "圖片無效。"
+  ],
+  "O fundo já é transparente.": [
+    "The background is already transparent.",
+    "背景已透明。"
+  ],
+  "Data indisponível": [
+    "Date unavailable",
+    "日期無法取得"
+  ],
+  "Em atraso": [
+    "Overdue",
+    "逾期"
+  ],
+  "Indique a referência única da transacção no prestador (6–120 caracteres).": [
+    "Enter the provider's unique transaction reference (6–120 characters).",
+    "請填寫付款服務商唯一交易編號（6–120 個字元）。"
+  ],
+  "Confirme no prestador a referência, o valor exacto e a moeda MZN antes de registar.": [
+    "Verify the reference, exact amount and MZN currency with the provider before recording.",
+    "登記前請向付款服務商核實編號、確切金額及 MZN 幣別。"
+  ],
+  "Produto inválido.": [
+    "Invalid product.",
+    "產品無效。"
+  ],
+  "Indique valores monetários válidos.": [
+    "Enter valid monetary amounts.",
+    "請填寫有效金額。"
+  ],
+  "Disponibilidade inválida.": [
+    "Invalid availability.",
+    "供應狀態無效。"
+  ],
+  "Defina um preço superior a zero antes de disponibilizar o produto.": [
+    "Set a price greater than zero before enabling the product.",
+    "啟用產品前，請設定大於零的價格。"
+  ],
+  "Versão inválida.": [
+    "Invalid version.",
+    "版本無效。"
+  ],
+  "Seleccione uma imagem do catálogo ou carregue uma fotografia.": [
+    "Choose a catalogue image or upload a photo.",
+    "請選擇目錄圖片或上傳照片。"
+  ],
+  "Categoria inválida.": [
+    "Invalid category.",
+    "分類無效。"
+  ],
+  "Publicação inválida.": [
+    "Invalid publication setting.",
+    "發佈設定無效。"
+  ],
+  "Escolha entre 1 e 8 fotografias diferentes.": [
+    "Choose between 1 and 8 different photos.",
+    "請選擇 1 至 8 張不同照片。"
+  ],
+  "A fotografia principal deve pertencer à galeria.": [
+    "The main photo must be in the gallery.",
+    "主要照片須包含於圖庫中。"
+  ],
+  "Não foi possível guardar. Actualize e tente novamente.": [
+    "Unable to save. Refresh and try again.",
+    "無法儲存。請重新整理後再試。"
+  ],
+  "Request failed": [
+    "Request failed",
+    "請求失敗"
+  ],
+  "Armazenamento indisponível.": [
+    "Storage unavailable.",
+    "儲存空間無法使用。"
+  ],
+  "Reserva expirada": [
+    "Reservation expired",
+    "預留已到期"
+  ],
+  "Acesso reservado à gestão.": [
+    "Management access only.",
+    "僅限管理團隊存取。"
+  ],
+  "Não foi possível carregar os acessos.": [
+    "Unable to load access settings.",
+    "無法載入權限設定。"
+  ],
+  "Origem inválida.": [
+    "Invalid origin.",
+    "來源無效。"
+  ],
+  "Pedido demasiado grande.": [
+    "Request too large.",
+    "請求過大。"
+  ],
+  "Pedido inválido.": [
+    "Invalid request.",
+    "請求無效。"
+  ],
+  "Não pode atribuir este nível de acesso.": [
+    "You cannot assign this access level.",
+    "您無法指派此權限層級。"
+  ],
+  "Indique nome e email válidos.": [
+    "Enter a valid name and email.",
+    "請填寫有效姓名及電子郵件。"
+  ],
+  "Seleccione um agente válido.": [
+    "Select a valid agent.",
+    "請選擇有效代理員。"
+  ],
+  "Agente não encontrado.": [
+    "Agent not found.",
+    "找不到代理員。"
+  ],
+  "Conta criada; activação pendente": [
+    "Account created; activation pending",
+    "帳戶已建立，等待啟用"
+  ],
+  "Conta não encontrada.": [
+    "Account not found.",
+    "找不到帳戶。"
+  ],
+  "Não pode alterar a sua conta ou este nível de acesso.": [
+    "You cannot change your own account or this access level.",
+    "您無法變更自己的帳戶或此權限層級。"
+  ],
+  "Crie uma conta separada para outro nível de gestão.": [
+    "Create a separate account for another management level.",
+    "請為其他管理層級建立獨立帳戶。"
+  ],
+  "Estado inválido.": [
+    "Invalid status.",
+    "狀態無效。"
+  ],
+  "A conta deve primeiro concluir a activação.": [
+    "The account must complete activation first.",
+    "帳戶須先完成啟用。"
+  ],
+  "Acesso suspenso; recuperação emitida": [
+    "Access suspended; recovery issued",
+    "存取已暫停，已發出復原邀請"
+  ],
+  "Conta activada": [
+    "Account activated",
+    "帳戶已啟用"
+  ],
+  "Conta desactivada": [
+    "Account deactivated",
+    "帳戶已停用"
+  ],
+  "A conta mudou ou esta alteração deixaria o sistema sem gestor activo.": [
+    "The account has changed, or this change would leave the system without an active manager.",
+    "帳戶已變更，或此操作將導致系統沒有已啟用的管理員。"
+  ],
+  "Não foi possível guardar. Verifique se o email ou agente já tem uma conta e actualize os dados.": [
+    "Unable to save. Check whether the email or agent already has an account and refresh the data.",
+    "無法儲存。請檢查該電子郵件或代理員是否已有帳戶，並重新整理資料。"
+  ],
+  "Use o convite recebido e uma palavra-passe com pelo menos 12 caracteres (máximo 72 bytes).": [
+    "Use your invitation and a password of at least 12 characters (maximum 72 bytes).",
+    "請使用收到的邀請，並設定至少 12 個字元的密碼（最多 72 位元組）。"
+  ],
+  "O convite é inválido, expirou ou já foi utilizado. Solicite outro à gestão.": [
+    "The invitation is invalid, expired or already used. Request a new one from management.",
+    "邀請無效、已到期或已使用。請向管理團隊要求新邀請。"
+  ],
+  "Convite utilizado": [
+    "Invitation used",
+    "邀請已使用"
+  ],
+  "O convite já foi utilizado.": [
+    "The invitation has already been used.",
+    "此邀請已使用。"
+  ],
+  "Não foi possível activar a conta.": [
+    "Unable to activate the account.",
+    "無法啟用帳戶。"
+  ],
+  "Acesso reservado ao agente.": [
+    "Agent access only.",
+    "僅限代理員存取。"
+  ],
+  "Não foi possível carregar as operações. Tente actualizar.": [
+    "Unable to load operations. Try refreshing.",
+    "無法載入營運資料。請嘗試重新整理。"
+  ],
+  "Origem não autorizada.": [
+    "Unauthorised origin.",
+    "來源未獲授權。"
+  ],
+  "Tipo de relatório inválido.": [
+    "Invalid report type.",
+    "報告類型無效。"
+  ],
+  "Descreva o relatório (5–3000 caracteres).": [
+    "Describe the report (5–3000 characters).",
+    "請填寫報告說明（5–3000 個字元）。"
+  ],
+  "Seleccione um produto do stock atribuído.": [
+    "Select a product from assigned stock.",
+    "請從已分配庫存中選擇產品。"
+  ],
+  "Quantidade inválida.": [
+    "Invalid quantity.",
+    "數量無效。"
+  ],
+  "Relatório do agente": [
+    "Agent report",
+    "代理員報告"
+  ],
+  "Relatório já enviado. Actualize para consultar.": [
+    "Report already sent. Refresh to view.",
+    "報告已提交。請重新整理以查看。"
+  ],
+  "Acção inválida.": [
+    "Invalid action.",
+    "操作無效。"
+  ],
+  "Pedido não encontrado.": [
+    "Order not found.",
+    "找不到訂單。"
+  ],
+  "Entrega #": [
+    "Delivery #",
+    "配送 #"
+  ],
+  "Pedido alterado ou stock insuficiente. Actualize e contacte Operações.": [
+    "Order changed or insufficient stock. Refresh and contact Operations.",
+    "訂單已變更或庫存不足。請重新整理並聯絡營運團隊。"
+  ],
+  "Inicie sessão.": [
+    "Sign in.",
+    "請登入。"
+  ],
+  "Não foi possível carregar as candidaturas.": [
+    "Unable to load applications.",
+    "無法載入申請。"
+  ],
+  "Tente novamente mais tarde.": [
+    "Please try again later.",
+    "請稍後再試。"
+  ],
+  "Esta candidatura destina-se a novas contas de agente.": [
+    "This application is for new agent accounts.",
+    "此申請適用於新的代理員帳戶。"
+  ],
+  "A candidatura mudou ou já foi submetida. Actualize a página.": [
+    "The application has changed or was already submitted. Refresh the page.",
+    "申請已變更或已提交。請重新整理頁面。"
+  ],
+  "Guarde primeiro os seus dados.": [
+    "Save your details first.",
+    "請先儲存資料。"
+  ],
+  "Candidatura submetida": [
+    "Application submitted",
+    "申請已提交"
+  ],
+  "Actualize os dados e carregue a fotografia e as duas faces do BI antes de submeter.": [
+    "Update your details and upload your photo and both sides of the identity document before submitting.",
+    "提交前請更新資料，並上傳個人照片及身分證正反面照片。"
+  ],
+  "Decisão inválida.": [
+    "Invalid decision.",
+    "決定無效。"
+  ],
+  "Candidatura não encontrada.": [
+    "Application not found.",
+    "找不到申請。"
+  ],
+  "Indique uma justificação entre 10 e 1500 caracteres.": [
+    "Provide a reason between 10 and 1500 characters.",
+    "請提供 10 至 1500 個字元的理由。"
+  ],
+  "Verifique o BI e a idade antes de aprovar.": [
+    "Check the identity document and age before approving.",
+    "核准前請核對身分證及年齡。"
+  ],
+  "Não foi possível guardar a candidatura.": [
+    "Unable to save the application.",
+    "無法儲存申請。"
+  ],
+  "Acesso reservado a Operações.": [
+    "Operations access only.",
+    "僅限營運團隊存取。"
+  ],
+  "Não foi possível carregar os relatórios.": [
+    "Unable to load reports.",
+    "無法載入報告。"
+  ],
+  "Resposta demasiado grande.": [
+    "Response too large.",
+    "回覆過長。"
+  ],
+  "Inclua uma resposta de 5–2000 caracteres.": [
+    "Include a response of 5–2000 characters.",
+    "請填寫 5–2000 個字元的回覆。"
+  ],
+  "Relatório do agente resolvido": [
+    "Agent report resolved",
+    "代理員報告已結案"
+  ],
+  "O relatório mudou. Actualize antes de responder.": [
+    "The report has changed. Refresh before replying.",
+    "報告已變更。回覆前請重新整理。"
+  ],
+  "Tipo de fotografia inválido.": [
+    "Invalid photo type.",
+    "照片類型無效。"
+  ],
+  "Guarde os dados da candidatura antes de carregar fotografias.": [
+    "Save application details before uploading photos.",
+    "上傳照片前請先儲存申請資料。"
+  ],
+  "Carregamento indisponível.": [
+    "Upload unavailable.",
+    "無法上傳。"
+  ],
+  "Use fotografias PNG, JPG ou WebP.": [
+    "Use PNG, JPG or WebP photos.",
+    "請使用 PNG、JPG 或 WebP 照片。"
+  ],
+  "Limite de carregamentos atingido. Contacte o apoio.": [
+    "Upload limit reached. Contact support.",
+    "已達上傳上限。請聯絡客服。"
+  ],
+  "Não foi possível carregar a fotografia.": [
+    "Unable to upload the photo.",
+    "無法上傳照片。"
+  ],
+  "Consulta de documento de candidatura": [
+    "Application document viewed",
+    "已查閱申請文件"
+  ],
+  "Indique um email válido e uma palavra-passe com pelo menos 12 caracteres (máximo 72 bytes).": [
+    "Enter a valid email and a password of at least 12 characters (maximum 72 bytes).",
+    "請輸入有效電子郵件及至少 12 個字元的密碼（最多 72 位元組）。"
+  ],
+  "Demasiadas tentativas. Tente novamente dentro de 15 minutos.": [
+    "Too many attempts. Try again in 15 minutes.",
+    "嘗試次數過多。請於 15 分鐘後再試。"
+  ],
+  "Não foi possível criar esta conta. Tente iniciar sessão.": [
+    "Unable to create this account. Try signing in.",
+    "無法建立此帳戶。請嘗試登入。"
+  ],
+  "Indique o seu nome completo.": [
+    "Enter your full name.",
+    "請填寫全名。"
+  ],
+  "Email ou palavra-passe incorrectos.": [
+    "Incorrect email or password.",
+    "電子郵件或密碼錯誤。"
+  ],
+  "Esta conta está desactivada. Contacte o Manager.": [
+    "This account is disabled. Contact the manager.",
+    "此帳戶已停用。請聯絡管理員。"
+  ],
+  "A conta mudou. Inicie sessão novamente.": [
+    "The account has changed. Sign in again.",
+    "帳戶已變更。請重新登入。"
+  ],
+  "Não foi possível entrar. Tente novamente.": [
+    "Unable to sign in. Please try again.",
+    "無法登入。請再試一次。"
+  ],
+  "Inicie sessão para guardar o design.": [
+    "Sign in to save the design.",
+    "請登入以儲存設計。"
+  ],
+  "Ficheiro em falta.": [
+    "File missing.",
+    "缺少檔案。"
+  ],
+  "Máximo: 8 MB.": [
+    "Maximum: 8 MB.",
+    "上限：8 MB。"
+  ],
+  "Use PNG, JPG ou PDF.": [
+    "Use PNG, JPG or PDF.",
+    "請使用 PNG、JPG 或 PDF。"
+  ],
+  "Limite de armazenamento atingido (50 MB ou 100 ficheiros). Contacte o apoio.": [
+    "Storage limit reached (50 MB or 100 files). Contact support.",
+    "已達儲存上限（50 MB 或 100 個檔案）。請聯絡客服。"
+  ],
+  "Não foi possível guardar o ficheiro.": [
+    "Unable to save the file.",
+    "無法儲存檔案。"
+  ],
+  "Inválido": [
+    "Invalid",
+    "無效"
+  ],
+  "Não encontrado": [
+    "Not found",
+    "找不到"
+  ],
+  "Acesso reservado à gestão do catálogo.": [
+    "Catalogue management access only.",
+    "僅限目錄管理人員存取。"
+  ],
+  "Catálogo temporariamente indisponível.": [
+    "Catalogue temporarily unavailable.",
+    "目錄暫時無法使用。"
+  ],
+  "Produto não encontrado.": [
+    "Product not found.",
+    "找不到產品。"
+  ],
+  "A imagem já não está disponível. Carregue-a novamente.": [
+    "The image is no longer available. Upload it again.",
+    "圖片已無法使用。請重新上傳。"
+  ],
+  "Produto actualizado": [
+    "Product updated",
+    "產品已更新"
+  ],
+  "Produto criado": [
+    "Product created",
+    "產品已建立"
+  ],
+  "Este produto foi alterado. Recarregue os dados antes de guardar.": [
+    "This product has changed. Reload the data before saving.",
+    "此產品已變更。儲存前請重新載入資料。"
+  ],
+  "Não foi possível guardar o produto. Tente novamente.": [
+    "Unable to save the product. Please try again.",
+    "無法儲存產品。請再試一次。"
+  ],
+  "Acesso reservado ao Manager.": [
+    "Manager access only.",
+    "僅限管理員存取。"
+  ],
+  "Não foi possível carregar a gestão. Tente novamente.": [
+    "Unable to load management. Please try again.",
+    "無法載入管理資料。請再試一次。"
+  ],
+  "Acesso reservado.": [
+    "Restricted access.",
+    "存取受限。"
+  ],
+  "Campo inválido:": [
+    "Invalid field:",
+    "欄位無效："
+  ],
+  "Valor inválido:": [
+    "Invalid value:",
+    "數值無效："
+  ],
+  "Referência inválida.": [
+    "Invalid reference.",
+    "參考編號無效。"
+  ],
+  "Preço mensal inválido.": [
+    "Invalid monthly price.",
+    "月費價格無效。"
+  ],
+  "Agente actualizado": [
+    "Agent updated",
+    "代理員已更新"
+  ],
+  "Plano actualizado": [
+    "Plan updated",
+    "方案已更新"
+  ],
+  "Este registo mudou. Actualize antes de guardar.": [
+    "This record has changed. Refresh before saving.",
+    "此紀錄已變更。儲存前請重新整理。"
+  ],
+  "Movimento inválido.": [
+    "Invalid movement.",
+    "異動無效。"
+  ],
+  "Seleccione um agente activo para receber stock.": [
+    "Select an active agent to receive stock.",
+    "請選擇已啟用的代理員接收庫存。"
+  ],
+  "Seleccione origens diferentes e uma quantidade positiva.": [
+    "Select different origins and a positive quantity.",
+    "請選擇不同來源，並輸入正數數量。"
+  ],
+  "Transferência de stock": [
+    "Stock transfer",
+    "庫存調撥"
+  ],
+  "Movimento de stock": [
+    "Stock movement",
+    "庫存異動"
+  ],
+  "Movimento repetido ou stock disponível insuficiente na origem.": [
+    "Duplicate movement or insufficient available stock at source.",
+    "異動重複，或來源的可用庫存不足。"
+  ],
+  "Seleccione um agente activo.": [
+    "Select an active agent.",
+    "請選擇已啟用的代理員。"
+  ],
+  "Transacção verificada manualmente:": [
+    "Transaction manually verified:",
+    "交易已人工核實："
+  ],
+  "Atribuição do pedido #": [
+    "Order assignment #",
+    "訂單指派 #"
+  ],
+  "O pedido mudou ou não há stock disponível. Actualize o stock antes de continuar.": [
+    "The order changed or no stock is available. Refresh stock before continuing.",
+    "訂單已變更或無可用庫存。繼續前請重新整理庫存。"
+  ],
+  "Não foi possível consultar o pagamento.": [
+    "Unable to check payment.",
+    "無法查詢付款。"
+  ],
+  "Sem permissão para editar produtos.": [
+    "No permission to edit products.",
+    "沒有編輯產品的權限。"
+  ],
+  "Limite temporário de carregamentos. Tente mais tarde.": [
+    "Temporary upload limit. Try again later.",
+    "暫時達到上傳上限。請稍後再試。"
+  ],
+  "A imagem deve ter até 8 MB.": [
+    "The image must be no larger than 8 MB.",
+    "圖片不得超過 8 MB。"
+  ],
+  "Use PNG, JPG ou WebP.": [
+    "Use PNG, JPG or WebP.",
+    "請使用 PNG、JPG 或 WebP。"
+  ],
+  "Limite de armazenamento atingido. Contacte o apoio.": [
+    "Storage limit reached. Contact support.",
+    "已達儲存上限。請聯絡客服。"
+  ],
+  "Não foi possível carregar a imagem.": [
+    "Unable to upload the image.",
+    "無法上傳圖片。"
+  ],
+  "Stock indisponível. Tente novamente.": [
+    "Stock unavailable. Please try again.",
+    "庫存資料無法取得。請再試一次。"
+  ],
+  "Stock inválido.": [
+    "Invalid stock.",
+    "庫存無效。"
+  ],
+  "Stock / personalização": [
+    "Stock / personalisation",
+    "庫存／自訂"
+  ],
+  "Não foi possível guardar o stock.": [
+    "Unable to save stock.",
+    "無法儲存庫存。"
+  ],
+  "Tente mais tarde.": [
+    "Try again later.",
+    "請稍後再試。"
+  ],
+  "Visita inválida.": [
+    "Invalid visit.",
+    "瀏覽紀錄無效。"
+  ],
+  "Não foi possível registar a visita.": [
+    "Unable to record the visit.",
+    "無法記錄瀏覽。"
+  ],
+  "Estatísticas indisponíveis.": [
+    "Statistics unavailable.",
+    "統計資料無法取得。"
+  ],
+  "Fotografias temporariamente indisponíveis.": [
+    "Photos temporarily unavailable.",
+    "照片暫時無法使用。"
+  ],
+  "A fotografia deve ter até 5 MB.": [
+    "The photo must be no larger than 5 MB.",
+    "照片不得超過 5 MB。"
+  ],
+  "Escolha uma fotografia.": [
+    "Choose a photo.",
+    "請選擇照片。"
+  ],
+  "Use uma fotografia JPG, PNG ou WebP.": [
+    "Use a JPG, PNG or WebP photo.",
+    "請使用 JPG、PNG 或 WebP 照片。"
+  ],
+  "Não foi possível carregar a fotografia. Tente novamente.": [
+    "Unable to upload the photo. Please try again.",
+    "無法上傳照片。請再試一次。"
+  ],
+  "Fotografia indisponível.": [
+    "Photo unavailable.",
+    "照片無法使用。"
+  ],
+  "Demasiadas tentativas. Aguarde 15 minutos.": [
+    "Too many attempts. Wait 15 minutes.",
+    "嘗試次數過多。請等待 15 分鐘。"
+  ],
+  "Use uma palavra-passe com pelo menos 12 caracteres (máximo 72 bytes).": [
+    "Use a password of at least 12 characters (maximum 72 bytes).",
+    "請使用至少 12 個字元的密碼（最多 72 位元組）。"
+  ],
+  "Palavra-passe actual incorrecta.": [
+    "Incorrect current password.",
+    "目前密碼錯誤。"
+  ],
+  "Palavra-passe alterada": [
+    "Password changed",
+    "密碼已變更"
+  ],
+  "Todas as sessões terminadas": [
+    "All sessions ended",
+    "已登出所有工作階段"
+  ],
+  "Não foi possível actualizar a segurança da conta.": [
+    "Unable to update account security.",
+    "無法更新帳戶安全設定。"
+  ],
+  "Inicie sessão para continuar.": [
+    "Sign in to continue.",
+    "請登入以繼續。"
+  ],
+  "Não foi possível carregar os dados. Tente novamente.": [
+    "Unable to load data. Please try again.",
+    "無法載入資料。請再試一次。"
+  ],
+  "A entrega já está em tratamento. Contacte a equipa para alterar o local.": [
+    "Delivery is already being processed. Contact the team to change the location.",
+    "配送已在處理中。如需變更地點，請聯絡團隊。"
+  ],
+  "Apenas o plano de 30 dias grátis está disponível.": [
+    "Only the 30-day free plan is available.",
+    "目前僅提供 30 天免費方案。"
+  ],
+  "O período gratuito terminou. Contacte a equipa para continuar.": [
+    "The free trial has ended. Contact the team to continue.",
+    "免費試用已結束。請聯絡團隊以繼續使用。"
+  ],
+  "Plano indisponível.": [
+    "Plan unavailable.",
+    "方案無法使用。"
+  ],
+  "As condições do plano mudaram. Actualize antes de aderir.": [
+    "Plan terms have changed. Refresh before subscribing.",
+    "方案條件已變更。訂閱前請重新整理。"
+  ],
+  "Active os 30 dias gratuitos antes de publicar. Se o período terminou, contacte a equipa.": [
+    "Activate the 30-day free trial before publishing. If it has ended, contact the team.",
+    "發佈前請啟用 30 天免費試用。如已到期，請聯絡團隊。"
+  ],
+  "Carregue a sua própria fotografia antes de guardar.": [
+    "Upload your own photo before saving.",
+    "儲存前請上傳您自己的照片。"
+  ],
+  "O nome de utilizador fica reservado após a primeira gravação.": [
+    "Your username is reserved after the first save.",
+    "使用者名稱於首次儲存後即被保留。"
+  ],
+  "O nome já está reservado ou os dados mudaram. Actualize antes de tentar novamente.": [
+    "The name is already reserved or data has changed. Refresh before trying again.",
+    "名稱已被保留或資料已變更。請重新整理後再試。"
+  ],
+  "O acompanhamento do pedido é apenas de consulta. Apenas a equipa autorizada pode alterar pedidos.": [
+    "Order tracking is read-only. Only the authorised team can change orders.",
+    "訂單追蹤僅供查閱。只有獲授權的團隊可以變更訂單。"
+  ],
+  "Confirme o perfil e utilize o percurso de compra.": [
+    "Confirm the profile and use the purchase flow.",
+    "請確認個人檔案並使用購買流程。"
+  ],
+  "Este produto está disponível apenas sob consulta.": [
+    "This product is available by consultation only.",
+    "此產品僅供洽詢訂購。"
+  ],
+  "Esta referência pertence a outro pedido. Inicie uma nova encomenda.": [
+    "This reference belongs to another order. Start a new order.",
+    "此編號屬於其他訂單。請建立新訂單。"
+  ],
+  "Demasiados pedidos nesta ligação. Aguarde uma hora ou contacte a equipa.": [
+    "Too many orders from this connection. Wait one hour or contact the team.",
+    "此連線的訂單過多。請等待一小時或聯絡團隊。"
+  ],
+  "Active um período gratuito válido antes de confirmar.": [
+    "Activate a valid free trial before confirming.",
+    "確認前請啟用有效的免費試用。"
+  ],
+  "Guarde e aprove o perfil antes de confirmar o pedido.": [
+    "Save and approve the profile before confirming the order.",
+    "確認訂單前請儲存並核准個人檔案。"
+  ],
+  "As condições do plano mudaram. Reveja a escolha antes de confirmar.": [
+    "Plan terms have changed. Review your choice before confirming.",
+    "方案條件已變更。確認前請重新檢查所選方案。"
+  ],
+  "Indique um contacto de entrega válido.": [
+    "Enter a valid delivery contact.",
+    "請提供有效配送聯絡資料。"
+  ],
+  "Sem stock físico disponível para reserva. Contacte a equipa.": [
+    "No physical stock available to reserve. Contact the team.",
+    "無實際庫存可供預留。請聯絡團隊。"
+  ],
+  "Utilize o percurso de compra para escolher o modelo e aprovar o design.": [
+    "Use the purchase flow to choose a model and approve the design.",
+    "請透過購買流程選擇款式並核准設計。"
+  ],
+  "O modelo está sem stock ou foi desactivado. Escolha outro.": [
+    "This model is out of stock or disabled. Choose another.",
+    "此款式無庫存或已停用。請選擇其他款式。"
+  ],
+  "Carregue o seu próprio ficheiro de design.": [
+    "Upload your own design file.",
+    "請上傳您自己的設計檔案。"
+  ],
+  "Nome e email são obrigatórios para imprimir o cartão.": [
+    "Name and email are required to print the card.",
+    "印製卡片須提供姓名及電子郵件。"
+  ],
+  "Referência indisponível.": [
+    "Reference unavailable.",
+    "參考編號無法使用。"
+  ],
+  "Este pedido mudou. Actualize antes de continuar.": [
+    "This order has changed. Refresh before continuing.",
+    "此訂單已變更。繼續前請重新整理。"
+  ],
+  "Não foi possível guardar. Actualize os dados e tente novamente.": [
+    "Unable to save. Refresh data and try again.",
+    "無法儲存。請重新整理資料後再試。"
+  ],
+  "Não foi possível completar a acção.": [
+    "Unable to complete the action.",
+    "無法完成操作。"
+  ],
+  "Idioma": [
+    "Language",
+    "語言"
+  ],
+  "Cliente": [
+    "Customer",
+    "客戶"
+  ],
+  "Clientes": [
+    "Customers",
+    "客戶"
+  ],
+  "Plano": [
+    "Plan",
+    "方案"
+  ],
+  "Conta": [
+    "Account",
+    "帳戶"
+  ],
+  "Perfil": [
+    "Profile",
+    "個人檔案"
+  ],
+  "Entrega": [
+    "Delivery",
+    "配送"
+  ],
+  "Confirmar": [
+    "Confirm",
+    "確認"
+  ],
+  "Entregue": [
+    "Delivered",
+    "已送達"
+  ],
+  "Cancelado": [
+    "Cancelled",
+    "已取消"
+  ],
+  "Aprovada": [
+    "Approved",
+    "已核准"
+  ],
+  "Financeiro": [
+    "Finance",
+    "財務"
+  ],
+  "Candidaturas": [
+    "Applications",
+    "申請"
+  ],
+  "Criadores": [
+    "Creators",
+    "創作者"
+  ],
+  "Profissionais": [
+    "Professionals",
+    "專業人士"
+  ],
+  "Individual": [
+    "Individual",
+    "個人"
+  ],
+  "Criador": [
+    "Creator",
+    "創作者"
+  ],
+  "Profissional": [
+    "Professional",
+    "專業人士"
+  ],
+  "AJUDA": [
+    "HELP",
+    "說明"
+  ],
+  "PRIVACIDADE": [
+    "PRIVACY",
+    "隱私"
+  ],
+  "CONTACTO": [
+    "CONTACT",
+    "聯絡"
+  ],
+  "Normal": [
+    "Normal",
+    "正常"
+  ],
+  "Stock": [
+    "Stock",
+    "庫存"
+  ],
+  "Fundo": [
+    "Background",
+    "背景"
+  ],
+  "Texto": [
+    "Text",
+    "文字"
+  ],
+  "Logótipo": [
+    "Logo",
+    "標誌"
+  ],
+  "Frente/verso": [
+    "Front/back",
+    "正面／背面"
+  ],
+  "QR": [
+    "QR",
+    "QR"
+  ],
+  "Branco": [
+    "White",
+    "白色"
+  ],
+  "Preto": [
+    "Black",
+    "黑色"
+  ],
+  "Vermelho": [
+    "Red",
+    "紅色"
+  ],
+  "Azul": [
+    "Blue",
+    "藍色"
+  ],
+  "Verde": [
+    "Green",
+    "綠色"
+  ],
+  "TikTok": [
+    "TikTok",
+    "TikTok"
+  ],
+  "Padrão": [
+    "Pattern",
+    "圖案"
+  ],
+  "NFC detectado e link correcto": [
+    "NFC detected and correct link",
+    "已偵測 NFC 且連結正確"
+  ],
+  "A partilha não está disponível neste navegador.": [
+    "Sharing is not available in this browser.",
+    "此瀏覽器不支援分享。"
+  ],
+  "Não foi possível partilhar o perfil.": [
+    "Unable to share the profile.",
+    "無法分享個人檔案。"
+  ],
+  "Pedido {0}": [
+    "Order {0}",
+    "訂單 {0}"
+  ],
+  "Ver detalhes do pedido {0}": [
+    "View details for order {0}",
+    "查看訂單 {0} 的詳情"
+  ],
+  "{0} de {1} links utilizados": [
+    "{0} of {1} links used",
+    "已使用 {0} 個連結，共 {1} 個"
+  ],
+  "QR do perfil {0}": [
+    "QR code for {0}'s profile",
+    "{0} 的個人檔案 QR 碼"
+  ],
+  "Design {0}": [
+    "Design {0}",
+    "設計 {0}"
+  ],
+  "Textos {0}": [
+    "Text {0}",
+    "文字 {0}"
+  ],
+  "{0}: seleccionar cor": [
+    "{0}: select colour",
+    "{0}：選擇顏色"
+  ],
+  "{0}: código HEX": [
+    "{0}: HEX code",
+    "{0}：HEX 色碼"
+  ],
+  "{0} — fotografia {1}": [
+    "{0} — photo {1}",
+    "{0} — 照片 {1}"
+  ],
+  "Ver fotografia {0}": [
+    "View photo {0}",
+    "查看照片 {0}"
+  ],
+  "Mover link {0} para cima": [
+    "Move link {0} up",
+    "將連結 {0} 上移"
+  ],
+  "Mover link {0} para baixo": [
+    "Move link {0} down",
+    "將連結 {0} 下移"
+  ],
+  "Remover link {0}": [
+    "Remove link {0}",
+    "移除連結 {0}"
+  ],
+  "Abrir pedido {0}": [
+    "Open order {0}",
+    "開啟訂單 {0}"
+  ],
+  "Fotografia de {0}": [
+    "Photo of {0}",
+    "{0} 的照片"
+  ],
+  "{0} · {1}/mês · Em breve": [
+    "{0} · {1}/month · Coming soon",
+    "{0} · {1}/月 · 即將推出"
+  ],
+  "Período gratuito até {0}. Sem renovação automática.": [
+    "Free trial until {0}. No automatic renewal.",
+    "免費試用至 {0}。不會自動續訂。"
+  ],
+  "Desenhamos uma experiência em português, inglês e chinês tradicional, orientada às pessoas, aos criadores e às organizações do nosso mercado.": [
+    "We design an experience in Portuguese, English and Traditional Chinese for the people, creators and organisations in our market.",
+    "我們以葡萄牙語、英語及繁體中文打造體驗，服務本地市場的個人、創作者與組織。"
+  ],
+  "+258 …": [
+    "+258 …",
+    "+258 …"
+  ],
+  "Pedidos": [
+    "Orders",
+    "訂單"
+  ],
+  "Adiantamentos": [
+    "Advances",
+    "預收款"
+  ],
+  "Entregues": [
+    "Delivered",
+    "已送達"
+  ],
+  "Relatórios": [
+    "Reports",
+    "報告"
+  ],
+  "Stock físico": [
+    "Physical stock",
+    "實際庫存"
+  ],
+  "Biografia até {0} caracteres": [
+    "Biography up to {0} characters",
+    "個人簡介最多 {0} 個字元"
+  ],
+  "Bio: {0} caracteres": [
+    "Bio: {0} characters",
+    "簡介：{0} 個字元"
+  ],
+  "Olá, {0}.": [
+    "Hello, {0}.",
+    "您好，{0}。"
+  ],
+  "bem-vindo": [
+    "welcome",
+    "歡迎"
+  ],
+  "· Pedido #{0}": [
+    "· Order #{0}",
+    "· 訂單 #{0}"
+  ],
+  "Pedido #{0}": [
+    "Order #{0}",
+    "訂單 #{0}"
+  ],
+  "Preencha correctamente o campo {0}.": [
+    "Complete the {0} field correctly.",
+    "請正確填寫「{0}」欄位。"
+  ],
+  "O campo {0} é inválido.": [
+    "The {0} field is invalid.",
+    "「{0}」欄位無效。"
+  ],
+  "Campo {0} inválido.": [
+    "Invalid {0} field.",
+    "「{0}」欄位無效。"
+  ],
+  "nome": [
+    "name",
+    "姓名"
+  ],
+  "data de nascimento": [
+    "date of birth",
+    "出生日期"
+  ],
+  "telefone": [
+    "phone",
+    "電話"
+  ],
+  "localidade": [
+    "locality",
+    "地區"
+  ],
+  "actividade": [
+    "occupation",
+    "職業"
+  ],
+  "name": [
+    "name",
+    "姓名"
+  ],
+  "username": [
+    "username",
+    "使用者名稱"
+  ],
+  "title": [
+    "title",
+    "職稱"
+  ],
+  "email": [
+    "email",
+    "電子郵件"
+  ],
+  "phone": [
+    "phone",
+    "電話"
+  ],
+  "website": [
+    "website",
+    "網站"
+  ],
+  "category": [
+    "category",
+    "分類"
+  ],
+  "tagline": [
+    "tagline",
+    "標語"
+  ],
+  "description": [
+    "description",
+    "說明"
+  ],
+  "audience": [
+    "audience",
+    "適用對象"
+  ],
+  "Fechar": [
+    "Close",
+    "關閉"
+  ],
+  "Menu lateral": [
+    "Sidebar",
+    "側邊選單"
+  ],
+  "Navegação da conta no telemóvel.": [
+    "Account navigation on mobile.",
+    "手機版帳戶導覽。"
+  ],
+  "Abrir ou fechar menu": [
+    "Toggle menu",
+    "開啟或關閉選單"
+  ],
+  "O link deve começar por https://.": [
+    "The link must start with https://.",
+    "連結須以 https:// 開頭。"
+  ],
+  "Use um endereço https:// sem credenciais.": [
+    "Use an https:// address without credentials.",
+    "請使用不含登入資料的 https:// 網址。"
+  ],
+  "Os links devem começar por https://.": [
+    "Links must start with https://.",
+    "連結須以 https:// 開頭。"
+  ],
+  "Use links https:// sem credenciais.": [
+    "Use https:// links without credentials.",
+    "請使用不含登入資料的 https:// 連結。"
+  ],
+  "O plano {0} permite {1} links. Remova links ou escolha um plano superior.": [
+    "The {0} plan allows {1} links. Remove links or choose a higher plan.",
+    "{0} 方案允許 {1} 個連結。請移除連結或選擇更高階方案。"
+  ],
+  "O plano {0} permite {1} caracteres de biografia. Reduza o texto ou escolha um plano superior.": [
+    "The {0} plan allows {1} biography characters. Shorten the text or choose a higher plan.",
+    "{0} 方案允許 {1} 個簡介字元。請縮短文字或選擇更高階方案。"
+  ]
+}

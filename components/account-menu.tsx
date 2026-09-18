@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useEffect, useState } from 'react';
 import Link from '@/components/hard-link';
 import { UserRound, ChevronDown } from 'lucide-react';
@@ -13,6 +15,7 @@ export function AccountMenu({
 }: {
   className?: string;
 }) {
+  const { t } = useI18n();
   const [dashboard, setDashboard] = useState('');
   useEffect(() => {
     void fetch('/api/session', { cache: 'no-store' })
@@ -23,7 +26,9 @@ export function AccountMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={`account-menu-trigger ${className}`}>
-        <UserRound size={17} /> Minha Conta <ChevronDown size={14} />
+        <UserRound size={17} />
+        {t(' Minha Conta ')}
+        <ChevronDown size={14} />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
@@ -36,33 +41,33 @@ export function AccountMenu({
               render={<Link href={dashboard} />}
               nativeButton={false}
             >
-              Abrir o meu painel
+              {t('Abrir o meu painel')}
             </DropdownMenuItem>
             {dashboard === '/agent' && (
               <DropdownMenuItem
                 render={<Link href="/dashboard" />}
                 nativeButton={false}
               >
-                Os meus pedidos e perfil
+                {t('Os meus pedidos e perfil')}
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
               render={<Link href="/aplicar" />}
               nativeButton={false}
             >
-              A minha candidatura
+              {t('A minha candidatura')}
             </DropdownMenuItem>
             <DropdownMenuItem
               render={<Link href="/seguranca" />}
               nativeButton={false}
             >
-              Segurança da conta
+              {t('Segurança da conta')}
             </DropdownMenuItem>
             <DropdownMenuItem
               render={<Link href="/sair" />}
               nativeButton={false}
             >
-              Terminar sessão
+              {t('Terminar sessão')}
             </DropdownMenuItem>
           </>
         ) : (
@@ -71,13 +76,13 @@ export function AccountMenu({
               render={<Link href="/entrar" />}
               nativeButton={false}
             >
-              Entrar
+              {t('Entrar')}
             </DropdownMenuItem>
             <DropdownMenuItem
               render={<Link href="/entrar?mode=register" />}
               nativeButton={false}
             >
-              Criar conta
+              {t('Criar conta')}
             </DropdownMenuItem>
           </>
         )}

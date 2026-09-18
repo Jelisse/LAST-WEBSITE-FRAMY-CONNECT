@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useState } from 'react';
 import { Download, Share2, Globe2, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +14,7 @@ function vcfEscape(s: string) {
     .replace(/,/g, '\\,');
 }
 export function ProfileShare({ profile }: { profile: Profile }) {
+  const { t } = useI18n();
   const [message, setMessage] = useState('');
   function download() {
     const lines = [
@@ -44,12 +47,11 @@ export function ProfileShare({ profile }: { profile: Profile }) {
           url: window.location.href,
         });
       } else {
-        await navigator.clipboard.writeText(window.location.href);
-        setMessage('Link copiado.');
+        setMessage('A partilha não está disponível neste navegador.');
       }
     } catch (e) {
       if (!(e instanceof Error && e.name === 'AbortError'))
-        setMessage('Copie o endereço na barra do navegador para partilhar.');
+        setMessage('Não foi possível partilhar o perfil.');
     }
   }
   return (
@@ -80,19 +82,22 @@ export function ProfileShare({ profile }: { profile: Profile }) {
         )}
         {profile.website && (
           <a href={profile.website} target="_blank" rel="noopener noreferrer">
-            <Globe2 size={19} /> Website / portefólio
+            <Globe2 size={19} />
+            {t(' Website / portefólio')}
           </a>
         )}
       </div>
       <div className="form-actions">
         <Button className="control-btn" onClick={download}>
-          <Download size={17} /> Adicionar contacto
+          <Download size={17} />
+          {t(' Adicionar contacto')}
         </Button>
         <Button className="control-btn" variant="outline" onClick={share}>
-          <Share2 size={17} /> Partilhar
+          <Share2 size={17} />
+          {t(' Partilhar')}
         </Button>
       </div>
-      {message && <output className="message">{message}</output>}
+      {message && <output className="message">{t(message)}</output>}
     </>
   );
 }

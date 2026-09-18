@@ -1,4 +1,6 @@
 'use client';
+import { useI18n, LanguageSelector } from '@/components/language-provider';
+
 import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
@@ -112,6 +114,7 @@ function initials(name: string) {
   );
 }
 export function Workspace({ displayName }: { displayName: string }) {
+  const { t } = useI18n();
   const [tab, setTab] = useState('overview'),
     [data, setData] = useState<WorkspaceData | null>(null),
     [profile, setProfile] = useState<Profile>(blankProfile),
@@ -418,14 +421,14 @@ export function Workspace({ displayName }: { displayName: string }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Pedido / produto</TableHead>
-            <TableHead>Local de entrega</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead>Pagamento</TableHead>
-            <TableHead>Valor de teste</TableHead>
-            <TableHead>Agente</TableHead>
+            <TableHead>{t('Pedido / produto')}</TableHead>
+            <TableHead>{t('Local de entrega')}</TableHead>
+            <TableHead>{t('Estado')}</TableHead>
+            <TableHead>{t('Pagamento')}</TableHead>
+            <TableHead>{t('Valor de teste')}</TableHead>
+            <TableHead>{t('Agente')}</TableHead>
             <TableHead>
-              <span className="sr-only">Abrir</span>
+              <span className="sr-only">{t('Abrir')}</span>
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -433,7 +436,7 @@ export function Workspace({ displayName }: { displayName: string }) {
           {orders.map((o) => (
             <TableRow key={o.id}>
               <TableCell>
-                <strong>{o.productName}</strong>
+                <strong>{t(o.productName)}</strong>
                 <small>
                   #{o.id.slice(0, 8).toUpperCase()} · {date(o.createdAt)}
                 </small>
@@ -447,15 +450,15 @@ export function Workspace({ displayName }: { displayName: string }) {
                 </Button>
               </TableCell>
               <TableCell>
-                <span className="status-badge">{orderLabels[o.status]}</span>
+                <span className="status-badge">{t(orderLabels[o.status])}</span>
               </TableCell>
               <TableCell>{payment(o)}</TableCell>
-              <TableCell>{money(o.amount)}</TableCell>
-              <TableCell>{o.agent || 'Por atribuir'}</TableCell>
+              <TableCell>{money(o.amount, t.locale)}</TableCell>
+              <TableCell>{o.agent || t('Por atribuir')}</TableCell>
               <TableCell>
                 <Button
                   variant="ghost"
-                  aria-label={`Abrir pedido ${o.id.slice(0, 8)}`}
+                  aria-label={t('Abrir pedido {0}', [o.id.slice(0, 8)])}
                   onClick={() => inspect(o)}
                 >
                   <ArrowUpRight />
@@ -468,11 +471,13 @@ export function Workspace({ displayName }: { displayName: string }) {
       {!orders.length && (
         <div className="empty-panel">
           <Package size={30} />
-          <h3>Ainda não há pedidos</h3>
+          <h3>{t('Ainda não há pedidos')}</h3>
           <p>
             {canEditOrders
-              ? 'Crie um pedido de teste para explorar o percurso completo.'
-              : 'Quando o seu pedido for registado, pode acompanhar aqui todas as etapas.'}
+              ? t('Crie um pedido de teste para explorar o percurso completo.')
+              : t(
+                  'Quando o seu pedido for registado, pode acompanhar aqui todas as etapas.',
+                )}
           </p>
         </div>
       )}
@@ -498,10 +503,10 @@ export function Workspace({ displayName }: { displayName: string }) {
               height={100}
               unoptimized
               src="/brand/logo.svg"
-              alt="Framy Connect"
+              alt={t('Framy Connect')}
             />
           </Link>
-          <span className="workspace-label">O SEU ESPAÇO</span>
+          <span className="workspace-label">{t('O SEU ESPAÇO')}</span>
         </SidebarHeader>
         <SidebarContent className="px-4">
           <SidebarMenu>
@@ -516,7 +521,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                   }}
                 >
                   <m.icon />
-                  <span>{m.label}</span>
+                  <span>{t(m.label)}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
@@ -528,11 +533,11 @@ export function Workspace({ displayName }: { displayName: string }) {
               onOpenChange={setTestToolsOpen}
             >
               <CollapsibleTrigger className="workspace-test-trigger">
-                <Settings2 size={17} /> Ferramentas de teste{' '}
-                <ChevronDown size={16} />
+                <Settings2 size={17} />
+                {t(' Ferramentas de teste')} <ChevronDown size={16} />
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <p>Vistas de demonstração, sem permissões reais.</p>
+                <p>{t('Vistas de demonstração, sem permissões reais.')}</p>
                 <SidebarMenu>
                   {menu.slice(3).map((m) => (
                     <SidebarMenuItem key={m.id}>
@@ -545,7 +550,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                         }}
                       >
                         <m.icon />
-                        <span>{m.label}</span>
+                        <span>{t(m.label)}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
@@ -556,28 +561,31 @@ export function Workspace({ displayName }: { displayName: string }) {
         </SidebarContent>
         <SidebarFooter className="p-6">
           <Link className="catalog-link" href="/produtos">
-            Explorar produtos <ArrowUpRight size={18} />
+            {t('Explorar produtos ')}
+            <ArrowUpRight size={18} />
           </Link>
           <div className="user-mini">
             <span>{initials(displayName)}</span>
             <div>
               <strong>{displayName}</strong>
-              <small>A sua conta Framy Connect</small>
+              <small>{t('A sua conta Framy Connect')}</small>
             </div>
           </div>
           <a className="signout" href={signOutHref} target="_top">
-            <LogOut size={16} /> Terminar sessão
+            <LogOut size={16} />
+            {t(' Terminar sessão')}
           </a>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <header className="workspace-header">
+          <LanguageSelector />
           <div>
             <SidebarTrigger />
             <span>
-              Minha Conta{' '}
+              {t('Minha Conta')}{' '}
               <span className="breadcrumb">
-                / {menu.find((m) => m.id === tab)?.label}
+                / {t(menu.find((m) => m.id === tab)?.label)}
               </span>
             </span>
           </div>
@@ -586,7 +594,8 @@ export function Workspace({ displayName }: { displayName: string }) {
             disabled={loading || busy || uploadingPhoto || !data}
             onClick={openPlans}
           >
-            Escolher plano <ArrowUpRight size={17} />
+            {t('Escolher plano ')}
+            <ArrowUpRight size={17} />
           </Button>
         </header>
         <main
@@ -596,19 +605,23 @@ export function Workspace({ displayName }: { displayName: string }) {
           <div className="sandbox-banner">
             <ShieldCheck size={19} />
             <span>
-              <strong>A sua conta</strong> · Acompanhe o perfil e as encomendas.
-              O pagamento do produto é confirmado pela equipa.
+              <strong>{t('A sua conta')}</strong>
+              {t(
+                ' · Acompanhe o perfil e as encomendas. O pagamento do produto é confirmado pela equipa.',
+              )}
             </span>
           </div>
           <div className="workspace-title">
             <div>
               <span className="eyebrow">
-                FRAMY CONNECT /{' '}
-                {tab === 'profile' ? 'IDENTIDADE' : 'MINHA CONTA'}
+                {t('FRAMY CONNECT /')}{' '}
+                {tab === 'profile' ? t('IDENTIDADE') : t('MINHA CONTA')}
               </span>
               <h1>
                 {tab === 'overview'
-                  ? `Olá, ${displayName.trim().split(/\s+/)[0] || 'bem-vindo'}.`
+                  ? t('Olá, {0}.', [
+                      displayName.trim().split(/\s+/)[0] || t('bem-vindo'),
+                    ])
                   : menu
                       .find((m) => m.id === tab)
                       ?.label.replace(' · teste', '')}
@@ -617,29 +630,32 @@ export function Workspace({ displayName }: { displayName: string }) {
             <Button
               variant="outline"
               className="control-btn"
-              aria-label="Actualizar dados"
+              aria-label={t('Actualizar dados')}
               disabled={busy || loading || uploadingPhoto}
               onClick={() => run(() => load(false), 'Dados actualizados.')}
             >
-              <RefreshCw size={17} /> Actualizar
+              <RefreshCw size={17} />
+              {t(' Actualizar')}
             </Button>
           </div>
           {error && (
             <div role="alert" className="message error-message">
-              {error}
+              {t(error)}
             </div>
           )}
-          {notice && <output className="message">{notice}</output>}
+          {notice && <output className="message">{t(notice)}</output>}
           {loading ? (
-            <output className="empty-panel">A carregar o seu espaço…</output>
+            <output className="empty-panel">
+              {t('A carregar o seu espaço…')}
+            </output>
           ) : !data ? (
             <div className="empty-panel">
-              <p>O seu espaço está temporariamente indisponível.</p>
+              <p>{t('O seu espaço está temporariamente indisponível.')}</p>
               <Button
                 className="control-btn"
                 onClick={() => run(() => load(true))}
               >
-                Tentar novamente
+                {t('Tentar novamente')}
               </Button>
             </div>
           ) : (
@@ -657,18 +673,19 @@ export function Workspace({ displayName }: { displayName: string }) {
                 <div className="editor-grid profile-editor-layout">
                   <section className="panel">
                     <div className="section-heading">
-                      <h2>A sua identidade</h2>
+                      <h2>{t('A sua identidade')}</h2>
                       <span className="status-badge">
                         {dirty
-                          ? 'Alterações por guardar'
+                          ? t('Alterações por guardar')
                           : data.published
-                            ? 'Publicada'
-                            : 'Rascunho'}
+                            ? t('Publicada')
+                            : t('Rascunho')}
                       </span>
                     </div>
                     <p className="muted">
-                      Escolha os dados que quer partilhar. O nome de utilizador
-                      fica reservado na primeira gravação.
+                      {t(
+                        'Escolha os dados que quer partilhar. O nome de utilizador fica reservado na primeira gravação.',
+                      )}
                     </p>
                     <form
                       onSubmit={(e) => {
@@ -729,7 +746,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                               key={f.key}
                               htmlFor={`profile-${f.key}`}
                             >
-                              {f.label}
+                              {t(f.label)}
                               <Input
                                 id={`profile-${f.key}`}
                                 value={profile[f.key]}
@@ -777,9 +794,9 @@ export function Workspace({ displayName }: { displayName: string }) {
                           ))}
                         </div>
                         <div className="visibility">
-                          <h3>O que aparece no seu perfil?</h3>
+                          <h3>{t('O que aparece no seu perfil?')}</h3>
                           <label htmlFor="show-email">
-                            <span>Mostrar email ao público</span>
+                            <span>{t('Mostrar email ao público')}</span>
                             <Switch
                               id="show-email"
                               checked={profile.showEmail}
@@ -790,7 +807,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                             />
                           </label>
                           <label htmlFor="show-phone">
-                            <span>Mostrar telefone ao público</span>
+                            <span>{t('Mostrar telefone ao público')}</span>
                             <Switch
                               id="show-phone"
                               checked={profile.showPhone}
@@ -819,7 +836,8 @@ export function Workspace({ displayName }: { displayName: string }) {
                             disabled={busy}
                             type="submit"
                           >
-                            <Save size={17} /> Guardar rascunho
+                            <Save size={17} />
+                            {t(' Guardar rascunho')}
                           </Button>
                           <Button
                             className="btn btn-primary"
@@ -827,7 +845,8 @@ export function Workspace({ displayName }: { displayName: string }) {
                             disabled={busy}
                             onClick={() => save('publish-profile')}
                           >
-                            Publicar perfil <ArrowUpRight size={20} />
+                            {t('Publicar perfil ')}
+                            <ArrowUpRight size={20} />
                           </Button>
                         </div>
                       </fieldset>
@@ -839,26 +858,27 @@ export function Workspace({ displayName }: { displayName: string }) {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          <Eye size={17} /> Abrir perfil publicado
+                          <Eye size={17} />
+                          {t(' Abrir perfil publicado')}
                         </a>
                         <Button
                           variant="ghost"
                           disabled={busy}
                           onClick={() => save('unpublish-profile')}
                         >
-                          Retirar publicação
+                          {t('Retirar publicação')}
                         </Button>
                       </div>
                     )}
                     <p className="quiet-note">
-                      Quem tiver o endereço pode consultar o perfil publicado
-                      enquanto o plano estiver activo. Pode retirar a publicação
-                      a qualquer momento. O perfil não é indexado em motores de pesquisa.
+                      {t(
+                        'Quem tiver o endereço pode consultar o perfil publicado enquanto o plano estiver activo. Pode retirar a publicação a qualquer momento. O perfil não é indexado em motores de pesquisa.',
+                      )}
                     </p>
                   </section>
                   <aside className="profile-preview-column">
                     <span className="preview-label">
-                      O SEU PERFIL · PRÉ-VISUALIZAÇÃO
+                      {t('O SEU PERFIL · PRÉ-VISUALIZAÇÃO')}
                     </span>
                     <IPhonePreview>
                       <MobileProfile
@@ -896,17 +916,23 @@ export function Workspace({ displayName }: { displayName: string }) {
                     <div>
                       <h2>
                         {tab === 'orders'
-                          ? 'Acompanhe o seu pedido.'
+                          ? t('Acompanhe o seu pedido.')
                           : tab === 'operations'
-                            ? 'Cada pedido, no sítio certo.'
-                            : 'O próximo toque passa por si.'}
+                            ? t('Cada pedido, no sítio certo.')
+                            : t('O próximo toque passa por si.')}
                       </h2>
                       <p className="muted">
                         {tab === 'orders'
-                          ? 'Veja em que etapa está cada pedido e consulte o histórico, do pagamento à entrega.'
+                          ? t(
+                              'Veja em que etapa está cada pedido e consulte o histórico, do pagamento à entrega.',
+                            )
                           : tab === 'operations'
-                            ? 'Atribua um agente e acompanhe os pedidos de teste até à entrega.'
-                            : 'Abra um pedido atribuído, inicie a produção e conclua o controlo de qualidade.'}
+                            ? t(
+                                'Atribua um agente e acompanhe os pedidos de teste até à entrega.',
+                              )
+                            : t(
+                                'Abra um pedido atribuído, inicie a produção e conclua o controlo de qualidade.',
+                              )}
                       </p>
                     </div>
                     {canEditOrders && (
@@ -920,7 +946,8 @@ export function Workspace({ displayName }: { displayName: string }) {
                           )
                         }
                       >
-                        <Plus /> Novo pedido de teste
+                        <Plus />
+                        {t(' Novo pedido de teste')}
                       </Button>
                     )}
                   </div>
@@ -929,14 +956,14 @@ export function Workspace({ displayName }: { displayName: string }) {
                       htmlFor="field-componentsworkspacetsx-0"
                       className="field"
                     >
-                      Local de entrega obrigatório
+                      {t('Local de entrega obrigatório')}
                       <Input
                         id="field-componentsworkspacetsx-0"
                         value={orderCity}
                         minLength={2}
                         maxLength={90}
                         required
-                        placeholder="Ex.: Maputo ou Beira"
+                        placeholder={t('Ex.: Maputo ou Beira')}
                         onChange={(e) => {
                           setOrderCity(e.target.value);
                           pendingCreate.current = null;
@@ -947,7 +974,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                   {canEditOrders && (
                     <fieldset
                       className="product-choice"
-                      aria-label="Produto para o novo pedido"
+                      aria-label={t('Produto para o novo pedido')}
                     >
                       {products
                         .filter((p) => p.available)
@@ -965,7 +992,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                               pendingCreate.current = null;
                             }}
                           >
-                            {p.name}
+                            {t(p.name)}
                           </Button>
                         ))}
                     </fieldset>
@@ -985,31 +1012,31 @@ export function Workspace({ displayName }: { displayName: string }) {
                 <>
                   <div className="metric-grid">
                     <Metric
-                      label="Capturas simuladas"
-                      value={money(stats.captures)}
+                      label={t('Capturas simuladas')}
+                      value={money(stats.captures, t.locale)}
                       note="Pagamentos confirmados no teste"
                     />
                     <Metric
-                      label="Receita reconhecida"
-                      value={money(stats.revenue)}
+                      label={t('Receita reconhecida')}
+                      value={money(stats.revenue, t.locale)}
                       note="Apenas entregas simuladas"
                     />
                     <Metric
-                      label="Resultado bruto"
-                      value={money(stats.grossProfit)}
+                      label={t('Resultado bruto')}
+                      value={money(stats.grossProfit, t.locale)}
                       note="Receita menos custo dos produtos"
                     />
                     <Metric
-                      label="Adiantamentos"
-                      value={money(stats.advances)}
+                      label={t('Adiantamentos')}
+                      value={money(stats.advances, t.locale)}
                       note="Recebido, ainda não reconhecido"
                     />
                   </div>
                   <div className="workspace-split">
                     <article className="panel">
-                      <h2>Do pagamento à entrega</h2>
+                      <h2>{t('Do pagamento à entrega')}</h2>
                       <p className="muted">
-                        Distribuição dos pedidos de teste por etapa.
+                        {t('Distribuição dos pedidos de teste por etapa.')}
                       </p>
                       <div className="bar-chart">
                         {Object.entries(orderLabels).map(([state, label]) => {
@@ -1018,7 +1045,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                           ).length;
                           return (
                             <div key={state}>
-                              <span>{label}</span>
+                              <span>{t(label)}</span>
                               <div>
                                 <i
                                   style={{
@@ -1033,40 +1060,42 @@ export function Workspace({ displayName }: { displayName: string }) {
                       </div>
                     </article>
                     <article className="panel">
-                      <h2>Conciliação de teste</h2>
+                      <h2>{t('Conciliação de teste')}</h2>
                       <dl className="totals">
                         <div>
-                          <dt>Capturas</dt>
-                          <dd>{money(stats.captures)}</dd>
+                          <dt>{t('Capturas')}</dt>
+                          <dd>{money(stats.captures, t.locale)}</dd>
                         </div>
                         <div>
-                          <dt>Reembolsos</dt>
-                          <dd>{money(stats.refunds)}</dd>
+                          <dt>{t('Reembolsos')}</dt>
+                          <dd>{money(stats.refunds, t.locale)}</dd>
                         </div>
                         <div>
-                          <dt>Saldo no prestador</dt>
-                          <dd>{money(stats.providerBalance)}</dd>
+                          <dt>{t('Saldo no prestador')}</dt>
+                          <dd>{money(stats.providerBalance, t.locale)}</dd>
                         </div>
                         <div>
-                          <dt>Custo reconhecido</dt>
-                          <dd>{money(stats.costs)}</dd>
+                          <dt>{t('Custo reconhecido')}</dt>
+                          <dd>{money(stats.costs, t.locale)}</dd>
                         </div>
                       </dl>
                       <p className="quiet-note">
-                        Sem taxas, impostos ou liquidações bancárias. Estes
-                        resultados não são demonstrações financeiras oficiais.
+                        {t(
+                          'Sem taxas, impostos ou liquidações bancárias. Estes resultados não são demonstrações financeiras oficiais.',
+                        )}
                       </p>
                       <Button
                         variant="outline"
                         className="control-btn"
                         onClick={exportCsv}
                       >
-                        <Download size={17} /> Exportar pedidos CSV
+                        <Download size={17} />
+                        {t(' Exportar pedidos CSV')}
                       </Button>
                     </article>
                   </div>
                   <section className="panel audit-panel">
-                    <h2>Histórico de operações</h2>
+                    <h2>{t('Histórico de operações')}</h2>
                     {data.events.length ? (
                       data.events.slice(0, 12).map((e) => (
                         <div className="audit-row" key={e.id}>
@@ -1092,7 +1121,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                       ))
                     ) : (
                       <p className="muted">
-                        As operações de teste aparecerão aqui.
+                        {t('As operações de teste aparecerão aqui.')}
                       </p>
                     )}
                   </section>
@@ -1111,16 +1140,17 @@ export function Workspace({ displayName }: { displayName: string }) {
         <DialogContent className="order-dialog">
           <DialogTitle>{selected?.productName}</DialogTitle>
           <DialogDescription>
-            Pedido de teste #{selected?.id.slice(0, 8).toUpperCase()} · Nenhuma
-            cobrança ou entrega real.
+            {t('Pedido de teste #')}
+            {selected?.id.slice(0, 8).toUpperCase()}
+            {t(' · Nenhuma cobrança ou entrega real.')}
           </DialogDescription>
           {selected && (
             <>
               <div className="dialog-status">
                 <span className="status-badge">
-                  {orderLabels[selected.status]}
+                  {t(orderLabels[selected.status])}
                 </span>
-                <strong>{money(selected.amount)}</strong>
+                <strong>{money(selected.amount, t.locale)}</strong>
               </div>
               <p>{payment(selected)}</p>
               <OrderPayment orderId={selected.id} />
@@ -1135,21 +1165,23 @@ export function Workspace({ displayName }: { displayName: string }) {
                 }}
               />
               <p className="muted">
-                Agente: {selected.agent || 'Por atribuir'} · Controlo de
-                qualidade: {selected.qc ? 'Concluído' : 'Pendente'}
+                {t('Agente: ')}
+                {selected.agent || t('Por atribuir')}
+                {t(' · Controlo de qualidade: ')}
+                {selected.qc ? t('Concluído') : t('Pendente')}
               </p>
               <p className="muted">
-                Última actualização:{' '}
-                {new Date(selected.updatedAt).toLocaleString('pt-PT')}
+                {t('Última actualização:')}{' '}
+                {new Date(selected.updatedAt).toLocaleString(t.locale)}
               </p>
               {error && (
                 <p role="alert" className="message">
-                  {error}
+                  {t(error)}
                 </p>
               )}
               <OrderProgressLine order={selected} />
-              <section aria-label="Histórico do pedido">
-                <h3>Histórico do pedido</h3>
+              <section aria-label={t('Histórico do pedido')}>
+                <h3>{t('Histórico do pedido')}</h3>
                 <ol>
                   {(data?.events ?? [])
                     .filter((e) => e.orderId === selected.id)
@@ -1158,7 +1190,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                     .map((e) => (
                       <li key={e.id}>
                         <time dateTime={e.createdAt}>
-                          {new Date(e.createdAt).toLocaleString('pt-PT')}
+                          {new Date(e.createdAt).toLocaleString(t.locale)}
                         </time>{' '}
                         —{' '}
                         {(
@@ -1185,19 +1217,19 @@ export function Workspace({ displayName }: { displayName: string }) {
                   className="control-btn"
                   onClick={() => action(selected, 'pay')}
                 >
-                  Simular pagamento confirmado
+                  {t('Simular pagamento confirmado')}
                 </Button>
               )}
               {canEditOrders && selected.status === 'QUEUED' && (
                 <>
                   <label className="field" htmlFor="agent-name">
-                    Agente de teste
+                    {t('Agente de teste')}
                     <Input
                       id="agent-name"
                       value={agent}
                       maxLength={90}
                       onChange={(e) => setAgent(e.target.value)}
-                      placeholder="Nome do agente"
+                      placeholder={t('Nome do agente')}
                     />
                   </label>
                   <Button
@@ -1206,20 +1238,20 @@ export function Workspace({ displayName }: { displayName: string }) {
                     className="control-btn"
                     onClick={() => action(selected, 'assign', { agent })}
                   >
-                    Guardar atribuição
+                    {t('Guardar atribuição')}
                   </Button>
                   <Button
                     disabled={busy || !selected.agent}
                     className="control-btn"
                     onClick={() => action(selected, 'start')}
                   >
-                    Iniciar produção
+                    {t('Iniciar produção')}
                   </Button>
                 </>
               )}
               {canEditOrders && selected.status === 'IN_PRODUCTION' && (
                 <>
-                  <h3>Controlo de qualidade</h3>
+                  <h3>{t('Controlo de qualidade')}</h3>
                   {[
                     'NFC detectado e programado',
                     'Link abre a identidade correcta',
@@ -1236,7 +1268,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                           )
                         }
                       />
-                      {label}
+                      {t(label)}
                     </label>
                   ))}
                   <Button
@@ -1246,20 +1278,20 @@ export function Workspace({ displayName }: { displayName: string }) {
                       action(selected, 'ready', { qc: checks.every(Boolean) })
                     }
                   >
-                    Confirmar QC e marcar pronto
+                    {t('Confirmar QC e marcar pronto')}
                   </Button>
                 </>
               )}
               {canEditOrders && selected.status === 'READY' && (
                 <>
                   <label className="field" htmlFor="delivery-proof">
-                    Evidência de entrega de teste
+                    {t('Evidência de entrega de teste')}
                     <Input
                       id="delivery-proof"
                       maxLength={250}
                       value={proof}
                       onChange={(e) => setProof(e.target.value)}
-                      placeholder="Ex.: confirmação de recolha DEMO-001"
+                      placeholder={t('Ex.: confirmação de recolha DEMO-001')}
                     />
                   </label>
                   <Button
@@ -1267,13 +1299,14 @@ export function Workspace({ displayName }: { displayName: string }) {
                     className="control-btn"
                     onClick={() => action(selected, 'deliver', { proof })}
                   >
-                    Confirmar entrega simulada
+                    {t('Confirmar entrega simulada')}
                   </Button>
                 </>
               )}
               {selected.status === 'DELIVERED' && (
                 <p className="message">
-                  <Check size={18} /> Entrega de teste concluída. Evidência:{' '}
+                  <Check size={18} />
+                  {t(' Entrega de teste concluída. Evidência:')}{' '}
                   {selected.proof}
                 </p>
               )}
@@ -1285,7 +1318,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                     className="control-btn"
                     onClick={() => action(selected, 'cancel')}
                   >
-                    Cancelar pedido de teste
+                    {t('Cancelar pedido de teste')}
                   </Button>
                 )}
               {canEditOrders &&
@@ -1297,7 +1330,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                     disabled={busy}
                     onClick={() => action(selected, 'refund')}
                   >
-                    Simular reembolso integral
+                    {t('Simular reembolso integral')}
                   </Button>
                 )}
             </>
@@ -1316,11 +1349,12 @@ function Metric({
   value: string;
   note: string;
 }) {
+  const { t } = useI18n();
   return (
     <article className="metric">
-      <span>{label}</span>
+      <span>{t(label)}</span>
       <strong>{value}</strong>
-      <small>{note}</small>
+      <small>{t(note)}</small>
     </article>
   );
 }

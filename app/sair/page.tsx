@@ -1,7 +1,10 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { clearPrivateDeviceData } from '@/lib/client-privacy';
 import { useEffect, useState } from 'react';
 export default function Page() {
+  const { t } = useI18n();
   const [error, setError] = useState(false);
   useEffect(() => {
     fetch('/api/auth', {
@@ -24,10 +27,10 @@ export default function Page() {
     <main style={{ padding: 40 }}>
       {error ? (
         <button onClick={() => location.reload()}>
-          Tentar terminar sessão novamente
+          {t('Tentar terminar sessão novamente')}
         </button>
       ) : (
-        'A terminar sessão…'
+        t('A terminar sessão…')
       )}
     </main>
   );

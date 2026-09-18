@@ -1,4 +1,5 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 
 import * as React from 'react';
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
@@ -46,6 +47,7 @@ function SheetContent({
   side?: 'top' | 'right' | 'bottom' | 'left';
   showCloseButton?: boolean;
 }) {
+  const { t } = useI18n();
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -71,7 +73,7 @@ function SheetContent({
             }
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{t('Fechar')}</span>
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Popup>

@@ -1,22 +1,27 @@
 'use client';
+import { useI18n, LanguageSelector } from '@/components/language-provider';
+
 import { useState } from 'react';
 import Link from '@/components/hard-link';
 import '../entrar/style.css';
 export default function Page() {
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
     [done, setDone] = useState(false);
   return (
     <main id="main" className="auth-page">
       <section className="auth-card">
-        <h1>Activar o meu acesso</h1>
+        <LanguageSelector />
+        <h1>{t('Activar o meu acesso')}</h1>
         {done ? (
           <>
             <p>
-              Conta activada. Já pode iniciar sessão com o seu email e a nova
-              palavra-passe.
+              {t(
+                'Conta activada. Já pode iniciar sessão com o seu email e a nova palavra-passe.',
+              )}
             </p>
-            <Link href="/entrar">Iniciar sessão</Link>
+            <Link href="/entrar">{t('Iniciar sessão')}</Link>
           </>
         ) : (
           <form
@@ -49,11 +54,12 @@ export default function Page() {
             }}
           >
             <p>
-              Defina a sua palavra-passe. O convite é pessoal, válido por 24
-              horas e só pode ser usado uma vez.
+              {t(
+                'Defina a sua palavra-passe. O convite é pessoal, válido por 24 horas e só pode ser usado uma vez.',
+              )}
             </p>
             <label>
-              Nova palavra-passe
+              {t('Nova palavra-passe')}
               <input
                 name="password"
                 type="password"
@@ -64,7 +70,7 @@ export default function Page() {
               />
             </label>
             <label>
-              Repetir palavra-passe
+              {t('Repetir palavra-passe')}
               <input
                 name="confirm"
                 type="password"
@@ -74,9 +80,9 @@ export default function Page() {
                 autoComplete="new-password"
               />
             </label>
-            {error && <p role="alert">{error}</p>}
+            {error && <p role="alert">{t(error)}</p>}
             <button disabled={busy}>
-              {busy ? 'A activar…' : 'Activar conta'}
+              {busy ? t('A activar…') : t('Activar conta')}
             </button>
           </form>
         )}

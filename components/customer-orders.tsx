@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
 import Link from '@/components/hard-link';
 import { Check, Package, MapPin, ArrowUpRight } from 'lucide-react';
@@ -37,17 +39,18 @@ const eventNames: Record<string, string> = {
   refund: 'Pagamento reembolsado',
 };
 export function OrderProgressLine({ order }: { order: SandboxOrder }) {
+  const { t } = useI18n();
   const current = stages.findIndex(([s]) => s === order.status);
   if (current < 0)
     return (
       <p className="tracking-exception">
         {order.status === 'CANCELLED'
-          ? 'Pedido cancelado — percurso interrompido.'
-          : 'Estado em actualização.'}
+          ? t('Pedido cancelado — percurso interrompido.')
+          : t('Estado em actualização.')}
       </p>
     );
   return (
-    <ol className="tracking-progress" aria-label="Etapas do pedido">
+    <ol className="tracking-progress" aria-label={t('Etapas do pedido')}>
       {stages.map(([state, label], i) => {
         const complete = i < current || order.status === 'DELIVERED';
         return (
@@ -62,13 +65,13 @@ export function OrderProgressLine({ order }: { order: SandboxOrder }) {
               {complete ? <Check size={17} aria-hidden="true" /> : i + 1}
             </span>
             <span>
-              {label}
+              {t(label)}
               <small>
                 {complete
-                  ? 'Concluído'
+                  ? t('Concluído')
                   : i === current
-                    ? 'Estado actual'
-                    : 'Próxima etapa'}
+                    ? t('Estado actual')
+                    : t('Próxima etapa')}
               </small>
             </span>
           </li>
@@ -86,14 +89,15 @@ export function CustomerOrders({
   events: Event[];
   onOpen: (order: SandboxOrder) => void;
 }) {
+  const { t } = useI18n();
   if (!orders.length)
     return (
       <section className="panel tracking-empty">
         <Package size={36} />
-        <h2>O seu próximo toque começa aqui.</h2>
-        <p>Depois de submeter o pedido, acompanhe aqui cada etapa.</p>
+        <h2>{t('O seu próximo toque começa aqui.')}</h2>
+        <p>{t('Depois de submeter o pedido, acompanhe aqui cada etapa.')}</p>
         <Link className="btn btn-primary" href="/produtos">
-          Escolher o meu produto
+          {t('Escolher o meu produto')}
         </Link>
       </section>
     );
@@ -107,7 +111,7 @@ export function CustomerOrders({
           <article
             className="tracking-card"
             key={order.id}
-            aria-label={`Pedido ${order.id.slice(0, 8)}`}
+            aria-label={t('Pedido {0}', [order.id.slice(0, 8)])}
           >
             <header>
               <div className="tracking-product">
@@ -115,45 +119,52 @@ export function CustomerOrders({
                   <Package size={26} />
                 </span>
                 <div>
-                  <p>Pedido #{order.id.slice(0, 8).toUpperCase()}</p>
-                  <h2>{order.productName}</h2>
+                  <p>
+                    {t('Pedido #')}
+                    {order.id.slice(0, 8).toUpperCase()}
+                  </p>
+                  <h2>{t(order.productName)}</h2>
                 </div>
               </div>
               <span
                 className={`tracking-status ${order.status === 'DELIVERED' ? 'delivered' : order.status === 'CANCELLED' ? 'cancelled' : ''}`}
               >
-                {orderLabels[order.status] ?? 'Em actualização'}
+                {t(orderLabels[order.status] ?? 'Em actualização')}
               </span>
             </header>
             <p className="tracking-message">
-              {descriptions[order.status] ??
-                'Consulte os detalhes para mais informações.'}
+              {t(
+                descriptions[order.status] ??
+                  'Consulte os detalhes para mais informações.',
+              )}
             </p>
             <OrderProgressLine order={order} />
             <div className="tracking-information">
               <div>
                 <MapPin size={18} aria-hidden="true" />
                 <span>
-                  Local de entrega
-                  <strong>{order.deliveryCity || 'Ainda não indicado'}</strong>
+                  {t('Local de entrega')}
+                  <strong>
+                    {order.deliveryCity || t('Ainda não indicado')}
+                  </strong>
                 </span>
               </div>
               <div>
                 <span>
-                  Submetido em
+                  {t('Submetido em')}
                   <strong>
                     <time dateTime={order.createdAt}>
-                      {submissionTime(order.createdAt)}
+                      {submissionTime(order.createdAt, t.locale)}
                     </time>
                   </strong>
                 </span>
               </div>
               <div>
                 <span>
-                  Última actualização
+                  {t('Última actualização')}
                   <strong>
                     <time dateTime={order.updatedAt}>
-                      {submissionTime(order.updatedAt)}
+                      {submissionTime(order.updatedAt, t.locale)}
                     </time>
                   </strong>
                 </span>
@@ -161,32 +172,34 @@ export function CustomerOrders({
             </div>
             <footer>
               <p>
-                {money(order.amount)}{' '}
+                {money(order.amount, t.locale)}{' '}
                 <span>
                   ·{' '}
                   {order.refunded
-                    ? 'Reembolsado (simulado)'
+                    ? t('Reembolsado (simulado)')
                     : order.paid
-                      ? 'Pagamento confirmado (simulado)'
-                      : 'Pagamento pendente'}{' '}
-                  · Horas de Maputo
+                      ? t('Pagamento confirmado (simulado)')
+                      : t('Pagamento pendente')}{' '}
+                  {t('· Horas de Maputo')}
                 </span>
               </p>
               <button
                 className="btn"
                 onClick={() => onOpen(order)}
-                aria-label={`Ver detalhes do pedido ${order.id.slice(0, 8)}`}
+                aria-label={t('Ver detalhes do pedido {0}', [
+                  order.id.slice(0, 8),
+                ])}
               >
                 {!order.deliveryCity &&
                 !['CANCELLED', 'DELIVERED'].includes(order.status)
-                  ? 'Indicar local de entrega'
-                  : 'Ver detalhes'}
+                  ? t('Indicar local de entrega')
+                  : t('Ver detalhes')}
                 <ArrowUpRight size={17} />
               </button>
             </footer>
             <details className="tracking-history">
               <summary>
-                Histórico do pedido{' '}
+                {t('Histórico do pedido')}{' '}
                 {history.length > 0 && `(${history.length})`}
               </summary>
               {history.length ? (
@@ -196,17 +209,17 @@ export function CustomerOrders({
                       <span className="history-dot" aria-hidden="true" />
                       <div>
                         <strong>
-                          {eventNames[e.action] ?? 'Pedido actualizado'}
+                          {t(eventNames[e.action] ?? 'Pedido actualizado')}
                         </strong>
                         <time dateTime={e.createdAt}>
-                          {submissionTime(e.createdAt)}
+                          {submissionTime(e.createdAt, t.locale)}
                         </time>
                       </div>
                     </li>
                   ))}
                 </ol>
               ) : (
-                <p>Sem actualizações registadas.</p>
+                <p>{t('Sem actualizações registadas.')}</p>
               )}
             </details>
           </article>

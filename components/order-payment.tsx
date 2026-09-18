@@ -1,7 +1,10 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
+
 import { useEffect, useState } from 'react';
 import { money } from '@/lib/catalog';
 export function OrderPayment({ orderId }: { orderId: string }) {
+  const { t } = useI18n();
   const [data, setData] = useState<{
       url: string | null;
       amount: number;
@@ -28,15 +31,18 @@ export function OrderPayment({ orderId }: { orderId: string }) {
       });
     return () => controller.abort();
   }, [orderId]);
-  if (error) return <p role="alert">{error}</p>;
-  if (!data) return <p>A consultar o pagamento…</p>;
-  if (data.paid) return <p>Pagamento registado pela equipa.</p>;
+  if (error) return <p role="alert">{t(error)}</p>;
+  if (!data) return <p>{t('A consultar o pagamento…')}</p>;
+  if (data.paid) return <p>{t('Pagamento registado pela equipa.')}</p>;
   if (data.status !== 'PENDING_PAYMENT')
-    return <p>Este pedido já não aguarda pagamento.</p>;
+    return <p>{t('Este pedido já não aguarda pagamento.')}</p>;
   return (
     <section>
-      <h3>Pagamento do produto</h3>
-      <p>Referência da encomenda: {orderId}</p>
+      <h3>{t('Pagamento do produto')}</h3>
+      <p>
+        {t('Referência da encomenda: ')}
+        {orderId}
+      </p>
       {data.url ? (
         <>
           <a
@@ -45,28 +51,32 @@ export function OrderPayment({ orderId }: { orderId: string }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Pagar {money(data.amount)} na Opsellio
+            {t('Pagar ')}
+            {money(data.amount, t.locale)}
+            {t(' na Opsellio')}
           </a>
           <p>
-            Guarde a referência da transacção e indique-a à equipa juntamente
-            com a referência da encomenda. A equipa confirma o pagamento no
-            prestador antes de iniciar a produção.
+            {t(
+              'Guarde a referência da transacção e indique-a à equipa juntamente com a referência da encomenda. A equipa confirma o pagamento no prestador antes de iniciar a produção.',
+            )}
           </p>
         </>
       ) : (
         <p>
-          O pagamento online deste produto ainda não está configurado. Contacte
-          a equipa antes de pagar.
+          {t(
+            'O pagamento online deste produto ainda não está configurado. Contacte a equipa antes de pagar.',
+          )}
         </p>
       )}
       {data.expiresAt && (
         <p>
-          Reserva válida até{' '}
-          {new Date(data.expiresAt).toLocaleString('pt-MZ', {
+          {t('Reserva válida até')}{' '}
+          {new Date(data.expiresAt).toLocaleString(t.locale, {
             timeZone: 'Africa/Maputo',
           })}{' '}
-          (Maputo). Depois deste prazo, confirme a disponibilidade com a equipa
-          antes de pagar.
+          {t(
+            '(Maputo). Depois deste prazo, confirme a disponibilidade com a equipa antes de pagar.',
+          )}
         </p>
       )}
       <a
@@ -75,7 +85,7 @@ export function OrderPayment({ orderId }: { orderId: string }) {
           encodeURIComponent('Pagamento da encomenda ' + orderId)
         }
       >
-        Contactar a equipa
+        {t('Contactar a equipa')}
       </a>
     </section>
   );

@@ -24,8 +24,8 @@ export function orderProgress(
     elapsed,
   };
 }
-export const submissionTime = (value: string) =>
-  new Date(value).toLocaleString('pt-PT', {
+export const submissionTime = (value: string, locale = 'pt-MZ') =>
+  new Date(value).toLocaleString(locale, {
     timeZone: 'Africa/Maputo',
     dateStyle: 'short',
     timeStyle: 'short',
