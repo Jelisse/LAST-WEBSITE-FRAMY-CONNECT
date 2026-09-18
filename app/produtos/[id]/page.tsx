@@ -1,4 +1,5 @@
 import { ProductGallery } from '@/components/product-gallery';
+import { publicPageRobots } from '@/lib/server-site';
 import { notFound } from 'next/navigation';
 import Link from '@/components/hard-link';
 import { ArrowUpRight, Check, ChevronLeft } from 'lucide-react';
@@ -14,6 +15,7 @@ export async function generateMetadata({
 }) {
   const { id } = await params;
   return {
+    robots: publicPageRobots(),
     title:
       (await getProducts()).find((p) => p.id === id && p.published !== false)
         ?.name ?? 'Produto',

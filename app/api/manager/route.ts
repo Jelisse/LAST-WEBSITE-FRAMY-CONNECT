@@ -1,4 +1,5 @@
 import { publicError } from '@/lib/public-error';
+import { serviceFailure } from '@/lib/service-failure';
 import { expireReservations } from '@/lib/server-reservations';
 import { validatePaymentEvidence } from '@/lib/payment-policy';
 import { agentTransition } from '@/lib/agent-workflow';
@@ -68,8 +69,8 @@ export async function GET() {
       products,
       plans,
     });
-  } catch {
-    return json({ error: 'Não foi possível carregar o Manager.' }, 503);
+  } catch (error) {
+    return serviceFailure(error, 'manager', 'Não foi possível carregar a gestão. Tente novamente.');
   }
 }
 const allReservedSQL =

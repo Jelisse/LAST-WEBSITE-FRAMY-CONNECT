@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { siteURL } from '@/lib/server-site';
 import { Poppins } from 'next/font/google';
 import './globals.css';
 import './footer.css';
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
   },
   description:
     'A sua identidade, as suas ligações e o seu trabalho. Descubra os produtos NFC da Framy Connect, feitos para conectar Moçambique.',
-  metadataBase: new URL('https://framy-connect.codex5729.chatgpt.site'),
+  metadataBase: siteURL() ?? undefined,
   robots: { index: false, follow: false },
 };
 export default function RootLayout({

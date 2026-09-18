@@ -415,7 +415,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
             <section className="manager-card">
               <p>
                 {error
-                  ? 'O Gestor requer uma conta autorizada.'
+                  ? 'Não foi possível carregar a gestão. Consulte a mensagem acima e tente actualizar.'
                   : 'A carregar o seu espaço de gestão…'}
               </p>
             </section>

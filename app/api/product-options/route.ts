@@ -1,4 +1,5 @@
 import { expireReservations } from '@/lib/server-reservations';
+import { serviceFailure } from '@/lib/service-failure';
 import { database } from '@/lib/server-db';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { canManageCatalog } from '@/lib/server-catalog';
@@ -15,8 +16,8 @@ export async function GET() {
           .all()
       ).results,
     });
-  } catch {
-    return json({ error: 'Stock indisponível. Tente novamente.' }, 503);
+  } catch (error) {
+    return serviceFailure(error, 'product-options', 'Stock indisponível. Tente novamente.');
   }
 }
 export async function PUT(request: Request) {

@@ -1,8 +1,9 @@
 import { getProducts } from '@/lib/server-catalog';
+import { publicPageRobots } from '@/lib/server-site';
 import { publicProduct } from '@/lib/catalog';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { Catalog } from '@/components/catalog';
-export const metadata = { title: 'Produtos' };
+export const metadata = { title: 'Produtos', robots: publicPageRobots() };
 export const dynamic = 'force-dynamic';
 export default async function Page() {
   const products = (await getProducts())

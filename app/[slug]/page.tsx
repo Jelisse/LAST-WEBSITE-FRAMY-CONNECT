@@ -1,4 +1,5 @@
 import { activeProfileSQL } from '@/lib/entitlement';
+import { publicPageRobots } from '@/lib/server-site';
 import { notFound } from 'next/navigation';
 import Link from '@/components/hard-link';
 import { Mail, ArrowUpRight } from 'lucide-react';
@@ -152,7 +153,7 @@ export async function generateMetadata({
   const { slug } = await params;
   return {
     title: pages[slug]?.title ?? 'Identidade digital',
-    robots: { index: false, follow: false },
+    robots: pages[slug] ? publicPageRobots() : { index: false, follow: false },
   };
 }
 export default async function Page({

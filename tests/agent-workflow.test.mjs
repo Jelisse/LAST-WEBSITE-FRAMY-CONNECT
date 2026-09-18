@@ -190,6 +190,7 @@ const dataModule = (code) =>
   'data:text/javascript;base64,' + Buffer.from(code).toString('base64');
 async function route(file) {
   const dependencies = {
+    '@/lib/service-failure': new URL('../lib/service-failure.ts', import.meta.url).href,
     '@/lib/server-reservations': dataModule(
       'export async function expireReservations(){}',
     ),

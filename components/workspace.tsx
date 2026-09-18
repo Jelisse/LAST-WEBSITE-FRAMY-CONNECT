@@ -562,7 +562,7 @@ export function Workspace({ displayName }: { displayName: string }) {
             <span>{initials(displayName)}</span>
             <div>
               <strong>{displayName}</strong>
-              <small>Prévia de desenvolvimento</small>
+              <small>A sua conta Framy Connect</small>
             </div>
           </div>
           <a className="signout" href={signOutHref} target="_top">
@@ -851,8 +851,9 @@ export function Workspace({ displayName }: { displayName: string }) {
                       </div>
                     )}
                     <p className="quiet-note">
-                      A publicação fica acessível apenas dentro desta prévia
-                      privada. Não é enviada para motores de pesquisa.
+                      Quem tiver o endereço pode consultar o perfil publicado
+                      enquanto o plano estiver activo. Pode retirar a publicação
+                      a qualquer momento. O perfil não é indexado em motores de pesquisa.
                     </p>
                   </section>
                   <aside className="profile-preview-column">

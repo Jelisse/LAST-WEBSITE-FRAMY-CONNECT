@@ -15,6 +15,20 @@ This deployment is separate from Sites hosting. A GitHub push or Sites publish d
 
 `npm run build:cloudflare` remains available for build-only use. Local preview uses separate resources.
 
+## Repairing a schema mismatch
+
+After Cloudflare sign-in, run `npm run repair:cloudflare-db` for a read-only migration plan. It compares tables, columns, indexes and triggers against the actual migration sequence. It stops on partial or non-additive migrations and never blindly replays historical price changes.
+
+Review the plan, then run `npm run repair:cloudflare-db -- --apply`. The command targets only the configured staging D1 ID, exports a private backup into ignored `tmp/private-backups/`, applies only the compatible missing migrations and runs the deployment check. It stops if the backup fails. If a migration fails after others succeeded, inspect the cause and rerun the planner; never reset the database. Historical migration 0008 is deliberately not replayed, to preserve manager-edited PVC pricing. The guarded Maputo inventory migration is applied only when its audit marker is missing.
+
+The API now returns a random error reference and writes a corresponding structured error category to Worker logs, without exposing SQL, private records or secrets. A `schema-missing` category should be investigated with the migration planner; do not treat every 503 as proof of a missing migration.
+
+## Permanent domain
+
+After configuring and verifying the real custom domain in Cloudflare, set the non-secret Worker variable `PUBLIC_SITE_URL` to its HTTPS origin (for example `https://shop.example.com`, using the actual business domain instead). The application no longer hardcodes the separate Sites preview as its metadata base. Only public marketing/catalogue pages become indexable when a valid permanent origin is configured; customer profiles and account pages retain noindex. Staging remains blocked from indexing. The sitemap contains public pages only.
+
+Domain configuration does not migrate NFC links already programmed with a staging address. Verify the permanent profile URL on a physical unit before selling it.
+
 ## Customer data and stock failures
 
 On 19 September 2026 staging options returned HTTP 503; anonymous workspace requests correctly returned HTTP 401. Cloudflare authentication was unavailable, so the remote schema and authenticated customer error remain unverified. Missing migration 0007 is one possible cause: it provides product_options and membership trial columns used by these screens. Check before applying it. Later security and application migrations are also required.

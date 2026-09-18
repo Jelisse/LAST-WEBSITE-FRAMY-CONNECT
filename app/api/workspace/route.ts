@@ -1,4 +1,5 @@
 import { customerOrder } from '@/lib/customer-order';
+import { serviceFailure } from '@/lib/service-failure';
 import { hasActiveTrial } from '@/lib/entitlement';
 import {
   expireReservations,
@@ -31,9 +32,9 @@ export const dynamic = 'force-dynamic';
 const json = (data: unknown, status = 200) =>
   Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
 export async function GET() {
-  const user = await getChatGPTUser();
-  if (!user) return json({ error: 'Inicie sessão para continuar.' }, 401);
   try {
+    const user = await getChatGPTUser();
+    if (!user) return json({ error: 'Inicie sessão para continuar.' }, 401);
     await expireReservations();
     const db = database();
     const [p, orders, events, membership] = await Promise.all([
@@ -95,11 +96,8 @@ export async function GET() {
       orders: orders.results.map((o) => customerOrder(JSON.parse(o.data_json))),
       events: events.results,
     });
-  } catch {
-    return json(
-      { error: 'Não foi possível carregar os dados. Tente novamente.' },
-      503,
-    );
+  } catch (error) {
+    return serviceFailure(error, 'workspace', 'Não foi possível carregar os dados. Tente novamente.');
   }
 }
 export async function POST(request: Request) {

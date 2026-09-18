@@ -12,6 +12,7 @@
     "build": "node scripts/build-sites.mjs",
     "build:cloudflare": "node scripts/build-cloudflare.mjs",
     "check:cloudflare-db": "node scripts/check-cloudflare-db.mjs",
+    "repair:cloudflare-db": "node scripts/repair-cloudflare-db.mjs",
     "deploy:cloudflare": "node scripts/deploy-cloudflare.mjs",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",

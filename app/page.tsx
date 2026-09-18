@@ -1,4 +1,5 @@
 import { planMeticais, planPrice } from '@/lib/plan-pricing';
+import { publicPageRobots } from '@/lib/server-site';
 import { SourceImage } from '@/components/source-image';
 import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
@@ -66,7 +67,7 @@ const questions = [
   ],
   [
     'O produto inclui uma subscrição?',
-    'Os produtos físicos e os planos digitais são apresentados separadamente. A inclusão de um plano na compra e as condições comerciais serão confirmadas antes do lançamento.',
+    'O produto físico é pago separadamente do perfil digital. Pode experimentar o perfil durante 30 dias, sem renovação automática. Consulte as condições do plano antes de comprar.',
   ],
   [
     'Como indico o local de entrega?',
@@ -78,6 +79,7 @@ const questions = [
   ],
 ];
 export const dynamic = 'force-dynamic';
+export const metadata = { robots: publicPageRobots() };
 export default async function Home() {
   const [products, allPlans] = await Promise.all([
     getProducts(),
@@ -230,8 +232,8 @@ export default async function Home() {
             </div>
           </div>
           <p className="home-disclosure">
-            Planos de demonstração, sem cobrança nesta prévia. Produto físico e
-            subscrição apresentados separadamente.
+            Comece com 30 dias gratuitos, sem renovação automática. Os planos
+            mensais ainda não aceitam adesões. O produto físico é pago separadamente.
           </p>
           <div className="home-plans-grid">
             {plans.map((p) => (
