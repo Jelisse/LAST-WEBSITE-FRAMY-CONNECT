@@ -3252,6 +3252,9 @@ summary {
 .purchase-summary {
   position: sticky;
   top: 24px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
 }
 .purchase-profile {
   display: grid;
@@ -3261,7 +3264,16 @@ summary {
 .purchase-profile .iphone-preview {
   width: 100%;
   max-width: 320px;
-  margin: auto;
+  margin: 0 auto;
+  align-self: start;
+}
+@media (min-width: 901px) {
+  .purchase-profile > .iphone-preview {
+    position: sticky;
+    top: 24px;
+    /* Fit the phone and caption within the viewport, including browser zoom. */
+    max-width: min(320px, calc((100dvh - 128px) * 0.46));
+  }
 }
 .purchase-consent {
   display: flex;
@@ -3278,6 +3290,8 @@ summary {
   }
   .purchase-summary {
     position: static;
+    max-height: none;
+    overflow-y: visible;
   }
   .purchase-profile {
     grid-template-columns: 1fr;
