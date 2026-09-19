@@ -27,7 +27,7 @@ export default async function Page({
   if (!product) notFound();
   return (
     <>
-      <SiteHeader />
+      <SiteHeader focused />
       <main id="main" className="order-submission">
         <OrderSubmission
           product={publicProduct(product)}

@@ -4128,3 +4128,30 @@ html[lang='zh-Hant'] h2 {
 }
 
 .public-profile-language { display: flex; justify-content: flex-end; padding: 8px 12px; background: #fff; }
+
+/* Keep task pages focused and give navigation deliberate responsive rows. */
+.site-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 20px;
+  min-height: 88px;
+  padding-block: 16px;
+}
+.site-header > nav { justify-content: center; width: auto; gap: 16px; }
+.site-header .header-actions { margin: 0; width: auto; justify-content: flex-end; gap: 14px; }
+.site-header .header-actions > * { white-space: nowrap; }
+.header-agent-link, .header-contact-link { font-size: 14px; padding: 10px 0; }
+.header-agent-link:hover, .header-contact-link:hover { text-decoration: underline; }
+.site-header-focused { grid-template-columns: auto minmax(0, 1fr); }
+@media (min-width: 761px) and (max-width: 1250px) {
+  .site-header:not(.site-header-focused) { grid-template-columns: auto minmax(0, 1fr); }
+  .site-header:not(.site-header-focused) > nav { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (max-width: 760px) {
+  .site-header { grid-template-columns: minmax(0, 1fr); height: auto; gap: 12px; padding: 16px 5%; }
+  .site-header > .brand { justify-self: center; }
+  .site-header > nav { grid-row: 3; justify-content: center; flex-wrap: wrap; gap: 10px 16px; }
+  .site-header .header-actions { justify-content: center; flex-wrap: wrap; gap: 10px 16px; }
+  .site-header .language-selector select { max-width: 135px; }
+  .site-header-focused { grid-template-columns: minmax(0, 1fr); }
+}

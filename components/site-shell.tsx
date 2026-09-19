@@ -4,10 +4,10 @@ import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
 import Link from '@/components/hard-link';
 import { ArrowUpRight, Mail, ShieldCheck } from 'lucide-react';
-export async function SiteHeader() {
+export async function SiteHeader({ focused = false }: { focused?: boolean }) {
   const t = await getTranslations();
   return (
-    <header className="site-header">
+    <header className={`site-header${focused ? ' site-header-focused' : ''}`}>
       <Link href="/" className="brand">
         <Image
           width={220}
@@ -17,22 +17,19 @@ export async function SiteHeader() {
           alt={t('Framy Connect')}
         />
       </Link>
-      <nav aria-label={t('Navegação principal')}>
+      {!focused && <nav aria-label={t('Navegação principal')}>
         <Link href="/">{t('Página Inicial')}</Link>
         <Link href="/sobre">{t('Sobre nós')}</Link>
         <Link href="/produtos">{t('Produtos')}</Link>
         <Link href="/contacto">{t('Contacto')}</Link>
-      </nav>
+      </nav>}
       <div className="header-actions">
         <LanguageSelector />
-        <Link className="btn btn-outline" href="/aplicar">
+        {!focused && <Link className="header-agent-link" href="/aplicar">
           {t('Tornar-se agente')}
-        </Link>
+        </Link>}
         <AccountMenu />
-        <Link className="btn btn-primary" href="/produtos">
-          {t('Compre agora ')}
-          <ArrowUpRight size={19} />
-        </Link>
+        {focused && <Link className="header-contact-link" href="/contacto">{t('Contacto')}</Link>}
       </div>
     </header>
   );

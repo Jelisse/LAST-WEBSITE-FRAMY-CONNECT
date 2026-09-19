@@ -16,7 +16,7 @@ export default async function Page() {
   const user = await getChatGPTUser();
   return (
     <>
-      <SiteHeader />
+      <SiteHeader focused />
       <main id="main" className="section-wrap application-page">
         <span className="eyebrow">{t('EQUIPA FRAMY')}</span>
         <h1>{t('Tornar-se agente')}</h1>
