@@ -3267,14 +3267,19 @@ summary {
   margin: 0 auto;
   align-self: start;
 }
-@media (min-width: 901px) {
-  .purchase-profile > .iphone-preview {
-    position: sticky;
-    top: 24px;
-    /* Fit the phone and caption within the viewport, including browser zoom. */
-    max-width: min(320px, calc((100dvh - 128px) * 0.46));
-  }
+/* Portal positioning keeps the phone fixed even past the form container. */
+.checkout-preview-slot { min-width: 0; align-self: start; }
+.checkout-fixed-preview {
+  position: fixed;
+  top: 24px;
+  z-index: 20;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 6px;
 }
+.checkout-fixed-preview .iphone-preview { width: 100%; margin: 0; }
+.checkout-fixed-preview .iphone-preview-caption { margin: 12px 0 0; }
 .purchase-consent {
   display: flex;
   align-items: start;
