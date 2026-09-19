@@ -5882,5 +5882,45 @@
   "O plano {0} permite {1} caracteres de biografia. Reduza o texto ou escolha um plano superior.": [
     "The {0} plan allows {1} biography characters. Shorten the text or choose a higher plan.",
     "{0} 方案允許 {1} 個簡介字元。請縮短文字或選擇更高階方案。"
+  ],
+  "Obrigado pela sua encomenda!": [
+    "Thank you for your order!",
+    "感謝您的訂購！"
+  ],
+  "A aguardar confirmação do pagamento": [
+    "Awaiting payment confirmation",
+    "等待付款確認"
+  ],
+  "A equipa irá verificar o pagamento. O regresso da Opsellio não confirma automaticamente a transacção.": [
+    "Our team will verify your payment. Returning from Opsellio does not automatically confirm the transaction.",
+    "我們的團隊將核實付款。從 Opsellio 返回不代表交易已自動確認。"
+  ],
+  "Entre na sua conta para acompanhar a confirmação e o pedido.": [
+    "Sign in to track payment confirmation and your order.",
+    "請登入帳戶查看付款確認及訂單進度。"
+  ],
+  "Não foi possível consultar o pedido. Tente novamente.": [
+    "Unable to load your order. Please try again.",
+    "無法載入訂單。請重試。"
+  ],
+  "Escolha a encomenda que acabou de pagar.": [
+    "Select the order you just paid for.",
+    "請選擇您剛付款的訂單。"
+  ],
+  "Contacto do agente": [
+    "Agent contact",
+    "代理員聯絡方式"
+  ],
+  "O contacto será apresentado quando um agente for atribuído.": [
+    "Contact details will appear when an agent is assigned.",
+    "指派代理員後將顯示聯絡方式。"
+  ],
+  "Contacto ainda não disponível. Contacte a equipa.": [
+    "Contact details are not yet available. Contact our team.",
+    "暫無聯絡方式，請聯絡我們的團隊。"
+  ],
+  "Ligar ao agente": [
+    "Call agent",
+    "致電代理員"
   ]
 }

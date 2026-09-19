@@ -8,6 +8,7 @@ export function dashboardFor(role: AccountRole) {
   }[role];
 }
 export function loginDestination(role: AccountRole, requested: string) {
+  if (role === 'customer' && /^\/pagamento\/retorno(?:\?order=[a-zA-Z0-9-]+)?$/.test(requested)) return requested;
   if (
     role === 'customer' &&
     /^\/encomendar\/[a-z0-9-]+(?:\?[^#]*)?$/.test(requested)

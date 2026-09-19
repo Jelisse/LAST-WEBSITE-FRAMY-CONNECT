@@ -71,6 +71,19 @@ export async function GET() {
           trial_expires_at: string | null;
         }>(),
     ]);
+    const customerOrders = await Promise.all(orders.results.map(async (row) => {
+      const order = JSON.parse(row.data_json) as SandboxOrder;
+      let contact;
+      if (order.agentId && order.paid && order.status !== 'CANCELLED') {
+        const record = await db.prepare("SELECT data_json FROM manager_records WHERE id=? AND kind='agent'")
+          .bind(order.agentId).first<{ data_json: string }>();
+        if (record) {
+          const agent = JSON.parse(record.data_json);
+          if (agent.active) contact = { name: String(agent.name || order.agent), phone: String(agent.phone || '') };
+        }
+      }
+      return customerOrder(order, contact);
+    }));
     return json({
       products: (await getProducts())
         .filter((p) => p.published !== false)
@@ -93,7 +106,7 @@ export async function GET() {
         active: hasActiveTrial(membership),
         expiresAt: membership?.trial_expires_at ?? null,
       },
-      orders: orders.results.map((o) => customerOrder(JSON.parse(o.data_json))),
+      orders: customerOrders,
       events: events.results,
     });
   } catch (error) {

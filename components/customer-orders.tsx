@@ -1,4 +1,5 @@
 'use client';
+import { AgentContact } from '@/components/agent-contact';
 import { useI18n } from '@/components/language-provider';
 
 import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
@@ -139,6 +140,7 @@ export function CustomerOrders({
               )}
             </p>
             <OrderProgressLine order={order} />
+            <AgentContact order={order} />
             <div className="tracking-information">
               <div>
                 <MapPin size={18} aria-hidden="true" />
@@ -176,9 +178,9 @@ export function CustomerOrders({
                 <span>
                   ·{' '}
                   {order.refunded
-                    ? t('Reembolsado (simulado)')
+                    ? t('Reembolsado')
                     : order.paid
-                      ? t('Pagamento confirmado (simulado)')
+                      ? t('Pagamento confirmado')
                       : t('Pagamento pendente')}{' '}
                   {t('· Horas de Maputo')}
                 </span>

@@ -1,9 +1,10 @@
 import type { SandboxOrder } from './domain';
 
 // Explicit public contract: new internal fields must never reach customers by default.
-export function customerOrder(order: SandboxOrder) {
+export function customerOrder(order: SandboxOrder, agentContact?: { name: string; phone: string }) {
   return {
     id: order.id,
+    agentContact,
     productId: order.productId,
     productName: order.productName,
     amount: order.amount,
@@ -26,7 +27,4 @@ export function customerOrder(order: SandboxOrder) {
     cancellationReason: order.cancellationReason,
   };
 }
-export type CustomerOrder = Pick<
-  SandboxOrder,
-  keyof ReturnType<typeof customerOrder>
->;
+export type CustomerOrder = ReturnType<typeof customerOrder>;

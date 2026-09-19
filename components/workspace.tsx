@@ -1,4 +1,5 @@
 'use client';
+import { AgentContact } from '@/components/agent-contact';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
 
 import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
@@ -1140,9 +1141,9 @@ export function Workspace({ displayName }: { displayName: string }) {
         <DialogContent className="order-dialog">
           <DialogTitle>{selected?.productName}</DialogTitle>
           <DialogDescription>
-            {t('Pedido de teste #')}
+            {t('Pedido #')}
             {selected?.id.slice(0, 8).toUpperCase()}
-            {t(' · Nenhuma cobrança ou entrega real.')}
+
           </DialogDescription>
           {selected && (
             <>
@@ -1154,6 +1155,7 @@ export function Workspace({ displayName }: { displayName: string }) {
               </div>
               <p>{payment(selected)}</p>
               <OrderPayment orderId={selected.id} />
+              <AgentContact order={selected} />
               <DeliveryEditor
                 key={selected.id}
                 order={selected}

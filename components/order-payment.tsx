@@ -48,6 +48,7 @@ export function OrderPayment({ orderId }: { orderId: string }) {
           <a
             className="btn btn-primary"
             href={data.url}
+            onClick={() => { try { localStorage.setItem('framy-payment-order', orderId); } catch {} }}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -87,6 +88,7 @@ export function OrderPayment({ orderId }: { orderId: string }) {
       >
         {t('Contactar a equipa')}
       </a>
+      <p><a className="btn" href={'/pagamento/retorno?order=' + encodeURIComponent(orderId)}>{t('Acompanhar o pedido')}</a></p>
     </section>
   );
 }
