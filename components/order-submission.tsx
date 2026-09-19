@@ -18,7 +18,6 @@ import {
 import { validateDelivery } from '@/lib/delivery';
 import { MobileProfile } from './mobile-profile';
 import { IPhonePreview } from './iphone-preview';
-import { FixedCheckoutPreview } from './fixed-checkout-preview';
 import { ProfilePhotoUpload } from './profile-photo-upload';
 import { ProfileLinksEditor } from './profile-links-editor';
 import { OrderPayment } from './order-payment';
@@ -525,9 +524,9 @@ export function OrderSubmission({
                   onUpgrade={() => setStep(1)}
                 />
               </div>
-              <FixedCheckoutPreview><IPhonePreview>
+              <IPhonePreview>
                 <MobileProfile profile={profile} preview />
-              </IPhonePreview></FixedCheckoutPreview>
+              </IPhonePreview>
             </div>
           )}
           {step === 4 && (
