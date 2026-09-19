@@ -120,10 +120,6 @@ export default async function Home() {
             {t('Tornar-se agente')}
           </Link>
           <AccountMenu className="home-account" />
-          <Link className="home-buy" href="/produtos">
-            {t('Ver produtos ')}
-            <ArrowUpRight size={16} />
-          </Link>
         </div>
       </header>
       <main id="main">

@@ -1842,38 +1842,58 @@
 .framy-home .home-product.is-coming-soon .home-product-price { color: #626662; }
 .framy-home .home-product.is-coming-soon:hover { box-shadow: none; }
 
-/* Language and agent actions stay visible on narrow screens. */
+/* Homepage navigation: one desktop row, explicit rows on smaller screens. */
 .home-nav {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  max-width: 1600px;
   height: auto;
-  flex-wrap: wrap;
-  gap: 16px;
+  min-height: 88px;
+  padding: 14px 4%;
+  gap: 24px;
 }
+.home-nav .home-brand { width: 160px; height: 58px; object-fit: contain; }
+.home-nav nav {
+  order: initial;
+  width: auto;
+  justify-content: center;
+  gap: 20px;
+  padding: 0;
+  font-size: 14px;
+}
+.home-nav nav a { white-space: nowrap; }
 .home-nav-actions {
-  flex-wrap: wrap;
+  width: auto;
+  margin: 0;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
   gap: 10px;
 }
+.home-nav-actions > a,
+.home-nav-actions > button {
+  padding: 10px 12px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.home-nav .language-selector select { max-width: 130px; min-height: 44px; }
 .home-nav-actions .home-agent {
   display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   background: #fff0e8;
   color: #93320f;
   border: 1px solid #e9c7b5;
 }
-@media (max-width: 760px) {
-  .home-nav-actions {
-    width: 100%;
-    margin-left: 0;
-    justify-content: flex-start;
-  }
+@media (max-width: 1120px) {
+  .home-nav { grid-template-columns: auto minmax(0, 1fr); gap: 12px 20px; }
+  .home-nav nav { grid-column: 1 / -1; grid-row: 2; flex-wrap: wrap; }
+}
+@media (max-width: 700px) {
+  .home-nav { grid-template-columns: minmax(0, 1fr); padding: 12px 5%; }
+  .home-nav > a:first-child { justify-self: center; }
+  .home-nav-actions { grid-row: 2; justify-content: center; flex-wrap: wrap; gap: 8px; }
+  .home-nav nav { grid-row: 3; gap: 10px 16px; font-size: 13px; }
   .home-nav-actions > a,
-  .home-nav-actions > button {
-    padding: 10px 12px;
-    font-size: 14px;
-  }
-  .home-nav .language-selector select {
-    max-width: 140px;
-  }
-  .home-nav nav {
-    width: 100%;
-    order: 3;
-  }
+  .home-nav-actions > button { padding: 9px 10px; font-size: 13px; }
+  .home-nav .language-selector select { max-width: 120px; font-size: 13px; }
 }
