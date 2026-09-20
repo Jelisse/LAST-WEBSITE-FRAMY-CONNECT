@@ -3062,7 +3062,27 @@ summary {
   background: #fffdfb;
   color: #282626;
   box-shadow: 0 16px 48px #30201624;
+  border: 1px solid #e9e1db;
 }
+.account-menu-popup [data-slot='dropdown-menu-separator'] {
+  height: 1px;
+  margin: 6px 10px;
+  background: #e9e1db;
+}
+.account-menu-popup .account-menu-option {
+  align-items: center;
+  min-height: 46px;
+  padding: 12px;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: normal;
+}
+.account-menu-popup .account-menu-option svg { flex-shrink: 0; color: #8c786a; }
+.account-menu-popup .account-menu-signout,
+.account-menu-popup .account-menu-signout svg { color: #a13c29; }
+.account-menu-popup .account-menu-option[data-highlighted],
+.account-menu-popup .account-menu-option:focus-visible { background: #fff0e8; outline: 2px solid #c34008; outline-offset: -2px; }
 .account-menu-label {
   padding: 10px 12px;
   color: #746b65;

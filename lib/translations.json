@@ -5922,5 +5922,13 @@
   "Ligar ao agente": [
     "Call agent",
     "致電代理員"
+  ],
+  "Dispositivos e sessões": [
+    "Devices and sessions",
+    "裝置與登入工作階段"
+  ],
+  "Termine o acesso em todos os dispositivos, incluindo este. Terá de iniciar sessão novamente.": [
+    "Sign out on every device, including this one. You will need to sign in again.",
+    "登出所有裝置，包括此裝置。您需要重新登入。"
   ]
 }

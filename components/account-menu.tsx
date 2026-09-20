@@ -3,12 +3,13 @@ import { useI18n } from '@/components/language-provider';
 
 import { useEffect, useState } from 'react';
 import Link from '@/components/hard-link';
-import { UserRound, ChevronDown } from 'lucide-react';
+import { UserRound, ChevronDown, LayoutDashboard, Package, BriefcaseBusiness, ShieldCheck, LogOut, LogIn, UserPlus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 export function AccountMenu({
   className = 'account-link',
@@ -38,51 +39,61 @@ export function AccountMenu({
         {dashboard ? (
           <>
             <DropdownMenuItem
+              className="account-menu-option"
               render={<Link href={dashboard} />}
               nativeButton={false}
             >
-              {t('Abrir o meu painel')}
+              <LayoutDashboard size={18} aria-hidden="true" /><span>{t('Abrir o meu painel')}</span>
             </DropdownMenuItem>
             {dashboard === '/agent' && (
               <DropdownMenuItem
+              className="account-menu-option"
                 render={<Link href="/dashboard" />}
                 nativeButton={false}
               >
-                {t('Os meus pedidos e perfil')}
+                <Package size={18} aria-hidden="true" /><span>{t('Os meus pedidos e perfil')}</span>
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
+              className="account-menu-option"
               render={<Link href="/aplicar" />}
               nativeButton={false}
             >
-              {t('A minha candidatura')}
+              <BriefcaseBusiness size={18} aria-hidden="true" /><span>{t('A minha candidatura')}</span>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
+              className="account-menu-option"
               render={<Link href="/seguranca" />}
               nativeButton={false}
             >
-              {t('Segurança da conta')}
+              <ShieldCheck size={18} aria-hidden="true" /><span>{t('Segurança da conta')}</span>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
+              className="account-menu-option account-menu-signout"
               render={<Link href="/sair" />}
               nativeButton={false}
             >
-              {t('Terminar sessão')}
+              <LogOut size={18} aria-hidden="true" /><span>{t('Terminar sessão')}</span>
             </DropdownMenuItem>
           </>
         ) : (
           <>
             <DropdownMenuItem
+              className="account-menu-option"
               render={<Link href="/entrar" />}
               nativeButton={false}
             >
-              {t('Entrar')}
+              <LogIn size={18} aria-hidden="true" /><span>{t('Entrar')}</span>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
+              className="account-menu-option"
               render={<Link href="/entrar?mode=register" />}
               nativeButton={false}
             >
-              {t('Criar conta')}
+              <UserPlus size={18} aria-hidden="true" /><span>{t('Criar conta')}</span>
             </DropdownMenuItem>
           </>
         )}
