@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { Languages } from 'lucide-react';
 import { translator, validLocale, type Locale } from '@/lib/i18n';
 const LanguageContext = createContext<Locale>('pt-MZ');
 export function LanguageProvider({
@@ -24,6 +25,7 @@ export function LanguageSelector() {
   return (
     <label className="language-selector">
       <span className="sr-only">{t('Idioma')}</span>
+      <Languages className="language-selector-icon" size={18} aria-hidden="true" />
       <select
         aria-label={t('Idioma')}
         value={locale}
@@ -40,7 +42,7 @@ export function LanguageSelector() {
           English
         </option>
         <option value="zh-Hant" lang="zh-Hant">
-          繁體中文
+          中文（繁體）
         </option>
       </select>
     </label>

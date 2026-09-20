@@ -4081,9 +4081,19 @@ output { display: block; }
 
 /* All navigation actions remain reachable as translated labels grow. */
 .language-selector {
+  position: relative;
+  width: fit-content;
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+}
+.language-selector-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #655b54;
+  pointer-events: none;
 }
 .language-selector select {
   color: #292626;
@@ -4091,7 +4101,8 @@ output { display: block; }
   border: 1px solid #d7d1cc;
   border-radius: 10px;
   min-height: 42px;
-  padding: 8px 28px 8px 10px;
+  padding: 8px 28px 8px 38px;
+  min-width: 160px;
   font: inherit;
   font-size: 14px;
   max-width: 160px;
@@ -4133,6 +4144,7 @@ output { display: block; }
   display: flex;
   justify-content: flex-end;
   margin-bottom: 16px;
+  margin-left: auto;
 }
 html[lang='zh-Hant'] body {
   font-family:
