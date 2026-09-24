@@ -13,12 +13,16 @@
     }
   ],
 
-"r2_buckets": [
-  {
-    "binding": "PROFILE_PHOTOS",
-    "bucket_name": "framy-connect-profile-photos"
-  }
-],
+  "r2_buckets": [
+    {
+      "binding": "PROFILE_PHOTOS",
+      "bucket_name": "framy-connect-profile-photos"
+    }
+  ],
+
+  "vars": {
+    "PUBLIC_SITE_URL": "https://framyconnect.co.mz"
+  },
 
   "observability": {
     "logs": {
