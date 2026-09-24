@@ -1,5 +1,5 @@
 'use client';
-import { useI18n, LanguageSelector } from '@/components/language-provider';
+import { useI18n } from '@/components/language-provider';
 
 import Image from 'next/image';
 import { useState } from 'react';
@@ -138,7 +138,6 @@ export function MobileProfile({
   return (
     <div className="mobile-profile-frame">
       <article className="mobile-identity-page">
-        {!preview && <div className="public-profile-language"><LanguageSelector /></div>}
         <div className="mobile-portrait">
           {profile.photoUrl ? (
             <Image
