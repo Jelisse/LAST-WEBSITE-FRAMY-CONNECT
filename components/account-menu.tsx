@@ -28,8 +28,8 @@ export function AccountMenu({
     <DropdownMenu>
       <DropdownMenuTrigger className={`account-menu-trigger ${className}`}>
         <UserRound size={17} />
-        {t(' Minha Conta ')}
-        <ChevronDown size={14} />
+        <span className="account-menu-label">{t(' Minha Conta ')}</span>
+        <ChevronDown className="account-menu-chevron" size={14} />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"

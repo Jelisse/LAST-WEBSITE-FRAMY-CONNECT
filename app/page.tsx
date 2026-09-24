@@ -1,15 +1,15 @@
+import { CorporatePlan } from '@/components/corporate-plan';
 import { getTranslations } from '@/lib/server-i18n';
 import { LanguageSelector } from '@/components/language-provider';
 import { planMeticais, planPrice } from '@/lib/plan-pricing';
 import { publicPageRobots } from '@/lib/server-site';
 import { SourceImage } from '@/components/source-image';
 import { AccountMenu } from '@/components/account-menu';
+import { HomeMobileMenu } from '@/components/home-mobile-menu';
 import Image from 'next/image';
 import Link from '@/components/hard-link';
 import {
   ArrowUpRight,
-  Eye,
-  Target,
   Nfc,
   Smartphone,
   RefreshCw,
@@ -90,7 +90,7 @@ export default async function Home() {
   ]);
   const featured = products
     .filter((p) => p.published !== false)
-    .sort(productOrder)
+    .sort((a, b) => Number(b.available) - Number(a.available) || productOrder(a, b))
     .slice(0, 4);
   const plans = allPlans
     .filter((p) => p.active)
@@ -120,6 +120,7 @@ export default async function Home() {
             {t('Tornar-se agente')}
           </Link>
           <AccountMenu className="home-account" />
+          <HomeMobileMenu />
         </div>
       </header>
       <main id="main">
@@ -127,18 +128,21 @@ export default async function Home() {
           <div className="home-hero-inner">
             <div className="home-hero-copy">
               <h1>
+                <span>
                 {t('O Seu Mundo,')}
                 <br />
                 {t('Num Toque.')}
+                </span>
+                <svg className="home-contactless-mark" viewBox="0 0 48 64" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" aria-hidden="true" focusable="false">
+                  <path d="M7 25 Q12 32 7 39" />
+                  <path d="M17 18 Q27 32 17 46" />
+                  <path d="M27 11 Q42 32 27 53" />
+                  <path d="M37 4 Q57 32 37 60" />
+                </svg>
               </h1>
               <p className="home-offer">
                 {t(
-                  'Cartões e acessórios NFC que partilham o seu perfil digital por toque ou QR.',
-                )}
-              </p>
-              <p>
-                {t(
-                  'Os seus contactos, redes sociais e trabalho num só lugar. Escolha o formato que o acompanha e actualize o perfil sempre que precisar.',
+                  'Partilhe contactos, redes sociais e trabalho por toque ou QR.',
                 )}
               </p>
               <div className="home-hero-actions">
@@ -190,7 +194,7 @@ export default async function Home() {
               'Porta-chaves NFC disponíveis. Os restantes produtos chegam brevemente.',
             )}
           </p>
-          <div className="home-products-grid">
+          <div className={`home-products-grid${featured.some(p => p.available) ? " has-available" : ""}`}>
             {featured.map((p) => (
               <Link
                 className={`home-product ${p.available ? 'is-available' : 'is-coming-soon'}`}
@@ -217,7 +221,7 @@ export default async function Home() {
                       ? t('Produto físico · disponível para encomenda')
                       : t('Brevemente · compra ainda indisponível')}
                   </span>
-                  <ArrowUpRight size={18} />
+                  <span className="home-product-action">{p.available ? t("Encomendar agora") : t("Ver detalhes")} <ArrowUpRight size={18} /></span>
                 </div>
               </Link>
             ))}
@@ -239,9 +243,15 @@ export default async function Home() {
               'Comece com 30 dias gratuitos, sem renovação automática. Os planos mensais ainda não aceitam adesões. O produto físico é pago separadamente.',
             )}
           </p>
+          {plans.find(p => p.id === 'free-30') && <div className="home-trial-banner">
+            <strong>{t('30 dias grátis')}</strong>
+            <span>{t('Experimente 20 links e 600 caracteres de biografia, sem renovação automática.')}</span>
+            <Link className="home-text-link" href="/perfil?plans=1">{t('Começar 30 dias grátis')} <ArrowUpRight size={18} /></Link>
+          </div>}
           <div className="home-plans-grid">
-            {plans.map((p) => (
-              <article className="home-plan" key={p.id}>
+            {plans.filter(p => p.id !== 'free-30').map((p) => (
+              <article className={`home-plan${p.id === "free-30" ? " home-plan-trial" : ""}`} key={p.id}>
+                <span className="home-plan-label">{p.id === "free-30" ? t("Experimente primeiro") : t("Adesões em breve")}</span>
                 <h3>{t(p.name)}</h3>
                 <p>{t(p.description)}</p>
                 <div className="home-plan-price">
@@ -264,6 +274,7 @@ export default async function Home() {
                 </ul>
               </article>
             ))}
+            <CorporatePlan />
           </div>
           {plans.length === 0 ? (
             <p>
@@ -297,33 +308,10 @@ export default async function Home() {
           <div className="home-about-content">
             <p className="home-about-intro">
               {t(
-                'A Framy Connect transforma cartões, etiquetas e pulseiras em identidades digitais instantâneas. Com um simples toque, pessoas e organizações podem partilhar e comprovar quem são, o que conquistaram e o que representam, de forma simples, confiável e acessível.',
+                'A Framy Connect liga os seus produtos NFC a um perfil digital com contactos, redes sociais e trabalho. Uma forma simples de se apresentar e manter a sua informação actualizada.',
               )}
             </p>
-            <div className="home-purpose-grid">
-              <article>
-                <span className="home-purpose-icon">
-                  <Eye />
-                </span>
-                <h3>{t('Visão')}</h3>
-                <p>
-                  {t(
-                    'Fazer do toque a linguagem universal da identidade, para cada pessoa e cada instituição à qual pertencem.',
-                  )}
-                </p>
-              </article>
-              <article>
-                <span className="home-purpose-icon">
-                  <Target />
-                </span>
-                <h3>{t('Missão')}</h3>
-                <p>
-                  {t(
-                    'Transformar cada toque numa conexão de confiança, tornando identidades, conquistas e pertenças instantaneamente acessíveis, verificáveis e universais.',
-                  )}
-                </p>
-              </article>
-            </div>
+            <Link className="home-text-link" href="/sobre">{t("Conheça a Framy Connect")} <ArrowUpRight size={18} /></Link>
           </div>
         </section>
         <section className="home-faq" id="perguntas">

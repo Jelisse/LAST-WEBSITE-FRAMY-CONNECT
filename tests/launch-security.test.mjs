@@ -521,18 +521,18 @@ test('manager edits store meticais without reconverting saved plan prices', asyn
   const manager = await api('app/api/manager/route.ts');
   const plansApi = await api('lib/server-plans.ts');
   sql.prepare('INSERT INTO manager_records VALUES(?,?,?,?,?)').run(
-    'legacy', 'plan', JSON.stringify({ name: 'Legado', dollars: 3, active: true }), 1, new Date().toISOString(),
+    'personal', 'plan', JSON.stringify({ name: 'Legado', dollars: 3, active: true }), 1, new Date().toISOString(),
   );
-  assert.equal((await plansApi.getManagedPlans()).find(p => p.id === 'legacy').meticais, 191.73);
+  assert.equal((await plansApi.getManagedPlans()).find(p => p.id === 'personal').meticais, 191.73);
   const result = await post(manager, {
-    action: 'plan', id: 'legacy', version: 1, name: 'Plano', audience: 'Todos',
+    action: 'plan', id: 'personal', version: 1, name: 'Plano', audience: 'Todos',
     description: 'Plano em meticais', meticais: 200, links: 3, bio: 100, active: true,
   });
   assert.equal(result.status, 200, JSON.stringify(result));
-  const stored = JSON.parse(sql.prepare("SELECT data_json FROM manager_records WHERE id='legacy'").get().data_json);
+  const stored = JSON.parse(sql.prepare("SELECT data_json FROM manager_records WHERE id='personal'").get().data_json);
   assert.equal(stored.meticais, 200);
   assert.equal(stored.dollars, undefined);
-  assert.equal((await plansApi.getManagedPlans()).find(p => p.id === 'legacy').meticais, 200);
+  assert.equal((await plansApi.getManagedPlans()).find(p => p.id === 'personal').meticais, 200);
   sql.close();
 });
 test('launch: publication requires a valid trial, checkout is atomic, retries are safe, costs stay private', async () => {
@@ -881,5 +881,22 @@ test('launch: upload quota is enforced in the database and releasable after a fa
     ),
     true,
   );
+  sql.close();
+});
+
+test('simplified catalogue preserves historical terms and upgrades trial allowances', async () => {
+  const sql = fixture();
+  const apiPlans = await api('lib/server-plans.ts');
+  const old = { id: 'professional', name: 'Profissional', links: 15, bio: 400, meticais: 319.55, active: true, version: 2 };
+  sql.prepare('INSERT INTO manager_records VALUES(?,?,?,?,?)').run('professional', 'plan', JSON.stringify(old), 2, new Date().toISOString());
+  const current = await apiPlans.getManagedPlans();
+  assert.deepEqual(current.map(p => [p.id, p.meticais, p.links, p.bio]), [
+    ['free-30', 0, 20, 600], ['personal', 65, 8, 200], ['professional-v2', 150, 20, 600],
+  ]);
+  assert.deepEqual(apiPlans.membershipTerms({plan_id:'professional',terms_json:JSON.stringify(old)}), old);
+  assert.equal(apiPlans.membershipTerms({plan_id:'organisation'}).links, 50);
+  const trial = apiPlans.membershipTerms({plan_id:'free-30',terms_json:JSON.stringify({...old,id:'free-30',meticais:0})});
+  assert.equal(trial.links,20); assert.equal(trial.bio,600);
+  assert.equal(current.some(p=>p.id==='corporate'),false);
   sql.close();
 });

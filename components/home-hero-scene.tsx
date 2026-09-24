@@ -23,6 +23,9 @@ export async function HomeHeroScene() {
           unoptimized
           priority
         />
+        <svg className="home-base-extension" viewBox="0 380 2079 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <image href="/home/pedestal.png" width="2079" height="756" />
+        </svg>
       </div>
       {(['black'] as const).map((color) => (
         <div

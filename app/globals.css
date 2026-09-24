@@ -4205,3 +4205,14 @@ html[lang='zh-Hant'] h2 {
   .site-header .language-selector select { max-width: 135px; }
   .site-header-focused { grid-template-columns: minmax(0, 1fr); }
 }
+/* Corporate is an enquiry, never a self-service membership entitlement. */
+.corporate-plan { padding: 24px; border: 1px solid #dfc8b9; border-radius: 20px; background: #fff8f1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.corporate-plan h3 { font-size: 22px; margin: 0; }
+.corporate-plan > p, .corporate-plan li { font-size: 15px; line-height: 1.6; color: #655d57; }
+.corporate-plan .home-plan-label { font-size: 12px; color: #96300c; font-weight: 600; }
+.corporate-plan .home-plan-price { font-size: 28px; font-weight: 600; }
+.corporate-plan ul { padding-left: 18px; }
+.corporate-plan > a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; min-height: 44px; background: #a9360c; color: white; border-radius: 10px; font-weight: 600; margin-top: auto; }
+.plans-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.plans-grid .plan-trial-banner { grid-column: 1 / -1; }
+@media (max-width: 700px) { .plans-grid { grid-template-columns: 1fr; } }

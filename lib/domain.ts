@@ -1,4 +1,4 @@
-export const plans = [
+export const legacyPlans = [
   {
     id: 'free-30',
     name: '30 dias grátis',
@@ -55,6 +55,12 @@ export const plans = [
     description: 'Uma presença completa para a organização.',
   },
 ] as const;
+// New catalogue IDs keep historical paid memberships and stored terms intact.
+export const plans = [
+  { id: 'free-30', name: '30 dias grátis', audience: 'Todos', meticais: 0, links: 20, bio: 600, description: 'Experimente o seu perfil durante 30 dias, sem renovação automática.' },
+  { id: 'personal', name: 'Pessoal', audience: 'Uso pessoal', meticais: 65, links: 8, bio: 200, description: 'Os seus contactos e redes sociais, num só lugar.' },
+  { id: 'professional-v2', name: 'Profissional', audience: 'Profissionais', meticais: 150, links: 20, bio: 600, description: 'Apresente os seus serviços, portefólio e trabalho.' },
+] as const;
 export type PlanId = string;
 export type ManagedPlan = {
   id: string;
@@ -70,7 +76,7 @@ export type ManagedPlan = {
   version: number;
 };
 export function getPlan(id: unknown) {
-  const plan = plans.find((item) => item.id === id);
+  const plan = plans.find((item) => item.id === id) ?? legacyPlans.find((item) => item.id === id);
   if (!plan) throw new Error('Plano inválido.');
   return plan;
 }

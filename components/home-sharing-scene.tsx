@@ -109,83 +109,32 @@ export function HomeSharingScene() {
     };
   }, []);
   return (
-    <section
-      className="home-sharing"
-      id="como-funciona"
-      aria-labelledby="sharing-title"
-    >
+    <section className="home-sharing" id="como-funciona" aria-labelledby="sharing-title">
       <header>
         <p>{t('DUAS FORMAS DE SE CONECTAR')}</p>
-        <h2 id="sharing-title">{t('Um toque. Um scan. O seu perfil.')}</h2>
-        <span>{t('Partilhe a sua identidade por NFC ou código QR.')}</span>
+        <h2 id="sharing-title">{t('Duas formas. Um perfil.')}</h2>
+        <span>{t('Partilhe por toque ou código QR.')}</span>
       </header>
       <div className="sharing-stage">
-        <div className="sharing-method sharing-tap">
-          <h3>
-            <Nfc size={18} />
-            {t(' Partilhe por toque')}
-          </h3>
-          <svg
-            className="sharing-wave"
-            viewBox="0 0 110 110"
-            fill="none"
-            aria-hidden="true"
-          >
-            <circle cx="55" cy="55" r="22" />
-            <circle cx="55" cy="55" r="33" />
-            <circle cx="55" cy="55" r="44" />
-            <circle cx="55" cy="55" r="53" />
-          </svg>
-          <DemoCard />
-          <DemoPhone />
-          <p>{t('Aproxime o cartão de um telemóvel compatível.')}</p>
-        </div>
-        <a
-          href={exampleProfile}
-          className="sharing-result"
-          aria-label={t('Abrir o perfil de exemplo de Firmino Chambale')}
-        >
-          <div>
-            <Image
-              src="/home/profile-screen.jpg"
-              alt={t('O mesmo perfil Framy, com fotografia e links')}
-              width={390}
-              height={848}
-              unoptimized
-            />
+        <article className="sharing-method sharing-tap">
+          <h3><Nfc size={22} aria-hidden="true" />{t('Toque para partilhar')}</h3>
+          <div className="sharing-illustration">
+            <DemoCard />
+            <DemoPhone />
           </div>
-        </a>
-        <div className="sharing-method sharing-scan">
-          <h3>
-            <ScanLine size={18} />
-            {t(' Ou leia o QR')}
-          </h3>
-          <DemoCard qr={qr} />
-          <DemoPhone scan qr={qr} />
-          <p>{t('Abra a câmara e leia o código do cartão.')}</p>
-        </div>
-        <svg
-          className="sharing-arrows"
-          viewBox="0 0 1000 90"
-          aria-hidden="true"
-        >
-          <defs>
-            <path
-              id="sharing-tapered-arrow"
-              d="M235 13 C282 51 343 73 409 36 L407 28 L428 27 L418 46 L415 39 C345 83 282 56 235 13Z"
-            />
-          </defs>
-          <use href="#sharing-tapered-arrow" fill="currentColor" />
-          <use
-            href="#sharing-tapered-arrow"
-            transform="translate(1000 0) scale(-1 1)"
-            fill="currentColor"
-          />
-        </svg>
+          <p>{t('Aproxime o cartão de um telemóvel compatível com NFC.')}</p>
+        </article>
+        <article className="sharing-method sharing-scan">
+          <h3><ScanLine size={22} aria-hidden="true" />{t('Leia o QR para se conectar')}</h3>
+          <div className="sharing-illustration">
+            <DemoCard qr={qr} />
+            <DemoPhone scan qr={qr} />
+          </div>
+          <p>{t('Abra a câmara e leia o código QR do cartão.')}</p>
+        </article>
       </div>
       <a className="home-text-link sharing-demo-link" href={exampleProfile}>
-        {t('Ver perfil de exemplo ')}
-        <Globe size={18} />
+        {t('Ver perfil de exemplo ')}<Globe size={18} aria-hidden="true" />
       </a>
     </section>
   );

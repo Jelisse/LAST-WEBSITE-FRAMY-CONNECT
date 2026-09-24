@@ -1,4 +1,8 @@
 {
+  "Partilhe contactos, redes sociais e trabalho por toque ou QR.": [
+    "Share your contacts, social links and work with a tap or QR code.",
+    "輕觸或掃描 QR 碼，分享聯絡方式、社群連結與作品。"
+  ],
   "Activar o meu acesso": [
     "Activate my access",
     "啟用我的存取權限"
@@ -5930,5 +5934,109 @@
   "Termine o acesso em todos os dispositivos, incluindo este. Terá de iniciar sessão novamente.": [
     "Sign out on every device, including this one. You will need to sign in again.",
     "登出所有裝置，包括此裝置。您需要重新登入。"
+  ],
+  "Os seus contactos. As suas redes. O seu mundo conectado.": [
+    "Your contacts. Your social links. Your world connected.",
+    "您的聯絡方式、社群連結，串起您的世界。"
+  ],
+  "Actualize o perfil sempre que precisar.": [
+    "Update your profile whenever you need.",
+    "隨時更新您的個人檔案。"
+  ],
+  "Encomendar agora": [
+    "Order now",
+    "立即訂購"
+  ],
+  "Experimente primeiro": [
+    "Try it first",
+    "先試用看看"
+  ],
+  "Adesões em breve": [
+    "Registration coming soon",
+    "即將開放申請"
+  ],
+  "Conheça a Framy Connect": [
+    "Meet Framy Connect",
+    "認識 Framy Connect"
+  ],
+  "A Framy Connect liga os seus produtos NFC a um perfil digital com contactos, redes sociais e trabalho. Uma forma simples de se apresentar e manter a sua informação actualizada.": [
+    "Framy Connect links your NFC products to a digital profile with your contacts, social links and work. A simple way to introduce yourself and keep your information up to date.",
+    "Framy Connect 將您的 NFC 產品連結至包含聯絡方式、社群連結及作品的數位檔案，讓自我介紹和更新資訊更簡單。"
+  ],
+  "Duas formas. Um perfil.": [
+    "Two ways. One profile.",
+    "兩種方式，同一個檔案。"
+  ],
+  "Partilhe por toque ou código QR.": [
+    "Share with a tap or a QR scan.",
+    "輕觸或掃描 QR 碼即可分享。"
+  ],
+  "Toque para partilhar": [
+    "Tap to share",
+    "輕觸分享"
+  ],
+  "Leia o QR para se conectar": [
+    "Scan to connect",
+    "掃碼連結"
+  ],
+  "Aproxime o cartão de um telemóvel compatível com NFC.": [
+    "Hold your card near an NFC-compatible phone.",
+    "將卡片靠近支援 NFC 的手機。"
+  ],
+  "Abra a câmara e leia o código QR do cartão.": [
+    "Open the camera and scan your card’s QR code.",
+    "開啟相機，掃描卡片上的 QR 碼。"
+  ],
+  "Pessoal": [
+    "Personal",
+    "個人"
+  ],
+  "Uso pessoal": [
+    "Personal use",
+    "個人使用"
+  ],
+  "Os seus contactos e redes sociais, num só lugar.": [
+    "Your contacts and social links, in one place.",
+    "集中您的聯絡方式與社群連結。"
+  ],
+  "Apresente os seus serviços, portefólio e trabalho.": [
+    "Showcase your services, portfolio and work.",
+    "展示您的服務、作品集與工作成果。"
+  ],
+  "Para empresas e equipas": [
+    "For businesses and teams",
+    "適合企業與團隊"
+  ],
+  "Corporativo": [
+    "Corporate",
+    "企業"
+  ],
+  "Uma proposta à medida do número de colaboradores e das necessidades da empresa.": [
+    "A proposal tailored to your team size and business needs.",
+    "依據團隊人數與企業需求量身制定方案。"
+  ],
+  "Sob consulta": [
+    "Contact for pricing",
+    "洽詢報價"
+  ],
+  "Preço e limites definidos na proposta": [
+    "Pricing and limits set in your proposal",
+    "價格與使用額度依提案訂定"
+  ],
+  "Produtos, personalização e apoio a combinar": [
+    "Products, customisation and support by agreement",
+    "產品、客製化與支援依協議提供"
+  ],
+  "Solicitar proposta": [
+    "Request a proposal",
+    "索取提案"
+  ],
+  "Experimente 20 links e 600 caracteres de biografia, sem renovação automática.": [
+    "Try 20 links and a 600-character bio, with no automatic renewal.",
+    "試用 20 個連結及 600 字元簡介，不會自動續訂。"
+  ],
+  "Pessoal e Profissional incluem um perfil digital. Corporativo: preço e condições sob consulta. Subscrições mensais ainda não disponíveis.": [
+    "Personal and Professional include one digital profile. Corporate pricing and terms are agreed by consultation. Monthly subscriptions are not yet available.",
+    "個人與專業方案包含一個數位檔案。企業方案的價格與條件請洽詢。月訂閱尚未開放。"
   ]
 }

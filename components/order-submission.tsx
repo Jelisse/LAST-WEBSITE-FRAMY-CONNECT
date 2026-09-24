@@ -1,6 +1,7 @@
 'use client';
 import { useI18n } from '@/components/language-provider';
 
+import { CorporatePlan } from './corporate-plan';
 import { planPrice } from '@/lib/plan-pricing';
 
 import { SourceImage } from '@/components/source-image';
@@ -427,6 +428,7 @@ export function OrderSubmission({
                   </label>
                 ))}
               </div>
+              <CorporatePlan />
             </>
           )}
           {step === 2 &&

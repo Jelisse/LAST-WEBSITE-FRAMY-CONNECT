@@ -167,7 +167,7 @@ test('customers get preview only; staff can copy the approved order URL in all l
       picker,
       new RegExp(`<option[^>]*value="${locale}"[^>]*selected=""`),
     );
-    assert.ok(picker.includes('繁體中文'));
+    assert.ok(picker.includes('中文（繁體）'));
   }
   assert.doesNotMatch(read('components/mobile-profile.tsx'), /clipboard/);
   assert.doesNotMatch(read('components/profile-share.tsx'), /clipboard/);

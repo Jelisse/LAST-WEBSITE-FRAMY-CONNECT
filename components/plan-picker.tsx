@@ -1,6 +1,7 @@
 'use client';
 import { useI18n } from '@/components/language-provider';
 
+import { CorporatePlan } from './corporate-plan';
 import { planPrice } from '@/lib/plan-pricing';
 
 import { useState } from 'react';
@@ -137,13 +138,13 @@ export function PlanPicker({
             <div className="plans-grid">
               {plans.map((plan) => (
                 <article
-                  className={`plan-card ${plan.id === 'professional' ? 'plan-featured' : ''}`}
+                  className={`plan-card ${plan.id === 'free-30' ? 'plan-trial-banner' : ''} ${plan.id === 'professional-v2' ? 'plan-featured' : ''}`}
                   key={plan.id}
                 >
                   <span className="plan-recommendation">
                     {plan.id === current
                       ? t('O seu plano')
-                      : plan.id === 'professional'
+                      : plan.id === 'professional-v2'
                         ? t('A nossa sugestão')
                         : plan.audience}
                   </span>
@@ -162,7 +163,7 @@ export function PlanPicker({
                   </p>
                   <Button
                     className={
-                      plan.id === 'professional'
+                      plan.id === 'professional-v2'
                         ? 'plan-upgrade'
                         : 'plan-select'
                     }
@@ -204,10 +205,11 @@ export function PlanPicker({
                   </ul>
                 </article>
               ))}
+              <CorporatePlan />
             </div>
             <p className="plan-disclosure">
               {t(
-                'Todos incluem uma identidade digital, links editáveis e opção de guardar o contacto. Instituições e organizações: preço por perfil, sem gestão de equipas. Subscrições mensais ainda não disponíveis.',
+                'Pessoal e Profissional incluem um perfil digital. Corporativo: preço e condições sob consulta. Subscrições mensais ainda não disponíveis.',
               )}
             </p>
           </>
