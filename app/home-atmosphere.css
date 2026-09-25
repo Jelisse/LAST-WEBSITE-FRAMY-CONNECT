@@ -63,24 +63,26 @@
   mask-image: linear-gradient(110deg, transparent 15%, #000 85%);
 }
 
-/* A deliberate warm finish; no extra pattern in the call to action. */
-.framy-home .home-how { background: linear-gradient(135deg, #b83b09, #87391f); }
+/* Both surfaces meet at the same colour; the mountain peak meets the old seam. */
+.framy-home .home-how {
+  background: linear-gradient(180deg, #b83b09 0%, #953b1c 48%, #633322 100%);
+}
 .framy-home .home-how::before { display: none; }
 .framy-home .brand-footer {
-  background: linear-gradient(180deg, #87391f, #30231e 150px);
+  overflow: hidden;
+  background: linear-gradient(180deg, #633322 0%, #402a21 120px, #30231e 260px);
 }
 .framy-home .brand-footer::before {
   content: '';
   position: absolute;
   pointer-events: none;
   z-index: -1;
-  inset: auto -4% -12% 15%;
-  height: 76%;
+  inset: 0;
   background: url('/brand/profile-mountains.png') no-repeat center bottom / 100% 100%;
   filter: invert(1);
   mix-blend-mode: screen;
-  opacity: .055;
-  mask-image: linear-gradient(180deg, transparent, #000);
+  opacity: .14;
+  mask-image: linear-gradient(180deg, #000c, #0007 45%, #000);
 }
 
 @media (max-width: 700px) {
@@ -96,8 +98,9 @@
     opacity: .035;
   }
   .framy-home .brand-footer::before {
-    inset: auto -50% -3% 0;
-    height: 28%;
-    opacity: .04;
+    inset: 0;
+    background-size: auto 100%;
+    background-position: 37% bottom;
+    opacity: .09;
   }
 }
