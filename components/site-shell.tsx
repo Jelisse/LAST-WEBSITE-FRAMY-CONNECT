@@ -1,5 +1,6 @@
 import { getTranslations } from '@/lib/server-i18n';
 import { LanguageSelector } from '@/components/language-provider';
+import { MobileNavigation } from '@/components/mobile-navigation';
 import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
 import Link from '@/components/hard-link';
@@ -17,19 +18,28 @@ export async function SiteHeader({ focused = false }: { focused?: boolean }) {
           alt={t('Framy Connect')}
         />
       </Link>
-      {!focused && <nav aria-label={t('Navegação principal')}>
-        <Link href="/">{t('Página Inicial')}</Link>
-        <Link href="/sobre">{t('Sobre nós')}</Link>
-        <Link href="/produtos">{t('Produtos')}</Link>
-        <Link href="/contacto">{t('Contacto')}</Link>
-      </nav>}
+      {!focused && (
+        <nav aria-label={t('Navegação principal')}>
+          <Link href="/">{t('Página Inicial')}</Link>
+          <Link href="/sobre">{t('Sobre nós')}</Link>
+          <Link href="/produtos">{t('Produtos')}</Link>
+          <Link href="/contacto">{t('Contacto')}</Link>
+        </nav>
+      )}
       <div className="header-actions">
         <LanguageSelector />
-        {!focused && <Link className="header-agent-link" href="/aplicar">
-          {t('Tornar-se agente')}
-        </Link>}
+        {!focused && (
+          <Link className="header-agent-link" href="/aplicar">
+            {t('Tornar-se agente')}
+          </Link>
+        )}
         <AccountMenu />
-        {focused && <Link className="header-contact-link" href="/contacto">{t('Contacto')}</Link>}
+        <MobileNavigation />
+        {focused && (
+          <Link className="header-contact-link" href="/contacto">
+            {t('Contacto')}
+          </Link>
+        )}
       </div>
     </header>
   );

@@ -2049,3 +2049,71 @@
 .home-plans-grid > .corporate-plan { gap: 0; }
 .home-plans-grid > .corporate-plan h3 { font-size: 19px; margin: 0 0 12px; }
 .home-plans-grid > .corporate-plan > p { margin: 0 0 16px; }
+/* Editable hero media retains each product's proportions. */
+.home-hero-scene .home-solange-card { left: 28%; width: 26%; bottom: 20%; transform: rotate(2deg); z-index: 3; }
+.home-solange-card img { border-radius: 7% / 4.5%; object-fit: contain; }
+.home-photo-keychain { width: 27%; left: 1%; bottom: 8%; transform: rotate(-12deg); }
+.home-photo-keychain img { display: block; width: 100%; height: auto; object-fit: contain; }
+.home-phone-display { background: #08090b; }
+.home-phone-display video { display: block; width: 100%; height: 100%; object-fit: contain; }
+.home-video-control { position: absolute; bottom: 4%; right: 3%; z-index: 5; display: grid; place-items: center; border: 0; border-radius: 50%; width: 36px; height: 36px; padding: 0; background: transparent; color: #fff; cursor: pointer; font-size: 11px; isolation: isolate; }
+.home-video-control::before { content: ""; position: absolute; inset: 7px; z-index: -1; border-radius: 50%; background: #1119; border: 1px solid #ffffff30; transition: background 160ms ease; }
+.home-video-control:hover::before, .home-video-control:focus-visible::before { background: #111e; border-color: #ffffff80; }
+.home-video-control:focus-visible { outline: 2px solid white; outline-offset: 2px; }
+
+/* Front and reverse form a quiet fan, with the silver mark unobstructed. */
+.home-hero-scene .home-front-card { left: 4%; width: 32%; bottom: 22%; z-index: 2; transform: rotate(-9deg); }
+.home-front-card img { object-fit: contain; }
+@media (max-width: 700px) {
+  .home-hero-copy > .home-offer { margin-top: 16px; max-width: 320px; font-size: 14px; line-height: 1.6; color: #514942; }
+}
+
+/* Matching portrait cards and real profile artwork for the two demonstrations. */
+.sharing-product-demo { aspect-ratio: 1.15; }
+.sharing-product-card { position: absolute; left: 8%; top: 28%; width: 31%; z-index: 2; transform: rotate(-7deg); filter: drop-shadow(3px 7px 5px #25211c28); }
+.sharing-product-card img { display: block; width: 100%; height: auto; object-fit: contain; }
+.sharing-black-back { left: 10%; top: 29%; width: 28%; transform: rotate(-5deg); }
+.sharing-black-back img { border-radius: 7% / 4.5%; }
+.sharing-product-demo > .sharing-phone { left: 48%; top: 4%; width: 41%; transform: rotate(2deg); }
+.sharing-product-demo .sharing-screen > img { object-fit: cover; }
+.sharing-nfc-pulse { position: absolute; left: 35%; top: 24%; width: 16%; height: auto; z-index: 4; overflow: visible; color: #f4510b; pointer-events: none; }
+.sharing-nfc-pulse path { stroke: currentColor; stroke-width: 4; stroke-linecap: round; opacity: .35; animation: sharing-nfc-wave 2.1s ease-in-out infinite; }
+.sharing-nfc-pulse path:nth-child(2) { animation-delay: .22s; }
+.sharing-nfc-pulse path:nth-child(3) { animation-delay: .44s; }
+@keyframes sharing-nfc-wave { 0%, 75%, 100% { opacity: .2; } 35% { opacity: 1; } }
+.sharing-solange-camera { background: linear-gradient(145deg, #2e2c29, #1b1b1b); }
+.sharing-solange-camera > span:first-child { inset: 0 0 auto; padding: 17% 0 7%; font-size: 2cqw; background: #151515; }
+.sharing-camera-card { position: absolute; inset: 16% 0; overflow: hidden; background: #202020; }
+.sharing-camera-card > img { position: absolute; width: 230%; max-width: none; height: auto; left: -60%; top: 50%; transform: translateY(-79%); }
+.sharing-camera-card .sharing-scan-frame { left: 15%; right: 15%; top: 50%; height: auto; aspect-ratio: 1; transform: translateY(-50%); border-radius: 1cqw; }
+.sharing-solange-camera > .home-phone-island { padding: 0; width: 30%; top: 1.4%; height: 4%; background: #000; }
+@media (prefers-reduced-motion: reduce) { .sharing-nfc-pulse path { animation: none; opacity: .75; } }
+
+/* Soft studio light and contact shadows add depth without changing the artwork. */
+.home-sharing {
+  background: radial-gradient(ellipse at 18% 45%, #fff0e080, transparent 52%), radial-gradient(ellipse at 85% 45%, #dce2e970, transparent 55%), linear-gradient(180deg, #fafbfc, #f0f2f5);
+  border-top: 1px solid #ffffffc0;
+  border-bottom: 1px solid #dce0e660;
+}
+.sharing-product-demo::before, .sharing-product-demo::after {
+  content: ''; position: absolute; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse, #30292126, #3029210a 45%, transparent 70%);
+  height: 9%; filter: blur(3px);
+}
+.sharing-product-demo::before { left: 5%; top: 78%; width: 38%; transform: rotate(-5deg); }
+.sharing-product-demo::after { left: 46%; top: 94%; width: 46%; }
+.sharing-product-demo > .sharing-product-card {
+  transform: perspective(100cqw) rotateY(8deg) rotateZ(-7deg);
+  filter: drop-shadow(1px 2px 1px #241c1840) drop-shadow(6px 10px 8px #241c182b);
+}
+.sharing-product-demo > .sharing-black-back { transform: perspective(100cqw) rotateY(8deg) rotateZ(-5deg); }
+.sharing-black-back::after {
+  content: ''; position: absolute; inset: 0; border-radius: 7% / 4.5%; pointer-events: none;
+  box-shadow: inset 1px 1px 1px #ffffff38, inset -2px -1px 2px #0008;
+  background: linear-gradient(120deg, #ffffff0d, transparent 42%, #0000000a);
+}
+.sharing-product-demo > .sharing-phone {
+  transform: perspective(140cqw) rotateY(-5deg) rotateZ(2deg);
+  filter: drop-shadow(1px 2px 1px #1c20284d) drop-shadow(7px 10px 8px #1c202830);
+}
+.sharing-product-demo .sharing-screen { box-shadow: inset 0 0 2px #0008; }

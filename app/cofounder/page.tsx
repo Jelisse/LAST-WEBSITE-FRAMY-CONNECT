@@ -1,9 +1,9 @@
+import { UsersRound, ClipboardList, ShoppingBag } from 'lucide-react';
 import { getTranslations } from '@/lib/server-i18n';
-import { LanguageSelector } from '@/components/language-provider';
+import { DashboardTools } from '@/components/mobile-navigation';
 import { ApplicationManager } from '@/components/application-manager';
 import { ProductManager } from '@/components/product-manager';
 import { AccountManager } from '@/components/account-manager';
-import Link from '@/components/hard-link';
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
 import { orderLabels } from '@/lib/domain';
@@ -25,9 +25,8 @@ export default async function Page() {
   return (
     <main id="main" className="staff-page">
       <header>
-        <LanguageSelector />
+        <DashboardTools />
         <div>
-          <Link href="/">{t('Framy Connect')}</Link>
           <h1>
             {t('Direcção · ')}
             {user.displayName}
@@ -38,15 +37,32 @@ export default async function Page() {
             )}
           </p>
         </div>
-        <Link href="/sair">{t('Terminar sessão')}</Link>
       </header>
       <article>
         <h2>{t('Agentes activos')}</h2>
         <p>{agents?.total ?? 0}</p>
       </article>
-      <AccountManager />
-      <ApplicationManager />
-      <ProductManager />
+      <details className="staff-section">
+        <summary>
+          <UsersRound size={20} aria-hidden="true" />
+          {t('Contas e acessos')}
+        </summary>
+        <AccountManager />
+      </details>
+      <details className="staff-section">
+        <summary>
+          <ClipboardList size={20} aria-hidden="true" />
+          {t('Candidaturas')}
+        </summary>
+        <ApplicationManager />
+      </details>
+      <details className="staff-section">
+        <summary>
+          <ShoppingBag size={20} aria-hidden="true" />
+          {t('Produtos e planos')}
+        </summary>
+        <ProductManager />
+      </details>
       <h2>{t('Pedidos por etapa')}</h2>
       {counts.results.length ? (
         counts.results.map((c) => (

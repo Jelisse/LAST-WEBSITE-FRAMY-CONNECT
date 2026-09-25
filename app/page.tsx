@@ -15,6 +15,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { SiteFooter } from '@/components/site-shell';
+import { getHeroMedia } from '@/lib/server-hero-media';
 import { HomeHeroScene } from '@/components/home-hero-scene';
 import { HomeSharingScene } from '@/components/home-sharing-scene';
 import { getProducts } from '@/lib/server-catalog';
@@ -84,9 +85,10 @@ export const dynamic = 'force-dynamic';
 export const metadata = { robots: publicPageRobots() };
 export default async function Home() {
   const t = await getTranslations();
-  const [products, allPlans] = await Promise.all([
+  const [products, allPlans, heroMedia] = await Promise.all([
     getProducts(),
     getManagedPlans(),
+    getHeroMedia(),
   ]);
   const featured = products
     .filter((p) => p.published !== false)
@@ -170,10 +172,10 @@ export default async function Home() {
                 </span>
               </div>
             </div>
-            <HomeHeroScene />
+            <HomeHeroScene media={heroMedia} />
           </div>
         </section>
-        <HomeSharingScene />
+        <HomeSharingScene media={heroMedia} />
         <section className="home-products" id="produtos">
           <div className="home-section-heading">
             <div>

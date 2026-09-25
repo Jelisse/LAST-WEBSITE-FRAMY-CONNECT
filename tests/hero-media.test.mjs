@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import { heroMediaType, isHeroSlot } from '../lib/hero-media.ts';
+assert.equal(isHeroSlot('video1'), true);
+assert.equal(isHeroSlot('__proto__'), false);
+assert.equal(isHeroSlot('../settings'), false);
+const png = Uint8Array.from([137,80,78,71,13,10,26,10]);
+const mp4 = Uint8Array.from([0,0,0,24,102,116,121,112,105,115,111,109]);
+assert.equal(heroMediaType(png, false), 'image/png');
+assert.equal(heroMediaType(png, true), null);
+assert.equal(heroMediaType(mp4, true), 'video/mp4');
+assert.equal(heroMediaType(mp4, false), null);
+assert.equal(heroMediaType(new TextEncoder().encode('<svg onload="alert(1)">'), false), null);
+assert.equal(heroMediaType(new Uint8Array(), false), null);
+console.log('Hero media validation passed');

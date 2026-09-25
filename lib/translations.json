@@ -1937,7 +1937,7 @@
   ],
   "Secções": [
     "Sections",
-    "區段"
+    "區塊"
   ],
   "Fotografia de perfil": [
     "Profile photo",
@@ -2769,7 +2769,7 @@
   ],
   "Adicionar fotografias": [
     "Add photos",
-    "新增照片"
+    "新增相片"
   ],
   "Até 8 fotografias. PNG, JPG ou WebP, até 8 MB cada.": [
     "Up to 8 photos. PNG, JPG or WebP, up to 8 MB each.",
@@ -6038,5 +6038,141 @@
   "Pessoal e Profissional incluem um perfil digital. Corporativo: preço e condições sob consulta. Subscrições mensais ainda não disponíveis.": [
     "Personal and Professional include one digital profile. Corporate pricing and terms are agreed by consultation. Monthly subscriptions are not yet available.",
     "個人與專業方案包含一個數位檔案。企業方案的價格與條件請洽詢。月訂閱尚未開放。"
+  ],
+  "Mockup da página inicial": [
+    "Home page mockup",
+    "首頁模型"
+  ],
+  "Atualize os vídeos e as imagens do mockup da página inicial.": [
+    "Update the videos and images in the home page mockup.",
+    "更新首頁模型中的影片與圖片。"
+  ],
+  "Os dois vídeos passam em sequência, sem som. Pré-visualize cada ficheiro e publique a alteração.": [
+    "The two videos play in sequence without sound. Preview each file, then publish the change.",
+    "兩段影片依序靜音播放。預覽每個檔案後發布變更。"
+  ],
+  "Vídeo 1 — Cartão": [
+    "Video 1 — Card",
+    "影片 1 — 卡片"
+  ],
+  "Vídeo 2 — Porta-chaves": [
+    "Video 2 — Keychain",
+    "影片 2 — 鑰匙圈"
+  ],
+  "Imagem do cartão": [
+    "Card image",
+    "卡片圖片"
+  ],
+  "Imagem do porta-chaves": [
+    "Keychain image",
+    "鑰匙圈圖片"
+  ],
+  "MP4 até 25 MB. Formato vertical recomendado.": [
+    "MP4 up to 25 MB. Portrait format recommended.",
+    "MP4，最大 25 MB。建議使用直式影片。"
+  ],
+  "PNG, JPG ou WebP até 8 MB. Fundo transparente recomendado.": [
+    "PNG, JPG or WebP up to 8 MB. Transparent background recommended.",
+    "PNG、JPG 或 WebP，最大 8 MB。建議使用透明背景。"
+  ],
+  "Publicar alteração": [
+    "Publish change",
+    "發布變更"
+  ],
+  "Alteração publicada na página inicial.": [
+    "Change published on the home page.",
+    "變更已發布至首頁。"
+  ],
+  "O vídeo deve ter até 25 MB.": [
+    "The video must be no larger than 25 MB.",
+    "影片不得超過 25 MB。"
+  ],
+  "Use um vídeo MP4.": [
+    "Use an MP4 video.",
+    "請使用 MP4 影片。"
+  ],
+  "Acesso reservado ao gestor.": [
+    "Manager access required.",
+    "需要管理員權限。"
+  ],
+  "Não foi possível guardar. Tente novamente.": [
+    "Unable to save. Please try again.",
+    "無法儲存。請再試一次。"
+  ],
+  "Vídeos Framy Connect, cartão Solange e porta-chaves NFC": [
+    "Framy Connect videos, Solange card and NFC keychain",
+    "Framy Connect 影片、Solange 卡片與 NFC 鑰匙圈"
+  ],
+  "Cartão NFC Framy Connect": [
+    "Framy Connect NFC card",
+    "Framy Connect NFC 卡片"
+  ],
+  "Porta-chaves NFC Framy Connect": [
+    "Framy Connect NFC keychain",
+    "Framy Connect NFC 鑰匙圈"
+  ],
+  "Demonstração dos produtos Framy Connect": [
+    "Framy Connect product demonstration",
+    "Framy Connect 產品示範"
+  ],
+  "Reproduzir vídeo": [
+    "Play video",
+    "播放影片"
+  ],
+  "Pausar vídeo": [
+    "Pause video",
+    "暫停影片"
+  ],
+  "Frente do cartão": [
+    "Card front",
+    "卡片正面"
+  ],
+  "Verso do cartão": [
+    "Card back",
+    "卡片背面"
+  ],
+  "Imagens da página inicial": [
+    "Home page images",
+    "首頁圖片"
+  ],
+  "Toque NFC — Frente do cartão": [
+    "NFC tap — Card front",
+    "NFC 感應 — 卡片正面"
+  ],
+  "Toque NFC — Perfil no telemóvel": [
+    "NFC tap — Phone profile",
+    "NFC 感應 — 手機個人頁面"
+  ],
+  "Leitura QR — Verso do cartão": [
+    "QR scan — Card back",
+    "QR 掃描 — 卡片背面"
+  ],
+  "Em Como funciona, altere o cartão NFC, o perfil e o cartão QR. O cartão QR aparece também na câmara do telemóvel.": [
+    "In How it works, replace the NFC card, profile and QR card. The QR card also appears in the phone camera.",
+    "在使用方式區塊更換 NFC 卡片、個人頁面與 QR 卡片。QR 卡片也會同步顯示在手機相機畫面中。"
+  ],
+  "Frente do cartão NFC laranja": [
+    "Orange NFC card front",
+    "橘色 NFC 卡片正面"
+  ],
+  "Perfil Framy de Solange Siquela": [
+    "Solange Siquela’s Framy profile",
+    "Solange Siquela 的 Framy 個人頁面"
+  ],
+  "O mesmo cartão na câmara do telemóvel": [
+    "The same card in the phone camera",
+    "手機相機中的同一張卡片"
+  ],
+  "Pré-visualização": [
+    "Preview",
+    "預覽"
+  ],
+  "Substituir ficheiro": [
+    "Replace file",
+    "替換檔案"
+  ],
+  "PNG, JPG ou WebP · até 8 MB": [
+    "PNG, JPG or WebP · up to 8 MB",
+    "PNG、JPG 或 WebP · 最大 8 MB"
   ]
 }

@@ -1,141 +1,64 @@
 'use client';
 import { useI18n } from '@/components/language-provider';
-
-import { SourceImage } from '@/components/source-image';
+import type { HeroMedia } from '@/lib/hero-media';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import Link from '@/components/hard-link';
 import { Nfc, ScanLine, Globe, Camera, Zap } from 'lucide-react';
 
-const exampleProfile = '/exemplo';
-
-function DemoCard({ qr }: { qr?: string }) {
-  const { t } = useI18n();
-  return (
-    <div className="sharing-card">
-      <Image
-        src="/brand/logo.svg"
-        alt={t('Framy Connect')}
-        width={160}
-        height={73}
-        unoptimized
-      />
-      <div className="sharing-card-identity">
-        <strong>{t('FIRMINO CHAMBALE')}</strong>
-        <span>{t('Arquitecto e Planeador Fisico')}</span>
-        <i />
-        <small>
-          <SourceImage src="/social/instagram.svg" alt="" />
-          {t(' Instagram')}
-        </small>
-        <small>
-          <Globe />
-          {t(' Perfil Framy Connect')}
-        </small>
-      </div>
-      <span className="sharing-card-tagline">
-        {t('O Seu Mundo num Toque.')}
-      </span>
-      {qr ? (
-        <SourceImage
-          className="sharing-qr"
-          src={qr}
-          alt={t('QR para abrir o perfil de exemplo')}
-        />
-      ) : (
-        <Nfc className="sharing-nfc" />
-      )}
-    </div>
-  );
-}
-
-function DemoPhone({ scan, qr }: { scan?: boolean; qr?: string }) {
-  const { t } = useI18n();
-  return (
-    <div className={`sharing-phone${scan ? ' sharing-phone-scan' : ''}`}>
-      <Image
-        className="sharing-shell"
-        src="/home/iphone-side-shell.png"
-        alt=""
-        width={896}
-        height={1792}
-        unoptimized
-      />
-      <div className="sharing-screen">
-        {scan ? (
-          <div className="sharing-camera">
-            <span>{t('Ler código QR')}</span>
-            <DemoCard qr={qr} />
-            <div className="sharing-scan-frame" />
-            <div className="sharing-camera-controls">
-              <Zap />
-              <i />
-              <Camera />
-            </div>
-          </div>
-        ) : (
-          <Image
-            src="/home/profile-screen.jpg"
-            alt={t('Perfil Framy de Firmino Chambale')}
-            fill
-            unoptimized
-            sizes="260px"
-          />
-        )}
+function DemoPhone({ image, scan = false, label, alt }: {
+  image: string; scan?: boolean; label: string; alt: string;
+}) {
+  return <div className={`sharing-phone${scan ? ' sharing-phone-scan' : ''}`}>
+    <Image className="sharing-shell" src="/home/iphone-side-shell.png" alt="" width={896} height={1792} unoptimized />
+    <div className="sharing-screen">
+      {scan ? <div className="sharing-camera sharing-solange-camera">
+        <span>{label}</span>
+        <div className="sharing-camera-card">
+          <Image src={image} alt={alt} width={816} height={1290} unoptimized />
+          <div className="sharing-scan-frame" aria-hidden="true" />
+        </div>
+        <div className="sharing-camera-controls" aria-hidden="true"><Zap /><i /><Camera /></div>
         <span className="home-phone-island" />
-      </div>
+      </div> : <Image src={image} alt={alt} fill unoptimized sizes="(max-width: 700px) 150px, 190px" />}
     </div>
-  );
+  </div>;
 }
 
-export function HomeSharingScene() {
+export function HomeSharingScene({ media }: { media: HeroMedia }) {
   const { t } = useI18n();
-  const [qr, setQr] = useState<string>();
-  useEffect(() => {
-    let active = true;
-    import('qrcode')
-      .then(({ default: QRCode }) =>
-        QRCode.toDataURL(new URL(exampleProfile, window.location.origin).href, {
-          width: 240,
-          margin: 2,
-          color: { dark: '#30231e', light: '#ffffff' },
-        }),
-      )
-      .then((image) => {
-        if (active) setQr(image);
-      })
-      .catch(() => {});
-    return () => {
-      active = false;
-    };
-  }, []);
-  return (
-    <section className="home-sharing" id="como-funciona" aria-labelledby="sharing-title">
-      <header>
-        <p>{t('DUAS FORMAS DE SE CONECTAR')}</p>
-        <h2 id="sharing-title">{t('Duas formas. Um perfil.')}</h2>
-        <span>{t('Partilhe por toque ou código QR.')}</span>
-      </header>
-      <div className="sharing-stage">
-        <article className="sharing-method sharing-tap">
-          <h3><Nfc size={22} aria-hidden="true" />{t('Toque para partilhar')}</h3>
-          <div className="sharing-illustration">
-            <DemoCard />
-            <DemoPhone />
+  return <section className="home-sharing" id="como-funciona" aria-labelledby="sharing-title">
+    <header>
+      <h2 id="sharing-title">{t('Duas formas. Um perfil.')}</h2>
+    </header>
+    <div className="sharing-stage">
+      <article className="sharing-method sharing-tap">
+        <h3><Nfc size={22} aria-hidden="true" />{t('Toque para partilhar')}</h3>
+        <div className="sharing-illustration sharing-product-demo">
+          <div className="sharing-product-card sharing-orange-front">
+            <Image src={media.tapCard} alt={t('Frente do cartão NFC laranja')} width={1024} height={1600} unoptimized />
           </div>
-          <p>{t('Aproxime o cartão de um telemóvel compatível com NFC.')}</p>
-        </article>
-        <article className="sharing-method sharing-scan">
-          <h3><ScanLine size={22} aria-hidden="true" />{t('Leia o QR para se conectar')}</h3>
-          <div className="sharing-illustration">
-            <DemoCard qr={qr} />
-            <DemoPhone scan qr={qr} />
+          <svg className="sharing-nfc-pulse" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+            <path d="M20 38 Q31 50 20 62" />
+            <path d="M39 25 Q61 50 39 75" />
+            <path d="M60 12 Q94 50 60 88" />
+          </svg>
+          <DemoPhone image={media.tapProfile} label="" alt={t('Perfil Framy de Solange Siquela')} />
+        </div>
+        <p>{t('Aproxime o cartão de um telemóvel compatível com NFC.')}</p>
+      </article>
+      <article className="sharing-method sharing-scan">
+        <h3><ScanLine size={22} aria-hidden="true" />{t('Leia o QR para se conectar')}</h3>
+        <div className="sharing-illustration sharing-product-demo">
+          <div className="sharing-product-card sharing-black-back">
+            <Image src={media.scanCard} alt={t('Verso do cartão')} width={816} height={1290} unoptimized />
           </div>
-          <p>{t('Abra a câmara e leia o código QR do cartão.')}</p>
-        </article>
-      </div>
-      <a className="home-text-link sharing-demo-link" href={exampleProfile}>
-        {t('Ver perfil de exemplo ')}<Globe size={18} aria-hidden="true" />
-      </a>
-    </section>
-  );
+          <DemoPhone image={media.scanCard} scan label={t('Ler código QR')} alt={t('O mesmo cartão na câmara do telemóvel')} />
+        </div>
+        <p>{t('Abra a câmara e leia o código QR do cartão.')}</p>
+      </article>
+    </div>
+    <Link className="home-text-link sharing-demo-link" href="/exemplo">
+      {t('Ver perfil de exemplo ')}<Globe size={18} aria-hidden="true" />
+    </Link>
+  </section>;
 }

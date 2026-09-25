@@ -121,3 +121,7 @@
 .staff-page h2 {
   font-size: 20px;
 }
+.staff-section { margin:18px 0; border:1px solid #e5dfd8; padding:18px; border-radius:14px; background:#fff; }
+.staff-section > summary { cursor:pointer; font-size:18px; font-weight:600; padding:6px 0; }
+.staff-section[open] > summary { margin-bottom:18px; }
+.staff-page > header { flex-wrap:wrap; }

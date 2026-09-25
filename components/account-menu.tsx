@@ -3,7 +3,17 @@ import { useI18n } from '@/components/language-provider';
 
 import { useEffect, useState } from 'react';
 import Link from '@/components/hard-link';
-import { UserRound, ChevronDown, LayoutDashboard, Package, BriefcaseBusiness, ShieldCheck, LogOut, LogIn, UserPlus } from 'lucide-react';
+import {
+  UserRound,
+  ChevronDown,
+  LayoutDashboard,
+  Package,
+  BriefcaseBusiness,
+  ShieldCheck,
+  LogOut,
+  LogIn,
+  UserPlus,
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -26,7 +36,11 @@ export function AccountMenu({
   }, []);
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={`account-menu-trigger ${className}`}>
+      <DropdownMenuTrigger
+        id="framy-account-menu-trigger"
+        aria-label={t('Minha Conta')}
+        className={`account-menu-trigger ${className}`}
+      >
         <UserRound size={17} />
         <span className="account-menu-label">{t(' Minha Conta ')}</span>
         <ChevronDown className="account-menu-chevron" size={14} />
@@ -43,15 +57,17 @@ export function AccountMenu({
               render={<Link href={dashboard} />}
               nativeButton={false}
             >
-              <LayoutDashboard size={18} aria-hidden="true" /><span>{t('Abrir o meu painel')}</span>
+              <LayoutDashboard size={18} aria-hidden="true" />
+              <span>{t('Abrir o meu painel')}</span>
             </DropdownMenuItem>
             {dashboard === '/agent' && (
               <DropdownMenuItem
-              className="account-menu-option"
+                className="account-menu-option"
                 render={<Link href="/dashboard" />}
                 nativeButton={false}
               >
-                <Package size={18} aria-hidden="true" /><span>{t('Os meus pedidos e perfil')}</span>
+                <Package size={18} aria-hidden="true" />
+                <span>{t('Os meus pedidos e perfil')}</span>
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
@@ -59,7 +75,8 @@ export function AccountMenu({
               render={<Link href="/aplicar" />}
               nativeButton={false}
             >
-              <BriefcaseBusiness size={18} aria-hidden="true" /><span>{t('A minha candidatura')}</span>
+              <BriefcaseBusiness size={18} aria-hidden="true" />
+              <span>{t('A minha candidatura')}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -67,7 +84,8 @@ export function AccountMenu({
               render={<Link href="/seguranca" />}
               nativeButton={false}
             >
-              <ShieldCheck size={18} aria-hidden="true" /><span>{t('Segurança da conta')}</span>
+              <ShieldCheck size={18} aria-hidden="true" />
+              <span>{t('Segurança da conta')}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -75,7 +93,8 @@ export function AccountMenu({
               render={<Link href="/sair" />}
               nativeButton={false}
             >
-              <LogOut size={18} aria-hidden="true" /><span>{t('Terminar sessão')}</span>
+              <LogOut size={18} aria-hidden="true" />
+              <span>{t('Terminar sessão')}</span>
             </DropdownMenuItem>
           </>
         ) : (
@@ -85,7 +104,8 @@ export function AccountMenu({
               render={<Link href="/entrar" />}
               nativeButton={false}
             >
-              <LogIn size={18} aria-hidden="true" /><span>{t('Entrar')}</span>
+              <LogIn size={18} aria-hidden="true" />
+              <span>{t('Entrar')}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -93,7 +113,8 @@ export function AccountMenu({
               render={<Link href="/entrar?mode=register" />}
               nativeButton={false}
             >
-              <UserPlus size={18} aria-hidden="true" /><span>{t('Criar conta')}</span>
+              <UserPlus size={18} aria-hidden="true" />
+              <span>{t('Criar conta')}</span>
             </DropdownMenuItem>
           </>
         )}

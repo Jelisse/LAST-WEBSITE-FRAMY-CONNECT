@@ -7,6 +7,7 @@ import { LanguageProvider } from '@/components/language-provider';
 import './globals.css';
 import './footer.css';
 import './products.css';
+import './mobile-dashboard.css';
 const poppins = Poppins({
   weight: ['400', '500', '600', '700', '800'],
   subsets: ['latin'],

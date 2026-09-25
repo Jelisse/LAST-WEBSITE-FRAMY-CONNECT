@@ -8,6 +8,7 @@ import { ProductAnalytics } from './product-analytics';
 import { PersonalisationManager } from './personalisation-manager';
 import { money } from '@/lib/catalog';
 import { Button } from './ui/button';
+import { MediaUploadBox } from './media-upload-box';
 import { Input } from './ui/input';
 
 export function ProductManager({ onSaved }: { onSaved?: () => void }) {
@@ -175,20 +176,15 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
       ) : draft ? (
         <form onSubmit={save} className="product-management-form">
           <div className="product-image-editor">
-            <SourceImage src={draft.imageUrl} alt={draft.name} />
-            <label>
-              {t('Adicionar fotografias')}
-              <input
-                type="file"
-                multiple
-                accept="image/png,image/jpeg,image/webp"
-                disabled={busy}
-                onChange={(e) => void upload(Array.from(e.target.files ?? []))}
-              />
-            </label>
-            <small>
-              {t('Até 8 fotografias. PNG, JPG ou WebP, até 8 MB cada.')}
-            </small>
+            <MediaUploadBox
+              title={t('Adicionar fotografias')}
+              src={draft.imageUrl}
+              hint={t('Até 8 fotografias. PNG, JPG ou WebP, até 8 MB cada.')}
+              accept="image/png,image/jpeg,image/webp"
+              multiple
+              disabled={busy}
+              onFiles={upload}
+            />
             <div className="gallery-editor">
               {(draft.images ?? [draft.imageUrl]).map((src, i) => (
                 <div key={src}>

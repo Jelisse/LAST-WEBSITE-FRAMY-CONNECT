@@ -1,14 +1,16 @@
 'use client';
-import { useI18n, LanguageSelector } from '@/components/language-provider';
+import { useI18n } from '@/components/language-provider';
 
 import { useCallback, useEffect, useState } from 'react';
-import Link from '@/components/hard-link';
+
 import { orderLabels } from '@/lib/domain';
 import {
   reportTypes,
   type AgentOrder,
   type AgentReport,
 } from '@/lib/agent-workflow';
+import { DashboardTools } from './mobile-navigation';
+import { Package, Boxes, ClipboardList, RefreshCw } from 'lucide-react';
 import { AgentAction } from './agent-action';
 import { OrderArtwork } from './order-artwork';
 
@@ -111,9 +113,8 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
   return (
     <main id="main" className="agent-workspace">
       <header className="agent-header">
-        <LanguageSelector />
+        <DashboardTools />
         <div>
-          <Link href="/">{t('Framy Connect')}</Link>
           <p className="agent-eyebrow">{t('Operações · Agente de execução')}</p>
           <h1>
             {t('Olá, ')}
@@ -123,7 +124,6 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
             {t('Os seus pedidos, produção, entregas e stock num só lugar.')}
           </p>
         </div>
-        <Link href="/sair">{t('Terminar sessão')}</Link>
       </header>
       <section className="agent-metrics" aria-label={t('Resumo de trabalho')}>
         {[
@@ -154,7 +154,14 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
               aria-pressed={tab === id}
               onClick={() => setTab(id)}
             >
-              {t(label)}
+              {id === 'orders' ? (
+                <Package size={18} aria-hidden="true" />
+              ) : id === 'stock' ? (
+                <Boxes size={18} aria-hidden="true" />
+              ) : (
+                <ClipboardList size={18} aria-hidden="true" />
+              )}
+              <span>{t(label)}</span>
               {id === 'reports' &&
               data?.reports.some((r) => r.status === 'open')
                 ? ' •'
@@ -167,6 +174,7 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
           disabled={busy}
           onClick={() => void load().catch((e) => setError(e.message))}
         >
+          <RefreshCw size={17} aria-hidden="true" />
           {t('Actualizar')}
         </button>
       </div>

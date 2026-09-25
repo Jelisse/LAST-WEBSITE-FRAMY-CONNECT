@@ -319,3 +319,18 @@
     width: 100%;
   }
 }
+.agent-header { flex-direction:column; gap:18px; }
+.agent-toolbar nav button,.agent-toolbar > button { display:flex; align-items:center; justify-content:center; gap:8px; min-height:44px; }
+@media(max-width:700px) {
+ .agent-header { padding:0 0 20px; border:0; }
+ .agent-eyebrow { margin:0 0 8px; font-size:12px; }
+ .agent-header h1 { margin:0; font-size:27px; }
+ .agent-header p:last-child:not(.agent-eyebrow) { display:none; }
+ .agent-toolbar nav { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:100%; gap:6px; }
+ .agent-toolbar nav button { flex-direction:column; padding:10px 6px; font-size:12px; line-height:1.4; }
+ .agent-toolbar > button { margin-left:auto; }
+ .agent-metrics { margin-bottom:20px; }
+ .agent-filters { min-width:0; flex-wrap:wrap; }
+ .agent-workspace input:not([type=checkbox]),.agent-workspace select,.agent-workspace textarea { max-width:100%; font-size:16px; }
+ .agent-facts { overflow-wrap:anywhere; }
+}

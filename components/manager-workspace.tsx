@@ -27,7 +27,9 @@ import { OrderArtwork } from './order-artwork';
 import { ProfileHandoff } from './profile-handoff';
 import { ApplicationManager } from './application-manager';
 import { AccountManager } from './account-manager';
+import { MobileNavigation } from './mobile-navigation';
 import { AccountMenu } from './account-menu';
+import { HeroManager } from './hero-manager';
 import { ProductManager } from './product-manager';
 import { OperationsAgentReports } from './operations-agent-reports';
 import { money, type Product } from '@/lib/catalog';
@@ -85,6 +87,7 @@ type Data = {
 const sections = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
   { id: 'operations', label: 'Operações', icon: Boxes },
+  { id: 'hero', label: 'Página inicial', icon: LayoutDashboard },
   { id: 'catalog', label: 'Produtos e planos', icon: ShoppingBag },
   { id: 'accounts', label: 'Contas e acessos', icon: Users },
   { id: 'applications', label: 'Candidaturas', icon: Users },
@@ -379,11 +382,18 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
       </aside>
       <div className="manager-body">
         <header className="manager-top">
-          <LanguageSelector />
-          <span>
-            {t('Gestor')}{' '}
-            <span>/ {t(sections.find((s) => s.id === section)?.label)}</span>
+          <MobileNavigation
+            items={sections.map(({ id, label, icon: Icon }) => ({
+              label,
+              icon: <Icon size={20} />,
+              active: section === id,
+              onSelect: () => navigate(id),
+            }))}
+          />
+          <span className="desktop-language">
+            <LanguageSelector />
           </span>
+          <span>{t('Gestor')} </span>
           <AccountMenu />
         </header>
         <main id="main" className="manager-main">
@@ -396,19 +406,23 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   ? t('O que acontece no seu negócio, num só lugar.')
                   : section === 'operations'
                     ? t('Ligue os pedidos, a equipa e o stock.')
-                    : section === 'catalog'
+                    : section === 'hero'
                       ? t(
-                          'Os produtos e as subscrições que oferece aos seus clientes.',
+                          'Atualize os vídeos e as imagens do mockup da página inicial.',
                         )
-                      : section === 'applications'
-                        ? t('Analise e acompanhe as candidaturas a agente.')
-                        : section === 'accounts'
-                          ? t(
-                              'Crie acessos, recupere contas e controle a disponibilidade da equipa.',
-                            )
-                          : t(
-                              'Acompanhe os valores recebidos, pendentes e reconhecidos.',
-                            )}
+                      : section === 'catalog'
+                        ? t(
+                            'Os produtos e as subscrições que oferece aos seus clientes.',
+                          )
+                        : section === 'applications'
+                          ? t('Analise e acompanhe as candidaturas a agente.')
+                          : section === 'accounts'
+                            ? t(
+                                'Crie acessos, recupere contas e controle a disponibilidade da equipa.',
+                              )
+                            : t(
+                                'Acompanhe os valores recebidos, pendentes e reconhecidos.',
+                              )}
               </p>
             </div>
             <button
@@ -424,11 +438,13 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
               {t(' Actualizar')}
             </button>
           </div>
-          <p className="manager-sandbox">
-            {t(
-              'Gestão de encomendas · Confirme cada transacção no prestador antes de a registar. Valores de produtos em MZN; planos mensais em meticais.',
-            )}
-          </p>
+          {(section === 'operations' || section === 'finance') && (
+            <p className="manager-sandbox">
+              {t(
+                'Gestão de encomendas · Confirme cada transacção no prestador antes de a registar. Valores de produtos em MZN; planos mensais em meticais.',
+              )}
+            </p>
+          )}
           {error && (
             <p role="alert" className="manager-error">
               {t(error)}
@@ -467,6 +483,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   </button>
                 </div>
               )}
+              {section === 'hero' && <HeroManager />}
               {section === 'accounts' && <AccountManager />}
               {section === 'applications' && <ApplicationManager />}
               {section === 'overview' && (

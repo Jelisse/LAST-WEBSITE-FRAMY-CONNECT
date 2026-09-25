@@ -1,4 +1,5 @@
 'use client';
+import { MediaUploadBox } from './media-upload-box';
 import { useI18n } from '@/components/language-provider';
 
 import { SourceImage } from '@/components/source-image';
@@ -878,35 +879,26 @@ export function ProductDesigner({
                 )}
                 {!readOnly && (card || side === 'front') && (
                   <>
-                    <label>
-                      {card && side === 'back'
-                        ? t('Design próprio (PDF)')
-                        : t('Logótipo ou design próprio')}
-                      <input
-                        type="file"
-                        accept={
-                          card && side === 'back'
-                            ? 'application/pdf'
-                            : 'image/png,image/jpeg,application/pdf'
-                        }
-                        onChange={(e) => {
-                          void upload(e.target.files?.[0]);
-                          e.target.value = '';
-                        }}
-                      />
-                    </label>
-                    <small>
-                      {card && side === 'back'
-                        ? t(
-                            'O logótipo aparece apenas na frente. PDF para design completo · até 8 MB.',
-                          )
-                        : t(
-                            'PNG ou JPG substitui «Logo» no local indicado. PDF para design completo · até 8 MB.',
-                          )}
-                    </small>
+                    <MediaUploadBox
+                      title={t(
+                        card && side === 'back'
+                          ? 'Design próprio (PDF)'
+                          : 'Logótipo ou design próprio',
+                      )}
+                      fileName={selected?.name}
+                      src={selected ? art[side] : undefined}
+                      mediaType={selected && art[side] ? 'image' : 'file'}
+                      disabled={processing}
+                      accept={
+                        card && side === 'back'
+                          ? 'application/pdf'
+                          : 'image/png,image/jpeg,application/pdf'
+                      }
+                      hint={t('Use PNG, JPG ou PDF até 8 MB.')}
+                      onFiles={(files) => upload(files[0])}
+                    />
                     {selected && (
                       <>
-                        <p>{selected.name}</p>
                         {(!card || side === 'front') &&
                           !selected.name.toLowerCase().endsWith('.pdf') && (
                             <div className="logo-background-controls">

@@ -62,7 +62,8 @@ import {
   SidebarFooter,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
+  SidebarMenuButton as BaseSidebarMenuButton,
+  useSidebar,
   SidebarInset,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
@@ -1143,7 +1144,6 @@ export function Workspace({ displayName }: { displayName: string }) {
           <DialogDescription>
             {t('Pedido #')}
             {selected?.id.slice(0, 8).toUpperCase()}
-
           </DialogDescription>
           {selected && (
             <>
@@ -1358,5 +1358,20 @@ function Metric({
       <strong>{value}</strong>
       <small>{t(note)}</small>
     </article>
+  );
+}
+
+function SidebarMenuButton(
+  props: React.ComponentProps<typeof BaseSidebarMenuButton>,
+) {
+  const { isMobile, setOpenMobile } = useSidebar();
+  return (
+    <BaseSidebarMenuButton
+      {...props}
+      onClick={(event) => {
+        props.onClick?.(event);
+        if (isMobile) setOpenMobile(false);
+      }}
+    />
   );
 }

@@ -3,7 +3,7 @@ import { useI18n } from '@/components/language-provider';
 
 import { useEffect, useState } from 'react';
 import Link from './hard-link';
-import { SourceImage } from './source-image';
+import { MediaUploadBox } from './media-upload-box';
 import {
   applicationAge,
   applicationLabels,
@@ -289,40 +289,18 @@ export function AgentApplicationForm({
                 {fileKinds.map(([kind, label]) => {
                   const file = app.files.find((f) => f.kind === kind);
                   return (
-                    <div key={kind}>
-                      <h3>{t(label)}</h3>
-                      {file && (
-                        <SourceImage
-                          src={'/api/application-files/' + file.id}
-                          alt={t(label)}
-                          width={260}
-                          height={180}
-                        />
-                      )}
-                      <label>
-                        {t('Escolher ficheiro')}
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/webp"
-                          disabled={busy || unsaved}
-                          onChange={(e) =>
-                            void upload(kind, e.target.files?.[0])
-                          }
-                        />
-                      </label>
-                      <label>
-                        {t('Tirar fotografia')}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          capture={kind === 'portrait' ? 'user' : 'environment'}
-                          disabled={busy || unsaved}
-                          onChange={(e) =>
-                            void upload(kind, e.target.files?.[0])
-                          }
-                        />
-                      </label>
-                    </div>
+                    <MediaUploadBox
+                      key={kind}
+                      title={t(label)}
+                      src={
+                        file ? '/api/application-files/' + file.id : undefined
+                      }
+                      hint={t('PNG, JPG ou WebP · até 8 MB')}
+                      accept="image/png,image/jpeg,image/webp"
+                      capture={kind === 'portrait' ? 'user' : 'environment'}
+                      disabled={busy || unsaved}
+                      onFiles={(files) => upload(kind, files[0])}
+                    />
                   );
                 })}
               </div>
