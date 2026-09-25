@@ -104,3 +104,39 @@
     opacity: .09;
   }
 }
+/* Featured products: one clear availability label, balanced image and copy. */
+.framy-home .home-product-group + .home-product-group { margin-top:36px; }
+.framy-home .home-upcoming-heading { font-size:20px; font-weight:600; margin:0 0 18px; color:#655d57; }
+.framy-home .home-products-grid.has-available .home-product.is-available {
+  grid-template-columns:minmax(0,.45fr) minmax(0,.55fr);
+  background:#fff5eb; border-color:#ead1bc; overflow:hidden;
+  box-shadow:0 12px 32px #703d1410;
+}
+.framy-home .home-products-grid .is-available .home-product-art {
+  height:360px; padding:20px; align-items:center;
+  background:radial-gradient(ellipse at 55% 55%,#eadacb80,transparent 72%);
+}
+.framy-home .home-products-grid .is-available .home-product-art img {
+  width:100%; height:100%; max-width:380px; object-fit:contain;
+  mix-blend-mode:multiply;
+  mask-image:radial-gradient(ellipse closest-side at center,#000 76%,transparent 100%);
+}
+.framy-home .home-products-grid .is-available .home-product-copy { padding:32px 44px 32px 24px; }
+.framy-home .home-available-badge {
+  display:inline-flex; align-items:center; gap:8px; padding:6px 11px;
+  margin-bottom:14px; background:#f4e8d9; border:1px solid #e4ccb3;
+  border-radius:999px; color:#78401f; font-size:12px; font-weight:600;
+}
+.framy-home .home-available-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:#a34219; }
+.framy-home .home-products-grid .is-available h3 { margin:0 0 8px; font-size:clamp(25px,2.6vw,34px); }
+.framy-home .home-products-grid .is-available .home-product-price { font-size:26px; margin-top:22px; }
+.framy-home .home-products-grid .is-available .home-product-action { margin-top:20px; min-height:48px; justify-content:center; }
+.framy-home .home-product h4 { font-size:18px; font-weight:600; line-height:1.4; margin:0 0 8px; }
+.framy-home .home-product.is-coming-soon .home-product-art img { opacity:.85; filter:saturate(.65); }
+@media(max-width:700px) {
+  .framy-home .home-products-grid.has-available .home-product.is-available { grid-template-columns:minmax(0,1fr); }
+  .framy-home .home-products-grid .is-available .home-product-art { height:280px; aspect-ratio:auto; padding:12px; }
+  .framy-home .home-products-grid .is-available .home-product-copy { padding:12px 24px 24px; }
+  .framy-home .home-products-grid .is-available .home-product-action { width:100%; }
+  .framy-home .home-products-grid .is-available .home-product-price { font-size:24px; margin-top:18px; }
+}

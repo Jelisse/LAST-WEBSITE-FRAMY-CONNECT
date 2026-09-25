@@ -192,13 +192,13 @@ export default async function Home() {
               <ArrowUpRight size={18} />
             </Link>
           </div>
-          <p className="home-disclosure">
-            {t(
-              'Porta-chaves NFC disponíveis. Os restantes produtos chegam brevemente.',
-            )}
-          </p>
-          <div className={`home-products-grid${featured.some(p => p.available) ? " has-available" : ""}`}>
-            {featured.map((p) => (
+          {[true, false].map((available) => {
+            const items = featured.filter(p => p.available === available);
+            if (!items.length) return null;
+            return <div className="home-product-group" key={String(available)}>
+              {!available && <h3 className="home-upcoming-heading">{t('Brevemente')}</h3>}
+          <div className={`home-products-grid${available ? " has-available" : ""}`}>
+            {items.map((p) => (
               <Link
                 className={`home-product ${p.available ? 'is-available' : 'is-coming-soon'}`}
                 key={p.id}
@@ -214,21 +214,17 @@ export default async function Home() {
                   />
                 </div>
                 <div className="home-product-copy">
-                  <h3>{t(productNames[p.name] ?? p.name)}</h3>
+                  {p.available && <span className="home-available-badge">{t('Disponível agora')}</span>}
+                  {p.available ? <h3>{t(productNames[p.name] ?? p.name)}</h3> : <h4>{t(productNames[p.name] ?? p.name)}</h4>}
                   <p>{t(p.tagline)}</p>
-                  <strong className="home-product-price">
-                    {p.available ? money(p.amount, t.locale) : t('Brevemente')}
-                  </strong>
-                  <span className="home-product-status">
-                    {p.available
-                      ? t('Produto físico · disponível para encomenda')
-                      : t('Brevemente · compra ainda indisponível')}
-                  </span>
+                  {p.available && <strong className="home-product-price">{money(p.amount, t.locale)}</strong>}
                   <span className="home-product-action">{p.available ? t("Encomendar agora") : t("Ver detalhes")} <ArrowUpRight size={18} /></span>
                 </div>
               </Link>
             ))}
           </div>
+          </div>;
+          })}
         </section>
         <section className="home-plans" id="planos">
           <div className="home-section-heading">
