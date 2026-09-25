@@ -16,6 +16,10 @@ export function HeroVideo({ sources }: { sources: string[] }) {
   }, []);
   useEffect(() => {
     let cancelled = false;
+    if (ref.current) {
+      ref.current.defaultPlaybackRate = 1.8;
+      ref.current.playbackRate = 1.8;
+    }
     if (paused) ref.current?.pause();
     else void ref.current?.play().catch((error: DOMException) => {
       if (!cancelled && error.name !== 'AbortError') setPaused(true);

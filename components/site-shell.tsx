@@ -4,7 +4,7 @@ import { MobileNavigation } from '@/components/mobile-navigation';
 import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
 import Link from '@/components/hard-link';
-import { ArrowUpRight, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, Mail, MessageCircle, ShieldCheck } from 'lucide-react';
 export async function SiteHeader({ focused = false }: { focused?: boolean }) {
   const t = await getTranslations();
   return (
@@ -86,11 +86,11 @@ export async function SiteFooter() {
                 {t('info@framyconnect.co.mz')}
               </span>
             </a>
-            <a href="mailto:support@framyconnect.co.mz">
-              <Mail size={16} />
+            <a href="https://wa.me/258846847629" target="_blank" rel="noopener noreferrer">
+              <MessageCircle size={16} aria-hidden="true" />
               <span>
-                <small>{t('Apoio ao cliente')}</small>
-                {t('support@framyconnect.co.mz')}
+                <small>{t('WhatsApp')}</small>
+                +258 84 684 7629
               </span>
             </a>
             <Link className="brand-footer-pill" href="/contacto">
