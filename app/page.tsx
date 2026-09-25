@@ -22,6 +22,7 @@ import { getProducts } from '@/lib/server-catalog';
 import { getManagedPlans } from '@/lib/server-plans';
 import { money, productOrder } from '@/lib/catalog';
 import './home.css';
+import './home-atmosphere.css';
 
 const productNames: Record<string, string> = {
   'PVC Business Cards': 'Cartão NFC em PVC',

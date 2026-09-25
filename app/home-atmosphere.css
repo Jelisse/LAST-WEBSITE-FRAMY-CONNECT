@@ -1,0 +1,103 @@
+/* A shared warm canvas, with four quiet appearances of the mountain artwork. */
+.framy-home {
+  --home-ivory: #fff9f3;
+  --home-cream: #fff2e6;
+  background: var(--home-ivory);
+}
+
+.framy-home .home-nav { background: var(--home-ivory); }
+.framy-home .home-sharing {
+  position: relative;
+  isolation: isolate;
+  border: 0;
+  background:
+    radial-gradient(ellipse at 24% 48%, #ffd8b747, transparent 48%),
+    radial-gradient(ellipse at 78% 52%, #efd6bf40, transparent 46%),
+    linear-gradient(180deg, var(--home-ivory), #fff5eb 55%, var(--home-ivory));
+}
+.framy-home .home-sharing > * { position: relative; z-index: 1; }
+
+.framy-home :is(.home-products, .home-plans, .home-audience, .home-about, .home-faq) {
+  max-width: none;
+  padding-inline: max(5%, calc((100% - 1296px) / 2));
+}
+.framy-home .home-products {
+  background: linear-gradient(180deg, var(--home-ivory), #fff4e970, var(--home-ivory));
+}
+.framy-home .home-plans {
+  background: linear-gradient(180deg, var(--home-ivory), var(--home-cream));
+}
+.framy-home .home-audience {
+  background: linear-gradient(180deg, var(--home-cream), var(--home-ivory));
+}
+.framy-home :is(.home-about, .home-faq) {
+  background: var(--home-ivory);
+  border-top: 0;
+}
+.framy-home .home-product.is-coming-soon { background: #f6f0e9; }
+.framy-home .home-product.is-coming-soon .home-product-art { background: #eee7de; }
+
+/* Reuse the original dots. Multiply removes the artwork's white background. */
+.framy-home .home-sharing::before,
+.framy-home .home-products::before {
+  content: '';
+  display: block;
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  background: url('/brand/profile-mountains.png') no-repeat center / 100% 100%;
+  mix-blend-mode: multiply;
+  filter: sepia(1);
+  opacity: .06;
+}
+.framy-home .home-sharing::before {
+  inset: 20% -8% 12%;
+  transform: scaleY(-1);
+  mask-image: radial-gradient(ellipse at center, #000 15%, transparent 70%);
+}
+.framy-home .home-products::before {
+  inset: auto -15% -4% auto;
+  width: 74%;
+  height: 65%;
+  opacity: .055;
+  mask-image: linear-gradient(110deg, transparent 15%, #000 85%);
+}
+
+/* A deliberate warm finish; no extra pattern in the call to action. */
+.framy-home .home-how { background: linear-gradient(135deg, #b83b09, #87391f); }
+.framy-home .home-how::before { display: none; }
+.framy-home .brand-footer {
+  background: linear-gradient(180deg, #87391f, #30231e 150px);
+}
+.framy-home .brand-footer::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+  inset: auto -4% -12% 15%;
+  height: 76%;
+  background: url('/brand/profile-mountains.png') no-repeat center bottom / 100% 100%;
+  filter: invert(1);
+  mix-blend-mode: screen;
+  opacity: .055;
+  mask-image: linear-gradient(180deg, transparent, #000);
+}
+
+@media (max-width: 700px) {
+  .framy-home .home-sharing::before {
+    inset: 22% -52% 20%;
+    opacity: .035;
+    mask-image: linear-gradient(180deg, transparent, #000 40%, transparent);
+  }
+  .framy-home .home-products::before {
+    width: 125%;
+    height: 30%;
+    right: -55%;
+    opacity: .035;
+  }
+  .framy-home .brand-footer::before {
+    inset: auto -50% -3% 0;
+    height: 28%;
+    opacity: .04;
+  }
+}
