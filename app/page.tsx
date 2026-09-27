@@ -25,6 +25,7 @@ import { money, productOrder } from '@/lib/catalog';
 import './home.css';
 import './home-atmosphere.css';
 import './home-interactions.css';
+import './home-featured.css';
 
 const productNames: Record<string, string> = {
   'PVC Business Cards': 'Cartão NFC em PVC',
@@ -200,7 +201,26 @@ export default async function Home() {
             return <div className="home-product-group" key={String(available)}>
               {!available && <h3 className="home-upcoming-heading">{t('Brevemente')}</h3>}
           <div className={`home-products-grid${available ? " has-available" : ""}`}>
-            {items.map((p) => (
+            {items.map((p) => p.available ? (
+              <article className="home-featured-product" key={p.id}>
+                <div className="home-featured-visual">
+                  <span className="home-available-badge">{t('Disponível agora')}</span>
+                  <SourceImage src={p.imageUrl} alt={t(productNames[p.name] ?? p.name)} width={1254} height={1254} loading="lazy" />
+                  <span className="home-featured-caption">{t('O Seu Mundo num Toque.')}</span>
+                </div>
+                <div className="home-featured-content">
+                  <span className="home-featured-eyebrow">{t('Framy Connect')}</span>
+                  <h3>{t(productNames[p.name] ?? p.name)}</h3>
+                  <p className="home-featured-description">{t(p.tagline)}</p>
+                  {p.id === 'keychain' && <p className="home-featured-benefit"><Nfc size={20} aria-hidden="true" />{t('Partilhe contactos, redes sociais e trabalho por toque ou QR.')}</p>}
+                  <div className="home-featured-purchase">
+                    <div className="home-featured-price"><strong>{money(p.amount, t.locale)}</strong><span>{t('Preço por unidade. A entrega é confirmada separadamente.')}</span></div>
+                    <Link className="home-primary" href={`/encomendar/${p.id}`}>{t('Encomendar agora')}<ArrowUpRight size={18} aria-hidden="true" /></Link>
+                    <Link className="home-featured-details" href={`/produtos/${p.id}`}>{t('Ver detalhes')}<ArrowUpRight size={16} aria-hidden="true" /></Link>
+                  </div>
+                </div>
+              </article>
+            ) : (
               <Link
                 className={`home-product ${p.available ? 'is-available' : 'is-coming-soon'}`}
                 key={p.id}
