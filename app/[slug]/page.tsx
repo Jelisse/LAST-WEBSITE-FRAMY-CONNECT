@@ -1,6 +1,7 @@
+import { publishedProfile } from '@/lib/server-profile-access';
 import { getTranslations } from '@/lib/server-i18n';
 import { activeProfileSQL } from '@/lib/entitlement';
-import { publicPageRobots } from '@/lib/server-site';
+import { siteURL, publicPageRobots } from '@/lib/server-site';
 import { notFound } from 'next/navigation';
 import Link from '@/components/hard-link';
 import { Mail, ArrowUpRight } from 'lucide-react';
@@ -84,6 +85,14 @@ const pages: Record<
       'Conheça os dados utilizados para gerir a sua conta, publicar o seu perfil e acompanhar as suas encomendas.',
     blocks: [
       {
+        title: 'Pedidos de informação e equipas',
+        text: 'Ao enviar um pedido pelo perfil, autoriza a entrega do seu nome, email e mensagem ao titular. As mensagens ficam disponíveis durante 90 dias e podem ser eliminadas pelo titular. O convite para equipa só dá acesso ao nome, endereço e estado de publicação do perfil após aceitação; permite aplicar a cor da marca. Pode sair da equipa a qualquer momento. Domínios personalizados exigem prova de propriedade e validação HTTPS.',
+      },
+      {
+        title: 'Medição dos perfis digitais',
+        text: 'Cada perfil pode pedir consentimento para medir visitas e cliques. O titular recebe contagens agregadas, sem a identidade ou os contactos dos visitantes. Pode recusar ou alterar a escolha no próprio perfil. Os eventos são conservados por até 90 dias.',
+      },
+      {
         title: 'Dados que escolhe guardar',
         text: 'Guardamos os dados da conta, o perfil, as fotografias e os designs que envia. O email e o telefone do perfil só são publicados quando activa a respectiva visibilidade.',
       },
@@ -121,7 +130,7 @@ const pages: Record<
     blocks: [
       {
         title: 'Perfil digital e produto físico',
-        text: 'O perfil digital tem um período gratuito de 30 dias, sem renovação automática. Os produtos físicos são pagos separadamente. O pedido registado aguarda confirmação do pagamento; não constitui recibo de pagamento.',
+        text: 'O perfil digital começa com 30 dias gratuitos, sem renovação automática. Enquanto as adesões mensais não abrirem, prolongamos o acesso sem cobrança. Cada pagamento mensal confirmado activa um mês de calendário. Ao terminar, há 7 dias de tolerância; depois permanece uma página com nome, fotografia e um contacto. Os restantes dados ficam guardados. O produto físico é pago separadamente. Um pedido de pagamento não constitui comprovativo de pagamento.',
       },
       {
         title: 'Entrega, cancelamento e apoio',
@@ -207,15 +216,18 @@ export default async function Page({
   if (!/^[a-z0-9_]{3,40}$/.test(slug)) notFound();
   const row = await database()
     .prepare(
-      `SELECT published_json FROM profiles WHERE username=? AND published_json IS NOT NULL AND ${activeProfileSQL}`,
+      `SELECT owner_id,published_json FROM profiles WHERE username=? AND published_json IS NOT NULL AND ${activeProfileSQL}`,
     )
     .bind(slug, new Date().toISOString(), new Date().toISOString())
-    .first<{ published_json: string }>();
+    .first<{ owner_id: string; published_json: string }>();
   if (!row) notFound();
-  const p = JSON.parse(row.published_json) as Profile;
+  const p = await publishedProfile(
+    row.owner_id,
+    JSON.parse(row.published_json) as Profile,
+  );
   return (
     <main id="main" className="standalone-mobile-profile">
-      <MobileProfile profile={p} published />
+      <MobileProfile profile={p} published brandHref={siteURL()?.href ?? '/'} />
     </main>
   );
 }

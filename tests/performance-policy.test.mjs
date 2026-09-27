@@ -73,6 +73,7 @@ void test('worker preserves private cache policy and logs only route categories 
     },
     securityHeaders: () => {},
     cleanupReservations: async () => {},
+    customDomainRequest: async (request) => request,
     console: { warn: (value) => logs.push(value) },
   });
   const response = await worker.fetch(

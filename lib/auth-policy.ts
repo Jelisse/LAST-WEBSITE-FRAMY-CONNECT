@@ -8,7 +8,11 @@ export function dashboardFor(role: AccountRole) {
   }[role];
 }
 export function loginDestination(role: AccountRole, requested: string) {
-  if (role === 'customer' && /^\/pagamento\/retorno(?:\?order=[a-zA-Z0-9-]+)?$/.test(requested)) return requested;
+  if (
+    role === 'customer' &&
+    /^\/pagamento\/retorno(?:\?order=[a-zA-Z0-9-]+)?$/.test(requested)
+  )
+    return requested;
   if (
     role === 'customer' &&
     /^\/encomendar\/[a-z0-9-]+(?:\?[^#]*)?$/.test(requested)
@@ -16,7 +20,13 @@ export function loginDestination(role: AccountRole, requested: string) {
     return requested;
   if (
     role === 'customer' &&
-    ['/perfil', '/dashboard', '/aplicar'].includes(requested)
+    [
+      '/perfil',
+      '/perfil?tools=1',
+      '/perfil?plans=1',
+      '/dashboard',
+      '/aplicar',
+    ].includes(requested)
   )
     return requested;
   return dashboardFor(role);

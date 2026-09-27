@@ -1,6 +1,6 @@
 import { customerOrder } from '@/lib/customer-order';
 import { serviceFailure } from '@/lib/service-failure';
-import { hasActiveTrial } from '@/lib/entitlement';
+import { hasProfileAccess, profileAccess, expiryDate } from '@/lib/entitlement';
 import {
   expireReservations,
   RESERVATION_MS,
@@ -37,7 +37,16 @@ export async function GET() {
     if (!user) return json({ error: 'Inicie sessão para continuar.' }, 401);
     await expireReservations(false);
     const db = database();
-    const [p, orders, events, membership, products, plans, manageProducts, manageOrders] = await Promise.all([
+    const [
+      p,
+      orders,
+      events,
+      membership,
+      products,
+      plans,
+      manageProducts,
+      manageOrders,
+    ] = await Promise.all([
       db
         .prepare('SELECT * FROM profiles WHERE owner_id = ?')
         .bind(user.userId)
@@ -59,9 +68,7 @@ export async function GET() {
         .bind(user.userId)
         .all(),
       db
-        .prepare(
-          'SELECT plan_id,version,terms_json,trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
-        )
+        .prepare('SELECT * FROM profile_membership_view WHERE owner_id=?')
         .bind(user.userId)
         .first<{
           plan_id: string;
@@ -69,6 +76,10 @@ export async function GET() {
           terms_json: string | null;
           trial_started_at: string | null;
           trial_expires_at: string | null;
+          paid_started_at?: string | null;
+          paid_expires_at?: string | null;
+          billing_enabled?: number;
+          billing_opened_at?: string | null;
         }>(),
       getProducts(),
       getManagedPlans(),
@@ -76,21 +87,34 @@ export async function GET() {
       canManageOrders(user.userId),
     ]);
     const agents = new Map<string, Promise<{ data_json: string } | null>>();
-    const customerOrders = await Promise.all(orders.results.map(async (row) => {
-      const order = JSON.parse(row.data_json) as SandboxOrder;
-      let contact;
-      if (order.agentId && order.paid && order.status !== 'CANCELLED') {
-        if (!agents.has(order.agentId)) agents.set(order.agentId,
-          db.prepare("SELECT data_json FROM manager_records WHERE id=? AND kind='agent'")
-            .bind(order.agentId).first<{ data_json: string }>());
-        const record = await agents.get(order.agentId);
-        if (record) {
-          const agent = JSON.parse(record.data_json);
-          if (agent.active) contact = { name: String(agent.name || order.agent), phone: String(agent.phone || '') };
+    const customerOrders = await Promise.all(
+      orders.results.map(async (row) => {
+        const order = JSON.parse(row.data_json) as SandboxOrder;
+        let contact;
+        if (order.agentId && order.paid && order.status !== 'CANCELLED') {
+          if (!agents.has(order.agentId))
+            agents.set(
+              order.agentId,
+              db
+                .prepare(
+                  "SELECT data_json FROM manager_records WHERE id=? AND kind='agent'",
+                )
+                .bind(order.agentId)
+                .first<{ data_json: string }>(),
+            );
+          const record = await agents.get(order.agentId);
+          if (record) {
+            const agent = JSON.parse(record.data_json);
+            if (agent.active)
+              contact = {
+                name: String(agent.name || order.agent),
+                phone: String(agent.phone || ''),
+              };
+          }
         }
-      }
-      return customerOrder(order, contact);
-    }));
+        return customerOrder(order, contact);
+      }),
+    );
     return json({
       products: products
         .filter((p) => p.published !== false)
@@ -98,9 +122,9 @@ export async function GET() {
       canManageProducts: manageProducts,
       canManageOrders: manageOrders,
       profile: p ? JSON.parse(p.draft_json) : null,
-      published: !!p?.published_json && hasActiveTrial(membership),
+      published: !!p?.published_json && hasProfileAccess(membership),
       publishedUsername:
-        p?.published_json && hasActiveTrial(membership)
+        p?.published_json && hasProfileAccess(membership)
           ? JSON.parse(p.published_json).username
           : null,
       profileVersion: p?.version ?? 0,
@@ -109,15 +133,33 @@ export async function GET() {
         terms: membershipTerms(membership),
         planId: membership?.plan_id ?? '',
         version: membership?.version ?? 0,
-        mode: 'trial',
-        active: hasActiveTrial(membership),
-        expiresAt: membership?.trial_expires_at ?? null,
+        mode:
+          membership?.plan_id && membership.plan_id !== 'free-30'
+            ? 'paid'
+            : 'trial',
+        accessState: profileAccess(membership),
+        billingAvailable: membership?.billing_enabled === 1,
+        launchExtended: profileAccess(membership) === 'launch',
+        active: hasProfileAccess(membership),
+        expiresAt: expiryDate(membership),
+        daysRemaining: expiryDate(membership)
+          ? Math.max(
+              0,
+              Math.ceil(
+                (Date.parse(expiryDate(membership)!) - Date.now()) / 86400000,
+              ),
+            )
+          : null,
       },
       orders: customerOrders,
       events: events.results,
     });
   } catch (error) {
-    return serviceFailure(error, 'workspace', 'Não foi possível carregar os dados. Tente novamente.');
+    return serviceFailure(
+      error,
+      'workspace',
+      'Não foi possível carregar os dados. Tente novamente.',
+    );
   }
 }
 export async function POST(request: Request) {
@@ -221,14 +263,24 @@ export async function POST(request: Request) {
         );
       const trial = await db
         .prepare(
-          'SELECT trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
+          'SELECT *, (SELECT enabled FROM profile_billing_settings WHERE id=1) AS billing_enabled FROM sandbox_memberships WHERE owner_id=?',
         )
         .bind(user.userId)
         .first<{
           trial_started_at: string | null;
           trial_expires_at: string | null;
+          paid_started_at?: string | null;
+          paid_expires_at?: string | null;
+          billing_enabled?: number;
+          billing_opened_at?: string | null;
         }>();
-      if (trial?.trial_expires_at && trial.trial_expires_at <= now)
+      if (
+        trial &&
+        (('plan_id' in trial && trial.plan_id !== 'free-30') ||
+          (trial.billing_enabled === 1 &&
+            trial.trial_expires_at &&
+            trial.trial_expires_at <= now))
+      )
         return json(
           {
             error:
@@ -332,12 +384,10 @@ export async function POST(request: Request) {
       }
       if (body.action === 'publish-profile') {
         const trial = await db
-          .prepare(
-            'SELECT plan_id,trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
-          )
+          .prepare('SELECT * FROM profile_membership_view WHERE owner_id=?')
           .bind(user.userId)
           .first<import('@/lib/entitlement').Membership>();
-        if (!hasActiveTrial(trial))
+        if (!hasProfileAccess(trial))
           return json(
             {
               error:
@@ -358,9 +408,7 @@ export async function POST(request: Request) {
           );
       }
       const membership = await db
-        .prepare(
-          'SELECT plan_id,version,terms_json,trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
-        )
+        .prepare('SELECT * FROM profile_membership_view WHERE owner_id=?')
         .bind(user.userId)
         .first<{
           plan_id: string;
@@ -368,8 +416,12 @@ export async function POST(request: Request) {
           terms_json: string | null;
           trial_started_at: string | null;
           trial_expires_at: string | null;
+          paid_started_at?: string | null;
+          paid_expires_at?: string | null;
+          billing_enabled?: number;
+          billing_opened_at?: string | null;
         }>();
-      validatePlanContent(profile, membershipTerms(membership));
+      // Keep saved links and biographies intact across downgrades. Public output applies plan limits.
       const published =
         body.action === 'publish-profile'
           ? JSON.stringify(publicProfile(profile))
@@ -533,9 +585,7 @@ export async function POST(request: Request) {
             version: number;
           }>();
         const member = await db
-          .prepare(
-            'SELECT plan_id,version,terms_json,trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id=?',
-          )
+          .prepare('SELECT * FROM profile_membership_view WHERE owner_id=?')
           .bind(user.userId)
           .first<{
             plan_id: string;
@@ -543,17 +593,24 @@ export async function POST(request: Request) {
             terms_json: string | null;
             trial_started_at: string | null;
             trial_expires_at: string | null;
+            paid_started_at?: string | null;
+            paid_expires_at?: string | null;
+            billing_enabled?: number;
+            billing_opened_at?: string | null;
           }>();
-        if (!hasActiveTrial(member))
+        if (!hasProfileAccess(member))
           return json(
             { error: 'Active um período gratuito válido antes de confirmar.' },
             403,
           );
         membershipVersion = member!.version;
         const terms = membershipTerms(member);
-        const currentPlan = (await getManagedPlans()).find(
-          (p) => p.id === FREE_PLAN_ID && p.id === body.planId && p.active,
-        );
+        const currentPlan =
+          member?.plan_id !== FREE_PLAN_ID
+            ? terms
+            : (await getManagedPlans()).find(
+                (p) => p.id === body.planId && p.active,
+              );
         if (
           !profileRow?.draft_json ||
           profileRow.version !== body.profileVersion
@@ -690,7 +747,7 @@ export async function POST(request: Request) {
       await db.batch([
         db
           .prepare(
-            "INSERT OR IGNORE INTO sandbox_orders (id,owner_id,data_json,version,created_at) SELECT ?,?,?,1,? WHERE (? IS NULL OR EXISTS(SELECT 1 FROM product_options WHERE id=? AND quantity>0 AND enabled=1)) AND (SELECT COUNT(*) FROM sandbox_orders WHERE owner_id=? AND json_extract(data_json,'$.status')='PENDING_PAYMENT')<? AND EXISTS(SELECT 1 FROM profiles WHERE owner_id=? AND version=?) AND EXISTS(SELECT 1 FROM sandbox_memberships WHERE owner_id=? AND plan_id='free-30' AND trial_started_at<=? AND trial_expires_at>? AND version=?) AND COALESCE((SELECT version FROM manager_records WHERE id=? AND kind='plan'),0)=? AND COALESCE((SELECT version FROM product_catalog WHERE id=?),0)=? AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)>(SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('PENDING_PAYMENT','QUEUED','IN_PRODUCTION','READY'))",
+            `INSERT OR IGNORE INTO sandbox_orders (id,owner_id,data_json,version,created_at) SELECT ?,?,?,1,? WHERE (? IS NULL OR EXISTS(SELECT 1 FROM product_options WHERE id=? AND quantity>0 AND enabled=1)) AND (SELECT COUNT(*) FROM sandbox_orders WHERE owner_id=? AND json_extract(data_json,'$.status')='PENDING_PAYMENT')<? AND EXISTS(SELECT 1 FROM profiles WHERE owner_id=? AND version=?) AND EXISTS(SELECT 1 FROM profile_membership_view WHERE owner_id=? AND ((plan_id='free-30' AND trial_started_at<=? AND julianday(trial_expires_at)>julianday(trial_started_at) AND julianday(trial_expires_at)<=julianday(trial_started_at)+30) OR (plan_id IN ('personal','professional-v2') AND paid_started_at<=? AND julianday(paid_expires_at)>julianday(paid_started_at))) AND version=?) AND (?<>'free-30' OR COALESCE((SELECT version FROM manager_records WHERE id=? AND kind='plan'),0)=?) AND COALESCE((SELECT version FROM product_catalog WHERE id=?),0)=? AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)>(SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('PENDING_PAYMENT','QUEUED','IN_PRODUCTION','READY'))`,
           )
           .bind(
             o.id,
@@ -707,6 +764,7 @@ export async function POST(request: Request) {
             now,
             now,
             membershipVersion,
+            body.planId,
             body.planId,
             body.planVersion,
             product.id,

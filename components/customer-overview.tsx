@@ -6,6 +6,7 @@ import { planPrice } from '@/lib/plan-pricing';
 import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
 import { ArrowRight, ArrowUpRight, Link2, Plus, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { TrialNotice } from './trial-notice';
 import { Progress } from '@/components/ui/progress';
 import { orderLabels } from '@/lib/domain';
 import type { WorkspaceData } from '@/lib/profile-types';
@@ -41,6 +42,7 @@ export function CustomerOverview({
     .slice(0, 2);
   return (
     <div className="essential-dashboard">
+      <TrialNotice membership={data.membership} />
       <div className="essential-top-grid">
         <section
           className="essential-identity"
@@ -129,14 +131,16 @@ export function CustomerOverview({
             <ArrowUpRight size={18} />
           </Button>
           <p className="essential-plan-note">
-            {data.membership.expiresAt
-              ? t('Período gratuito até {0}. Sem renovação automática.', [
-                  new Date(data.membership.expiresAt).toLocaleDateString(
-                    t.locale,
-                    { timeZone: 'Africa/Maputo' },
-                  ),
-                ])
-              : t('Active o período gratuito para publicar o perfil.')}
+            {data.membership.launchExtended
+              ? t('Acesso prolongado durante o lançamento')
+              : data.membership.expiresAt
+                ? t('Período gratuito até {0}. Sem renovação automática.', [
+                    new Date(data.membership.expiresAt).toLocaleDateString(
+                      t.locale,
+                      { timeZone: 'Africa/Maputo' },
+                    ),
+                  ])
+                : t('Active o período gratuito para publicar o perfil.')}
           </p>
         </section>
       </div>

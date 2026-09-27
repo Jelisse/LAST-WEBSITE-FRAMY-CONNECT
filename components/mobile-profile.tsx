@@ -1,8 +1,14 @@
 'use client';
+import { ProfilePublicExtras } from './profile-public-extras';
 import { useI18n } from '@/components/language-provider';
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { whatsappURL, directionsURL } from '@/lib/profile-business';
+import {
+  useProfileEngagement,
+  ProfileMeasurementChoice,
+} from './profile-engagement';
 import {
   Camera,
   Globe2,
@@ -22,7 +28,6 @@ import type { Profile } from '@/lib/domain';
 import { socialPlatform } from '@/lib/social-platform';
 
 function SocialIcon({ url }: { url: string }) {
-  const { t } = useI18n();
   const brand = socialPlatform(url);
   if (brand)
     return (
@@ -47,39 +52,69 @@ const escapeVcf = (text: string) =>
     .replace(/;/g, '\\;')
     .replace(/,/g, '\\,');
 export function MobileProfile({
-  profile,
+  profile: sourceProfile,
   published = false,
   preview = false,
+  brandHref = '/',
 }: {
   profile: Profile;
   published?: boolean;
   preview?: boolean;
+  brandHref?: string;
 }) {
   const { t } = useI18n();
+  const [english, setEnglish] = useState(false);
+  const translation = sourceProfile.extras?.english;
+  const profile = english
+    ? {
+        ...sourceProfile,
+        title: translation?.title || sourceProfile.title,
+        bio: translation?.bio || sourceProfile.bio,
+        business: sourceProfile.business
+          ? {
+              ...sourceProfile.business,
+              hours: translation?.hours || sourceProfile.business.hours,
+            }
+          : undefined,
+      }
+    : sourceProfile;
   const [message, setMessage] = useState(''),
     [qr, setQr] = useState(''),
     [qrOpen, setQrOpen] = useState(false),
     [qrBusy, setQrBusy] = useState(false);
+  const measurement = useProfileEngagement(
+    profile.username,
+    published && !preview,
+  );
+  const business = profile.business;
+  const whatsapp = whatsappURL(business);
   const Heading = preview ? 'h2' : 'h1';
   const links = [
-    ...(profile.links ?? []),
+    ...(profile.links ?? []).map((link, index) => ({
+      ...link,
+      target: `link:${index}`,
+    })),
     ...(profile.email && profile.showEmail
-      ? [{ label: 'Email', url: `mailto:${profile.email}` }]
+      ? [{ target: 'email', label: 'Email', url: `mailto:${profile.email}` }]
       : []),
     ...(profile.phone && profile.showPhone
       ? [
           {
+            target: 'phone',
             label: 'Telefone',
             url: `tel:${profile.phone.replace(/[^+0-9]/g, '')}`,
           },
         ]
       : []),
-    ...(profile.website ? [{ label: 'Website', url: profile.website }] : []),
+    ...(profile.website
+      ? [{ target: 'website', label: 'Website', url: profile.website }]
+      : []),
   ];
   function profileUrl() {
     return new URL(`/${profile.username}`, window.location.origin).href;
   }
   function download() {
+    measurement.record('contact');
     const values = [
       'BEGIN:VCARD',
       'VERSION:3.0',
@@ -136,7 +171,11 @@ export function MobileProfile({
     }
   }
   return (
-    <div className="mobile-profile-frame">
+    <div
+      className="mobile-profile-frame"
+      data-accent={business?.accent ?? 'orange'}
+      data-layout={business?.layout ?? 'portrait'}
+    >
       <article className="mobile-identity-page">
         <div className="mobile-portrait">
           {profile.photoUrl ? (
@@ -164,11 +203,80 @@ export function MobileProfile({
         </div>
         <div className="mobile-profile-wave" aria-hidden="true" />
         <div className="mobile-profile-body">
+          {(translation?.title ||
+            translation?.bio ||
+            translation?.hours ||
+            profile.extras?.services.some(
+              (s) => s.englishTitle || s.englishDescription || s.englishPrice,
+            )) && (
+            <nav
+              className="profile-content-languages"
+              aria-label="Idioma do conteúdo"
+            >
+              <button
+                type="button"
+                aria-pressed={!english}
+                onClick={() => setEnglish(false)}
+              >
+                Português
+              </button>
+              <button
+                type="button"
+                aria-pressed={english}
+                onClick={() => setEnglish(true)}
+              >
+                English
+              </button>
+            </nav>
+          )}
           <Heading>{profile.name || t('O seu nome')}</Heading>
           <p className="mobile-profile-title">
             {profile.title || t('O seu título ou profissão')}
           </p>
           {profile.bio && <p className="mobile-profile-bio">{profile.bio}</p>}
+          {(whatsapp || business?.address || business?.hours) && (
+            <section
+              className="public-business"
+              aria-label={t('Informações do negócio')}
+            >
+              {whatsapp && (
+                <a
+                  className="profile-whatsapp"
+                  href={whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => measurement.record('whatsapp')}
+                >
+                  {english ? 'Chat on WhatsApp' : t('Falar no WhatsApp')}{' '}
+                  <span aria-hidden="true">↗</span>
+                </a>
+              )}
+              {business?.hours && (
+                <p>
+                  <strong>
+                    {english ? 'Business hours' : t('Horário de atendimento')}
+                  </strong>
+                  <span>{business.hours}</span>
+                </p>
+              )}
+              {business?.address && (
+                <p>
+                  <strong>
+                    {english ? 'Business address' : t('Endereço do negócio')}
+                  </strong>
+                  <span>{business.address}</span>
+                  <a
+                    href={directionsURL(business.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => measurement.record('directions')}
+                  >
+                    {english ? 'Get directions' : t('Como chegar')} ↗
+                  </a>
+                </p>
+              )}
+            </section>
+          )}
           <nav
             className="mobile-profile-links"
             aria-label={t('Links do perfil — deslize para ver mais')}
@@ -176,6 +284,7 @@ export function MobileProfile({
             {links.map((link, index) => (
               <a
                 key={index}
+                onClick={() => measurement.record(link.target)}
                 href={
                   /^(https:\/\/|mailto:|tel:)/i.test(link.url)
                     ? link.url
@@ -195,11 +304,19 @@ export function MobileProfile({
               </p>
             )}
           </nav>
+          <ProfilePublicExtras
+            profile={profile}
+            english={english}
+            preview={preview || !published}
+            onAction={measurement.record}
+          />
           <div className="mobile-profile-actions">
             <button
               type="button"
-              aria-label={t('Adicionar aos contactos')}
-              title={t('Adicionar aos contactos')}
+              aria-label={
+                english ? 'Save contact' : t('Adicionar aos contactos')
+              }
+              title={english ? 'Save contact' : t('Adicionar aos contactos')}
               disabled={!profile.name}
               onClick={download}
             >
@@ -207,10 +324,14 @@ export function MobileProfile({
             </button>
             <button
               type="button"
-              aria-label={t('Mostrar QR do perfil')}
+              aria-label={
+                english ? 'Show profile QR' : t('Mostrar QR do perfil')
+              }
               title={
                 published
-                  ? t('Mostrar QR do perfil')
+                  ? english
+                    ? 'Show profile QR'
+                    : t('Mostrar QR do perfil')
                   : t('Publique o perfil para activar o QR')
               }
               disabled={!published || qrBusy}
@@ -221,10 +342,12 @@ export function MobileProfile({
             {!preview && (
               <button
                 type="button"
-                aria-label={t('Partilhar perfil')}
+                aria-label={english ? 'Share profile' : t('Partilhar perfil')}
                 title={
                   published
-                    ? t('Partilhar perfil')
+                    ? english
+                      ? 'Share profile'
+                      : t('Partilhar perfil')
                     : t('Publique o perfil para partilhar')
                 }
                 disabled={!published}
@@ -237,9 +360,16 @@ export function MobileProfile({
           {message && (
             <output className="mobile-profile-message">{t(message)}</output>
           )}
+          {!preview && published && (
+            <ProfileMeasurementChoice
+              english={english}
+              consent={measurement.consent}
+              choose={measurement.choose}
+            />
+          )}
           <footer className="mobile-profile-footer">
             <a
-              href="/"
+              href={brandHref}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={t(

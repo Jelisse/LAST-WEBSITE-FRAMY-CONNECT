@@ -1,0 +1,232 @@
+/* Customer-owned growth tools; native controls remain keyboard accessible. */
+.profile-growth-panel,
+.profile-growth {
+  max-width: 100%;
+  min-width: 0;
+}
+.profile-growth-panel {
+  background: #fffdf9;
+  border: 1px solid #e4dcd2;
+  border-radius: 20px;
+  padding: clamp(18px, 3vw, 32px);
+  color: #292622;
+}
+.profile-growth-panel h2 {
+  font-size: 24px;
+  margin: 0 0 12px;
+}
+.profile-growth-panel h3 {
+  font-size: 18px;
+  margin: 12px 0;
+}
+.profile-growth-panel p,
+.profile-business-editor p {
+  line-height: 1.65;
+}
+.growth-tabs,
+.growth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+.profile-growth button,
+.profile-growth-panel button,
+.profile-business-editor button {
+  border: 1px solid #d9c9bc;
+  border-radius: 10px;
+  padding: 10px 16px;
+  min-height: 44px;
+  background: #fff;
+  color: #923306;
+  font-weight: 500;
+  cursor: pointer;
+}
+.growth-tabs button[aria-pressed='true'],
+.profile-growth-panel form > button {
+  background: #b83c0a;
+  color: #fff;
+  border-color: #b83c0a;
+}
+.profile-growth button:disabled,
+.profile-growth-panel button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.profile-growth-panel label,
+.profile-business-editor details label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+}
+.profile-growth-panel input:not([type='checkbox']),
+.profile-growth-panel textarea,
+.profile-growth-panel select,
+.profile-business-editor details input:not([type='checkbox']),
+.profile-business-editor details textarea,
+.profile-business-editor details select {
+  width: 100%;
+  border: 1px solid #c9beb4;
+  border-radius: 9px;
+  min-height: 44px;
+  padding: 10px;
+  background: #fff;
+  color: #292622;
+  font: inherit;
+}
+.profile-growth-panel input[type='checkbox'],
+.profile-business-editor input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+.growth-check {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 14px 0;
+}
+.growth-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.growth-invoice,
+.growth-plan-grid form,
+.growth-notice,
+.profile-business-editor fieldset {
+  padding: 18px;
+  border: 1px solid #e4dcd2;
+  border-radius: 12px;
+  margin: 16px 0;
+  min-width: 0;
+}
+.growth-notice {
+  background: #fff3e7;
+}
+.growth-preserve {
+  white-space: pre-wrap;
+}
+.profile-growth-panel code,
+.profile-growth-panel pre {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  font-size: 13px;
+}
+.profile-growth-panel details,
+.profile-business-editor details {
+  margin: 20px 0;
+}
+.profile-growth-panel summary,
+.profile-business-editor summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 36px;
+}
+.profile-growth-panel a {
+  text-decoration: underline;
+  color: #923306;
+}
+.profile-showcase,
+.profile-enquiry {
+  width: 100%;
+  text-align: left;
+  margin: 22px 0;
+}
+.profile-showcase h2,
+.profile-enquiry h2 {
+  font-size: 20px;
+  color: inherit;
+}
+.profile-showcase article {
+  padding: 16px;
+  margin: 12px 0;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid #ffffff38;
+  border-radius: 12px;
+}
+.profile-showcase h3 {
+  font-size: 17px;
+}
+.profile-showcase p {
+  font-size: 14px;
+  margin: 8px 0;
+}
+.profile-showcase a {
+  display: block;
+  text-decoration: underline;
+  margin-top: 12px;
+  min-height: 32px;
+}
+.profile-enquiry label {
+  display: block;
+  font-size: 14px;
+  margin: 12px 0;
+}
+.profile-enquiry input:not([type='checkbox']),
+.profile-enquiry textarea {
+  display: block;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  color: #272323;
+  background: #fff;
+  font: inherit;
+  margin-top: 6px;
+  min-height: 44px;
+}
+.profile-enquiry button,
+.profile-content-languages button {
+  border: 1px solid #ffffff88;
+  border-radius: 8px;
+  padding: 10px 14px;
+  min-height: 44px;
+  background: #fff;
+  color: var(--profile-accent);
+  font-weight: 500;
+}
+.profile-enquiry button:disabled {
+  opacity: 0.6;
+}
+.profile-content-languages {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px 0;
+}
+.profile-content-languages button[aria-pressed='false'] {
+  background: transparent;
+  color: #fff;
+}
+.growth-honeypot {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.profile-growth-panel [role='alert'] {
+  color: #a11b13;
+}
+.profile-growth-panel :focus-visible,
+.profile-enquiry :focus-visible {
+  outline: 3px solid #eba36b;
+  outline-offset: 3px;
+}
+@media (max-width: 640px) {
+  .growth-plan-grid {
+    grid-template-columns: 1fr;
+  }
+  .growth-tabs button {
+    flex: 1 1 44%;
+  }
+  .profile-growth-panel {
+    padding: 18px;
+  }
+  .growth-invoice {
+    padding: 14px;
+  }
+}

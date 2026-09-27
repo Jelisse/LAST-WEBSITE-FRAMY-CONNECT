@@ -1,4 +1,7 @@
 'use client';
+import { profilePresentation } from '@/lib/entitlement';
+import { ProfileExtrasEditor } from './profile-extras-editor';
+import { ProfileGrowthHub } from './profile-growth-hub';
 import { AgentContact } from '@/components/agent-contact';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
 
@@ -27,6 +30,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { CustomerOverview } from '@/components/customer-overview';
 import { PlanPicker } from '@/components/plan-picker';
+import { ProfileBusinessEditor } from './profile-business-editor';
+import { ProfileEngagementPanel } from './profile-engagement';
+import { TrialNotice } from './trial-notice';
 import { ProfileLinksEditor } from '@/components/profile-links-editor';
 import { MobileProfile } from '@/components/mobile-profile';
 import { IPhonePreview } from '@/components/iphone-preview';
@@ -90,6 +96,8 @@ const menu = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
   { id: 'profile', label: 'A minha identidade', icon: UserRound },
   { id: 'orders', label: 'O meu pedido', icon: Package },
+  { id: 'analytics', label: 'Resultados do perfil', icon: ChartNoAxesCombined },
+  { id: 'growth', label: 'Ferramentas do perfil', icon: BriefcaseBusiness },
   { id: 'operations', label: 'Operações · teste', icon: Settings2 },
   { id: 'agent', label: 'Agente · teste', icon: BriefcaseBusiness },
   { id: 'ceo', label: 'CEO · teste', icon: ChartNoAxesCombined },
@@ -173,6 +181,8 @@ export function Workspace({ displayName }: { displayName: string }) {
             ),
           );
         }
+        if (new URLSearchParams(window.location.search).get('tools') === '1')
+          setTab('growth');
         if (new URLSearchParams(window.location.search).get('plans') === '1')
           setPlansOpen(true);
         const submittedId = new URLSearchParams(window.location.search).get(
@@ -356,6 +366,11 @@ export function Workspace({ displayName }: { displayName: string }) {
   }
   async function selectPlan(planId: PlanId) {
     if (!data) return;
+    if (planId !== 'free-30') {
+      setPlansOpen(false);
+      setTab('growth');
+      return;
+    }
     await run(async () => {
       validatePlanContent(
         profile,
@@ -489,6 +504,7 @@ export function Workspace({ displayName }: { displayName: string }) {
     <SidebarProvider className="refined-workspace">
       {plansOpen && data && (
         <PlanPicker
+          paidAvailable={data.membership.billingAvailable}
           plans={data.plans}
           current={data.membership.planId}
           busy={busy}
@@ -512,7 +528,7 @@ export function Workspace({ displayName }: { displayName: string }) {
         </SidebarHeader>
         <SidebarContent className="px-4">
           <SidebarMenu>
-            {menu.slice(0, 3).map((m) => (
+            {menu.slice(0, 5).map((m) => (
               <SidebarMenuItem key={m.id}>
                 <SidebarMenuButton
                   className="workspace-menu-item"
@@ -541,7 +557,7 @@ export function Workspace({ displayName }: { displayName: string }) {
               <CollapsibleContent>
                 <p>{t('Vistas de demonstração, sem permissões reais.')}</p>
                 <SidebarMenu>
-                  {menu.slice(3).map((m) => (
+                  {menu.slice(5).map((m) => (
                     <SidebarMenuItem key={m.id}>
                       <SidebarMenuButton
                         className="workspace-menu-item"
@@ -689,6 +705,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                         'Escolha os dados que quer partilhar. O nome de utilizador fica reservado na primeira gravação.',
                       )}
                     </p>
+                    <TrialNotice membership={data.membership} />
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
@@ -820,6 +837,21 @@ export function Workspace({ displayName }: { displayName: string }) {
                             />
                           </label>
                         </div>
+                        <ProfileBusinessEditor
+                          profile={profile}
+                          onChange={(next) => {
+                            setProfile(next);
+                            setDirty(true);
+                          }}
+                        />
+                        <ProfileExtrasEditor
+                          profile={profile}
+                          limit={data.membership.terms.links}
+                          onChange={(p) => {
+                            setProfile(p);
+                            setDirty(true);
+                          }}
+                        />
                         <ProfileLinksEditor
                           profile={profile}
                           planId={data.membership.planId}
@@ -884,7 +916,14 @@ export function Workspace({ displayName }: { displayName: string }) {
                     </span>
                     <IPhonePreview>
                       <MobileProfile
-                        profile={publicProfile(profile)}
+                        profile={profilePresentation(
+                          publicProfile(profile),
+                          data.membership.accessState ?? 'trial',
+                          {
+                            plan_id: data.membership.planId,
+                            terms_json: JSON.stringify(data.membership.terms),
+                          },
+                        )}
                         published={data.published}
                         preview
                       />
@@ -898,6 +937,8 @@ export function Workspace({ displayName }: { displayName: string }) {
                   </aside>
                 </div>
               )}
+              {tab === 'analytics' && <ProfileEngagementPanel />}
+              {tab === 'growth' && <ProfileGrowthHub />}
               {tab === 'operations' && data.canManageProducts && (
                 <ProductManager
                   onSaved={() => {

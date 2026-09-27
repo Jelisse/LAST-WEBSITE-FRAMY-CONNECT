@@ -17,6 +17,7 @@ import { type ManagedPlan, type PlanId } from '@/lib/domain';
 
 export function PlanPicker({
   plans,
+  paidAvailable = false,
   current,
   busy,
   error,
@@ -24,6 +25,7 @@ export function PlanPicker({
   onSelect,
 }: {
   plans: ManagedPlan[];
+  paidAvailable?: boolean;
   current: PlanId;
   busy: boolean;
   error: string;
@@ -62,7 +64,7 @@ export function PlanPicker({
             <DialogDescription>
               {t('Uma identidade digital, com ')}
               {choice.links}
-              {t(' caixas de links.')}
+              {t(' links à sua escolha.')}
             </DialogDescription>
             <div className="plan-summary">
               <span>
@@ -132,7 +134,7 @@ export function PlanPicker({
             </DialogTitle>
             <DialogDescription className="plans-intro">
               {t(
-                'Comece com 30 dias grátis. Os restantes planos estão em breve disponíveis.',
+                'Experimente durante 30 dias, sem renovação automática. Enquanto os planos mensais não abrirem, prolongamos o acesso sem cobrança.',
               )}
             </DialogDescription>
             <div className="plans-grid">
@@ -169,15 +171,23 @@ export function PlanPicker({
                     }
                     variant="outline"
                     disabled={
-                      plan.id !== 'free-30' || plan.id === current || busy
+                      (!paidAvailable && plan.id !== 'free-30') ||
+                      plan.id === current ||
+                      busy
                     }
-                    onClick={() => setSelected(plan.id)}
+                    onClick={() =>
+                      plan.id === 'free-30'
+                        ? setSelected(plan.id)
+                        : onSelect(plan.id)
+                    }
                   >
                     {plan.id === current
                       ? t('Plano actual')
                       : plan.id === 'free-30'
                         ? t('Começar 30 dias grátis')
-                        : t('Em breve')}
+                        : paidAvailable
+                          ? 'Ver pagamento mensal'
+                          : t('Em breve')}
                     {plan.id !== current && <ArrowRight size={16} />}
                   </Button>
                   <ul>
@@ -185,7 +195,7 @@ export function PlanPicker({
                       <Check />{' '}
                       <strong>
                         {plan.links}
-                        {t(' caixas de links')}
+                        {t(' links à sua escolha')}
                       </strong>
                     </li>
                     <li>

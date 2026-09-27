@@ -1,3 +1,4 @@
+import './profile-growth.css';
 import { getTranslations } from '@/lib/server-i18n';
 import type { Metadata } from 'next';
 import { siteURL } from '@/lib/server-site';
@@ -9,6 +10,7 @@ import './footer.css';
 import './products.css';
 import './mobile-dashboard.css';
 import './analytics-consent.css';
+import './profile-business.css';
 import { SiteAnalyticsTracker } from '@/components/site-analytics-tracker';
 const poppins = Poppins({
   weight: ['400', '500', '600', '700', '800'],
@@ -44,7 +46,10 @@ export default async function RootLayout({
         <a className="skip-link" href="#main">
           {t('Saltar para o conteúdo')}
         </a>
-        <LanguageProvider locale={locale}>{children}<SiteAnalyticsTracker /></LanguageProvider>
+        <LanguageProvider locale={locale}>
+          {children}
+          <SiteAnalyticsTracker />
+        </LanguageProvider>
       </body>
     </html>
   );

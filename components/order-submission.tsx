@@ -13,7 +13,6 @@ import {
   blankProfile,
   usernameFromName,
   validateProfile,
-  validatePlanContent,
   type Profile,
   type ManagedPlan,
 } from '@/lib/domain';
@@ -72,15 +71,23 @@ export function OrderSubmission({
       : {}),
     optionId: product.id === 'keychain' ? 'tiktok' : blankOption(product),
   });
-  const plan = plans.find((p) => p.id === planId);
+  const plan =
+    data?.membership.planId === planId && planId !== FREE_PLAN_ID
+      ? data.membership.terms
+      : plans.find((p) => p.id === planId);
   useEffect(() => {
-    const report = () => { if (ready && !done) emitCheckoutAnalytics('step', step); };
+    const report = () => {
+      if (ready && !done) emitCheckoutAnalytics('step', step);
+    };
     report();
     window.addEventListener('framy-analytics-enabled', report);
     return () => window.removeEventListener('framy-analytics-enabled', report);
   }, [ready, done, step]);
   async function load() {
-    const r = await fetch('/api/workspace', { cache: 'no-store', signal: AbortSignal.timeout(15_000) });
+    const r = await fetch('/api/workspace', {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15_000),
+    });
     if (!r.ok) throw Error('Inicie sessão novamente para continuar.');
     const d = (await r.json()) as Data;
     setData(d);
@@ -120,7 +127,7 @@ export function OrderSubmission({
         setDone(
           !!(saved?.orderId && d?.orders.some((o) => o.id === saved.orderId)),
         );
-        setPlanId(FREE_PLAN_ID);
+        setPlanId(d?.membership.planId || FREE_PLAN_ID);
         setStep(
           Math.min(
             saved?.step ??
@@ -201,7 +208,10 @@ export function OrderSubmission({
     setBusy(true);
     try {
       if (step === 0 && supportsDesign(product)) {
-        const r = await fetch('/api/product-options', { cache: 'no-store', signal: AbortSignal.timeout(15_000) });
+        const r = await fetch('/api/product-options', {
+          cache: 'no-store',
+          signal: AbortSignal.timeout(15_000),
+        });
         const d = (await r.json()) as {
           error?: string;
           options: { id: string; enabled: number; quantity: number }[];
@@ -219,7 +229,11 @@ export function OrderSubmission({
         if (design.optionId === 'blank-keychain' && !design.front)
           throw Error('Adicione o seu logótipo ou design PDF.');
       }
-      if (step === 1 && (!plan || plan.id !== FREE_PLAN_ID))
+      if (
+        step === 1 &&
+        (!plan ||
+          (plan.id !== FREE_PLAN_ID && plan.id !== data?.membership.planId))
+      )
         throw Error('Escolha um plano disponível.');
       if (step === 2 && !account)
         throw Error('Inicie sessão para guardar o seu perfil.');
@@ -231,7 +245,7 @@ export function OrderSubmission({
         });
         if (product.category === 'Cartões' && !p.email)
           throw Error('Indique o email a imprimir no cartão.');
-        validatePlanContent(p, plan);
+        // The public profile applies plan limits without deleting saved links.
         if (
           data.membership.version === 0 ||
           data.membership.planId !== plan.id ||
@@ -360,11 +374,20 @@ export function OrderSubmission({
           ? t('O progresso fica guardado durante esta sessão do navegador.')
           : t('Pode guardar a sua escolha e continuar com a conta.')}
       </p>
-      <PurchaseProgress steps={steps} step={step} disabled={busy || uploading}
-        onStep={(nextStep) => { setStep(nextStep); setError(''); }} />
+      <PurchaseProgress
+        steps={steps}
+        step={step}
+        disabled={busy || uploading}
+        onStep={(nextStep) => {
+          setStep(nextStep);
+          setError('');
+        }}
+      />
       <div className="purchase-layout">
         <section className="panel">
-          <h2 id="purchase-step-title" tabIndex={-1}>{t(steps[step])}</h2>
+          <h2 id="purchase-step-title" tabIndex={-1}>
+            {t(steps[step])}
+          </h2>
           {step === 0 && (
             <>
               <h3>{t(product.name)}</h3>
@@ -396,7 +419,10 @@ export function OrderSubmission({
             <>
               <p>
                 {t(
-                  'Comece com 30 dias grátis. Os restantes planos estão em breve disponíveis.',
+                  data?.membership.planId &&
+                    data.membership.planId !== FREE_PLAN_ID
+                    ? 'O produto usa o seu plano digital actual. A compra não renova a subscrição.'
+                    : 'Comece com 30 dias grátis. Pode escolher uma subscrição mensal nas Ferramentas do perfil.',
                 )}
               </p>
               <div className="purchase-plans">
@@ -405,17 +431,24 @@ export function OrderSubmission({
                     <input
                       type="radio"
                       name="plan"
-                      disabled={p.id !== FREE_PLAN_ID}
+                      disabled={
+                        data?.membership.planId &&
+                        data.membership.planId !== FREE_PLAN_ID
+                          ? p.id !== data.membership.planId
+                          : p.id !== FREE_PLAN_ID
+                      }
                       checked={planId === p.id}
                       onChange={() => setPlanId(p.id)}
                     />
                     <strong>
                       {p.id === FREE_PLAN_ID
                         ? t('30 dias grátis · 0 MT')
-                        : t('{0} · {1}/mês · Em breve', [
-                            t(p.name),
-                            planPrice(p, t.locale),
-                          ])}
+                        : p.id === data?.membership.planId
+                          ? `${t(p.name)} · plano actual`
+                          : t('{0} · {1}/mês · Em breve', [
+                              t(p.name),
+                              planPrice(p, t.locale),
+                            ])}
                     </strong>
                     <span>
                       {t('Até ')}
@@ -444,11 +477,7 @@ export function OrderSubmission({
                   )}
                 </p>
                 <PurchaseAccountAccess productId={product.id} />
-                <p>
-                  {t(
-                    'Após entrar, voltará à sua encomenda.',
-                  )}
-                </p>
+                <p>{t('Após entrar, voltará à sua encomenda.')}</p>
               </>
             ))}
           {step === 3 && plan && (
@@ -612,7 +641,11 @@ export function OrderSubmission({
                 disabled={busy || uploading || (step === 2 && !account)}
                 onClick={next}
               >
-                {busy ? t('A guardar…') : step === 3 ? t('Guardar e continuar') : t('Continuar')}
+                {busy
+                  ? t('A guardar…')
+                  : step === 3
+                    ? t('Guardar e continuar')
+                    : t('Continuar')}
               </button>
             ) : (
               <button

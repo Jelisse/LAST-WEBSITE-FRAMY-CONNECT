@@ -1,4 +1,5 @@
 'use client';
+import { ProfileSubscriptions } from './profile-subscriptions';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
 
 import { planMeticais, planPrice } from '@/lib/plan-pricing';
@@ -88,6 +89,7 @@ type Data = {
 const sections = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
   { id: 'analytics', label: 'Análise do website', icon: ArrowUpRight },
+  { id: 'subscriptions', label: 'Subscrições digitais', icon: Wallet },
   { id: 'operations', label: 'Operações', icon: Boxes },
   { id: 'hero', label: 'Página inicial', icon: LayoutDashboard },
   { id: 'catalog', label: 'Produtos e planos', icon: ShoppingBag },
@@ -132,7 +134,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
   }, []);
   useEffect(() => {
     const requested = new URLSearchParams(location.search).get('section');
-    if (requested && sections.some(s => s.id === requested))
+    if (requested && sections.some((s) => s.id === requested))
       queueMicrotask(() => setSection(requested));
     void Promise.resolve()
       .then(load)
@@ -405,41 +407,45 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
               <span className="manager-eyebrow">{t('CENTRO DE GESTÃO')}</span>
               <h1>{t(sections.find((s) => s.id === section)?.label)}</h1>
               <p>
-                {section === 'analytics' ? t('Visitas, horários e percurso de compra. Hora de Maputo.') : section === 'overview'
-                  ? t('O que acontece no seu negócio, num só lugar.')
-                  : section === 'operations'
-                    ? t('Ligue os pedidos, a equipa e o stock.')
-                    : section === 'hero'
-                      ? t(
-                          'Atualize os vídeos e as imagens do mockup da página inicial.',
-                        )
-                      : section === 'catalog'
+                {section === 'analytics'
+                  ? t('Visitas, horários e percurso de compra. Hora de Maputo.')
+                  : section === 'overview'
+                    ? t('O que acontece no seu negócio, num só lugar.')
+                    : section === 'operations'
+                      ? t('Ligue os pedidos, a equipa e o stock.')
+                      : section === 'hero'
                         ? t(
-                            'Os produtos e as subscrições que oferece aos seus clientes.',
+                            'Atualize os vídeos e as imagens do mockup da página inicial.',
                           )
-                        : section === 'applications'
-                          ? t('Analise e acompanhe as candidaturas a agente.')
-                          : section === 'accounts'
-                            ? t(
-                                'Crie acessos, recupere contas e controle a disponibilidade da equipa.',
-                              )
-                            : t(
-                                'Acompanhe os valores recebidos, pendentes e reconhecidos.',
-                              )}
+                        : section === 'catalog'
+                          ? t(
+                              'Os produtos e as subscrições que oferece aos seus clientes.',
+                            )
+                          : section === 'applications'
+                            ? t('Analise e acompanhe as candidaturas a agente.')
+                            : section === 'accounts'
+                              ? t(
+                                  'Crie acessos, recupere contas e controle a disponibilidade da equipa.',
+                                )
+                              : t(
+                                  'Acompanhe os valores recebidos, pendentes e reconhecidos.',
+                                )}
               </p>
             </div>
-            {section !== 'analytics' && <button
-              className="manager-secondary"
-              disabled={busy}
-              onClick={() =>
-                void load()
-                  .then(() => setError(''))
-                  .catch((e) => setError(e.message))
-              }
-            >
-              <RefreshCw size={16} />
-              {t(' Actualizar')}
-            </button>}
+            {section !== 'analytics' && (
+              <button
+                className="manager-secondary"
+                disabled={busy}
+                onClick={() =>
+                  void load()
+                    .then(() => setError(''))
+                    .catch((e) => setError(e.message))
+                }
+              >
+                <RefreshCw size={16} />
+                {t(' Actualizar')}
+              </button>
+            )}
           </div>
           {(section === 'operations' || section === 'finance') && (
             <p className="manager-sandbox">
@@ -454,7 +460,11 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
             </p>
           )}
           {notice && <output className="manager-notice">{t(notice)}</output>}
-          {section === 'analytics' ? <WebsiteAnalytics /> : !data ? (
+          {section === 'subscriptions' ? (
+            <ProfileSubscriptions manager />
+          ) : section === 'analytics' ? (
+            <WebsiteAnalytics />
+          ) : !data ? (
             <section className="manager-card">
               <p>
                 {error

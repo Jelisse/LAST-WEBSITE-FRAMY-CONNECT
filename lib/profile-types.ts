@@ -13,9 +13,13 @@ export type WorkspaceData = {
     terms: ManagedPlan;
     planId: PlanId;
     version: number;
-    mode: 'trial';
+    mode: 'trial' | 'paid';
+    accessState?: import('./entitlement').AccessState;
+    billingAvailable?: boolean;
+    daysRemaining?: number | null;
     active: boolean;
     expiresAt: string | null;
+    launchExtended?: boolean;
   };
   orders: import('./customer-order').CustomerOrder[];
   events: { id: string; orderId: string; action: string; createdAt: string }[];

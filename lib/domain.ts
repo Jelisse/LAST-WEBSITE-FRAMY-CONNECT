@@ -1,3 +1,5 @@
+import { validateExtras, type ProfileExtras } from './profile-growth.ts';
+import { validateBusiness, type ProfileBusiness } from './profile-business.ts';
 export const legacyPlans = [
   {
     id: 'free-30',
@@ -57,9 +59,34 @@ export const legacyPlans = [
 ] as const;
 // New catalogue IDs keep historical paid memberships and stored terms intact.
 export const plans = [
-  { id: 'free-30', name: '30 dias grátis', audience: 'Todos', meticais: 0, links: 20, bio: 600, description: 'Experimente o seu perfil durante 30 dias, sem renovação automática.' },
-  { id: 'personal', name: 'Pessoal', audience: 'Uso pessoal', meticais: 65, links: 8, bio: 200, description: 'Os seus contactos e redes sociais, num só lugar.' },
-  { id: 'professional-v2', name: 'Profissional', audience: 'Profissionais', meticais: 150, links: 20, bio: 600, description: 'Apresente os seus serviços, portefólio e trabalho.' },
+  {
+    id: 'free-30',
+    name: '30 dias grátis',
+    audience: 'Todos',
+    meticais: 0,
+    links: 20,
+    bio: 600,
+    description:
+      'Experimente o seu perfil durante 30 dias, sem renovação automática.',
+  },
+  {
+    id: 'personal',
+    name: 'Pessoal',
+    audience: 'Uso pessoal',
+    meticais: 65,
+    links: 8,
+    bio: 200,
+    description: 'Os seus contactos e redes sociais, num só lugar.',
+  },
+  {
+    id: 'professional-v2',
+    name: 'Profissional',
+    audience: 'Profissionais',
+    meticais: 150,
+    links: 20,
+    bio: 600,
+    description: 'Apresente os seus serviços, portefólio e trabalho.',
+  },
 ] as const;
 export type PlanId = string;
 export type ManagedPlan = {
@@ -76,12 +103,16 @@ export type ManagedPlan = {
   version: number;
 };
 export function getPlan(id: unknown) {
-  const plan = plans.find((item) => item.id === id) ?? legacyPlans.find((item) => item.id === id);
+  const plan =
+    plans.find((item) => item.id === id) ??
+    legacyPlans.find((item) => item.id === id);
   if (!plan) throw new Error('Plano inválido.');
   return plan;
 }
 export type ProfileLink = { label: string; url: string };
 export type Profile = {
+  business?: ProfileBusiness;
+  extras?: ProfileExtras;
   name: string;
   username: string;
   title: string;
@@ -251,6 +282,8 @@ export function validateProfile(input: unknown): Profile {
     bio: typeof p.bio === 'string' ? p.bio.trim() : '',
     photoUrl,
     photoPosition,
+    business: validateBusiness(p.business),
+    extras: validateExtras(p.extras),
   };
 }
 export function validatePlanContent(

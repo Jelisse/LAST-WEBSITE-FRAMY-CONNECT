@@ -1,3 +1,4 @@
+import { database } from '@/lib/server-db';
 import { CorporatePlan } from '@/components/corporate-plan';
 import { getTranslations } from '@/lib/server-i18n';
 import { LanguageSelector } from '@/components/language-provider';
@@ -9,12 +10,7 @@ import { HomeMobileMenu } from '@/components/home-mobile-menu';
 import { HomeHeader } from '@/components/home-header';
 import Image from 'next/image';
 import Link from '@/components/hard-link';
-import {
-  ArrowUpRight,
-  Nfc,
-  Smartphone,
-  RefreshCw,
-} from 'lucide-react';
+import { ArrowUpRight, Nfc, Smartphone, RefreshCw } from 'lucide-react';
 import { SiteFooter } from '@/components/site-shell';
 import { getHeroMedia } from '@/lib/server-hero-media';
 import { HomeHeroScene } from '@/components/home-hero-scene';
@@ -89,6 +85,10 @@ export const dynamic = 'force-dynamic';
 export const metadata = { robots: publicPageRobots() };
 export default async function Home() {
   const t = await getTranslations();
+  const billing = await database()
+    .prepare('SELECT enabled FROM profile_billing_settings WHERE id=1')
+    .first<{ enabled: number }>()
+    .catch(() => null);
   const [products, allPlans, heroMedia] = await Promise.all([
     getProducts(),
     getManagedPlans(),
@@ -96,7 +96,9 @@ export default async function Home() {
   ]);
   const featured = products
     .filter((p) => p.published !== false)
-    .sort((a, b) => Number(b.available) - Number(a.available) || productOrder(a, b))
+    .sort(
+      (a, b) => Number(b.available) - Number(a.available) || productOrder(a, b),
+    )
     .slice(0, 4);
   const plans = allPlans
     .filter((p) => p.active)
@@ -135,11 +137,20 @@ export default async function Home() {
             <div className="home-hero-copy">
               <h1>
                 <span>
-                {t('O Seu Mundo,')}
-                <br />
-                {t('Num Toque.')}
+                  {t('O Seu Mundo,')}
+                  <br />
+                  {t('Num Toque.')}
                 </span>
-                <svg className="home-contactless-mark" viewBox="0 0 48 64" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" aria-hidden="true" focusable="false">
+                <svg
+                  className="home-contactless-mark"
+                  viewBox="0 0 48 64"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
                   <path d="M7 25 Q12 32 7 39" />
                   <path d="M17 18 Q27 32 17 46" />
                   <path d="M27 11 Q42 32 27 53" />
@@ -196,105 +207,218 @@ export default async function Home() {
             </Link>
           </div>
           {[true, false].map((available) => {
-            const items = featured.filter(p => p.available === available);
+            const items = featured.filter((p) => p.available === available);
             if (!items.length) return null;
-            return <div className="home-product-group" key={String(available)}>
-              {!available && <h3 className="home-upcoming-heading">{t('Brevemente')}</h3>}
-          <div className={`home-products-grid${available ? " has-available" : ""}`}>
-            {items.map((p) => p.available ? (
-              <article className="home-featured-product" key={p.id}>
-                <div className="home-featured-visual">
-                  <SourceImage src={p.id === 'keychain' ? '/products/keychain-transparent.png' : p.imageUrl} alt={t(productNames[p.name] ?? p.name)} width={1254} height={1254} loading="lazy" />
-                  {p.id === 'keychain' && <span className="home-featured-caption"><Nfc size={18} aria-hidden="true" />{t('Partilha por toque NFC')}</span>}
+            return (
+              <div className="home-product-group" key={String(available)}>
+                {!available && (
+                  <h3 className="home-upcoming-heading">{t('Brevemente')}</h3>
+                )}
+                <div
+                  className={`home-products-grid${available ? ' has-available' : ''}`}
+                >
+                  {items.map((p) =>
+                    p.available ? (
+                      <article className="home-featured-product" key={p.id}>
+                        <div className="home-featured-visual">
+                          <SourceImage
+                            src={
+                              p.id === 'keychain'
+                                ? '/products/keychain-transparent.png'
+                                : p.imageUrl
+                            }
+                            alt={t(productNames[p.name] ?? p.name)}
+                            width={1254}
+                            height={1254}
+                            loading="lazy"
+                          />
+                          {p.id === 'keychain' && (
+                            <span className="home-featured-caption">
+                              <Nfc size={18} aria-hidden="true" />
+                              {t('Partilha por toque NFC')}
+                            </span>
+                          )}
+                        </div>
+                        <div className="home-featured-content">
+                          <span className="home-available-badge">
+                            {t('Disponível agora')}
+                          </span>
+                          <h3>{t(productNames[p.name] ?? p.name)}</h3>
+                          <p className="home-featured-description">
+                            {t(p.tagline)}
+                          </p>
+                          {p.id === 'keychain' && (
+                            <p className="home-featured-benefit">
+                              {t(
+                                'Partilhe contactos, redes sociais e trabalho com um toque num telemóvel compatível com NFC.',
+                              )}
+                            </p>
+                          )}
+                          {p.id === 'keychain' && (
+                            <ul className="home-featured-features">
+                              <li>
+                                <Smartphone size={16} aria-hidden="true" />
+                                {t('Abre no navegador')}
+                              </li>
+                              <li>
+                                <RefreshCw size={16} aria-hidden="true" />
+                                {t('Perfil actualizável')}
+                              </li>
+                            </ul>
+                          )}
+                          <div className="home-featured-purchase">
+                            <div className="home-featured-price">
+                              <strong>{money(p.amount, t.locale)}</strong>
+                              <span>
+                                {t(
+                                  'Preço por unidade. A entrega é confirmada separadamente.',
+                                )}
+                              </span>
+                            </div>
+                            <div className="home-featured-actions">
+                              <Link
+                                className="home-primary"
+                                href={`/encomendar/${p.id}`}
+                              >
+                                {t('Encomendar agora')}
+                                <ArrowUpRight size={18} aria-hidden="true" />
+                              </Link>
+                              <Link
+                                className="home-featured-details"
+                                href={`/produtos/${p.id}`}
+                              >
+                                {t('Ver detalhes')}
+                                <ArrowUpRight size={16} aria-hidden="true" />
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    ) : (
+                      <Link
+                        className={`home-product ${p.available ? 'is-available' : 'is-coming-soon'}`}
+                        key={p.id}
+                        href={`/produtos/${p.id}`}
+                      >
+                        <div className="home-product-art">
+                          <SourceImage
+                            src={p.imageUrl}
+                            alt=""
+                            width={1254}
+                            height={1254}
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="home-product-copy">
+                          {p.available && (
+                            <span className="home-available-badge">
+                              {t('Disponível agora')}
+                            </span>
+                          )}
+                          {p.available ? (
+                            <h3>{t(productNames[p.name] ?? p.name)}</h3>
+                          ) : (
+                            <h4>{t(productNames[p.name] ?? p.name)}</h4>
+                          )}
+                          <p>{t(p.tagline)}</p>
+                          {p.available && (
+                            <strong className="home-product-price">
+                              {money(p.amount, t.locale)}
+                            </strong>
+                          )}
+                          <span className="home-product-action">
+                            {p.available
+                              ? t('Encomendar agora')
+                              : t('Ver detalhes')}{' '}
+                            <ArrowUpRight size={18} />
+                          </span>
+                        </div>
+                      </Link>
+                    ),
+                  )}
                 </div>
-                <div className="home-featured-content">
-                  <span className="home-available-badge">{t('Disponível agora')}</span>
-                  <h3>{t(productNames[p.name] ?? p.name)}</h3>
-                  <p className="home-featured-description">{t(p.tagline)}</p>
-                  {p.id === 'keychain' && <p className="home-featured-benefit">{t('Partilhe contactos, redes sociais e trabalho com um toque num telemóvel compatível com NFC.')}</p>}
-                  {p.id === 'keychain' && <ul className="home-featured-features"><li><Smartphone size={16} aria-hidden="true" />{t('Abre no navegador')}</li><li><RefreshCw size={16} aria-hidden="true" />{t('Perfil actualizável')}</li></ul>}
-                  <div className="home-featured-purchase">
-                    <div className="home-featured-price"><strong>{money(p.amount, t.locale)}</strong><span>{t('Preço por unidade. A entrega é confirmada separadamente.')}</span></div>
-                    <div className="home-featured-actions"><Link className="home-primary" href={`/encomendar/${p.id}`}>{t('Encomendar agora')}<ArrowUpRight size={18} aria-hidden="true" /></Link>
-                    <Link className="home-featured-details" href={`/produtos/${p.id}`}>{t('Ver detalhes')}<ArrowUpRight size={16} aria-hidden="true" /></Link></div>
-                  </div>
-                </div>
-              </article>
-            ) : (
-              <Link
-                className={`home-product ${p.available ? 'is-available' : 'is-coming-soon'}`}
-                key={p.id}
-                href={`/produtos/${p.id}`}
-              >
-                <div className="home-product-art">
-                  <SourceImage
-                    src={p.imageUrl}
-                    alt=""
-                    width={1254}
-                    height={1254}
-                    loading="lazy"
-                  />
-                </div>
-                <div className="home-product-copy">
-                  {p.available && <span className="home-available-badge">{t('Disponível agora')}</span>}
-                  {p.available ? <h3>{t(productNames[p.name] ?? p.name)}</h3> : <h4>{t(productNames[p.name] ?? p.name)}</h4>}
-                  <p>{t(p.tagline)}</p>
-                  {p.available && <strong className="home-product-price">{money(p.amount, t.locale)}</strong>}
-                  <span className="home-product-action">{p.available ? t("Encomendar agora") : t("Ver detalhes")} <ArrowUpRight size={18} /></span>
-                </div>
-              </Link>
-            ))}
-          </div>
-          </div>;
+              </div>
+            );
           })}
         </section>
         <section className="home-plans" id="planos">
           <div className="home-section-heading">
             <div>
-              <h2>{t('Mais espaço para o seu perfil.')}</h2>
+              <h2>{t('Planos para o seu perfil digital')}</h2>
               <p>
                 {t(
-                  'Planos digitais mensais em meticais. Compare o número de links e o espaço de apresentação.',
+                  'Escolha os seus links, contactos e apresentação. O produto físico é comprado separadamente.',
                 )}
               </p>
             </div>
           </div>
           <p className="home-disclosure">
             {t(
-              'Comece com 30 dias gratuitos, sem renovação automática. Os planos mensais ainda não aceitam adesões. O produto físico é pago separadamente.',
+              billing?.enabled
+                ? 'Experimente grátis durante 30 dias. Renove mensalmente quando quiser, sem renovação automática.'
+                : 'Experimente durante 30 dias, sem renovação automática. Enquanto os planos mensais não abrirem, prolongamos o acesso sem cobrança.',
             )}
           </p>
-          {plans.find(p => p.id === 'free-30') && <div className="home-trial-banner">
-            <strong>{t('30 dias grátis')}</strong>
-            <span>{t('Experimente 20 links e 600 caracteres de biografia, sem renovação automática.')}</span>
-            <Link className="home-text-link" href="/perfil?plans=1">{t('Começar 30 dias grátis')} <ArrowUpRight size={18} /></Link>
-          </div>}
+          {plans.find((p) => p.id === 'free-30') && (
+            <div className="home-trial-banner">
+              <strong>{t('30 dias grátis')}</strong>
+              <span>
+                {t(
+                  'Experimente 20 links e 600 caracteres de biografia, sem renovação automática.',
+                )}
+              </span>
+              <Link className="home-text-link" href="/perfil?plans=1">
+                {t('Começar 30 dias grátis')} <ArrowUpRight size={18} />
+              </Link>
+            </div>
+          )}
+          <p className="home-disclosure">
+            {t(
+              'Instagram, WhatsApp e website: 3 links à sua escolha. Nome, email, telefone e dados do negócio não ocupam links.',
+            )}
+          </p>
           <div className="home-plans-grid">
-            {plans.filter(p => p.id !== 'free-30').map((p) => (
-              <article className={`home-plan${p.id === "free-30" ? " home-plan-trial" : ""}`} key={p.id}>
-                <span className="home-plan-label">{p.id === "free-30" ? t("Experimente primeiro") : t("Adesões em breve")}</span>
-                <h3>{t(p.name)}</h3>
-                <p>{t(p.description)}</p>
-                <div className="home-plan-price">
-                  {planPrice(p, t.locale)}
-                  <span>
-                    {p.id === 'free-30' ? t(' / 30 dias') : t(' / mês')}
+            {plans
+              .filter((p) => p.id !== 'free-30')
+              .map((p) => (
+                <article
+                  className={`home-plan${p.id === 'free-30' ? ' home-plan-trial' : ''}`}
+                  key={p.id}
+                >
+                  <span className="home-plan-label">
+                    {p.id === 'free-30'
+                      ? t('Experimente primeiro')
+                      : billing?.enabled
+                        ? t('Mensal · por perfil')
+                        : t('Adesões em breve')}
                   </span>
-                </div>
-                <ul>
-                  <li>
-                    {t('Até ')}
-                    {p.links}
-                    {t(' links no perfil')}
-                  </li>
-                  <li>
-                    {p.bio > 0
-                      ? t('Biografia até {0} caracteres', [p.bio])
-                      : t('Contactos essenciais, sem biografia')}
-                  </li>
-                </ul>
-              </article>
-            ))}
+                  <h3>{t(p.name)}</h3>
+                  <p>{t(p.description)}</p>
+                  <div className="home-plan-price">
+                    {planPrice(p, t.locale)}
+                    <span>
+                      {p.id === 'free-30' ? t(' / 30 dias') : t(' / mês')}
+                    </span>
+                  </div>
+                  <ul>
+                    <li>
+                      {t('Até ')}
+                      {p.links}
+                      {t(' links à sua escolha')}
+                    </li>
+                    <li>
+                      {p.bio > 0
+                        ? t('Biografia até {0} caracteres', [p.bio])
+                        : t('Contactos essenciais, sem biografia')}
+                    </li>
+                    <li>{t('WhatsApp, horário e direcções')}</li>
+                    <li>{t('Cores e apresentação do perfil')}</li>
+                    {p.id === 'professional-v2' && (
+                      <li>{t('Estatísticas de visitas e cliques')}</li>
+                    )}
+                  </ul>
+                </article>
+              ))}
             <CorporatePlan />
           </div>
           {plans.length === 0 ? (
@@ -332,7 +456,9 @@ export default async function Home() {
                 'A Framy Connect liga os seus produtos NFC a um perfil digital com contactos, redes sociais e trabalho. Uma forma simples de se apresentar e manter a sua informação actualizada.',
               )}
             </p>
-            <Link className="home-text-link" href="/sobre">{t("Conheça a Framy Connect")} <ArrowUpRight size={18} /></Link>
+            <Link className="home-text-link" href="/sobre">
+              {t('Conheça a Framy Connect')} <ArrowUpRight size={18} />
+            </Link>
           </div>
         </section>
         <section className="home-faq" id="perguntas">

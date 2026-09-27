@@ -26,6 +26,10 @@ const source = ts.transpileModule(
 function fixture() {
   const sql = new DatabaseSync(':memory:');
   sql.exec(readFileSync('drizzle/0013_website_analytics.sql', 'utf8'));
+  sql.exec(readFileSync('drizzle/0014_profile_engagement.sql', 'utf8'));
+  sql.exec(
+    'CREATE TABLE profile_enquiries(id TEXT PRIMARY KEY,created_at INTEGER)',
+  );
   sql.exec(
     'CREATE TABLE sandbox_orders(id TEXT,created_at TEXT,data_json TEXT)',
   );
@@ -40,6 +44,9 @@ function fixture() {
         },
         async first() {
           return sql.prepare(query).get(...args) || null;
+        },
+        async run() {
+          return { meta: sql.prepare(query).run(...args) };
         },
         async execute() {
           const stmt = sql.prepare(query);
@@ -280,10 +287,82 @@ test('late beacons keep bounded observation timestamps; oversized and malformed 
   }
 });
 
-
-test('scheduled retention removes old analytics without touching recent events or orders',async()=>{
- const f=fixture();try{const now=Date.now(),old=now-91*86400000;f.sql.prepare("INSERT INTO site_sessions VALUES('old',?,?, '/', 'direct','','desktop','MZ')").run(old,old);f.sql.prepare("INSERT INTO site_events VALUES('old-event','old',?,'page','/',-1,NULL,NULL)").run(old);await f.post();f.sql.exec("INSERT INTO sandbox_orders VALUES('keep-order','2020-01-01','{}')");const code=ts.transpileModule(readFileSync('worker.ts','utf8').replace(/^import[\s\S]*?;\r?\n/gm,''),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;const exports={};
- // oxlint-disable-next-line typescript/no-implied-eval -- Isolated scheduled handler with real SQLite.
- new Function('exports','handler','securityHeaders','cleanupReservations',code)(exports,{},()=>{},async()=>{});const pending=[];await exports.default.scheduled({}, {DB:f.db},{waitUntil(p){pending.push(p);}});await Promise.all(pending);assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM site_events WHERE id='old-event'").get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM site_events').get().n,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM site_sessions').get().n,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM sandbox_orders').get().n,1);}finally{f.sql.close();}
+test('scheduled retention removes old analytics without touching recent events or orders', async () => {
+  const f = fixture();
+  try {
+    const now = Date.now(),
+      old = now - 91 * 86400000;
+    f.sql
+      .prepare(
+        "INSERT INTO site_sessions VALUES('old',?,?, '/', 'direct','','desktop','MZ')",
+      )
+      .run(old, old);
+    f.sql
+      .prepare(
+        "INSERT INTO site_events VALUES('old-event','old',?,'page','/',-1,NULL,NULL)",
+      )
+      .run(old);
+    await f.post();
+    f.sql.exec(
+      "INSERT INTO sandbox_orders VALUES('keep-order','2020-01-01','{}')",
+    );
+    const code = ts.transpileModule(
+      readFileSync('worker.ts', 'utf8').replace(/^import[\s\S]*?;\r?\n/gm, ''),
+      {
+        compilerOptions: {
+          target: ts.ScriptTarget.ES2022,
+          module: ts.ModuleKind.CommonJS,
+        },
+      },
+    ).outputText;
+    const exports = {};
+    // oxlint-disable-next-line typescript/no-implied-eval -- Isolated scheduled handler with real SQLite.
+    new Function(
+      'exports',
+      'handler',
+      'securityHeaders',
+      'cleanupReservations',
+      'profileReminders',
+      'refreshProfileDomains',
+      code,
+    )(
+      exports,
+      {},
+      () => {},
+      async () => {},
+      async () => {},
+      async () => {},
+    );
+    const pending = [];
+    await exports.default.scheduled(
+      {},
+      { DB: f.db },
+      {
+        waitUntil(p) {
+          pending.push(p);
+        },
+      },
+    );
+    await Promise.all(pending);
+    assert.equal(
+      f.sql
+        .prepare("SELECT COUNT(*) n FROM site_events WHERE id='old-event'")
+        .get().n,
+      0,
+    );
+    assert.equal(
+      f.sql.prepare('SELECT COUNT(*) n FROM site_events').get().n,
+      1,
+    );
+    assert.equal(
+      f.sql.prepare('SELECT COUNT(*) n FROM site_sessions').get().n,
+      1,
+    );
+    assert.equal(
+      f.sql.prepare('SELECT COUNT(*) n FROM sandbox_orders').get().n,
+      1,
+    );
+  } finally {
+    f.sql.close();
+  }
 });
-

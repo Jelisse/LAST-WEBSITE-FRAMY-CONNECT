@@ -6542,5 +6542,233 @@
   "Disponível agora": [
     "Available now",
     "現已供應"
+  ],
+  "Planos para o seu perfil digital": [
+    "Plans for your digital profile",
+    "數位個人檔案方案"
+  ],
+  "Escolha os seus links, contactos e apresentação. O produto físico é comprado separadamente.": [
+    "Choose your links, contact details and presentation. The physical product is purchased separately.",
+    "選擇您的連結、聯絡資料及介紹。實體產品須另外購買。"
+  ],
+  "Experimente durante 30 dias, sem renovação automática. Enquanto os planos mensais não abrirem, prolongamos o acesso sem cobrança.": [
+    "Try it for 30 days, with no automatic renewal. Access is extended at no charge while monthly subscriptions are unavailable.",
+    "體驗 30 天，不會自動續訂。月費訂閱尚未開放期間，我們將免費延長使用權。"
+  ],
+  "Instagram, WhatsApp e website: 3 links à sua escolha. Nome, email, telefone e dados do negócio não ocupam links.": [
+    "Instagram, WhatsApp and your website: three links of your choice. Name, email, phone and business details do not use your link allowance.",
+    "Instagram、WhatsApp 和網站：自由選擇三個連結。姓名、電郵、電話及商家資料不佔連結額度。"
+  ],
+  "links à sua escolha": [
+    "links of your choice",
+    "個自選連結"
+  ],
+  "WhatsApp, horário e direcções": [
+    "WhatsApp, opening hours and directions",
+    "WhatsApp、營業時間及路線"
+  ],
+  "Cores e apresentação do perfil": [
+    "Profile colours and layout",
+    "個人檔案配色與版面"
+  ],
+  "Estatísticas de visitas e cliques": [
+    "Visit and click statistics",
+    "瀏覽與點擊統計"
+  ],
+  "O seu negócio, num toque": [
+    "Your business, one tap away",
+    "輕觸即可認識您的商家"
+  ],
+  "Estes campos são opcionais e aparecem no perfil publicado. Não ocupam os seus links.": [
+    "These optional fields appear on your published profile. They do not use your link allowance.",
+    "這些選填欄位會顯示於已發佈的個人檔案，且不佔連結額度。"
+  ],
+  "WhatsApp público": [
+    "Public WhatsApp number",
+    "公開 WhatsApp 號碼"
+  ],
+  "Mensagem para iniciar a conversa": [
+    "Conversation starter message",
+    "開啟對話的訊息"
+  ],
+  "Olá, gostaria de saber mais sobre os seus serviços.": [
+    "Hello, I would like to know more about your services.",
+    "您好，我想進一步了解您的服務。"
+  ],
+  "Endereço do negócio": [
+    "Business address",
+    "商家地址"
+  ],
+  "Rua, cidade e país": [
+    "Street, city and country",
+    "街道、城市及國家"
+  ],
+  "Horário de atendimento": [
+    "Business hours",
+    "營業時間"
+  ],
+  "Segunda a sexta: 08:00–17:00": [
+    "Monday to Friday: 08:00–17:00",
+    "星期一至五：08:00–17:00"
+  ],
+  "Cor do perfil": [
+    "Profile colour",
+    "個人檔案配色"
+  ],
+  "Apresentação": [
+    "Layout",
+    "版面"
+  ],
+  "Fotografia em destaque": [
+    "Featured photo",
+    "主打照片"
+  ],
+  "Compacta": [
+    "Compact",
+    "精簡"
+  ],
+  "Use apenas contactos e endereços que deseja tornar públicos. Guarde e publique para aplicar as alterações.": [
+    "Only enter contact details and addresses you want to make public. Save and publish to apply your changes.",
+    "請只填寫您希望公開的聯絡資料及地址。儲存並發佈後即可套用變更。"
+  ],
+  "Preferências de medição": [
+    "Measurement preferences",
+    "統計偏好設定"
+  ],
+  "Permitir a contagem de visitas e cliques para o titular deste perfil? É opcional. Não partilhamos a sua identidade ou os seus contactos.": [
+    "Allow visits and clicks to be counted for this profile owner? This is optional. We do not share your identity or contact details.",
+    "是否允許為此個人檔案的擁有者統計瀏覽與點擊？此選項非必要，我們不會分享您的身分或聯絡資料。"
+  ],
+  "Permitir": [
+    "Allow",
+    "允許"
+  ],
+  "Resultados do meu perfil": [
+    "My profile results",
+    "我的個人檔案成效"
+  ],
+  "Resultados do perfil": [
+    "Profile results",
+    "個人檔案成效"
+  ],
+  "Veja como os visitantes interagem com o seu perfil digital.": [
+    "See how visitors interact with your digital profile.",
+    "了解訪客如何與您的數位個人檔案互動。"
+  ],
+  "Últimos {0} dias": [
+    "Last {0} days",
+    "最近 {0} 天"
+  ],
+  "Apenas visitas com consentimento. As suas próprias visitas e pré-visualizações são excluídas. Cliques indicam interesse, não vendas ou mensagens enviadas.": [
+    "Only visits with consent are counted. Your own visits and previews are excluded. Clicks show interest, not sales or messages sent.",
+    "僅統計已同意的瀏覽，不含您的瀏覽及預覽。點擊代表興趣，並不代表銷售或已傳送訊息。"
+  ],
+  "Sessões por dia": [
+    "Sessions by day",
+    "每日工作階段"
+  ],
+  "Cliques de interesse": [
+    "Engagement clicks",
+    "互動點擊"
+  ],
+  "Ainda não há actividade registada neste período. Partilhe o seu perfil publicado para começar.": [
+    "No activity has been recorded in this period yet. Share your published profile to get started.",
+    "此期間尚未記錄活動。分享已發佈的個人檔案即可開始。"
+  ],
+  "Acções mais procuradas": [
+    "Most popular actions",
+    "最受歡迎的動作"
+  ],
+  "Ver actividade por dia": [
+    "View daily activity",
+    "查看每日活動"
+  ],
+  "Cliques": [
+    "Clicks",
+    "點擊"
+  ],
+  "Dias apresentados na hora de Maputo. Sessões são estimativas, não pessoas identificadas. Dados conservados por até 90 dias.": [
+    "Days use Maputo time. Sessions are estimates, not identified people. Data is retained for up to 90 days.",
+    "日期使用馬普托時間。工作階段為估計值，並非已辨識的人數。資料最多保留 90 天。"
+  ],
+  "O seu plano de perfil digital": [
+    "Your digital profile plan",
+    "您的數位個人檔案方案"
+  ],
+  "O seu acesso foi prolongado sem cobrança enquanto os planos mensais não estão disponíveis. Os seus links e dados mantêm-se guardados.": [
+    "Your access has been extended at no charge while monthly plans are unavailable. Your links and data remain saved.",
+    "月費方案尚未開放，因此已免費延長您的使用權。連結及資料均會保留。"
+  ],
+  "Experiência de 30 dias até {0}. Sem renovação automática.": [
+    "30-day trial until {0}. No automatic renewal.",
+    "30 天體驗至 {0}。不會自動續訂。"
+  ],
+  "Os 30 dias começam quando activa o perfil digital. O produto físico é comprado separadamente.": [
+    "Your 30 days start when you activate your digital profile. The physical product is purchased separately.",
+    "啟用數位個人檔案時開始計算 30 天。實體產品須另外購買。"
+  ],
+  "Enquanto as adesões mensais não abrirem, o acesso será prolongado sem cobrança. Não precisa de eliminar links.": [
+    "Access will be extended at no charge until monthly subscriptions open. You do not need to delete links.",
+    "月費訂閱開放前將免費延長使用權。您無需刪除連結。"
+  ],
+  "Informações do negócio": [
+    "Business information",
+    "商家資訊"
+  ],
+  "Falar no WhatsApp": [
+    "Chat on WhatsApp",
+    "透過 WhatsApp 聯絡"
+  ],
+  "Como chegar": [
+    "Get directions",
+    "查看路線"
+  ],
+  "Descarregar contacto": [
+    "Download contact",
+    "下載聯絡資料"
+  ],
+  "Estatísticas temporariamente indisponíveis.": [
+    "Statistics are temporarily unavailable.",
+    "統計資料暫時無法使用。"
+  ],
+  "Dados do negócio inválidos.": [
+    "Invalid business details.",
+    "商家資料無效。"
+  ],
+  "Estilo do perfil inválido.": [
+    "Invalid profile style.",
+    "個人檔案樣式無效。"
+  ],
+  "Use o número WhatsApp com indicativo internacional, por exemplo +258840000000.": [
+    "Enter your WhatsApp number with its country code, for example +258840000000.",
+    "請輸入含國際區碼的 WhatsApp 號碼，例如 +258840000000。"
+  ],
+  "Laranja": [
+    "Orange",
+    "橙色"
+  ],
+  "Ameixa": [
+    "Plum",
+    "梅紫色"
+  ],
+  "Ardósia": [
+    "Slate",
+    "石板灰"
+  ],
+  "links à sua escolha.": [
+    "links of your choice.",
+    "個自選連結。"
+  ],
+  "Acesso prolongado durante o lançamento": [
+    "Access extended during launch",
+    "推出期間已延長使用權"
+  ],
+  "Medição dos perfis digitais": [
+    "Digital profile measurement",
+    "數位個人檔案統計"
+  ],
+  "Cada perfil pode pedir consentimento para medir visitas e cliques. O titular recebe contagens agregadas, sem a identidade ou os contactos dos visitantes. Pode recusar ou alterar a escolha no próprio perfil. Os eventos são conservados por até 90 dias.": [
+    "Each profile may ask for consent to measure visits and clicks. Its owner receives aggregate counts without visitor identities or contact details. You can decline or change your choice on that profile. Events are retained for up to 90 days.",
+    "每個個人檔案均可詢問是否同意統計瀏覽與點擊。擁有者只會收到彙整數量，不包含訪客身分或聯絡資料。您可在該個人檔案拒絕或變更選擇。活動資料最多保留 90 天。"
   ]
 }
