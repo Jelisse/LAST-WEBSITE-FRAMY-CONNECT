@@ -2508,7 +2508,7 @@ summary {
   inset: calc(40% + 20cqw) 0 0;
   /* Preserve the supplied mountain contours; convert grey dots to white.
      Screen blending removes the PNG's white background after inversion. */
-  background: url('/brand/profile-mountains.png') 38% top / cover no-repeat;
+  background: url('/media-optimized/brand-profile-mountains-1440-629d89b12d66.webp') 38% top / cover no-repeat;
   filter: invert(1) brightness(2);
   mix-blend-mode: screen;
   opacity: 0.6;

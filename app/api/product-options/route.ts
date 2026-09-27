@@ -8,7 +8,7 @@ const json = (v: unknown, status = 200) =>
   Response.json(v, { status, headers: { 'Cache-Control': 'no-store' } });
 export async function GET() {
   try {
-    await expireReservations();
+    await expireReservations(false);
     return json({
       options: (
         await database()

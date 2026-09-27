@@ -35,7 +35,7 @@ export async function GET() {
   try {
     const user = await getChatGPTUser();
     if (!user) return json({ error: 'Inicie sessão para continuar.' }, 401);
-    await expireReservations();
+    await expireReservations(false);
     const db = database();
     const [p, orders, events, membership, products, plans, manageProducts, manageOrders] = await Promise.all([
       db
@@ -460,7 +460,7 @@ export async function POST(request: Request) {
           { error: 'Confirme o perfil e utilize o percurso de compra.' },
           422,
         );
-      await expireReservations();
+      await expireReservations(true);
       const delivery = validateDelivery(body);
       if (typeof body.id !== 'string' || !/^[0-9a-f-]{36}$/.test(body.id))
         return json({ error: 'Referência inválida.' }, 422);

@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const user = await getChatGPTUser();
   if (!user) return json({ error: 'Inicie sessão.' }, 401);
   try {
-    await expireReservations();
+    await expireReservations(false);
     const id = new URL(request.url).searchParams.get('order');
     const row = await database()
       .prepare('SELECT data_json FROM sandbox_orders WHERE id=? AND owner_id=?')

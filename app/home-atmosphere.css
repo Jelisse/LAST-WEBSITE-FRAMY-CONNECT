@@ -45,7 +45,7 @@
   position: absolute;
   pointer-events: none;
   z-index: 0;
-  background: url('/brand/profile-mountains.png') no-repeat center / 100% 100%;
+  background: url('/media-optimized/brand-profile-mountains-1440-629d89b12d66.webp') no-repeat center / 100% 100%;
   mix-blend-mode: multiply;
   filter: sepia(1);
   opacity: .06;
@@ -78,7 +78,7 @@
   pointer-events: none;
   z-index: -1;
   inset: 0;
-  background: url('/brand/profile-mountains.png') no-repeat center bottom / 100% 100%;
+  background: url('/media-optimized/brand-profile-mountains-1440-629d89b12d66.webp') no-repeat center bottom / 100% 100%;
   filter: invert(1);
   mix-blend-mode: screen;
   opacity: .14;

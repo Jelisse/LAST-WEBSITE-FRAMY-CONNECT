@@ -1,0 +1,206 @@
+{
+  "/home/demo-portrait.jpg": {
+    "src": "/media-optimized/home-demo-portrait-640-ac0af57ac02c.webp",
+    "srcSet": "/media-optimized/home-demo-portrait-320-ae9df43a8d61.webp 320w, /media-optimized/home-demo-portrait-640-ac0af57ac02c.webp 640w, /media-optimized/home-demo-portrait-960-5cc7fcdc2edc.webp 960w, /media-optimized/home-demo-portrait-1080-967bf6ea7119.webp 1080w"
+  },
+  "/home/framy-keychain.png": {
+    "src": "/media-optimized/home-framy-keychain-640-c4848e7a3fbd.webp",
+    "srcSet": "/media-optimized/home-framy-keychain-320-2611a6285918.webp 320w, /media-optimized/home-framy-keychain-640-c4848e7a3fbd.webp 640w, /media-optimized/home-framy-keychain-960-648cf8a2cbdb.webp 960w, /media-optimized/home-framy-keychain-1254-a8503d9dc577.webp 1254w"
+  },
+  "/home/framy-keychain.webp": {
+    "src": "/media-optimized/home-framy-keychain-640-c4848e7a3fbd.webp",
+    "srcSet": "/media-optimized/home-framy-keychain-320-2611a6285918.webp 320w, /media-optimized/home-framy-keychain-640-c4848e7a3fbd.webp 640w, /media-optimized/home-framy-keychain-960-648cf8a2cbdb.webp 960w, /media-optimized/home-framy-keychain-1254-a8503d9dc577.webp 1254w"
+  },
+  "/home/iphone-shell.png": {
+    "src": "/media-optimized/home-iphone-shell-640-157934eb178d.webp",
+    "srcSet": "/media-optimized/home-iphone-shell-320-a91efb57b7fb.webp 320w, /media-optimized/home-iphone-shell-640-157934eb178d.webp 640w, /media-optimized/home-iphone-shell-887-869a86c7b98a.webp 887w"
+  },
+  "/home/iphone-shell.webp": {
+    "src": "/media-optimized/home-iphone-shell-640-157934eb178d.webp",
+    "srcSet": "/media-optimized/home-iphone-shell-320-a91efb57b7fb.webp 320w, /media-optimized/home-iphone-shell-640-157934eb178d.webp 640w, /media-optimized/home-iphone-shell-887-869a86c7b98a.webp 887w"
+  },
+  "/home/iphone-side-shell.png": {
+    "src": "/media-optimized/home-iphone-side-shell-640-eb726048b6bf.webp",
+    "srcSet": "/media-optimized/home-iphone-side-shell-320-dc258fe7ab54.webp 320w, /media-optimized/home-iphone-side-shell-640-eb726048b6bf.webp 640w, /media-optimized/home-iphone-side-shell-887-8498e352f12a.webp 887w"
+  },
+  "/home/iphone-side-shell.webp": {
+    "src": "/media-optimized/home-iphone-side-shell-640-eb726048b6bf.webp",
+    "srcSet": "/media-optimized/home-iphone-side-shell-320-dc258fe7ab54.webp 320w, /media-optimized/home-iphone-side-shell-640-eb726048b6bf.webp 640w, /media-optimized/home-iphone-side-shell-887-8498e352f12a.webp 887w"
+  },
+  "/home/nfc-card-blank.png": {
+    "src": "/media-optimized/home-nfc-card-blank-640-017bc77205cf.webp",
+    "srcSet": "/media-optimized/home-nfc-card-blank-320-d4f5f49370a7.webp 320w, /media-optimized/home-nfc-card-blank-640-017bc77205cf.webp 640w, /media-optimized/home-nfc-card-blank-960-4267f08e0cfa.webp 960w, /media-optimized/home-nfc-card-blank-996-8e48d7caeaba.webp 996w"
+  },
+  "/home/nfc-card-blank.webp": {
+    "src": "/media-optimized/home-nfc-card-blank-640-017bc77205cf.webp",
+    "srcSet": "/media-optimized/home-nfc-card-blank-320-d4f5f49370a7.webp 320w, /media-optimized/home-nfc-card-blank-640-017bc77205cf.webp 640w, /media-optimized/home-nfc-card-blank-960-4267f08e0cfa.webp 960w, /media-optimized/home-nfc-card-blank-996-8e48d7caeaba.webp 996w"
+  },
+  "/home/nfc-card-matte.png": {
+    "src": "/media-optimized/home-nfc-card-matte-640-5aeaa269fcb2.webp",
+    "srcSet": "/media-optimized/home-nfc-card-matte-320-6bba65253a7e.webp 320w, /media-optimized/home-nfc-card-matte-640-5aeaa269fcb2.webp 640w, /media-optimized/home-nfc-card-matte-960-94d4a753f9cf.webp 960w, /media-optimized/home-nfc-card-matte-996-e1e71a1118bc.webp 996w"
+  },
+  "/home/nfc-card-matte.webp": {
+    "src": "/media-optimized/home-nfc-card-matte-640-5aeaa269fcb2.webp",
+    "srcSet": "/media-optimized/home-nfc-card-matte-320-6bba65253a7e.webp 320w, /media-optimized/home-nfc-card-matte-640-5aeaa269fcb2.webp 640w, /media-optimized/home-nfc-card-matte-960-94d4a753f9cf.webp 960w, /media-optimized/home-nfc-card-matte-996-e1e71a1118bc.webp 996w"
+  },
+  "/home/nfc-card.png": {
+    "src": "/media-optimized/home-nfc-card-640-ccc826faeff8.webp",
+    "srcSet": "/media-optimized/home-nfc-card-320-043b4c639cb9.webp 320w, /media-optimized/home-nfc-card-640-ccc826faeff8.webp 640w, /media-optimized/home-nfc-card-960-ee5065b14458.webp 960w, /media-optimized/home-nfc-card-996-a828f4bf002e.webp 996w"
+  },
+  "/home/nfc-card.webp": {
+    "src": "/media-optimized/home-nfc-card-640-ccc826faeff8.webp",
+    "srcSet": "/media-optimized/home-nfc-card-320-043b4c639cb9.webp 320w, /media-optimized/home-nfc-card-640-ccc826faeff8.webp 640w, /media-optimized/home-nfc-card-960-ee5065b14458.webp 960w, /media-optimized/home-nfc-card-996-a828f4bf002e.webp 996w"
+  },
+  "/home/orange-card-front.png": {
+    "src": "/media-optimized/home-orange-card-front-640-12f55e9829f2.webp",
+    "srcSet": "/media-optimized/home-orange-card-front-320-5ab2ed3de623.webp 320w, /media-optimized/home-orange-card-front-640-12f55e9829f2.webp 640w, /media-optimized/home-orange-card-front-960-e501b8a7aac7.webp 960w, /media-optimized/home-orange-card-front-994-5837a85b4cc3.webp 994w"
+  },
+  "/home/orange-card-front.webp": {
+    "src": "/media-optimized/home-orange-card-front-640-12f55e9829f2.webp",
+    "srcSet": "/media-optimized/home-orange-card-front-320-5ab2ed3de623.webp 320w, /media-optimized/home-orange-card-front-640-12f55e9829f2.webp 640w, /media-optimized/home-orange-card-front-960-e501b8a7aac7.webp 960w, /media-optimized/home-orange-card-front-994-5837a85b4cc3.webp 994w"
+  },
+  "/home/pedestal.png": {
+    "src": "/media-optimized/home-pedestal-640-3871043c297f.webp",
+    "srcSet": "/media-optimized/home-pedestal-320-c2e681a8bc16.webp 320w, /media-optimized/home-pedestal-640-3871043c297f.webp 640w, /media-optimized/home-pedestal-960-1e2f8dec17c8.webp 960w, /media-optimized/home-pedestal-1440-c685b2efddda.webp 1440w"
+  },
+  "/home/pedestal.webp": {
+    "src": "/media-optimized/home-pedestal-640-3871043c297f.webp",
+    "srcSet": "/media-optimized/home-pedestal-320-c2e681a8bc16.webp 320w, /media-optimized/home-pedestal-640-3871043c297f.webp 640w, /media-optimized/home-pedestal-960-1e2f8dec17c8.webp 960w, /media-optimized/home-pedestal-1440-c685b2efddda.webp 1440w"
+  },
+  "/home/profile-screen.jpg": {
+    "src": "/media-optimized/home-profile-screen-390-94ec74db3b60.webp",
+    "srcSet": "/media-optimized/home-profile-screen-320-a1629689025d.webp 320w, /media-optimized/home-profile-screen-390-94ec74db3b60.webp 390w"
+  },
+  "/home/solange-card-front.png": {
+    "src": "/media-optimized/home-solange-card-front-640-b3ea8441e31d.webp",
+    "srcSet": "/media-optimized/home-solange-card-front-320-3a5bdae6840c.webp 320w, /media-optimized/home-solange-card-front-640-b3ea8441e31d.webp 640w, /media-optimized/home-solange-card-front-960-c557cd454e01.webp 960w, /media-optimized/home-solange-card-front-994-7bdc2bd63346.webp 994w"
+  },
+  "/home/solange-card-front.webp": {
+    "src": "/media-optimized/home-solange-card-front-640-b3ea8441e31d.webp",
+    "srcSet": "/media-optimized/home-solange-card-front-320-3a5bdae6840c.webp 320w, /media-optimized/home-solange-card-front-640-b3ea8441e31d.webp 640w, /media-optimized/home-solange-card-front-960-c557cd454e01.webp 960w, /media-optimized/home-solange-card-front-994-7bdc2bd63346.webp 994w"
+  },
+  "/home/solange-card.png": {
+    "src": "/media-optimized/home-solange-card-640-24d46c1c711b.webp",
+    "srcSet": "/media-optimized/home-solange-card-320-cca7adc22295.webp 320w, /media-optimized/home-solange-card-640-24d46c1c711b.webp 640w, /media-optimized/home-solange-card-816-9dafdd5a277b.webp 816w"
+  },
+  "/home/solange-card.webp": {
+    "src": "/media-optimized/home-solange-card-640-24d46c1c711b.webp",
+    "srcSet": "/media-optimized/home-solange-card-320-cca7adc22295.webp 320w, /media-optimized/home-solange-card-640-24d46c1c711b.webp 640w, /media-optimized/home-solange-card-816-9dafdd5a277b.webp 816w"
+  },
+  "/home/solange-profile.jpg": {
+    "src": "/media-optimized/home-solange-profile-384-fa2ab187f537.webp",
+    "srcSet": "/media-optimized/home-solange-profile-320-96d83343c42a.webp 320w, /media-optimized/home-solange-profile-384-fa2ab187f537.webp 384w"
+  },
+  "/products/bracelet.png": {
+    "src": "/media-optimized/products-bracelet-640-bcf9d996accf.webp",
+    "srcSet": "/media-optimized/products-bracelet-320-f1744309336a.webp 320w, /media-optimized/products-bracelet-640-bcf9d996accf.webp 640w, /media-optimized/products-bracelet-960-154120a056f6.webp 960w, /media-optimized/products-bracelet-1254-b9302b807bb6.webp 1254w"
+  },
+  "/products/bracelet.webp": {
+    "src": "/media-optimized/products-bracelet-640-bcf9d996accf.webp",
+    "srcSet": "/media-optimized/products-bracelet-320-f1744309336a.webp 320w, /media-optimized/products-bracelet-640-bcf9d996accf.webp 640w, /media-optimized/products-bracelet-960-154120a056f6.webp 960w, /media-optimized/products-bracelet-1254-b9302b807bb6.webp 1254w"
+  },
+  "/products/catalog.png": {
+    "src": "/media-optimized/products-catalog-640-f81a6dfade44.webp",
+    "srcSet": "/media-optimized/products-catalog-320-ef492c3685ac.webp 320w, /media-optimized/products-catalog-640-f81a6dfade44.webp 640w, /media-optimized/products-catalog-960-b4c922732cdd.webp 960w, /media-optimized/products-catalog-1254-0171fbe768af.webp 1254w"
+  },
+  "/products/catalog.webp": {
+    "src": "/media-optimized/products-catalog-640-f81a6dfade44.webp",
+    "srcSet": "/media-optimized/products-catalog-320-ef492c3685ac.webp 320w, /media-optimized/products-catalog-640-f81a6dfade44.webp 640w, /media-optimized/products-catalog-960-b4c922732cdd.webp 960w, /media-optimized/products-catalog-1254-0171fbe768af.webp 1254w"
+  },
+  "/products/employee.png": {
+    "src": "/media-optimized/products-employee-640-1e6478fd1cbd.webp",
+    "srcSet": "/media-optimized/products-employee-320-915954032e3f.webp 320w, /media-optimized/products-employee-640-1e6478fd1cbd.webp 640w, /media-optimized/products-employee-960-eb752c7e4ec4.webp 960w, /media-optimized/products-employee-1254-f82a40c4fcdb.webp 1254w"
+  },
+  "/products/employee.webp": {
+    "src": "/media-optimized/products-employee-640-1e6478fd1cbd.webp",
+    "srcSet": "/media-optimized/products-employee-320-915954032e3f.webp 320w, /media-optimized/products-employee-640-1e6478fd1cbd.webp 640w, /media-optimized/products-employee-960-eb752c7e4ec4.webp 960w, /media-optimized/products-employee-1254-f82a40c4fcdb.webp 1254w"
+  },
+  "/products/event.png": {
+    "src": "/media-optimized/products-event-640-c6abccd54eeb.webp",
+    "srcSet": "/media-optimized/products-event-320-99e7c01dc542.webp 320w, /media-optimized/products-event-640-c6abccd54eeb.webp 640w, /media-optimized/products-event-960-1900197df64c.webp 960w, /media-optimized/products-event-1254-133c2b4536ff.webp 1254w"
+  },
+  "/products/event.webp": {
+    "src": "/media-optimized/products-event-640-c6abccd54eeb.webp",
+    "srcSet": "/media-optimized/products-event-320-99e7c01dc542.webp 320w, /media-optimized/products-event-640-c6abccd54eeb.webp 640w, /media-optimized/products-event-960-1900197df64c.webp 960w, /media-optimized/products-event-1254-133c2b4536ff.webp 1254w"
+  },
+  "/products/keychain-transparent.png": {
+    "src": "/media-optimized/products-keychain-transparent-640-8a1ea2a1a3f5.webp",
+    "srcSet": "/media-optimized/products-keychain-transparent-320-8dace97ee4b9.webp 320w, /media-optimized/products-keychain-transparent-640-8a1ea2a1a3f5.webp 640w, /media-optimized/products-keychain-transparent-960-1b58b79fcff3.webp 960w, /media-optimized/products-keychain-transparent-1254-7377906e2e0b.webp 1254w"
+  },
+  "/products/keychain-transparent.webp": {
+    "src": "/media-optimized/products-keychain-transparent-640-8a1ea2a1a3f5.webp",
+    "srcSet": "/media-optimized/products-keychain-transparent-320-8dace97ee4b9.webp 320w, /media-optimized/products-keychain-transparent-640-8a1ea2a1a3f5.webp 640w, /media-optimized/products-keychain-transparent-960-1b58b79fcff3.webp 960w, /media-optimized/products-keychain-transparent-1254-7377906e2e0b.webp 1254w"
+  },
+  "/products/keychain.png": {
+    "src": "/media-optimized/products-keychain-640-a2046a04ef2e.webp",
+    "srcSet": "/media-optimized/products-keychain-320-a3c9e014d5c3.webp 320w, /media-optimized/products-keychain-640-a2046a04ef2e.webp 640w, /media-optimized/products-keychain-960-ac36b229b480.webp 960w, /media-optimized/products-keychain-1254-395b2b301149.webp 1254w"
+  },
+  "/products/keychain.webp": {
+    "src": "/media-optimized/products-keychain-640-a2046a04ef2e.webp",
+    "srcSet": "/media-optimized/products-keychain-320-a3c9e014d5c3.webp 320w, /media-optimized/products-keychain-640-a2046a04ef2e.webp 640w, /media-optimized/products-keychain-960-ac36b229b480.webp 960w, /media-optimized/products-keychain-1254-395b2b301149.webp 1254w"
+  },
+  "/products/menu.png": {
+    "src": "/media-optimized/products-menu-640-0926ef6adf89.webp",
+    "srcSet": "/media-optimized/products-menu-320-24e4ae5f798b.webp 320w, /media-optimized/products-menu-640-0926ef6adf89.webp 640w, /media-optimized/products-menu-960-020a9bf405ef.webp 960w, /media-optimized/products-menu-1254-d045b903b974.webp 1254w"
+  },
+  "/products/menu.webp": {
+    "src": "/media-optimized/products-menu-640-0926ef6adf89.webp",
+    "srcSet": "/media-optimized/products-menu-320-24e4ae5f798b.webp 320w, /media-optimized/products-menu-640-0926ef6adf89.webp 640w, /media-optimized/products-menu-960-020a9bf405ef.webp 960w, /media-optimized/products-menu-1254-d045b903b974.webp 1254w"
+  },
+  "/products/metal.png": {
+    "src": "/media-optimized/products-metal-640-1a2b67dc62ac.webp",
+    "srcSet": "/media-optimized/products-metal-320-cb7d3df167c7.webp 320w, /media-optimized/products-metal-640-1a2b67dc62ac.webp 640w, /media-optimized/products-metal-960-4087d8bcdc71.webp 960w, /media-optimized/products-metal-1254-717b12749bd9.webp 1254w"
+  },
+  "/products/metal.webp": {
+    "src": "/media-optimized/products-metal-640-1a2b67dc62ac.webp",
+    "srcSet": "/media-optimized/products-metal-320-cb7d3df167c7.webp 320w, /media-optimized/products-metal-640-1a2b67dc62ac.webp 640w, /media-optimized/products-metal-960-4087d8bcdc71.webp 960w, /media-optimized/products-metal-1254-717b12749bd9.webp 1254w"
+  },
+  "/products/pvc.png": {
+    "src": "/media-optimized/products-pvc-640-7084c7250fb6.webp",
+    "srcSet": "/media-optimized/products-pvc-320-ebc0d5b2d843.webp 320w, /media-optimized/products-pvc-640-7084c7250fb6.webp 640w, /media-optimized/products-pvc-960-38b98e0cac52.webp 960w, /media-optimized/products-pvc-1254-b842ceb5e9af.webp 1254w"
+  },
+  "/products/pvc.webp": {
+    "src": "/media-optimized/products-pvc-640-7084c7250fb6.webp",
+    "srcSet": "/media-optimized/products-pvc-320-ebc0d5b2d843.webp 320w, /media-optimized/products-pvc-640-7084c7250fb6.webp 640w, /media-optimized/products-pvc-960-38b98e0cac52.webp 960w, /media-optimized/products-pvc-1254-b842ceb5e9af.webp 1254w"
+  },
+  "/products/review.png": {
+    "src": "/media-optimized/products-review-640-b44296fdabb1.webp",
+    "srcSet": "/media-optimized/products-review-320-cc0bf45460e8.webp 320w, /media-optimized/products-review-640-b44296fdabb1.webp 640w, /media-optimized/products-review-960-42ab2cc248ca.webp 960w, /media-optimized/products-review-1254-b52cd4cd1d38.webp 1254w"
+  },
+  "/products/review.webp": {
+    "src": "/media-optimized/products-review-640-b44296fdabb1.webp",
+    "srcSet": "/media-optimized/products-review-320-cc0bf45460e8.webp 320w, /media-optimized/products-review-640-b44296fdabb1.webp 640w, /media-optimized/products-review-960-42ab2cc248ca.webp 960w, /media-optimized/products-review-1254-b52cd4cd1d38.webp 1254w"
+  },
+  "/products/sticker.png": {
+    "src": "/media-optimized/products-sticker-640-9757e3ebcf2d.webp",
+    "srcSet": "/media-optimized/products-sticker-320-0df78fd1016e.webp 320w, /media-optimized/products-sticker-640-9757e3ebcf2d.webp 640w, /media-optimized/products-sticker-960-591f6391fd6a.webp 960w, /media-optimized/products-sticker-1254-2a8b5ac95dd6.webp 1254w"
+  },
+  "/products/sticker.webp": {
+    "src": "/media-optimized/products-sticker-640-9757e3ebcf2d.webp",
+    "srcSet": "/media-optimized/products-sticker-320-0df78fd1016e.webp 320w, /media-optimized/products-sticker-640-9757e3ebcf2d.webp 640w, /media-optimized/products-sticker-960-591f6391fd6a.webp 960w, /media-optimized/products-sticker-1254-2a8b5ac95dd6.webp 1254w"
+  },
+  "/products/tag.png": {
+    "src": "/media-optimized/products-tag-640-81fa6a178f5e.webp",
+    "srcSet": "/media-optimized/products-tag-320-72fc4361a73e.webp 320w, /media-optimized/products-tag-640-81fa6a178f5e.webp 640w, /media-optimized/products-tag-960-30a03dcd3901.webp 960w, /media-optimized/products-tag-1254-c019e902332a.webp 1254w"
+  },
+  "/products/tag.webp": {
+    "src": "/media-optimized/products-tag-640-81fa6a178f5e.webp",
+    "srcSet": "/media-optimized/products-tag-320-72fc4361a73e.webp 320w, /media-optimized/products-tag-640-81fa6a178f5e.webp 640w, /media-optimized/products-tag-960-30a03dcd3901.webp 960w, /media-optimized/products-tag-1254-c019e902332a.webp 1254w"
+  },
+  "/products/wood.png": {
+    "src": "/media-optimized/products-wood-640-3fd53b793edd.webp",
+    "srcSet": "/media-optimized/products-wood-320-7c6fabd454e3.webp 320w, /media-optimized/products-wood-640-3fd53b793edd.webp 640w, /media-optimized/products-wood-960-e41f8dd15b73.webp 960w, /media-optimized/products-wood-1254-7d11e4a5054e.webp 1254w"
+  },
+  "/products/wood.webp": {
+    "src": "/media-optimized/products-wood-640-3fd53b793edd.webp",
+    "srcSet": "/media-optimized/products-wood-320-7c6fabd454e3.webp 320w, /media-optimized/products-wood-640-3fd53b793edd.webp 640w, /media-optimized/products-wood-960-e41f8dd15b73.webp 960w, /media-optimized/products-wood-1254-7d11e4a5054e.webp 1254w"
+  },
+  "/brand/profile-mountains.png": {
+    "src": "/media-optimized/brand-profile-mountains-640-fe42c1f4a7e2.webp",
+    "srcSet": "/media-optimized/brand-profile-mountains-320-7ffdb8d62fe1.webp 320w, /media-optimized/brand-profile-mountains-640-fe42c1f4a7e2.webp 640w, /media-optimized/brand-profile-mountains-960-a4483de27887.webp 960w, /media-optimized/brand-profile-mountains-1440-629d89b12d66.webp 1440w"
+  },
+  "/brand/profile-mountains.webp": {
+    "src": "/media-optimized/brand-profile-mountains-640-fe42c1f4a7e2.webp",
+    "srcSet": "/media-optimized/brand-profile-mountains-320-7ffdb8d62fe1.webp 320w, /media-optimized/brand-profile-mountains-640-fe42c1f4a7e2.webp 640w, /media-optimized/brand-profile-mountains-960-a4483de27887.webp 960w, /media-optimized/brand-profile-mountains-1440-629d89b12d66.webp 1440w"
+  }
+}

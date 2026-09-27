@@ -20,7 +20,7 @@ export async function GET(request: Request) {
   try {
     const user = await authorized();
     if (!user) return json({ error: 'Acesso reservado ao Manager.' }, 403);
-    await expireReservations();
+    await expireReservations(false);
     const db = database();
     const [orders, agents, movements, audit, products, plans] =
       await Promise.all([
@@ -264,7 +264,7 @@ export async function POST(request: Request) {
       return json({ ok: true });
     }
     if (b.action === 'order') {
-      await expireReservations();
+      await expireReservations(true);
       const id = text('orderId', 70),
         version = integer('version', 1, 1000000),
         step = text('step', 30);
