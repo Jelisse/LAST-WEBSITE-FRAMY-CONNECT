@@ -31,6 +31,7 @@ import { MobileNavigation } from './mobile-navigation';
 import { AccountMenu } from './account-menu';
 import { HeroManager } from './hero-manager';
 import { ProductManager } from './product-manager';
+import { WebsiteAnalytics } from './website-analytics';
 import { OperationsAgentReports } from './operations-agent-reports';
 import { money, type Product } from '@/lib/catalog';
 import {
@@ -86,6 +87,7 @@ type Data = {
 };
 const sections = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
+  { id: 'analytics', label: 'Análise do website', icon: ArrowUpRight },
   { id: 'operations', label: 'Operações', icon: Boxes },
   { id: 'hero', label: 'Página inicial', icon: LayoutDashboard },
   { id: 'catalog', label: 'Produtos e planos', icon: ShoppingBag },
@@ -129,8 +131,9 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
     return d as Data;
   }, []);
   useEffect(() => {
-    if (new URLSearchParams(location.search).get('section') === 'finance')
-      queueMicrotask(() => setSection('finance'));
+    const requested = new URLSearchParams(location.search).get('section');
+    if (requested && sections.some(s => s.id === requested))
+      queueMicrotask(() => setSection(requested));
     void Promise.resolve()
       .then(load)
       .catch((e) => setError(e.message));
@@ -402,7 +405,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
               <span className="manager-eyebrow">{t('CENTRO DE GESTÃO')}</span>
               <h1>{t(sections.find((s) => s.id === section)?.label)}</h1>
               <p>
-                {section === 'overview'
+                {section === 'analytics' ? t('Visitas, horários e percurso de compra. Hora de Maputo.') : section === 'overview'
                   ? t('O que acontece no seu negócio, num só lugar.')
                   : section === 'operations'
                     ? t('Ligue os pedidos, a equipa e o stock.')
@@ -425,7 +428,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                               )}
               </p>
             </div>
-            <button
+            {section !== 'analytics' && <button
               className="manager-secondary"
               disabled={busy}
               onClick={() =>
@@ -436,7 +439,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
             >
               <RefreshCw size={16} />
               {t(' Actualizar')}
-            </button>
+            </button>}
           </div>
           {(section === 'operations' || section === 'finance') && (
             <p className="manager-sandbox">
@@ -451,7 +454,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
             </p>
           )}
           {notice && <output className="manager-notice">{t(notice)}</output>}
-          {!data ? (
+          {section === 'analytics' ? <WebsiteAnalytics /> : !data ? (
             <section className="manager-card">
               <p>
                 {error

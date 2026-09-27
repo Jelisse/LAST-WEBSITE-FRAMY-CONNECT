@@ -8,6 +8,8 @@ import './globals.css';
 import './footer.css';
 import './products.css';
 import './mobile-dashboard.css';
+import './analytics-consent.css';
+import { SiteAnalyticsTracker } from '@/components/site-analytics-tracker';
 const poppins = Poppins({
   weight: ['400', '500', '600', '700', '800'],
   subsets: ['latin'],
@@ -42,7 +44,7 @@ export default async function RootLayout({
         <a className="skip-link" href="#main">
           {t('Saltar para o conteúdo')}
         </a>
-        <LanguageProvider locale={locale}>{children}</LanguageProvider>
+        <LanguageProvider locale={locale}>{children}<SiteAnalyticsTracker /></LanguageProvider>
       </body>
     </html>
   );

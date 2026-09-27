@@ -6,6 +6,7 @@ import { planPrice } from '@/lib/plan-pricing';
 
 import { SourceImage } from '@/components/source-image';
 import { useState, useEffect } from 'react';
+import { emitCheckoutAnalytics } from './site-analytics-tracker';
 import Link from '@/components/hard-link';
 import { money, type PublicProduct } from '@/lib/catalog';
 import {
@@ -72,6 +73,12 @@ export function OrderSubmission({
     optionId: product.id === 'keychain' ? 'tiktok' : blankOption(product),
   });
   const plan = plans.find((p) => p.id === planId);
+  useEffect(() => {
+    const report = () => { if (ready && !done) emitCheckoutAnalytics('step', step); };
+    report();
+    window.addEventListener('framy-analytics-enabled', report);
+    return () => window.removeEventListener('framy-analytics-enabled', report);
+  }, [ready, done, step]);
   async function load() {
     const r = await fetch('/api/workspace', { cache: 'no-store', signal: AbortSignal.timeout(15_000) });
     if (!r.ok) throw Error('Inicie sessão novamente para continuar.');
@@ -299,9 +306,11 @@ export function OrderSubmission({
         ...validateDelivery({ deliveryCity: city, deliveryAddress: address }),
       });
       setDone(true);
+      emitCheckoutAnalytics('submitted');
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Não foi possível confirmar.');
+      emitCheckoutAnalytics('checkout_error');
       await load().catch(() => {});
     } finally {
       setBusy(false);

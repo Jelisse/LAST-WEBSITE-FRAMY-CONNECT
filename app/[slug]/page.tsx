@@ -104,6 +104,10 @@ const pages: Record<
         text: 'Medimos visitas às páginas dos produtos, incluindo os produtos Brevemente, sem exigir uma compra. Um identificador aleatório por sessão evita repetições no mesmo dia; não guardamos o IP nesta estatística. Ao registar novas visitas, eliminamos os registos com mais de 90 dias. O painel apresenta os últimos 30 dias.',
       },
       {
+        title: 'Estatísticas opcionais do website',
+        text: 'Com a sua autorização, medimos páginas públicas, etapas da compra, tempos de carregamento, origem por domínio, campanha, categoria de dispositivo e país aproximado. Um identificador aleatório agrupa a sessão e expira após 30 minutos sem actividade. Não incluímos nomes, emails, formulários ou parâmetros privados dos endereços. Pode recusar ou retirar a autorização nas Preferências de estatísticas no rodapé. O sinal de não rastrear do navegador é respeitado. Os registos são eliminados automaticamente após 90 dias nas limpezas periódicas. Os relatórios são reservados à gestão.',
+      },
+      {
         title: 'Retirar um perfil',
         text: 'Pode retirar a publicação no editor e terminar sessões em Segurança da conta. Para pedir correcção ou eliminação de dados e esclarecimentos sobre conservação, contacte support@framyconnect.co.mz. Os ficheiros carregados são conservados enquanto necessários ao perfil ou encomenda.',
       },

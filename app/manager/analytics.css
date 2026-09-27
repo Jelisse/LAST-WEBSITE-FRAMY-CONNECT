@@ -1,0 +1,284 @@
+.website-analytics {
+  display: grid;
+  gap: 18px;
+  color: #342c27;
+}
+.wa-toolbar,
+.wa-toolbar form,
+.wa-presets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.wa-toolbar {
+  padding: 16px;
+  background: white;
+  border: 1px solid #eadfd7;
+  border-radius: 14px;
+}
+.wa-toolbar label {
+  display: grid;
+  font-size: 11px;
+  gap: 4px;
+}
+.wa-toolbar button,
+.wa-toolbar input {
+  border: 1px solid #ded1c7;
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: #fffaf6;
+  color: #603a25;
+  min-height: 40px;
+  font: inherit;
+}
+.wa-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.wa-toolbar button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.wa-toolbar form {
+  margin-inline: auto;
+}
+.wa-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: #78675c;
+}
+.wa-meta span,
+.wa-card h3,
+.wa-metrics .wa-card > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wa-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.wa-card {
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid #eadfd7;
+  border-radius: 16px;
+  background: #fff;
+}
+.wa-card h3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+.wa-card p,
+.wa-card small {
+  color: #77665a;
+  line-height: 1.6;
+}
+.wa-card p {
+  font-size: 12px;
+}
+.wa-card small {
+  font-size: 11px;
+}
+.wa-metrics .wa-card > strong {
+  display: block;
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  margin: 12px 0 4px;
+}
+.wa-live {
+  background: #fff5eb;
+  border-color: #e6bda0;
+}
+.wa-dot {
+  height: 8px;
+  width: 8px;
+  background: #318454;
+  border-radius: 50%;
+}
+.wa-note {
+  font-size: 11px;
+  color: #766457;
+  line-height: 1.7;
+  margin: 0;
+}
+.wa-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.wa-wide {
+  grid-column: span 2;
+}
+.wa-ranking {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0;
+  display: grid;
+  gap: 15px;
+}
+.wa-ranking li > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+.wa-ranking li span {
+  overflow-wrap: anywhere;
+}
+.wa-ranking strong {
+  font-weight: 500;
+}
+.wa-track {
+  height: 5px;
+  background: #f7eee6;
+  border-radius: 6px;
+  margin-top: 7px;
+  overflow: hidden;
+}
+.wa-track span {
+  display: block;
+  height: 100%;
+  background: #bf582c;
+  border-radius: 6px;
+}
+.wa-empty {
+  padding-block: 22px;
+}
+.wa-daily {
+  display: flex;
+  align-items: end;
+  gap: 6px;
+  height: 180px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+.wa-daily > div {
+  flex: 1;
+  min-width: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  gap: 6px;
+  height: 100%;
+}
+.wa-daily span {
+  display: block;
+  background: #be572c;
+  min-width: 12px;
+  width: 85%;
+  border-radius: 5px 5px 0 0;
+}
+.wa-card details summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: #99441d;
+  padding-block: 8px;
+}
+.wa-card table {
+  width: 100%;
+  font-size: 11px;
+  border-collapse: separate;
+  border-spacing: 3px;
+}
+.wa-card th,
+.wa-card td {
+  padding: 5px;
+  text-align: left;
+}
+.wa-heat-scroll {
+  overflow: auto;
+  margin-top: 16px;
+}
+.wa-heat {
+  min-width: 650px;
+}
+.wa-card .wa-heat td {
+  text-align: center;
+  border-radius: 4px;
+  font-size: 10px;
+}
+.wa-heat th {
+  color: #766457;
+  font-weight: 400;
+}
+.wa-funnel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.wa-funnel li {
+  background: #fff7ef;
+  border: 1px solid #eed9c8;
+  border-radius: 10px;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+.wa-funnel strong {
+  font-size: 25px;
+  font-weight: 500;
+}
+.wa-order-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  border-top: 1px solid #eee4dc;
+  padding-top: 14px;
+  margin-top: 18px;
+}
+.wa-order-stats p {
+  display: grid;
+  gap: 5px;
+  flex: 1;
+  min-width: 130px;
+}
+.wa-order-stats strong {
+  font-size: 26px;
+  font-weight: 500;
+  color: #433227;
+}
+@media (max-width: 1100px) {
+  .wa-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wa-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 650px) {
+  .wa-grid,
+  .wa-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wa-wide {
+    grid-column: auto;
+  }
+  .wa-card {
+    padding: 18px;
+  }
+  .wa-funnel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wa-toolbar form {
+    margin-inline: 0;
+    width: 100%;
+  }
+  .wa-toolbar input {
+    max-width: 145px;
+  }
+}

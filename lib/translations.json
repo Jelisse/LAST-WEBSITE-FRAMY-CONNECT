@@ -1,12 +1,372 @@
 {
-  "Partilha por toque NFC": ["Share with an NFC tap", "NFC 輕觸分享"],
-  "Partilhe contactos, redes sociais e trabalho com um toque num telemóvel compatível com NFC.": ["Share contacts, social links and work with a tap on an NFC-compatible phone.", "輕觸支援 NFC 的手機，分享聯絡方式、社群連結與作品。"],
-  "Após entrar, voltará à sua encomenda.": ["After signing in, you’ll return to your order.", "登入後，您將返回訂單。"],
-  "Voltar à encomenda": ["Back to your order", "返回訂單"],
-  "Indique o seu email para continuar com a opção certa para si.": ["Enter your email to continue with the right option for you.", "輸入您的電子郵件，即可繼續使用適合您的選項。"],
-  "Continuar": ["Continue", "繼續"],
-  "Etapas da compra": ["Purchase steps", "購買步驟"],
-  "Passo {0} de {1}": ["Step {0} of {1}", "第 {0} 步，共 {1} 步"],
+  "Sem período anterior completo": [
+    "No complete previous period",
+    "沒有完整的上一期間"
+  ],
+  "período anterior": [
+    "previous period",
+    "上一期間"
+  ],
+  "Sem base de comparação": [
+    "No comparison baseline",
+    "沒有比較基準"
+  ],
+  "Ainda sem dados neste período.": [
+    "No data for this period yet.",
+    "此期間尚無資料。"
+  ],
+  "De": [
+    "From",
+    "從"
+  ],
+  "Data inicial": [
+    "Start date",
+    "開始日期"
+  ],
+  "Data final": [
+    "End date",
+    "結束日期"
+  ],
+  "Aplicar": [
+    "Apply",
+    "套用"
+  ],
+  "Exportar CSV": [
+    "Export CSV",
+    "匯出 CSV"
+  ],
+  "Os valores abaixo são da última leitura; podem estar desactualizados.": [
+    "The values below are from the last successful refresh and may be out of date.",
+    "以下數值來自上次成功更新，可能已過時。"
+  ],
+  "Actualização a cada 30 segundos": [
+    "Refreshes every 30 seconds",
+    "每 30 秒更新"
+  ],
+  "Última leitura": [
+    "Last refreshed",
+    "上次更新"
+  ],
+  "Online agora": [
+    "Online now",
+    "目前在線"
+  ],
+  "Sessões com página visível nos últimos 5 minutos; estimativa, não pessoas exactas.": [
+    "Sessions with a visible page within the last 5 minutes; an estimate, not an exact people count.",
+    "最近 5 分鐘內有可見頁面的工作階段；為估計值，並非確切人數。"
+  ],
+  "Sessões observadas": [
+    "Observed sessions",
+    "觀測工作階段"
+  ],
+  "Visualizações": [
+    "Page views",
+    "頁面瀏覽量"
+  ],
+  "Checkouts observados": [
+    "Observed checkouts",
+    "觀測結帳工作階段"
+  ],
+  "Apenas visitas com estatísticas permitidas. Uma sessão termina após 30 minutos sem actividade. A equipa e bots identificados são excluídos. Não representa todas as visitas nem pessoas únicas.": [
+    "Only visits that allow analytics. Sessions expire after 30 minutes of inactivity. Staff and identified bots are excluded. These are not all visits or unique people.",
+    "僅統計允許分析的造訪。工作階段在閒置 30 分鐘後結束。不含員工及已識別機器人，並非所有造訪或不重複人數。"
+  ],
+  "Evolução do tráfego": [
+    "Traffic over time",
+    "流量趨勢"
+  ],
+  "Visualizações por dia · hora de Maputo": [
+    "Daily page views · Maputo time",
+    "每日瀏覽量 · 馬普托時間"
+  ],
+  "Visualizações por dia": [
+    "Daily page views",
+    "每日瀏覽量"
+  ],
+  "visualizações": [
+    "page views",
+    "瀏覽量"
+  ],
+  "sessões": [
+    "sessions",
+    "工作階段"
+  ],
+  "Ver dados da tabela": [
+    "View data table",
+    "檢視資料表"
+  ],
+  "Dia": [
+    "Day",
+    "日期"
+  ],
+  "Sessões": [
+    "Sessions",
+    "工作階段"
+  ],
+  "Horários de maior acesso": [
+    "Peak visiting hours",
+    "造訪尖峰時段"
+  ],
+  "Hora mais movimentada": [
+    "Busiest hour",
+    "最繁忙時段"
+  ],
+  "Totais por dia da semana e hora, não médias. O dia actual pode estar incompleto.": [
+    "Totals by weekday and hour, not averages. The current day may be incomplete.",
+    "按星期及時段彙總，非平均值。當天資料可能尚未完整。"
+  ],
+  "Percurso de compra": [
+    "Purchase journey",
+    "購買流程"
+  ],
+  "Percursos por sessão e produto iniciados no período, com etapas observadas por ordem. Percursos retomados de períodos anteriores e visitas sem consentimento não entram neste funil.": [
+    "Journeys per session and product started in this period, with steps observed in order. Earlier resumed journeys and visits without consent are excluded from this funnel.",
+    "本期間開始、按工作階段與產品區分且依序觀測的流程。不含先前期間續接的流程或未同意分析的造訪。"
+  ],
+  "dos percursos iniciados": [
+    "of journeys started",
+    "佔已開始流程"
+  ],
+  "não avançaram da etapa anterior": [
+    "did not advance from the previous step",
+    "未從上一步繼續"
+  ],
+  "conclusão observada": [
+    "observed completion",
+    "觀測完成率"
+  ],
+  "Não é uma taxa de pagamento.": [
+    "This is not a payment rate.",
+    "此非付款率。"
+  ],
+  "Pedidos criados no período": [
+    "Orders created in this period",
+    "本期間建立的訂單"
+  ],
+  "Destes pedidos, pagos actualmente": [
+    "Of these orders, currently paid",
+    "其中目前已付款的訂單"
+  ],
+  "Falhas de confirmação observadas": [
+    "Observed submission failures",
+    "觀測提交失敗"
+  ],
+  "Pedidos e pagamentos vêm do servidor, incluindo clientes sem consentimento analítico. Não devem ser divididos pelas sessões observadas para calcular conversão. Pagamentos mostram o estado actual dos pedidos criados no período.": [
+    "Orders and payment status come from the server, including customers without analytics consent. Do not divide them by observed sessions to calculate conversion. Payment figures show the current status of orders created in the selected period.",
+    "訂單與付款狀態來自伺服器，包含未同意分析的客戶。不可除以觀測工作階段來計算轉換率。付款數據反映所選期間建立訂單的目前狀態。"
+  ],
+  "Velocidade e fiabilidade": [
+    "Speed and reliability",
+    "速度與可靠性"
+  ],
+  "Carregamento médio": [
+    "Average load time",
+    "平均載入時間"
+  ],
+  "amostras": [
+    "samples",
+    "筆樣本"
+  ],
+  "LCP médio": [
+    "Average LCP",
+    "平均 LCP"
+  ],
+  "Medições do navegador após 15 segundos com a página visível; visitas curtas podem não entrar na amostra. Não são testes sintéticos nem percentis Core Web Vitals.": [
+    "Browser measurements after 15 seconds with the page visible; short visits may not be sampled. These are not synthetic tests or Core Web Vitals percentiles.",
+    "頁面可見 15 秒後的瀏覽器量測；短暫造訪可能未被取樣。此非模擬測試或 Core Web Vitals 百分位數。"
+  ],
+  "INP, CLS e erros HTTP do servidor: indisponíveis neste painel. Consulte a monitorização Cloudflare para erros e disponibilidade.": [
+    "INP, CLS and server HTTP errors are unavailable in this panel. Check Cloudflare monitoring for errors and availability.",
+    "此面板尚無 INP、CLS 及伺服器 HTTP 錯誤。請於 Cloudflare 監控查看錯誤與可用性。"
+  ],
+  "Recolha disponível desde": [
+    "Collection available since",
+    "開始收集時間"
+  ],
+  "Retenção máxima: 90 dias. Dados anteriores ao início da recolha não são reconstruídos. Visitantes recorrentes e tempo de envolvimento: indisponíveis, para evitar identificação persistente ou estimativas enganosas.": [
+    "Retention: 90 days with periodic cleanup. Earlier history is not reconstructed. Returning visitors and engagement time are unavailable to avoid persistent identification or misleading estimates.",
+    "保留 90 天並定期清理。不重建收集前的歷史。為避免持續識別或誤導性估計，不提供回訪訪客及互動時間。"
+  ],
+  "Preferências de estatísticas": [
+    "Analytics preferences",
+    "分析偏好設定"
+  ],
+  "Estatísticas opcionais": [
+    "Optional analytics",
+    "選用分析"
+  ],
+  "Ajude-nos a melhorar a experiência": [
+    "Help us improve your experience",
+    "協助我們改善體驗"
+  ],
+  "Podemos medir visitas, carregamento e etapas da compra? Não recolhemos nomes, formulários ou dados de pagamento. Pode alterar a escolha no rodapé.": [
+    "May we measure visits, loading and purchase steps? We do not collect names, form contents or payment details. You can change your choice in the footer.",
+    "可以量測造訪、載入及購買步驟嗎？我們不收集姓名、表單內容或付款資料。您可在頁尾更改選擇。"
+  ],
+  "Recusar": [
+    "Decline",
+    "拒絕"
+  ],
+  "Permitir estatísticas": [
+    "Allow analytics",
+    "允許分析"
+  ],
+  "Visitas, horários e percurso de compra. Hora de Maputo.": [
+    "Visits, peak hours and purchase journeys. Maputo time.",
+    "造訪、尖峰時段與購買流程。馬普托時間。"
+  ],
+  "Análise do website": [
+    "Website analytics",
+    "網站分析"
+  ],
+  "Hoje": [
+    "Today",
+    "今天"
+  ],
+  "Ontem": [
+    "Yesterday",
+    "昨天"
+  ],
+  "7 dias": [
+    "7 days",
+    "7 天"
+  ],
+  "30 dias": [
+    "30 days",
+    "30 天"
+  ],
+  "Sem campanha": [
+    "No campaign",
+    "無活動"
+  ],
+  "A carregar estatísticas…": [
+    "Loading analytics…",
+    "正在載入分析…"
+  ],
+  "Ainda não foi possível obter dados.": [
+    "Data could not be loaded yet.",
+    "尚無法載入資料。"
+  ],
+  "Páginas activas agora": [
+    "Pages active now",
+    "目前活躍頁面"
+  ],
+  "Páginas mais visitadas": [
+    "Most visited pages",
+    "最常瀏覽頁面"
+  ],
+  "Páginas de entrada": [
+    "Landing pages",
+    "到達頁面"
+  ],
+  "Origem das visitas": [
+    "Traffic sources",
+    "流量來源"
+  ],
+  "Directo / desconhecido": [
+    "Direct / unknown",
+    "直接／未知"
+  ],
+  "Dispositivos": [
+    "Devices",
+    "裝置"
+  ],
+  "Países": [
+    "Countries",
+    "國家"
+  ],
+  "Campanhas": [
+    "Campaigns",
+    "行銷活動"
+  ],
+  "Desconhecido": [
+    "Unknown",
+    "未知"
+  ],
+  "mobile": [
+    "Mobile",
+    "手機"
+  ],
+  "tablet": [
+    "Tablet",
+    "平板"
+  ],
+  "desktop": [
+    "Desktop",
+    "桌上型電腦"
+  ],
+  "unknown": [
+    "Unknown",
+    "未知"
+  ],
+  "Dom": [
+    "Sun",
+    "日"
+  ],
+  "Seg": [
+    "Mon",
+    "一"
+  ],
+  "Ter": [
+    "Tue",
+    "二"
+  ],
+  "Qua": [
+    "Wed",
+    "三"
+  ],
+  "Qui": [
+    "Thu",
+    "四"
+  ],
+  "Sex": [
+    "Fri",
+    "五"
+  ],
+  "Sáb": [
+    "Sat",
+    "六"
+  ],
+  "Escolha um período válido de até 90 dias.": [
+    "Choose a valid period of up to 90 days.",
+    "請選擇最多 90 天的有效期間。"
+  ],
+  "Estatísticas indisponíveis. Verifique a migração 0013 e tente novamente.": [
+    "Analytics unavailable. Check migration 0013 and try again.",
+    "分析無法使用。請檢查資料庫遷移 0013 後重試。"
+  ],
+  "Partilha por toque NFC": [
+    "Share with an NFC tap",
+    "NFC 輕觸分享"
+  ],
+  "Partilhe contactos, redes sociais e trabalho com um toque num telemóvel compatível com NFC.": [
+    "Share contacts, social links and work with a tap on an NFC-compatible phone.",
+    "輕觸支援 NFC 的手機，分享聯絡方式、社群連結與作品。"
+  ],
+  "Após entrar, voltará à sua encomenda.": [
+    "After signing in, you’ll return to your order.",
+    "登入後，您將返回訂單。"
+  ],
+  "Voltar à encomenda": [
+    "Back to your order",
+    "返回訂單"
+  ],
+  "Indique o seu email para continuar com a opção certa para si.": [
+    "Enter your email to continue with the right option for you.",
+    "輸入您的電子郵件，即可繼續使用適合您的選項。"
+  ],
+  "Continuar": [
+    "Continue",
+    "繼續"
+  ],
+  "Etapas da compra": [
+    "Purchase steps",
+    "購買步驟"
+  ],
+  "Passo {0} de {1}": [
+    "Step {0} of {1}",
+    "第 {0} 步，共 {1} 步"
+  ],
   "Partilhe contactos, redes sociais e trabalho por toque ou QR.": [
     "Share your contacts, social links and work with a tap or QR code.",
     "輕觸或掃描 QR 碼，分享聯絡方式、社群連結與作品。"
@@ -938,10 +1298,6 @@
   "24 horas": [
     "24 hours",
     "24 小時"
-  ],
-  "7 dias": [
-    "7 days",
-    "7 天"
   ],
   "A enviar…": [
     "Sending…",
