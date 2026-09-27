@@ -11,6 +11,7 @@ const deps = {
  getChatGPTUser: async () => user,
  canManageCatalog: async () => allowed,
  getHeroMedia: async () => ({}),
+ invalidateHeroMedia: () => {},
  isHeroSlot, heroMediaType,
  reserveUpload: async () => quota, releaseUpload: async () => {}, rateLimit: async () => true,
 };

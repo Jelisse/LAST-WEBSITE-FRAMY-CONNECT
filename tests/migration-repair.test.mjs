@@ -14,7 +14,7 @@ function snapshot(count) {
 test('database repair identifies missing post-auth migrations without replaying historical price edits', () => {
   assert.deepEqual(migrationPlan(snapshot(7),false).apply, [
     '0007_product_personalisation.sql','0009_launch_security.sql',
-    '0010_catalog_applications.sql','0011_maputo_keychain_stock.sql',
+    '0010_catalog_applications.sql','0011_maputo_keychain_stock.sql','0012_purchase_performance.sql',
   ]);
 });
 test('database repair is a no-op when schema and inventory migration are applied', () => {

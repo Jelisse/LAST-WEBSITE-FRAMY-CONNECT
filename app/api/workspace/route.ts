@@ -37,7 +37,7 @@ export async function GET() {
     if (!user) return json({ error: 'Inicie sessão para continuar.' }, 401);
     await expireReservations();
     const db = database();
-    const [p, orders, events, membership] = await Promise.all([
+    const [p, orders, events, membership, products, plans, manageProducts, manageOrders] = await Promise.all([
       db
         .prepare('SELECT * FROM profiles WHERE owner_id = ?')
         .bind(user.userId)
@@ -70,13 +70,20 @@ export async function GET() {
           trial_started_at: string | null;
           trial_expires_at: string | null;
         }>(),
+      getProducts(),
+      getManagedPlans(),
+      canManageCatalog(user.userId),
+      canManageOrders(user.userId),
     ]);
+    const agents = new Map<string, Promise<{ data_json: string } | null>>();
     const customerOrders = await Promise.all(orders.results.map(async (row) => {
       const order = JSON.parse(row.data_json) as SandboxOrder;
       let contact;
       if (order.agentId && order.paid && order.status !== 'CANCELLED') {
-        const record = await db.prepare("SELECT data_json FROM manager_records WHERE id=? AND kind='agent'")
-          .bind(order.agentId).first<{ data_json: string }>();
+        if (!agents.has(order.agentId)) agents.set(order.agentId,
+          db.prepare("SELECT data_json FROM manager_records WHERE id=? AND kind='agent'")
+            .bind(order.agentId).first<{ data_json: string }>());
+        const record = await agents.get(order.agentId);
         if (record) {
           const agent = JSON.parse(record.data_json);
           if (agent.active) contact = { name: String(agent.name || order.agent), phone: String(agent.phone || '') };
@@ -85,11 +92,11 @@ export async function GET() {
       return customerOrder(order, contact);
     }));
     return json({
-      products: (await getProducts())
+      products: products
         .filter((p) => p.published !== false)
         .map(publicProduct),
-      canManageProducts: await canManageCatalog(user.userId),
-      canManageOrders: await canManageOrders(user.userId),
+      canManageProducts: manageProducts,
+      canManageOrders: manageOrders,
       profile: p ? JSON.parse(p.draft_json) : null,
       published: !!p?.published_json && hasActiveTrial(membership),
       publishedUsername:
@@ -97,7 +104,7 @@ export async function GET() {
           ? JSON.parse(p.published_json).username
           : null,
       profileVersion: p?.version ?? 0,
-      plans: (await getManagedPlans()).filter((p) => p.active),
+      plans: plans.filter((p) => p.active),
       membership: {
         terms: membershipTerms(membership),
         planId: membership?.plan_id ?? '',

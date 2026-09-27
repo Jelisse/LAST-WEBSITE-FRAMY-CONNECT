@@ -22,6 +22,7 @@ export async function expireReservations() {
       data_json: string;
       version: number;
     }>();
+  const statements: D1PreparedStatement[] = [];
   for (const row of rows.results) {
     const order = JSON.parse(row.data_json) as SandboxOrder;
     // Legacy orders use their original creation date. Never expire on malformed dates.
@@ -42,7 +43,7 @@ export async function expireReservations() {
       version: row.version + 1,
       updatedAt: now,
     };
-    await db.batch([
+    statements.push(
       db
         .prepare(
           `UPDATE sandbox_orders SET data_json=?,version=? WHERE id=? AND version=? AND json_extract(data_json,'$.status')='PENDING_PAYMENT' AND json_extract(data_json,'$.paid')=0`,
@@ -74,6 +75,8 @@ export async function expireReservations() {
           now,
           eventId,
         ),
-    ]);
+    );
   }
+  // Keep each guarded release together, without a network round trip per order.
+  if (statements.length) await db.batch(statements);
 }

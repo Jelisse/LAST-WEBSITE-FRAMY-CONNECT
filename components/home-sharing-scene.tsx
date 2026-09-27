@@ -2,6 +2,7 @@
 import { useI18n } from '@/components/language-provider';
 import type { HeroMedia } from '@/lib/hero-media';
 import Image from 'next/image';
+import { optimizedImageSource } from '@/lib/optimized-images';
 import Link from '@/components/hard-link';
 import { Nfc, ScanLine, Globe, Camera, Zap } from 'lucide-react';
 
@@ -9,17 +10,17 @@ function DemoPhone({ image, scan = false, label, alt }: {
   image: string; scan?: boolean; label: string; alt: string;
 }) {
   return <div className={`sharing-phone${scan ? ' sharing-phone-scan' : ''}`}>
-    <Image className="sharing-shell" src="/home/iphone-side-shell.png" alt="" width={896} height={1792} unoptimized />
+    <Image className="sharing-shell" src="/home/iphone-side-shell.webp" alt="" width={896} height={1792} unoptimized />
     <div className="sharing-screen">
       {scan ? <div className="sharing-camera sharing-solange-camera">
         <span>{label}</span>
         <div className="sharing-camera-card">
-          <Image src={image} alt={alt} width={816} height={1290} unoptimized />
+          <Image src={optimizedImageSource(image)} alt={alt} width={816} height={1290} unoptimized />
           <div className="sharing-scan-frame" aria-hidden="true" />
         </div>
         <div className="sharing-camera-controls" aria-hidden="true"><Zap /><i /><Camera /></div>
         <span className="home-phone-island" />
-      </div> : <Image src={image} alt={alt} fill unoptimized sizes="(max-width: 700px) 150px, 190px" />}
+      </div> : <Image src={optimizedImageSource(image)} alt={alt} fill unoptimized sizes="(max-width: 700px) 150px, 190px" />}
     </div>
   </div>;
 }
@@ -35,7 +36,7 @@ export function HomeSharingScene({ media }: { media: HeroMedia }) {
         <h3><Nfc size={22} aria-hidden="true" />{t('Toque para partilhar')}</h3>
         <div className="sharing-illustration sharing-product-demo">
           <div className="sharing-product-card sharing-orange-front">
-            <Image src={media.tapCard} alt={t('Frente do cartão NFC laranja')} width={1024} height={1600} unoptimized />
+            <Image src={optimizedImageSource(media.tapCard)} alt={t('Frente do cartão NFC laranja')} width={1024} height={1600} unoptimized />
           </div>
           <svg className="sharing-nfc-pulse" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <path d="M20 38 Q31 50 20 62" />
@@ -50,7 +51,7 @@ export function HomeSharingScene({ media }: { media: HeroMedia }) {
         <h3><ScanLine size={22} aria-hidden="true" />{t('Leia o QR para se conectar')}</h3>
         <div className="sharing-illustration sharing-product-demo">
           <div className="sharing-product-card sharing-black-back">
-            <Image src={media.scanCard} alt={t('Verso do cartão')} width={816} height={1290} unoptimized />
+            <Image src={optimizedImageSource(media.scanCard)} alt={t('Verso do cartão')} width={816} height={1290} unoptimized />
           </div>
           <DemoPhone image={media.scanCard} scan label={t('Ler código QR')} alt={t('O mesmo cartão na câmara do telemóvel')} />
         </div>

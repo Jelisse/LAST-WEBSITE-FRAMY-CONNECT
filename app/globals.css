@@ -72,6 +72,9 @@
   --color-sidebar-ring: var(--foreground);
 }
 :root {
+  --action-orange: #b83b09;
+  --action-orange-hover: #96300c;
+  --action-orange-pressed: #792604;
   --background: #fcf9f7;
   --foreground: #3d3938;
   --card: #fff;
@@ -198,7 +201,7 @@ summary {
   min-height: 52px;
   padding: 13px 22px;
   border-radius: 16px;
-  font-weight: 600;
+  font-weight: 500;
   border: 1px solid transparent;
   line-height: 1.35;
   transition:
@@ -209,11 +212,16 @@ summary {
   transform: translateY(-2px);
 }
 .btn-primary {
-  background: var(--primary);
+  background: var(--action-orange);
   color: white;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 500;
 }
+.btn-primary:hover:not(:disabled) { background: var(--action-orange-hover); }
+.btn-primary:active:not(:disabled) { background: var(--action-orange-pressed); transform: translateY(0); }
+.btn:focus-visible { outline: 3px solid var(--action-orange); outline-offset: 3px; }
+.btn:disabled { cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-primary:disabled { background: #ded5ce; color: #63564c; opacity: 1; }
 .header-actions .btn {
   font-size: 19px;
   padding: 12px 20px;

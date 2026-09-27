@@ -1,4 +1,10 @@
 {
+  "Após entrar, voltará à sua encomenda.": ["After signing in, you’ll return to your order.", "登入後，您將返回訂單。"],
+  "Voltar à encomenda": ["Back to your order", "返回訂單"],
+  "Indique o seu email para continuar com a opção certa para si.": ["Enter your email to continue with the right option for you.", "輸入您的電子郵件，即可繼續使用適合您的選項。"],
+  "Continuar": ["Continue", "繼續"],
+  "Etapas da compra": ["Purchase steps", "購買步驟"],
+  "Passo {0} de {1}": ["Step {0} of {1}", "第 {0} 步，共 {1} 步"],
   "Partilhe contactos, redes sociais e trabalho por toque ou QR.": [
     "Share your contacts, social links and work with a tap or QR code.",
     "輕觸或掃描 QR 碼，分享聯絡方式、社群連結與作品。"

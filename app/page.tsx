@@ -6,6 +6,7 @@ import { publicPageRobots } from '@/lib/server-site';
 import { SourceImage } from '@/components/source-image';
 import { AccountMenu } from '@/components/account-menu';
 import { HomeMobileMenu } from '@/components/home-mobile-menu';
+import { HomeHeader } from '@/components/home-header';
 import Image from 'next/image';
 import Link from '@/components/hard-link';
 import {
@@ -23,6 +24,7 @@ import { getManagedPlans } from '@/lib/server-plans';
 import { money, productOrder } from '@/lib/catalog';
 import './home.css';
 import './home-atmosphere.css';
+import './home-interactions.css';
 
 const productNames: Record<string, string> = {
   'PVC Business Cards': 'Cartão NFC em PVC',
@@ -100,7 +102,7 @@ export default async function Home() {
     .sort((a, b) => planMeticais(a) - planMeticais(b));
   return (
     <div className="framy-home">
-      <header className="home-nav">
+      <HomeHeader>
         <Link href="/" aria-label={t('Framy Connect — início')}>
           <Image
             src="/brand/logo.svg"
@@ -125,7 +127,7 @@ export default async function Home() {
           <AccountMenu className="home-account" />
           <HomeMobileMenu />
         </div>
-      </header>
+      </HomeHeader>
       <main id="main">
         <section className="home-hero">
           <div className="home-hero-inner">

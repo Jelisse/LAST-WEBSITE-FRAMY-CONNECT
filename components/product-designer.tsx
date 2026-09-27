@@ -152,7 +152,9 @@ export function ProductDesigner({
     let alive = true;
     setStockLoading(true);
     setStockError('');
-    fetch('/api/product-options', { cache: 'no-store' })
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15_000);
+    fetch('/api/product-options', { cache: 'no-store', signal: controller.signal })
       .then(async (r) => {
         const d = (await r.json()) as {
           error?: string;
@@ -163,13 +165,18 @@ export function ProductDesigner({
       })
       .catch((e) => {
         if (alive)
-          setStockError(e.message || 'Não foi possível consultar o stock.');
+          setStockError(e.name === 'AbortError'
+            ? 'A consulta do stock demorou demasiado. Tente novamente.'
+            : e.message || 'Não foi possível consultar o stock.');
       })
       .finally(() => {
+        clearTimeout(timeout);
         if (alive) setStockLoading(false);
       });
     return () => {
       alive = false;
+      clearTimeout(timeout);
+      controller.abort();
     };
   }, [stockAttempt]);
   useEffect(() => {

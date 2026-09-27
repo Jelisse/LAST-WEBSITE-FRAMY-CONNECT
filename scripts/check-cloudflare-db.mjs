@@ -10,6 +10,12 @@ const schemaSQL = `SELECT m.name AS table_name, p.name AS column_name
   FROM sqlite_master m JOIN pragma_table_info(m.name) p
   WHERE m.type='table' AND m.name NOT LIKE 'sqlite_%'
   UNION ALL
+  SELECT '__index__' AS table_name, name AS column_name
+  FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%'
+  UNION ALL
+  SELECT '__inventory_count__' AS table_name, 'keychain-20260918' AS column_name
+  FROM stock_movements WHERE id='owner-count-keychain-20260918'
+  UNION ALL
   SELECT '__inventory_count__' AS table_name, 'maputo-20260919' AS column_name
   FROM manager_audit WHERE id='owner-maputo-keychain-count-20260919'
   ORDER BY table_name,column_name`;

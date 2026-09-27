@@ -85,6 +85,13 @@
       "when": 1789776000000,
       "tag": "0011_maputo_keychain_stock",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1790467200000,
+      "tag": "0012_purchase_performance",
+      "breakpoints": true
     }
   ]
 }

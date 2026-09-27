@@ -1,0 +1,114 @@
+/* Homepage interactions: small, composited movements without animation libraries. */
+.framy-home { --home-nav-offset: 100px; }
+.framy-home { --home-action: var(--action-orange); }
+.framy-home :is(.home-primary, .home-product-action, .home-secondary, .home-text-link, .home-agent, .account-menu-trigger) { font-weight: 500; }
+.framy-home .is-available .home-product-action { background: var(--action-orange); }
+/* The shared stylesheet adds 96px of root padding; use the measured header once. */
+html:has(.framy-home) { scroll-padding-top: 0; }
+.framy-home > .home-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  max-width: none;
+  width: 100%;
+  padding-inline: max(5%, calc((100% - 1296px) / 2));
+  border-bottom: 1px solid transparent;
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+.framy-home > .home-nav[data-scrolled='true'] {
+  border-bottom-color: #ead6c7;
+  box-shadow: 0 5px 24px #56331b12;
+}
+.framy-home :is(main, main > section[id]) { scroll-margin-top: var(--home-nav-offset); }
+.framy-home .home-nav nav a {
+  position: relative;
+  border-radius: 8px;
+  padding: 9px 10px;
+  transition: color 180ms ease, background-color 180ms ease;
+}
+.framy-home .home-nav nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+.framy-home .home-nav nav a[aria-current='location'] {
+  color: #a93408;
+  background: #ffe7d6;
+}
+.framy-home .home-nav nav a[aria-current='location']::after { transform: scaleX(1); }
+.framy-home :is(a, button, summary, select):focus-visible {
+  outline: 3px solid #96300c;
+  outline-offset: 4px;
+}
+.framy-home :is(.home-product, .home-plan, .home-audience-card, .home-trial-banner, .home-faq details) {
+  transition: transform 220ms ease, box-shadow 220ms ease, background-color 220ms ease, border-color 220ms ease;
+}
+.framy-home :is(.home-product-art img, .home-scene-card, .home-scene-keychain, .home-scene-phone, .sharing-product-card, .sharing-product-demo > .sharing-phone) {
+  transition: scale 300ms ease, translate 300ms ease;
+}
+.framy-home :is(.home-primary, .home-product-action, .home-secondary, .home-text-link, .home-agent, .account-menu-trigger, .home-mobile-menu summary) {
+  transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.framy-home :is(.home-primary, .home-product-action, .home-text-link, .home-secondary) svg {
+  transition: transform 180ms ease;
+}
+.framy-home :is(.home-plan, .home-trial-banner):focus-within {
+  background: #ffe7d2;
+  border-color: #dc9c71;
+  box-shadow: 0 12px 30px #71381016;
+}
+.framy-home .home-product:focus-visible { box-shadow: 0 12px 30px #71381024; }
+.framy-home .home-faq summary { border-radius: 8px; transition: color 180ms ease; }
+.framy-home .home-faq details[open] { background: #fff0e2; border-color: #dc9c71; }
+
+@media (hover: hover) and (pointer: fine) {
+  .framy-home .home-nav nav a:hover { color: #a93408; background: #ffeadc; }
+  .framy-home .home-nav nav a:hover::after { transform: scaleX(1); }
+  .framy-home :is(.home-product, .home-plan, .home-audience-card, .home-trial-banner):hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 32px #7138101c;
+    border-color: #dc9c71;
+  }
+  .framy-home :is(.home-plan, .home-audience-card, .home-trial-banner):hover { background: #ffe7d2; }
+  .framy-home .home-product:hover .home-product-art img { scale: 1.035; }
+  .framy-home :is(.home-scene-card, .home-scene-keychain, .home-scene-phone, .sharing-product-card, .sharing-product-demo > .sharing-phone):hover {
+    translate: 0 -6px;
+    scale: 1.025;
+  }
+  .framy-home .home-primary:hover,
+  .framy-home .home-product.is-available:hover .home-product-action {
+    background: var(--action-orange-hover);
+    color: white;
+    box-shadow: 0 7px 18px #96300c30;
+    transform: translateY(-2px);
+  }
+  .framy-home .home-how .home-primary:hover { background: white; color: #8c2c08; }
+  .framy-home :is(.home-primary, .home-text-link, .home-secondary):hover svg,
+  .framy-home .home-product:hover .home-product-action svg { transform: translate(3px, -3px); }
+  .framy-home :is(.home-secondary, .home-agent, .account-menu-trigger, .home-mobile-menu summary):hover {
+    background: #ffe7d2;
+    color: #96300c;
+  }
+  .framy-home .home-text-link:hover { color: #792604; text-decoration-thickness: 2px; }
+  .framy-home .home-faq details:hover { background: #fff0e2; }
+  .framy-home .home-faq summary:hover { color: #96300c; }
+}
+.framy-home :is(.home-primary, .home-secondary, .home-agent, .account-menu-trigger):active {
+  transform: translateY(1px) scale(.98);
+  box-shadow: none;
+}
+.framy-home .home-product:active { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .framy-home *, .framy-home *::before, .framy-home *::after { transition: none !important; }
+  .framy-home :is(.home-product, .home-plan, .home-audience-card, .home-trial-banner, .home-primary, .home-secondary, .home-agent, .account-menu-trigger) { transform: none !important; }
+  .framy-home :is(.home-product-art img, .home-scene-card, .home-scene-keychain, .home-scene-phone, .sharing-product-card, .sharing-product-demo > .sharing-phone) { scale: none !important; translate: none !important; }
+  .framy-home :is(.home-primary, .home-product-action, .home-text-link, .home-secondary) svg { transform: none !important; }
+}

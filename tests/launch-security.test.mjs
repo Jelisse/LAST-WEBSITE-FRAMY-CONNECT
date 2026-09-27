@@ -129,7 +129,7 @@ function fixture() {
     .run(
       'fixture-stock',
       'keychain',
-      20,
+      0, // Physical stock is initialized by the migration before request handling.
       'Test stock',
       'manager-a',
       new Date().toISOString(),
@@ -161,6 +161,28 @@ const post = async (route, body) => {
   return { status: response.status, body: await response.json() };
 };
 
+test('email-first account routing is rate limited and never creates accounts or sessions', async () => {
+  const sql = fixture();
+  const auth = await api('app/api/auth/route.ts');
+  const accountsBefore = sql.prepare('SELECT COUNT(*) n FROM auth_accounts').get().n;
+  assert.equal((await post(auth, { action: 'resolve-account', email: 'invalid' })).status, 422);
+  let result = await post(auth, { action: 'resolve-account', email: ' CUSTOMER-A@EXAMPLE.COM ' });
+  assert.equal(result.status, 200);
+  assert.deepEqual(result.body, { mode: 'login' });
+  result = await post(auth, { action: 'resolve-account', email: 'new@example.com' });
+  assert.deepEqual(result.body, { mode: 'register' });
+  sql.exec("UPDATE auth_accounts SET active=0 WHERE id='customer-a'");
+  result = await post(auth, { action: 'resolve-account', email: 'customer-a@example.com' });
+  assert.deepEqual(result.body, { mode: 'login' });
+  for (let i = 0; i < 10; i++) result = await post(auth, { action: 'resolve-account', email: 'customer-a@example.com' });
+  assert.equal(result.status, 429);
+  assert.equal(sql.prepare('SELECT COUNT(*) n FROM auth_accounts').get().n, accountsBefore);
+  assert.equal(sql.prepare('SELECT COUNT(*) n FROM auth_sessions').get().n, 0);
+  const crossOrigin = new Request(origin + '/api/auth', { method: 'POST', headers: { origin: 'https://other.example' }, body: JSON.stringify({ action: 'resolve-account', email: 'new@example.com' }) });
+  assert.equal((await auth.POST(crossOrigin)).status, 403);
+  sql.close();
+});
+
 test('Maputo inventory records 175 Instagram, 175 TikTok and 150 Pattern without duplicating physical stock', () => {
   const sql = fixture();
   const quantities = () => Object.fromEntries(sql.prepare("SELECT id,quantity FROM product_options WHERE id IN ('instagram','tiktok','pattern')").all().map(r => [r.id,r.quantity]));
@@ -182,6 +204,24 @@ test('Maputo inventory records 175 Instagram, 175 TikTok and 150 Pattern without
   assert.equal(sql.prepare("SELECT enabled FROM product_options WHERE id='pattern'").get().enabled, 0);
   assert.equal(sql.prepare("SELECT SUM(quantity) n FROM stock_movements WHERE product_id='keychain'").get().n, physicalBefore);
   assert.equal(sql.prepare("SELECT COUNT(*) n FROM manager_audit WHERE id='owner-maputo-keychain-count-20260919'").get().n, 1);
+  sql.close();
+});
+
+test('catalogue: concurrent reads never write inventory', async () => {
+  const sql = fixture();
+  const catalog = await api('lib/server-catalog.ts');
+  const before = sql.prepare('SELECT * FROM stock_movements ORDER BY id').all();
+  const prepare = globalThis.__launch.env.DB.prepare;
+  let reads = 0;
+  globalThis.__launch.env.DB.prepare = (query) => {
+    assert.match(query, /^SELECT /);
+    reads++;
+    return prepare(query);
+  };
+  const results = await Promise.all(Array.from({ length: 50 }, () => catalog.getProducts()));
+  assert.equal(reads, 50);
+  assert.ok(results.every(products => products.some(p => p.id === 'keychain' && p.available)));
+  assert.deepEqual(sql.prepare('SELECT * FROM stock_movements ORDER BY id').all(), before);
   sql.close();
 });
 

@@ -22,6 +22,8 @@ import { IPhonePreview } from './iphone-preview';
 import { ProfilePhotoUpload } from './profile-photo-upload';
 import { ProfileLinksEditor } from './profile-links-editor';
 import { OrderPayment } from './order-payment';
+import { PurchaseProgress } from './purchase-progress';
+import { PurchaseAccountAccess } from './purchase-account-access';
 import { ProductDesigner } from './product-designer';
 import { artworkFile } from '@/lib/artwork-storage';
 import {
@@ -71,7 +73,7 @@ export function OrderSubmission({
   });
   const plan = plans.find((p) => p.id === planId);
   async function load() {
-    const r = await fetch('/api/workspace', { cache: 'no-store' });
+    const r = await fetch('/api/workspace', { cache: 'no-store', signal: AbortSignal.timeout(15_000) });
     if (!r.ok) throw Error('Inicie sessão novamente para continuar.');
     const d = (await r.json()) as Data;
     setData(d);
@@ -192,7 +194,7 @@ export function OrderSubmission({
     setBusy(true);
     try {
       if (step === 0 && supportsDesign(product)) {
-        const r = await fetch('/api/product-options', { cache: 'no-store' });
+        const r = await fetch('/api/product-options', { cache: 'no-store', signal: AbortSignal.timeout(15_000) });
         const d = (await r.json()) as {
           error?: string;
           options: { id: string; enabled: number; quantity: number }[];
@@ -349,24 +351,11 @@ export function OrderSubmission({
           ? t('O progresso fica guardado durante esta sessão do navegador.')
           : t('Pode guardar a sua escolha e continuar com a conta.')}
       </p>
-      <ol className="purchase-steps">
-        {steps.map((s, i) => (
-          <li key={t(s)} aria-current={step === i ? 'step' : undefined}>
-            <button
-              disabled={busy || i > step}
-              onClick={() => {
-                setStep(i);
-                setError('');
-              }}
-            >
-              {i + 1}. {t(s)}
-            </button>
-          </li>
-        ))}
-      </ol>
+      <PurchaseProgress steps={steps} step={step} disabled={busy || uploading}
+        onStep={(nextStep) => { setStep(nextStep); setError(''); }} />
       <div className="purchase-layout">
         <section className="panel">
-          <h2>{t(steps[step])}</h2>
+          <h2 id="purchase-step-title" tabIndex={-1}>{t(steps[step])}</h2>
           {step === 0 && (
             <>
               <h3>{t(product.name)}</h3>
@@ -445,27 +434,10 @@ export function OrderSubmission({
                     'Guarde o seu perfil e acompanhe o pedido com acesso seguro.',
                   )}
                 </p>
-                <a
-                  className="btn btn-primary"
-                  href={
-                    '/entrar?return_to=' +
-                    encodeURIComponent('/encomendar/' + product.id)
-                  }
-                >
-                  {t('Entrar')}
-                </a>
-                <a
-                  className="btn btn-outline"
-                  href={
-                    '/entrar?mode=register&return_to=' +
-                    encodeURIComponent('/encomendar/' + product.id)
-                  }
-                >
-                  {t('Criar conta')}
-                </a>
+                <PurchaseAccountAccess productId={product.id} />
                 <p>
                   {t(
-                    'Entre ou crie uma conta com email e palavra-passe. A sua escolha de produto e plano será mantida no regresso.',
+                    'Após entrar, voltará à sua encomenda.',
                   )}
                 </p>
               </>
@@ -625,13 +597,13 @@ export function OrderSubmission({
                 {t('Voltar')}
               </button>
             )}
-            {step < 5 ? (
+            {step === 2 && !account ? null : step < 5 ? (
               <button
                 className="btn btn-primary"
                 disabled={busy || uploading || (step === 2 && !account)}
                 onClick={next}
               >
-                {busy ? t('A guardar…') : t('Guardar e continuar')}
+                {busy ? t('A guardar…') : step === 3 ? t('Guardar e continuar') : t('Continuar')}
               </button>
             ) : (
               <button

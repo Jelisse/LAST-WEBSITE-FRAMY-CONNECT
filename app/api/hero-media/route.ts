@@ -1,7 +1,7 @@
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { canManageCatalog } from '@/lib/server-catalog';
-import { getHeroMedia } from '@/lib/server-hero-media';
+import { getHeroMedia, invalidateHeroMedia } from '@/lib/server-hero-media';
 import { isHeroSlot, heroMediaType } from '@/lib/hero-media';
 import { reserveUpload, releaseUpload } from '@/lib/server-upload-quota';
 import { rateLimit } from '@/lib/request-limits';
@@ -56,6 +56,7 @@ export async function POST(request: Request) {
       await env.PROFILE_PHOTOS.put(`hero/settings/${slot}`, JSON.stringify({ url }), {
         httpMetadata: { contentType: 'application/json' },
       });
+      invalidateHeroMedia();
     } catch (error) {
       await env.PROFILE_PHOTOS.delete(`hero/assets/${id}`);
       await releaseUpload(id, user.userId);

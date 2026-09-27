@@ -40,11 +40,13 @@ export async function POST(request: Request) {
       typeof b.email === 'string' ? b.email.trim().toLowerCase() : '';
     if (
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-      email.length > 254 ||
+      email.length > 254
+    ) return json({ error: 'Indique um email válido.' }, 422);
+    if (b.action !== 'resolve-account' && (
       typeof b.password !== 'string' ||
       b.password.length < 12 ||
       new TextEncoder().encode(b.password).length > 72
-    )
+    ))
       return json(
         {
           error:
@@ -52,7 +54,7 @@ export async function POST(request: Request) {
         },
         422,
       );
-    if (!['login', 'register'].includes(b.action))
+    if (!['login', 'register', 'resolve-account'].includes(b.action))
       return json({ error: 'Pedido inválido.' }, 422);
     const keys = [
       await tokenHash('email:' + email),
@@ -75,6 +77,13 @@ export async function POST(request: Request) {
           },
           429,
         );
+    }
+    if (b.action === 'resolve-account') {
+      // Existing inactive accounts must use sign-in/support, never re-registration.
+      // Share the email/IP limits above; return no account record or session.
+      const existing = await db.prepare('SELECT id FROM auth_accounts WHERE email=?')
+        .bind(email).first<{ id: string }>();
+      return json({ mode: existing ? 'login' : 'register' });
     }
     let account = await db
       .prepare('SELECT * FROM auth_accounts WHERE email=? AND active=1')

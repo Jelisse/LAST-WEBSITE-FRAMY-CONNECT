@@ -1,14 +1,25 @@
 'use client';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from '@/components/hard-link';
 export function LoginForm({
   initialRegister = false,
+  purchaseReturn,
 }: {
   initialRegister?: boolean;
+  purchaseReturn?: string;
 }) {
   const { t } = useI18n();
+  const emailInput = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('framy-auth-prefill') || 'null');
+      if (saved && typeof saved.email === 'string' && saved.expires > Date.now() && emailInput.current)
+        emailInput.current.value = saved.email;
+      sessionStorage.removeItem('framy-auth-prefill');
+    } catch { /* Prefilling is optional. */ }
+  }, []);
   const [register, setRegister] = useState(initialRegister),
     [busy, setBusy] = useState(false),
     [error, setError] = useState('');
@@ -19,7 +30,7 @@ export function LoginForm({
         <Link href="/">{t('Framy Connect')}</Link>
         <h1>{register ? t('Criar a minha conta') : t('Bem-vindo à Framy')}</h1>
         <p>
-          {register
+          {purchaseReturn ? t('Após entrar, voltará à sua encomenda.') : register
             ? t('Guarde o seu perfil e acompanhe os seus pedidos.')
             : t('Entre para abrir o seu painel.')}
         </p>
@@ -68,6 +79,7 @@ export function LoginForm({
             {t('Email')}
             <input
               name="email"
+              ref={emailInput}
               type="email"
               required
               autoComplete="email"
@@ -112,6 +124,7 @@ export function LoginForm({
         >
           {register ? t('Já tenho conta') : t('Sou novo — criar conta')}
         </button>
+        {purchaseReturn && <Link className="auth-return" href={purchaseReturn}>{t('Voltar à encomenda')}</Link>}
       </section>
     </main>
   );
