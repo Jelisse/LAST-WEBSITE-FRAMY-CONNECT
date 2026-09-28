@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
 import { tokenHash } from '@/lib/server-auth';
@@ -14,16 +15,21 @@ type Row = {
   active: number;
   version: number;
 };
-export async function GET() {
+export async function GET(request?: Request) {
   const user = await getChatGPTUser();
   if (!user || !['manager', 'director'].includes(user.role))
     return json({ error: 'Acesso reservado à gestão.' }, 403);
   try {
     const db = database();
+    const search = request
+      ? (new URL(request.url).searchParams.get('q') || '').trim().slice(0, 100)
+      : '';
+    const pattern = '%' + search.replace(/[\\%_]/g, '\\$&') + '%';
     const rows = await db
       .prepare(
-        'SELECT id,name,email,role,active,version FROM auth_accounts ORDER BY name LIMIT 500',
+        "SELECT id,name,email,role,active,version FROM auth_accounts WHERE (name LIKE ? ESCAPE '\\' OR email LIKE ? ESCAPE '\\') ORDER BY name LIMIT 500",
       )
+      .bind(pattern, pattern)
       .all<Row>();
     const agents = await db
       .prepare(
@@ -31,6 +37,11 @@ export async function GET() {
       )
       .all();
     return json({
+      recoveryEmailReady: !!(
+        env.RESEND_API_KEY &&
+        env.PROFILE_EMAIL_FROM &&
+        env.PUBLIC_SITE_URL
+      ),
       accounts: rows.results.filter((r) =>
         canAdministerRole(user.role, r.role),
       ),
@@ -148,6 +159,14 @@ export async function POST(request: Request) {
       .bind(b.id)
       .first<Row>();
     if (!row) return json({ error: 'Conta não encontrada.' }, 404);
+    if (b.action === 'invite' && row.role === 'customer')
+      return json(
+        {
+          error:
+            'Use o envio de recuperação por email para contas de clientes.',
+        },
+        422,
+      );
     const nextRole = (b.action === 'update' ? b.role : row.role) as AccountRole;
     if (
       !Object.hasOwn(

@@ -11,6 +11,13 @@ const worker = {
     ctx: ExecutionContext,
   ) {
     ctx.waitUntil(cleanupReservations(env.DB));
+    ctx.waitUntil(
+      env.DB.prepare(
+        'DELETE FROM auth_recovery WHERE token_hash IN (SELECT token_hash FROM auth_recovery WHERE expires_at<? LIMIT 1000)',
+      )
+        .bind(Date.now())
+        .run(),
+    );
     ctx.waitUntil(profileReminders(env));
     ctx.waitUntil(refreshProfileDomains(env));
     ctx.waitUntil(

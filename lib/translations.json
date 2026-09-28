@@ -6914,5 +6914,133 @@
   "Sobre estas medições": [
     "About these measurements",
     "關於這些測量"
+  ],
+  "Pesquise clientes por nome ou email para recuperar o acesso. Os convites da equipa são geridos separadamente.": [
+    "Find customers by name or email to recover access. Staff invitations are managed separately.",
+    "以姓名或電子郵件尋找客戶並恢復存取。團隊邀請另外管理。"
+  ],
+  "Pesquisar por nome ou email": [
+    "Search by name or email",
+    "以姓名或電子郵件搜尋"
+  ],
+  "Nome do cliente ou email": [
+    "Customer name or email",
+    "客戶姓名或電子郵件"
+  ],
+  "Até 500 resultados. Refine a pesquisa para encontrar a conta pretendida.": [
+    "Up to 500 results. Refine your search to find the account.",
+    "最多顯示 500 筆結果。請縮小搜尋範圍以尋找帳號。"
+  ],
+  "O envio de recuperação por email ainda não está configurado.": [
+    "Recovery email delivery is not configured yet.",
+    "尚未設定復原電子郵件服務。"
+  ],
+  "Recuperar acesso do cliente": [
+    "Recover customer access",
+    "恢復客戶存取"
+  ],
+  "Email de acesso e destino": [
+    "Sign-in and recipient email",
+    "登入及收件電子郵件"
+  ],
+  "Envia uma ligação pessoal, válida por 30 minutos. O cliente escolhe uma nova palavra-passe; o gestor não a recebe. As sessões antigas terminam quando a recuperação é concluída.": [
+    "Sends a personal link valid for 30 minutes. The customer chooses a new password; the manager does not receive it. Existing sessions end when recovery is completed.",
+    "寄送有效期限為 30 分鐘的個人連結。客戶自行設定新密碼，管理員不會收到密碼。復原完成後將終止既有登入。"
+  ],
+  "Se o cliente não tiver acesso a este email, não envie para um endereço diferente sem um processo de verificação de identidade.": [
+    "If the customer cannot access this email, do not send to another address without an identity verification process.",
+    "若客戶無法使用此電子郵件，請先完成身分驗證流程，勿直接改寄其他地址。"
+  ],
+  "Confirmei que o cliente solicitou esta recuperação e que esta é a conta correcta.": [
+    "I confirmed that the customer requested recovery and this is the correct account.",
+    "我已確認客戶要求復原，且此為正確帳號。"
+  ],
+  "Enviar ligação de recuperação": [
+    "Send recovery link",
+    "寄送復原連結"
+  ],
+  "Enviar recuperação": [
+    "Send recovery",
+    "寄送復原郵件"
+  ],
+  "Criar acesso para a equipa": [
+    "Create staff access",
+    "建立團隊存取"
+  ],
+  "Convites da equipa: válidos por 24 horas. Um novo convite suspende o acesso anterior; entregue-o por um canal seguro.": [
+    "Staff invitations last 24 hours. A new invitation suspends previous access; deliver it through a secure channel.",
+    "團隊邀請有效期限為 24 小時。新邀請會暫停原有存取，請透過安全管道交付。"
+  ],
+  "Recuperar o meu acesso": [
+    "Recover my access",
+    "恢復我的存取"
+  ],
+  "Palavra-passe actualizada. As sessões anteriores foram terminadas. Inicie sessão com o email indicado na mensagem de recuperação.": [
+    "Password updated. Previous sessions have ended. Sign in with the email shown in your recovery message.",
+    "密碼已更新，原有登入已終止。請使用復原郵件中所列的電子郵件登入。"
+  ],
+  "Escolha uma nova palavra-passe. A ligação enviada pela gestão é pessoal, válida por 30 minutos e só pode ser usada uma vez.": [
+    "Choose a new password. The link from management is personal, valid for 30 minutes and can only be used once.",
+    "請設定新密碼。管理員寄送的連結僅供本人使用，有效期限為 30 分鐘，且只能使用一次。"
+  ],
+  "Abra a ligação recebida por email. Se expirou, peça uma nova ligação à gestão.": [
+    "Open the link received by email. If it expired, ask management for a new link.",
+    "請開啟電子郵件中的連結。若已過期，請向管理員索取新連結。"
+  ],
+  "Guardar nova palavra-passe": [
+    "Save new password",
+    "儲存新密碼"
+  ],
+  "Email de recuperação aceite para envio. A ligação expira em 30 minutos.": [
+    "Recovery email accepted for sending. The link expires in 30 minutes.",
+    "復原郵件已受理寄送，連結將於 30 分鐘後失效。"
+  ],
+  "O envio de email ainda não está configurado. Contacte a administração.": [
+    "Email delivery is not configured yet. Contact the administrator.",
+    "尚未設定郵件服務，請聯絡管理員。"
+  ],
+  "A recuperação só pode ser enviada para o email registado.": [
+    "Recovery can only be sent to the registered email.",
+    "復原郵件只能寄至已登記的電子郵件。"
+  ],
+  "Confirme o pedido de recuperação do cliente.": [
+    "Confirm the customer recovery request.",
+    "請確認客戶的復原要求。"
+  ],
+  "Seleccione uma conta de cliente activa.": [
+    "Select an active customer account.",
+    "請選擇有效的客戶帳號。"
+  ],
+  "Limite de recuperação atingido. Aguarde 15 minutos.": [
+    "Recovery limit reached. Wait 15 minutes.",
+    "已達復原次數上限，請等待 15 分鐘。"
+  ],
+  "Não foi possível confirmar o envio. O acesso actual não foi alterado. Tente novamente mais tarde.": [
+    "Sending could not be confirmed. Current access was not changed. Try again later.",
+    "無法確認寄送結果。目前存取未變更，請稍後再試。"
+  ],
+  "A conta mudou durante o envio. A ligação não pode ser usada; actualize a lista.": [
+    "The account changed during sending. The link cannot be used; refresh the list.",
+    "寄送期間帳號已變更，連結無法使用。請重新整理清單。"
+  ],
+  "A conta mudou. Actualize a lista e tente novamente.": [
+    "The account changed. Refresh the list and try again.",
+    "帳號已變更。請重新整理清單再試。"
+  ],
+  "A ligação expirou, já foi usada ou deixou de ser válida. Solicite outra à gestão.": [
+    "The link expired, was already used or is no longer valid. Ask management for another.",
+    "連結已過期、已使用或失效。請向管理員索取新連結。"
+  ],
+  "A ligação já foi utilizada ou deixou de ser válida.": [
+    "The link has already been used or is no longer valid.",
+    "連結已使用或失效。"
+  ],
+  "Não foi possível concluir a recuperação. Tente novamente.": [
+    "Recovery could not be completed. Try again.",
+    "無法完成復原，請再試一次。"
+  ],
+  "Use uma ligação válida e uma palavra-passe com pelo menos 12 caracteres (máximo 72 bytes).": [
+    "Use a valid link and a password of at least 12 characters (maximum 72 bytes).",
+    "請使用有效連結及至少 12 個字元的密碼（最多 72 位元組）。"
   ]
 }

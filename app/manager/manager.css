@@ -576,3 +576,16 @@
  .hero-manager-grid { grid-template-columns:minmax(0,1fr); }
  .hero-manager-item .media-upload-box img,.hero-manager-item .media-upload-box video { height:190px; }
 }
+
+.account-management .account-recovery-panel { padding: 20px; margin-block: 18px; border: 1px solid #e9c2a7; border-radius: 14px; background: #fff8f1; }
+.account-management .account-help { font-size: 12px; color: #75665d; }
+.account-management .account-recovery-panel p { font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.account-management .account-confirm { display: flex; align-items: flex-start; gap: 10px; }
+.account-management .account-confirm input { width: auto; margin-top: 4px; }
+.account-management .account-recovery-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.account-management .account-staff-create { margin-block: 20px; }
+.account-management .account-staff-create summary { cursor: pointer; font-weight: 500; }
+
+.account-management .account-recovery-panel form { grid-template-columns: minmax(0, 1fr); margin-bottom: 0; }
+.account-management .account-confirm { flex-direction: row; }
+.account-management .account-confirm input { width: 18px; height: 18px; min-height: 18px; flex-shrink: 0; }

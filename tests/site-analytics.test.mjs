@@ -28,6 +28,9 @@ function fixture() {
   sql.exec(readFileSync('drizzle/0013_website_analytics.sql', 'utf8'));
   sql.exec(readFileSync('drizzle/0014_profile_engagement.sql', 'utf8'));
   sql.exec(
+    'CREATE TABLE auth_recovery(token_hash TEXT PRIMARY KEY,expires_at INTEGER)',
+  );
+  sql.exec(
     'CREATE TABLE profile_enquiries(id TEXT PRIMARY KEY,created_at INTEGER)',
   );
   sql.exec(

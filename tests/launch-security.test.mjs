@@ -1939,3 +1939,258 @@ test('public www alias redirects without querying customer-domain tables', async
     /must not query D1/,
   );
 });
+
+test('customer recovery sends only to registered email, keeps access until redemption and revokes all old sessions', async () => {
+  const sql = fixture(),
+    original = globalThis.fetch;
+  const recovery = await api('app/api/account-recovery/route.ts');
+  const version = sql
+    .prepare("SELECT version FROM auth_accounts WHERE id='customer-a'")
+    .get().version;
+  const send = { action: 'send', id: 'customer-a', version, confirmed: true };
+  const messages = [];
+  globalThis.fetch = async (url, init) => {
+    assert.equal(url, 'https://api.resend.com/emails');
+    messages.push(JSON.parse(init.body));
+    return Response.json({ id: 'email-test' });
+  };
+  try {
+    assert.equal((await post(recovery, send)).status, 403);
+    globalThis.__launch.user = { userId: 'manager-a', role: 'manager' };
+    assert.equal((await post(recovery, send)).status, 503);
+    assert.equal(
+      sql.prepare('SELECT COUNT(*) n FROM auth_recovery').get().n,
+      0,
+    );
+    Object.assign(globalThis.__launch.env, {
+      RESEND_API_KEY: 'test-only',
+      PROFILE_EMAIL_FROM: 'Framy <support@example.com>',
+      PUBLIC_SITE_URL: origin,
+    });
+    assert.equal(
+      (await post(recovery, { ...send, email: 'attacker@example.com' })).status,
+      422,
+    );
+    assert.equal(
+      (await post(recovery, { ...send, confirmed: false })).status,
+      422,
+    );
+    assert.equal(
+      (await post(recovery, { ...send, id: 'manager-b' })).status,
+      404,
+    );
+    sql
+      .prepare(
+        'INSERT INTO auth_sessions(token_hash,account_id,expires_at) VALUES(?,?,?)',
+      )
+      .run('old-session', 'customer-a', Date.now() + 900000);
+    const sent = await post(recovery, send);
+    assert.equal(sent.status, 200);
+    assert.equal(sent.body.invitationUrl, undefined);
+    assert.equal(sent.body.token, undefined);
+    assert.deepEqual(messages[0].to, ['customer-a@example.com']);
+    assert.match(messages[0].text, /email de acesso: customer-a@example.com/);
+    const token = messages[0].text.match(/recuperar#([a-f0-9]{64})/)[1];
+    assert.notEqual(
+      sql.prepare('SELECT token_hash FROM auth_recovery').get().token_hash,
+      token,
+    );
+    assert.equal(
+      sql
+        .prepare("SELECT active FROM auth_accounts WHERE id='customer-a'")
+        .get().active,
+      1,
+    );
+    assert.equal(
+      sql
+        .prepare(
+          "SELECT password_hash FROM auth_accounts WHERE id='customer-a'",
+        )
+        .get().password_hash,
+      '!test',
+    );
+    assert.equal(
+      sql.prepare('SELECT COUNT(*) n FROM auth_sessions').get().n,
+      1,
+    );
+    globalThis.__launch.user = null;
+    const attempts = await Promise.all([
+      post(recovery, {
+        action: 'reset',
+        token,
+        password: 'New-long-password-2026',
+      }),
+      post(recovery, {
+        action: 'reset',
+        token,
+        password: 'Another-long-password-2026',
+      }),
+    ]);
+    assert.deepEqual(attempts.map((r) => r.status).sort(), [200, 410]);
+    assert.equal(
+      sql.prepare('SELECT COUNT(*) n FROM auth_sessions').get().n,
+      0,
+    );
+    assert.equal(
+      sql.prepare('SELECT COUNT(*) n FROM auth_recovery').get().n,
+      0,
+    );
+    assert.match(
+      sql
+        .prepare(
+          "SELECT password_hash FROM auth_accounts WHERE id='customer-a'",
+        )
+        .get().password_hash,
+      /^\$2[ab]\$12\$/,
+    );
+    assert.equal(
+      (
+        await post(recovery, {
+          action: 'reset',
+          token,
+          password: 'New-long-password-2026',
+        })
+      ).status,
+      410,
+    );
+    assert.equal(
+      sql
+        .prepare(
+          "SELECT COUNT(*) n FROM manager_audit WHERE action='Cliente concluiu recuperação; sessões terminadas'",
+        )
+        .get().n,
+      1,
+    );
+  } finally {
+    globalThis.fetch = original;
+    sql.close();
+  }
+});
+
+test('customer recovery rejects expiry, account changes and inactive issuer, and never enables suspended accounts', async () => {
+  const original = globalThis.fetch;
+  for (const mutation of [
+    'UPDATE auth_recovery SET expires_at=0',
+    "UPDATE auth_accounts SET active=0 WHERE id='customer-a'",
+    "UPDATE auth_accounts SET email='changed@example.com' WHERE id='customer-a'",
+    "UPDATE auth_accounts SET version=version+1 WHERE id='customer-a'",
+    "UPDATE auth_accounts SET active=0 WHERE id='manager-a'",
+    "UPDATE auth_accounts SET role='agent' WHERE id='customer-a'",
+  ]) {
+    const sql = fixture();
+    let token;
+    try {
+      const recovery = await api('app/api/account-recovery/route.ts');
+      globalThis.__launch.user = { userId: 'manager-a', role: 'manager' };
+      Object.assign(globalThis.__launch.env, {
+        RESEND_API_KEY: 'test-only',
+        PROFILE_EMAIL_FROM: 'support@example.com',
+        PUBLIC_SITE_URL: origin,
+      });
+      globalThis.fetch = async (_url, init) => {
+        token = JSON.parse(init.body).text.match(/recuperar#([a-f0-9]{64})/)[1];
+        return Response.json({ id: 'test-email' });
+      };
+      const version = sql
+        .prepare("SELECT version FROM auth_accounts WHERE id='customer-a'")
+        .get().version;
+      assert.equal(
+        (
+          await post(recovery, {
+            action: 'send',
+            id: 'customer-a',
+            version,
+            confirmed: true,
+          })
+        ).status,
+        200,
+      );
+      sql.exec(mutation);
+      assert.equal(
+        (
+          await post(recovery, {
+            action: 'reset',
+            token,
+            password: 'New-long-password-2026',
+          })
+        ).status,
+        410,
+        mutation,
+      );
+      assert.equal(
+        sql
+          .prepare(
+            "SELECT password_hash FROM auth_accounts WHERE id='customer-a'",
+          )
+          .get().password_hash,
+        '!test',
+      );
+    } finally {
+      sql.close();
+    }
+  }
+  globalThis.fetch = original;
+});
+
+test('failed recovery delivery leaves credentials intact; send limits and origin checks apply', async () => {
+  const sql = fixture(),
+    original = globalThis.fetch;
+  try {
+    const recovery = await api('app/api/account-recovery/route.ts');
+    globalThis.__launch.user = { userId: 'manager-a', role: 'manager' };
+    Object.assign(globalThis.__launch.env, {
+      RESEND_API_KEY: 'test-only',
+      PROFILE_EMAIL_FROM: 'support@example.com',
+      PUBLIC_SITE_URL: origin,
+    });
+    const version = sql
+      .prepare("SELECT version FROM auth_accounts WHERE id='customer-a'")
+      .get().version;
+    const send = { action: 'send', id: 'customer-a', version, confirmed: true };
+    globalThis.fetch = async () =>
+      Response.json({ error: 'provider-failure' }, { status: 500 });
+    for (let i = 0; i < 3; i++)
+      assert.equal((await post(recovery, send)).status, 502);
+    assert.equal((await post(recovery, send)).status, 429);
+    assert.equal(
+      sql.prepare('SELECT COUNT(*) n FROM auth_recovery').get().n,
+      0,
+    );
+    assert.equal(
+      sql
+        .prepare("SELECT active FROM auth_accounts WHERE id='customer-a'")
+        .get().active,
+      1,
+    );
+    assert.equal(
+      (
+        await recovery.POST(
+          new Request(origin + '/api/account-recovery', {
+            method: 'POST',
+            headers: { origin: 'https://evil.example' },
+            body: JSON.stringify(send),
+          }),
+        )
+      ).status,
+      403,
+    );
+    const accounts = await api('app/api/accounts/route.ts');
+    assert.equal(
+      (await post(accounts, { action: 'invite', id: 'customer-a', version }))
+        .status,
+      422,
+    );
+    const response = await accounts.GET(
+      new Request(origin + '/api/accounts?q=customer-b'),
+    );
+    assert.equal(response.status, 200);
+    const result = await response.json();
+    assert.deepEqual(
+      result.accounts.map((a) => a.id),
+      ['customer-b'],
+    );
+  } finally {
+    globalThis.fetch = original;
+    sql.close();
+  }
+});
