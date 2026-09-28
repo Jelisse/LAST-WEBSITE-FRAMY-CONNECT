@@ -1905,3 +1905,37 @@ test('email reminders send only the current phase and do not resend confirmed de
     sql.close();
   }
 });
+
+test('public www alias redirects without querying customer-domain tables', async () => {
+  const { customDomainRequest } = await api('lib/custom-domain-request.ts');
+  const env = {
+    PUBLIC_SITE_URL: 'https://framyconnect.co.mz',
+    DB: {
+      prepare() {
+        throw new Error('Public aliases must not query D1');
+      },
+    },
+  };
+  for (const path of [
+    '/',
+    '/encomendar/keychain',
+    '/entrar?return_to=%2Fencomendar%2Fkeychain&mode=register',
+  ]) {
+    const response = await customDomainRequest(
+      new Request('https://www.framyconnect.co.mz' + path),
+      env,
+    );
+    assert.equal(response.status, 308);
+    assert.equal(
+      response.headers.get('location'),
+      'https://framyconnect.co.mz' + path,
+    );
+  }
+  const canonical = new Request('https://framyconnect.co.mz/');
+  assert.equal(await customDomainRequest(canonical, env), canonical);
+  const unrelated = new Request('https://www.attacker.test/');
+  await assert.rejects(
+    customDomainRequest(unrelated, env),
+    /must not query D1/,
+  );
+});

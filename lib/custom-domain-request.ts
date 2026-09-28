@@ -11,6 +11,16 @@ export async function customDomainRequest(
   } catch {
     return new Response('Configuração indisponível', { status: 503 });
   }
+  // The public www alias is not a customer-owned profile domain.
+  // Redirect before touching D1, preserving checkout paths and query strings.
+  if (
+    host === 'www.framyconnect.co.mz' &&
+    canonical.hostname === 'framyconnect.co.mz'
+  ) {
+    url.protocol = canonical.protocol;
+    url.host = canonical.host;
+    return Response.redirect(url.toString(), 308);
+  }
   if (
     host === canonical.hostname ||
     host === 'localhost' ||
