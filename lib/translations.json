@@ -6770,5 +6770,81 @@
   "Cada perfil pode pedir consentimento para medir visitas e cliques. O titular recebe contagens agregadas, sem a identidade ou os contactos dos visitantes. Pode recusar ou alterar a escolha no próprio perfil. Os eventos são conservados por até 90 dias.": [
     "Each profile may ask for consent to measure visits and clicks. Its owner receives aggregate counts without visitor identities or contact details. You can decline or change your choice on that profile. Events are retained for up to 90 days.",
     "每個個人檔案均可詢問是否同意統計瀏覽與點擊。擁有者只會收到彙整數量，不包含訪客身分或聯絡資料。您可在該個人檔案拒絕或變更選擇。活動資料最多保留 90 天。"
+  ],
+  "Comparação indisponível": [
+    "Comparison unavailable",
+    "無法比較"
+  ],
+  "Actualiza a cada 30 s": [
+    "Updates every 30 s",
+    "每 30 秒更新"
+  ],
+  "Sessões activas · últimos 5 min": [
+    "Active sessions · last 5 min",
+    "活躍工作階段 · 最近 5 分鐘"
+  ],
+  "Como interpretar os dados": [
+    "How to read the data",
+    "如何解讀資料"
+  ],
+  "Apenas visitas com consentimento · online é uma estimativa": [
+    "Consented visits only · online is an estimate",
+    "僅統計同意的造訪 · 線上人數為估計值"
+  ],
+  "Como é calculado": [
+    "How it is calculated",
+    "計算方式"
+  ],
+  "do início": [
+    "from the start",
+    "佔開始數"
+  ],
+  "não avançaram": [
+    "did not advance",
+    "未繼續"
+  ],
+  "Recolha e limitações": [
+    "Collection and limitations",
+    "收集方式與限制"
+  ],
+  "Checkouts": [
+    "Checkouts",
+    "結帳"
+  ],
+  "Hora de Maputo": [
+    "Maputo time",
+    "馬普托時間"
+  ],
+  "Compra de porta-chaves": [
+    "Keychain checkout",
+    "鑰匙圈結帳"
+  ],
+  "Entrar na conta": [
+    "Sign in",
+    "登入帳號"
+  ],
+  "Candidatura a agente": [
+    "Agent application",
+    "代理申請"
+  ],
+  "Perfil de exemplo": [
+    "Example profile",
+    "個人檔案範例"
+  ],
+  "Compra": [
+    "Purchase",
+    "購買"
+  ],
+  "Telemóvel": [
+    "Mobile",
+    "手機"
+  ],
+  "Computador": [
+    "Desktop",
+    "電腦"
+  ],
+  "Tablet": [
+    "Tablet",
+    "平板電腦"
   ]
 }

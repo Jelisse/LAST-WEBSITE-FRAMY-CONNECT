@@ -8,6 +8,13 @@ import {
   Eye,
   ShoppingBag,
   Clock,
+  FileText,
+  LogIn,
+  Globe,
+  MonitorSmartphone,
+  Megaphone,
+  Radio,
+  MousePointer2,
 } from 'lucide-react';
 import { useI18n } from './language-provider';
 import { csvCell } from '@/lib/site-analytics';
@@ -119,7 +126,7 @@ export function WebsiteAnalytics() {
       data.range.previousStart < data.startedAt ||
       data.range.previousStart < data.updatedAt - 90 * 86400000
     )
-      return t('Sem período anterior completo');
+      return t('Comparação indisponível');
     const before = Number(data.previous[key] || 0),
       now = Number(data.current[key] || 0);
     return before
@@ -165,28 +172,106 @@ export function WebsiteAnalytics() {
     a.click();
     URL.revokeObjectURL(url);
   }
+  function readableLabel(label: string, title: string) {
+    const pages: Record<string, string> = {
+      '/': 'Página inicial',
+      '/produtos': 'Produtos',
+      '/sobre': 'Sobre nós',
+      '/contacto': 'Contacto',
+      '/ajuda': 'Ajuda',
+      '/termos': 'Termos de utilização',
+      '/privacidade': 'Privacidade',
+      '/aplicar': 'Candidatura a agente',
+      '/exemplo': 'Perfil de exemplo',
+      '/entrar': 'Entrar na conta',
+      '/encomendar/keychain': 'Compra de porta-chaves',
+      '/produtos/keychain': 'Porta-chaves NFC',
+    };
+    if (pages[label]) return t(pages[label]);
+    if (label.startsWith('/')) {
+      const parts = label.split('/').filter(Boolean);
+      const prefix =
+        parts[0] === 'encomendar'
+          ? t('Compra')
+          : parts[0] === 'produtos'
+            ? t('Produto')
+            : '';
+      const name = (prefix ? parts.slice(1) : parts)
+        .join(' · ')
+        .replaceAll('-', ' ');
+      return [prefix, name.charAt(0).toUpperCase() + name.slice(1)]
+        .filter(Boolean)
+        .join(' · ');
+    }
+    if (title === 'Dispositivos') {
+      const devices: Record<string, string> = {
+        mobile: 'Telemóvel',
+        desktop: 'Computador',
+        tablet: 'Tablet',
+        unknown: 'Desconhecido',
+      };
+      return t(devices[label] || label);
+    }
+    if (title === 'Países' && /^[A-Z]{2}$/.test(label)) {
+      try {
+        return (
+          new Intl.DisplayNames([t.locale], { type: 'region' }).of(label) ||
+          label
+        );
+      } catch {
+        return label;
+      }
+    }
+    return t(label || 'Sem campanha');
+  }
   function breakdown(title: string, rows: Row[], unit = 'sessões') {
-    const max = Math.max(1, ...rows.map((r) => r.value));
+    const sorted = [...rows].sort((a, b) => b.value - a.value);
+    const max = Math.max(1, ...sorted.map((r) => r.value));
+    const appearance = {
+      'Páginas activas agora': { icon: Radio, tone: 'green' },
+      'Páginas mais visitadas': { icon: FileText, tone: 'orange' },
+      'Páginas de entrada': { icon: LogIn, tone: 'blue' },
+      'Origem das visitas': { icon: MousePointer2, tone: 'purple' },
+      Dispositivos: { icon: MonitorSmartphone, tone: 'blue' },
+      Países: { icon: Globe, tone: 'green' },
+      Campanhas: { icon: Megaphone, tone: 'purple' },
+    }[title] || { icon: FileText, tone: 'orange' };
+    const Icon = appearance.icon;
     return (
-      <section className="wa-card">
-        <h3>{t(title)}</h3>
-        <small>{t(unit)}</small>
-        {!rows.length ? (
-          <p className="wa-empty">{t('Ainda sem dados neste período.')}</p>
+      <section className="wa-card wa-breakdown" data-tone={appearance.tone}>
+        <div className="wa-card-heading">
+          <h3>
+            <span className="wa-category-icon">
+              <Icon size={16} aria-hidden="true" />
+            </span>
+            {t(title)}
+          </h3>
+          <small>{t(unit)}</small>
+        </div>
+        {!sorted.length ? (
+          <div className="wa-empty-state">
+            <Icon size={22} aria-hidden="true" />
+            <p>{t('Ainda sem dados neste período.')}</p>
+          </div>
         ) : (
-          <ul className="wa-ranking">
-            {rows.map((r) => (
+          <ol className="wa-ranking">
+            {sorted.map((r, index) => (
               <li key={r.label}>
-                <div>
-                  <span>{t(r.label || 'Sem campanha')}</span>
-                  <strong>{fmt(r.value)}</strong>
-                </div>
-                <div className="wa-track">
-                  <span style={{ width: (100 * r.value) / max + '%' }} />
+                <span className="wa-rank-number" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div className="wa-rank-content">
+                  <div className="wa-rank-label">
+                    <span title={r.label}>{readableLabel(r.label, title)}</span>
+                    <strong>{fmt(r.value)}</strong>
+                  </div>
+                  <div className="wa-track" aria-hidden="true">
+                    <span style={{ width: (100 * r.value) / max + '%' }} />
+                  </div>
                 </div>
               </li>
             ))}
-          </ul>
+          </ol>
         )}
       </section>
     );
@@ -215,6 +300,10 @@ export function WebsiteAnalytics() {
             <button
               type="button"
               key={label}
+              aria-pressed={
+                range.from === dayAt(n === 0 ? 1 : Number(n) - 1) &&
+                range.to === dayAt(n === 0 ? 1 : 0)
+              }
               onClick={() => preset(Number(n) || 1, n === 0)}
             >
               {t(String(label))}
@@ -254,6 +343,9 @@ export function WebsiteAnalytics() {
         </form>
         <button
           type="button"
+          className="wa-refresh"
+          title={t('Actualizar')}
+          aria-label={t('Actualizar')}
           onClick={() => setRefresh((v) => v + 1)}
           disabled={loading}
         >
@@ -289,10 +381,16 @@ export function WebsiteAnalytics() {
           <div className="wa-meta">
             <span>
               <Activity size={14} />
-              {t('Actualização a cada 30 segundos')}
+              {t('Actualiza a cada 30 s')}
             </span>
             <span>
-              {t('Última leitura')}: {time(data.updatedAt)} · Africa/Maputo
+              {t('Última leitura')}:{' '}
+              {new Date(data.updatedAt).toLocaleTimeString(t.locale, {
+                timeZone: 'Africa/Maputo',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}{' '}
+              · {t('Hora de Maputo')}
             </span>
           </div>
           <div className="wa-metrics">
@@ -302,16 +400,12 @@ export function WebsiteAnalytics() {
                 {t('Online agora')}
               </span>
               <strong>{fmt(active)}</strong>
-              <small>
-                {t(
-                  'Sessões com página visível nos últimos 5 minutos; estimativa, não pessoas exactas.',
-                )}
-              </small>
+              <small>{t('Sessões activas · últimos 5 min')}</small>
             </section>
             <section className="wa-card">
               <span>
                 <Users size={16} />
-                {t('Sessões observadas')}
+                {t('Sessões')}
               </span>
               <strong>{fmt(data.current.sessions)}</strong>
               <small>{compare('sessions')}</small>
@@ -327,17 +421,27 @@ export function WebsiteAnalytics() {
             <section className="wa-card">
               <span>
                 <ShoppingBag size={16} />
-                {t('Checkouts observados')}
+                {t('Checkouts')}
               </span>
               <strong>{fmt(data.current.checkouts)}</strong>
               <small>{compare('checkouts')}</small>
             </section>
           </div>
-          <p className="wa-note">
-            {t(
-              'Apenas visitas com estatísticas permitidas. Uma sessão termina após 30 minutos sem actividade. A equipa e bots identificados são excluídos. Não representa todas as visitas nem pessoas únicas.',
-            )}
-          </p>
+          <details className="wa-note wa-method">
+            <summary>
+              {t('Como interpretar os dados')}
+              <span>
+                {t(
+                  'Apenas visitas com consentimento · online é uma estimativa',
+                )}
+              </span>
+            </summary>
+            <p>
+              {t(
+                'Apenas visitas com estatísticas permitidas. Uma sessão termina após 30 minutos sem actividade. A equipa e bots identificados são excluídos. Não representa todas as visitas nem pessoas únicas.',
+              )}
+            </p>
+          </details>
           <div className="wa-grid">
             <section className="wa-card wa-wide">
               <h3>{t('Evolução do tráfego')}</h3>
@@ -378,7 +482,7 @@ export function WebsiteAnalytics() {
                                     1,
                                     ...data.daily.map((r) => r.views),
                                   )) *
-                                  140,
+                                  100,
                               ) + 'px',
                           }}
                         />
@@ -493,13 +597,16 @@ export function WebsiteAnalytics() {
               })),
             )}
             {breakdown('Campanhas', data.campaigns)}
-            <section className="wa-card wa-wide">
+            <section className="wa-card wa-full wa-purchase">
               <h3>{t('Percurso de compra')}</h3>
-              <p>
-                {t(
-                  'Percursos por sessão e produto iniciados no período, com etapas observadas por ordem. Percursos retomados de períodos anteriores e visitas sem consentimento não entram neste funil.',
-                )}
-              </p>
+              <details className="wa-context">
+                <summary>{t('Como é calculado')}</summary>
+                <p>
+                  {t(
+                    'Percursos por sessão e produto iniciados no período, com etapas observadas por ordem. Percursos retomados de períodos anteriores e visitas sem consentimento não entram neste funil.',
+                  )}
+                </p>
+              </details>
               <ol className="wa-funnel">
                 {stageNames.map((name, i) => {
                   const n = data.funnel['s' + i] || 0;
@@ -513,12 +620,11 @@ export function WebsiteAnalytics() {
                       <strong>{fmt(n)}</strong>
                       <small>
                         {base ? Math.round((n / base) * 100) + '%' : '—'}{' '}
-                        {t('dos percursos iniciados')}
+                        {t('do início')}
                       </small>
                       {i > 0 && (
                         <small>
-                          {fmt(prior - n)}{' '}
-                          {t('não avançaram da etapa anterior')}
+                          {fmt(prior - n)} {t('não avançaram')}
                         </small>
                       )}
                     </li>
@@ -561,7 +667,7 @@ export function WebsiteAnalytics() {
                 )}
               </small>
             </section>
-            <section className="wa-card wa-wide">
+            <section className="wa-card wa-full wa-performance">
               <h3>{t('Velocidade e fiabilidade')}</h3>
               <div className="wa-order-stats">
                 <p>
@@ -599,12 +705,15 @@ export function WebsiteAnalytics() {
               </small>
             </section>
           </div>
-          <footer className="wa-note">
-            {t('Recolha disponível desde')}: {time(data.startedAt)}.{' '}
-            {t(
-              'Retenção máxima: 90 dias. Dados anteriores ao início da recolha não são reconstruídos. Visitantes recorrentes e tempo de envolvimento: indisponíveis, para evitar identificação persistente ou estimativas enganosas.',
-            )}
-          </footer>
+          <details className="wa-note wa-method">
+            <summary>{t('Recolha e limitações')}</summary>
+            <p>
+              {t('Recolha disponível desde')}: {time(data.startedAt)}.{' '}
+              {t(
+                'Retenção máxima: 90 dias. Dados anteriores ao início da recolha não são reconstruídos. Visitantes recorrentes e tempo de envolvimento: indisponíveis, para evitar identificação persistente ou estimativas enganosas.',
+              )}
+            </p>
+          </details>
         </>
       )}
     </div>

@@ -1,51 +1,52 @@
 .website-analytics {
   display: grid;
-  gap: 18px;
+  gap: 12px;
   color: #342c27;
 }
-.wa-toolbar,
-.wa-toolbar form,
-.wa-presets {
+.website-analytics .wa-toolbar,
+.website-analytics .wa-toolbar form,
+.website-analytics .wa-presets {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
 }
-.wa-toolbar {
-  padding: 16px;
+.website-analytics .wa-toolbar {
+  padding: 10px;
   background: white;
   border: 1px solid #eadfd7;
   border-radius: 14px;
 }
-.wa-toolbar label {
+.website-analytics .wa-toolbar label {
   display: grid;
   font-size: 11px;
   gap: 4px;
 }
-.wa-toolbar button,
-.wa-toolbar input {
+.website-analytics .wa-toolbar button,
+.website-analytics .wa-toolbar input {
   border: 1px solid #ded1c7;
   border-radius: 8px;
-  padding: 9px 12px;
+  padding: 7px 10px;
   background: #fffaf6;
   color: #603a25;
-  min-height: 40px;
+  min-height: 36px;
   font: inherit;
+  font-size: 12px;
 }
-.wa-toolbar button {
+.website-analytics .wa-toolbar button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
 }
-.wa-toolbar button:disabled {
+.website-analytics .wa-toolbar button:disabled {
   opacity: 0.5;
   cursor: wait;
 }
-.wa-toolbar form {
+.website-analytics .wa-toolbar form {
   margin-inline: auto;
 }
-.wa-meta {
+.website-analytics .wa-meta {
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -53,118 +54,118 @@
   font-size: 11px;
   color: #78675c;
 }
-.wa-meta span,
-.wa-card h3,
-.wa-metrics .wa-card > span {
+.website-analytics .wa-meta span,
+.website-analytics .wa-card h3,
+.website-analytics .wa-metrics .wa-card > span {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.wa-metrics {
+.website-analytics .wa-metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  gap: 10px;
 }
-.wa-card {
+.website-analytics .wa-card {
   min-width: 0;
-  padding: 24px;
+  padding: 16px;
   border: 1px solid #eadfd7;
-  border-radius: 16px;
+  border-radius: 12px;
   background: #fff;
 }
-.wa-card h3 {
+.website-analytics .wa-card h3 {
   font-size: 16px;
   font-weight: 500;
   margin: 0 0 8px;
 }
-.wa-card p,
-.wa-card small {
+.website-analytics .wa-card p,
+.website-analytics .wa-card small {
   color: #77665a;
   line-height: 1.6;
 }
-.wa-card p {
+.website-analytics .wa-card p {
   font-size: 12px;
 }
-.wa-card small {
+.website-analytics .wa-card small {
   font-size: 11px;
 }
-.wa-metrics .wa-card > strong {
+.website-analytics .wa-metrics .wa-card > strong {
   display: block;
-  font-size: 36px;
+  font-size: 30px;
   font-weight: 500;
   letter-spacing: -0.04em;
-  margin: 12px 0 4px;
+  margin: 4px 0 2px;
 }
-.wa-live {
+.website-analytics .wa-live {
   background: #fff5eb;
   border-color: #e6bda0;
 }
-.wa-dot {
+.website-analytics .wa-dot {
   height: 8px;
   width: 8px;
   background: #318454;
   border-radius: 50%;
 }
-.wa-note {
+.website-analytics .wa-note {
   font-size: 11px;
   color: #766457;
   line-height: 1.7;
   margin: 0;
 }
-.wa-grid {
+.website-analytics .wa-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 12px;
 }
-.wa-wide {
+.website-analytics .wa-wide {
   grid-column: span 2;
 }
-.wa-ranking {
+.website-analytics .wa-ranking {
   list-style: none;
   padding: 0;
-  margin: 20px 0 0;
+  margin: 12px 0 0;
   display: grid;
-  gap: 15px;
+  gap: 10px;
 }
-.wa-ranking li > div:first-child {
+.website-analytics .wa-ranking li > div:first-child {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   font-size: 12px;
 }
-.wa-ranking li span {
+.website-analytics .wa-ranking li span {
   overflow-wrap: anywhere;
 }
-.wa-ranking strong {
+.website-analytics .wa-ranking strong {
   font-weight: 500;
 }
-.wa-track {
+.website-analytics .wa-track {
   height: 5px;
   background: #f7eee6;
   border-radius: 6px;
   margin-top: 7px;
   overflow: hidden;
 }
-.wa-track span {
+.website-analytics .wa-track span {
   display: block;
   height: 100%;
   background: #bf582c;
   border-radius: 6px;
 }
-.wa-empty {
-  padding-block: 22px;
+.website-analytics .wa-empty {
+  padding-block: 10px;
 }
-.wa-daily {
+.website-analytics .wa-daily {
   display: flex;
   align-items: end;
   gap: 6px;
-  height: 180px;
+  height: 134px;
   overflow-x: auto;
-  margin: 16px 0;
+  margin: 10px 0;
 }
-.wa-daily > div {
+.website-analytics .wa-daily > div {
   flex: 1;
-  min-width: 18px;
+  min-width: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -172,113 +173,505 @@
   gap: 6px;
   height: 100%;
 }
-.wa-daily span {
+.website-analytics .wa-daily span {
   display: block;
   background: #be572c;
   min-width: 12px;
   width: 85%;
   border-radius: 5px 5px 0 0;
 }
-.wa-card details summary {
+.website-analytics .wa-card details summary {
   cursor: pointer;
   font-size: 12px;
   color: #99441d;
   padding-block: 8px;
 }
-.wa-card table {
+.website-analytics .wa-card table {
   width: 100%;
   font-size: 11px;
   border-collapse: separate;
   border-spacing: 3px;
 }
-.wa-card th,
-.wa-card td {
+.website-analytics .wa-card th,
+.website-analytics .wa-card td {
   padding: 5px;
   text-align: left;
 }
-.wa-heat-scroll {
+.website-analytics .wa-heat-scroll {
   overflow: auto;
   margin-top: 16px;
 }
-.wa-heat {
-  min-width: 650px;
+.website-analytics .wa-heat {
+  min-width: 540px;
 }
-.wa-card .wa-heat td {
+.website-analytics .wa-card .wa-heat td {
   text-align: center;
   border-radius: 4px;
   font-size: 10px;
 }
-.wa-heat th {
+.website-analytics .wa-heat th {
   color: #766457;
   font-weight: 400;
 }
-.wa-funnel {
+.website-analytics .wa-funnel {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   list-style: none;
   padding: 0;
-  margin: 20px 0;
+  margin: 12px 0;
 }
-.wa-funnel li {
+.website-analytics .wa-funnel li {
   background: #fff7ef;
   border: 1px solid #eed9c8;
   border-radius: 10px;
-  padding: 14px;
+  padding: 10px;
   display: grid;
   gap: 6px;
   font-size: 12px;
 }
-.wa-funnel strong {
-  font-size: 25px;
+.website-analytics .wa-funnel strong {
+  font-size: 24px;
   font-weight: 500;
 }
-.wa-order-stats {
+.website-analytics .wa-order-stats {
   display: flex;
-  gap: 24px;
+  gap: 16px;
   flex-wrap: wrap;
   border-top: 1px solid #eee4dc;
-  padding-top: 14px;
-  margin-top: 18px;
+  padding-top: 10px;
+  margin-top: 12px;
 }
-.wa-order-stats p {
+.website-analytics .wa-order-stats p {
   display: grid;
   gap: 5px;
   flex: 1;
   min-width: 130px;
 }
-.wa-order-stats strong {
-  font-size: 26px;
+.website-analytics .wa-order-stats strong {
+  font-size: 24px;
   font-weight: 500;
   color: #433227;
 }
 @media (max-width: 1100px) {
-  .wa-metrics {
+  .website-analytics .wa-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .wa-grid {
+  .website-analytics .wa-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 650px) {
-  .wa-grid,
-  .wa-metrics {
+  .website-analytics .wa-grid,
+  .website-analytics .wa-metrics {
     grid-template-columns: minmax(0, 1fr);
   }
-  .wa-wide {
+  .website-analytics .wa-wide {
     grid-column: auto;
   }
-  .wa-card {
+  .website-analytics .wa-card {
     padding: 18px;
   }
-  .wa-funnel {
+  .website-analytics .wa-funnel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .wa-toolbar form {
+  .website-analytics .wa-toolbar form {
     margin-inline: 0;
     width: 100%;
   }
-  .wa-toolbar input {
+  .website-analytics .wa-toolbar input {
     max-width: 145px;
+  }
+}
+
+/* Keep analytics density independent of the larger manager workspace controls. */
+.website-analytics {
+  font-size: 13px;
+  line-height: 1.45;
+}
+.website-analytics .wa-toolbar {
+  gap: 10px;
+}
+.website-analytics .wa-presets {
+  gap: 2px;
+  padding: 3px;
+  background: #f6f3f0;
+  border-radius: 9px;
+}
+.website-analytics .wa-presets button {
+  border-color: transparent;
+  background: transparent;
+  padding-inline: 10px;
+}
+.website-analytics .wa-presets button[aria-pressed='true'] {
+  background: #fff;
+  color: #b83b09;
+  border-color: #e9d4c6;
+  box-shadow: 0 1px 3px #4226120c;
+}
+.website-analytics .wa-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.website-analytics .wa-toolbar input {
+  width: 137px;
+  min-width: 0;
+  background: #fff;
+}
+.website-analytics .wa-toolbar button {
+  white-space: nowrap;
+  font-weight: 500;
+}
+.website-analytics .wa-toolbar button:hover:not(:disabled) {
+  background: #fff0e5;
+  border-color: #d88c60;
+}
+.website-analytics .wa-toolbar button:focus-visible,
+.website-analytics .wa-toolbar input:focus-visible,
+.website-analytics summary:focus-visible,
+.website-analytics .wa-heat td:focus-visible {
+  outline: 2px solid #b83b09;
+  outline-offset: 3px;
+}
+.website-analytics .wa-toolbar button.wa-refresh {
+  font-size: 0;
+  gap: 0;
+  width: 36px;
+  justify-content: center;
+}
+.website-analytics .wa-toolbar svg {
+  flex-shrink: 0;
+}
+.website-analytics .wa-meta {
+  font-size: 11px;
+  padding-inline: 2px;
+}
+.website-analytics .wa-card > p {
+  margin: 4px 0 10px;
+}
+.website-analytics .wa-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.website-analytics .wa-card-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.website-analytics .wa-card-heading h3 {
+  margin: 0;
+}
+.website-analytics .wa-card-heading small {
+  flex-shrink: 0;
+}
+.website-analytics .wa-metrics .wa-card {
+  padding: 12px 16px;
+  border-radius: 12px;
+}
+.website-analytics .wa-metrics .wa-card > span {
+  font-size: 12px;
+  gap: 6px;
+  color: #6d5b4f;
+}
+.website-analytics .wa-metrics .wa-card > strong {
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+.website-analytics .wa-metrics .wa-card > small {
+  display: block;
+  line-height: 1.4;
+  font-size: 11px;
+}
+.website-analytics .wa-live {
+  background: #fff7f0;
+}
+.website-analytics .wa-live > strong {
+  color: #a43a13;
+}
+.website-analytics .wa-dot {
+  flex: 0 0 7px;
+  height: 7px;
+  box-shadow: 0 0 0 3px #31845412;
+}
+.website-analytics .wa-method {
+  border-bottom: 1px solid #e8e0da;
+  padding: 0 2px 10px;
+}
+.website-analytics .wa-method summary {
+  cursor: pointer;
+  color: #695549;
+  font-size: 11px;
+}
+.website-analytics .wa-method summary span {
+  margin-left: 12px;
+  color: #807166;
+}
+.website-analytics .wa-method p {
+  margin: 8px 0 0;
+  max-width: 100ch;
+}
+.website-analytics .wa-ranking {
+  max-height: 210px;
+  overflow: auto;
+  padding-right: 3px;
+}
+.website-analytics .wa-track {
+  height: 3px;
+  margin-top: 4px;
+}
+.website-analytics .wa-track span,
+.website-analytics .wa-daily span {
+  background: #c75425;
+}
+.website-analytics .wa-daily {
+  gap: 4px;
+  border-bottom: 1px solid #eee4dc;
+}
+.website-analytics .wa-daily span {
+  min-width: 6px;
+  max-width: 42px;
+}
+.website-analytics .wa-full {
+  grid-column: 1 / -1;
+}
+.website-analytics .wa-funnel {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+.website-analytics .wa-funnel li {
+  background: #fffaf6;
+  gap: 3px;
+  min-width: 0;
+}
+.website-analytics .wa-funnel li > span {
+  font-weight: 500;
+  color: #6d4b36;
+}
+.website-analytics .wa-funnel small {
+  line-height: 1.4;
+}
+.website-analytics .wa-order-stats p {
+  margin: 0;
+  gap: 2px;
+}
+.website-analytics .wa-order-stats {
+  margin-bottom: 10px;
+}
+.website-analytics .wa-performance .wa-order-stats {
+  max-width: 620px;
+  border-top: 0;
+  padding-top: 0;
+}
+.website-analytics .wa-card .wa-context summary {
+  padding: 0;
+  font-size: 11px;
+  color: #78675c;
+}
+.website-analytics .wa-heat-scroll {
+  margin-top: 10px;
+}
+.website-analytics .wa-card .wa-heat th,
+.website-analytics .wa-card .wa-heat td {
+  padding: 3px;
+}
+.website-analytics .wa-card details:not(.wa-context) {
+  overflow-x: auto;
+}
+@media (max-width: 1100px) {
+  .website-analytics .wa-funnel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .website-analytics .wa-toolbar form {
+    margin-inline: 0;
+  }
+}
+@media (max-width: 650px) {
+  .website-analytics .wa-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .website-analytics .wa-metrics .wa-card {
+    padding: 12px;
+  }
+  .website-analytics .wa-metrics .wa-card > strong {
+    font-size: 28px;
+  }
+  .website-analytics .wa-metrics .wa-card > span {
+    font-size: 11px;
+  }
+  .website-analytics .wa-card {
+    padding: 14px;
+  }
+  .website-analytics .wa-toolbar {
+    gap: 8px;
+  }
+  .website-analytics .wa-presets {
+    flex: 1 0 100%;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+  .website-analytics .wa-toolbar form {
+    order: 3;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 6px;
+  }
+  .website-analytics .wa-toolbar label {
+    display: grid;
+    min-width: 0;
+  }
+  .website-analytics .wa-toolbar input {
+    width: 100%;
+    max-width: none;
+    padding-inline: 5px;
+    box-sizing: border-box;
+  }
+  .website-analytics .wa-toolbar form button {
+    align-self: end;
+  }
+  .website-analytics .wa-toolbar button,
+  .website-analytics .wa-toolbar input {
+    min-height: 40px;
+  }
+  .website-analytics .wa-toolbar button.wa-refresh {
+    width: 40px;
+  }
+  .website-analytics .wa-method summary span {
+    display: block;
+    margin: 4px 0 0;
+  }
+  .website-analytics .wa-funnel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .website-analytics .wa-order-stats {
+    gap: 12px;
+  }
+}
+
+/* Editorial rankings: readable names, aligned values, restrained category colour. */
+.website-analytics .wa-breakdown {
+  --wa-accent: #bf4b20;
+  --wa-tint: #fff1e8;
+  background: linear-gradient(135deg, #fffcfa, #fff 55%);
+}
+.website-analytics .wa-breakdown[data-tone='blue'] {
+  --wa-accent: #437393;
+  --wa-tint: #eef5fa;
+}
+.website-analytics .wa-breakdown[data-tone='green'] {
+  --wa-accent: #34765d;
+  --wa-tint: #edf7f1;
+}
+.website-analytics .wa-breakdown[data-tone='purple'] {
+  --wa-accent: #796192;
+  --wa-tint: #f4f0f8;
+}
+.website-analytics .wa-category-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: var(--wa-accent);
+  background: var(--wa-tint);
+}
+.website-analytics .wa-breakdown .wa-card-heading {
+  align-items: center;
+  gap: 10px;
+}
+.website-analytics .wa-breakdown .wa-card-heading h3 {
+  gap: 9px;
+  font-size: 13px;
+}
+.website-analytics .wa-breakdown .wa-card-heading > small {
+  font-size: 10px;
+}
+.website-analytics .wa-ranking {
+  margin-top: 14px;
+  gap: 0;
+  max-height: 240px;
+}
+.website-analytics .wa-ranking li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3eeea;
+}
+.website-analytics .wa-ranking li:last-child {
+  border-bottom: 0;
+  padding-bottom: 2px;
+}
+.website-analytics .wa-rank-number {
+  flex: 0 0 25px;
+  color: #9b8b80;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.website-analytics .wa-ranking li:first-child .wa-rank-number {
+  color: var(--wa-accent);
+  font-weight: 600;
+}
+.website-analytics .wa-rank-content {
+  flex: 1;
+  min-width: 0;
+}
+.website-analytics .wa-rank-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+.website-analytics .wa-rank-label > span {
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+.website-analytics .wa-rank-label strong {
+  flex-shrink: 0;
+  min-width: 32px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--wa-tint);
+  color: var(--wa-accent);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.website-analytics .wa-breakdown .wa-track {
+  margin-top: 7px;
+  background: #f5f0ec;
+  height: 3px;
+}
+.website-analytics .wa-breakdown .wa-track span {
+  background: var(--wa-accent);
+  opacity: 0.85;
+}
+.website-analytics .wa-empty-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 4px 12px;
+  color: var(--wa-accent);
+}
+.website-analytics .wa-empty-state p {
+  margin: 0;
+  font-size: 12px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .website-analytics .wa-breakdown {
+    transition:
+      border-color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+  .website-analytics .wa-breakdown:hover {
+    border-color: #dbc9bc;
+    box-shadow: 0 4px 16px #50321b06;
   }
 }
