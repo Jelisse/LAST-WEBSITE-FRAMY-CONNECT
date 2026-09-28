@@ -6846,5 +6846,73 @@
   "Tablet": [
     "Tablet",
     "平板電腦"
+  ],
+  "Actividade em tempo real": [
+    "Real-time activity",
+    "即時活動"
+  ],
+  "Ver páginas activas": [
+    "View active pages",
+    "查看活躍頁面"
+  ],
+  "Nenhuma sessão activa neste momento.": [
+    "No active sessions right now.",
+    "目前沒有活躍工作階段。"
+  ],
+  "Vista do tráfego": [
+    "Traffic view",
+    "流量檢視"
+  ],
+  "Gráfico": [
+    "Chart",
+    "圖表"
+  ],
+  "Tabela": [
+    "Table",
+    "表格"
+  ],
+  "Dados do tráfego": [
+    "Traffic data",
+    "流量資料"
+  ],
+  "Visualizações e sessões por dia": [
+    "Daily page views and sessions",
+    "每日瀏覽量及工作階段"
+  ],
+  "Visualizações e sessões · hora de Maputo": [
+    "Page views and sessions · Maputo time",
+    "瀏覽量及工作階段 · 馬普托時間"
+  ],
+  "Distribuição das sessões por dispositivo": [
+    "Session distribution by device",
+    "各裝置的工作階段分佈"
+  ],
+  "Outros resultados": [
+    "Other results",
+    "其他結果"
+  ],
+  "no período": [
+    "in period",
+    "期間內"
+  ],
+  "Dos resultados apresentados": [
+    "Of the results shown",
+    "佔所示結果"
+  ],
+  "As percentagens usam apenas os resultados apresentados neste cartão, que podem não incluir todo o tráfego.": [
+    "Percentages use only the results shown in this card, which may not include all traffic.",
+    "百分比僅以此卡片所示結果計算，可能不包含所有流量。"
+  ],
+  "Subtotal": [
+    "Subtotal",
+    "小計"
+  ],
+  "Subtotal apresentado": [
+    "Subtotal shown",
+    "所示小計"
+  ],
+  "Sobre estas medições": [
+    "About these measurements",
+    "關於這些測量"
   ]
 }

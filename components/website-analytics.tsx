@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable jsx-a11y/prefer-tag-over-role -- Inline SVG charts use role=img and accessible labels; replacing them with img would discard vector content. */
 import { useEffect, useState } from 'react';
 import {
   Activity,
@@ -13,7 +14,6 @@ import {
   Globe,
   MonitorSmartphone,
   Megaphone,
-  Radio,
   MousePointer2,
 } from 'lucide-react';
 import { useI18n } from './language-provider';
@@ -61,6 +61,8 @@ export function WebsiteAnalytics() {
   const { t } = useI18n();
   const [range, setRange] = useState({ from: dayAt(6), to: dayAt() });
   const [draft, setDraft] = useState(range);
+  const [selectedDay, setSelectedDay] = useState('');
+  const [trafficView, setTrafficView] = useState<'chart' | 'table'>('chart');
   const [data, setData] = useState<Report | null>(null),
     [error, setError] = useState(''),
     [loading, setLoading] = useState(false),
@@ -225,10 +227,22 @@ export function WebsiteAnalytics() {
     return t(label || 'Sem campanha');
   }
   function breakdown(title: string, rows: Row[], unit = 'sessões') {
-    const sorted = [...rows].sort((a, b) => b.value - a.value);
-    const max = Math.max(1, ...sorted.map((r) => r.value));
+    const sorted = [...rows]
+      .filter((row) => row.value > 0)
+      .sort((a, b) => b.value - a.value);
+    const total = sorted.reduce((sum, row) => sum + row.value, 0);
+    const segments =
+      sorted.length > 5
+        ? [
+            ...sorted.slice(0, 4),
+            {
+              label: 'Outros resultados',
+              value: sorted.slice(4).reduce((sum, row) => sum + row.value, 0),
+            },
+          ]
+        : sorted;
+    const colours = ['#bf4b20', '#437393', '#34765d', '#796192', '#a18c77'];
     const appearance = {
-      'Páginas activas agora': { icon: Radio, tone: 'green' },
       'Páginas mais visitadas': { icon: FileText, tone: 'orange' },
       'Páginas de entrada': { icon: LogIn, tone: 'blue' },
       'Origem das visitas': { icon: MousePointer2, tone: 'purple' },
@@ -237,8 +251,73 @@ export function WebsiteAnalytics() {
       Campanhas: { icon: Megaphone, tone: 'purple' },
     }[title] || { icon: FileText, tone: 'orange' };
     const Icon = appearance.icon;
+    const isRanking =
+      [
+        'Páginas mais visitadas',
+        'Páginas de entrada',
+        'Países',
+        'Campanhas',
+      ].includes(title) ||
+      (title === 'Origem das visitas' && sorted.length > 5);
+    if (!total)
+      return (
+        <section className="wa-card wa-empty-compact" aria-label={t(title)}>
+          <Icon size={18} aria-hidden="true" />
+          <h3>{t(title)}</h3>
+          <p>{t('Ainda sem dados neste período.')}</p>
+        </section>
+      );
+    if (isRanking)
+      return (
+        <section
+          className="wa-card wa-breakdown wa-ranking-card"
+          data-tone={appearance.tone}
+        >
+          <div className="wa-card-heading">
+            <h3>
+              <span className="wa-category-icon">
+                <Icon size={16} aria-hidden="true" />
+              </span>
+              {t(title)}
+            </h3>
+            <small>{t(unit)}</small>
+          </div>
+          <ol className="wa-ranking">
+            {sorted.map((row, index) => (
+              <li key={row.label}>
+                <span className="wa-rank-number" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div className="wa-rank-content">
+                  <div className="wa-rank-label">
+                    <span title={row.label}>
+                      {readableLabel(row.label, title)}
+                    </span>
+                    <strong>{fmt(row.value)}</strong>
+                  </div>
+                  <div className="wa-track" aria-hidden="true">
+                    <span
+                      style={{
+                        width: `${(100 * row.value) / sorted[0].value}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      );
+    let offset = 0;
+    const percent = (value: number) =>
+      ((100 * value) / total).toLocaleString(t.locale, {
+        maximumFractionDigits: 1,
+      }) + '%';
     return (
-      <section className="wa-card wa-breakdown" data-tone={appearance.tone}>
+      <section
+        className="wa-card wa-breakdown wa-distribution"
+        data-tone={appearance.tone}
+      >
         <div className="wa-card-heading">
           <h3>
             <span className="wa-category-icon">
@@ -248,32 +327,276 @@ export function WebsiteAnalytics() {
           </h3>
           <small>{t(unit)}</small>
         </div>
-        {!sorted.length ? (
-          <div className="wa-empty-state">
-            <Icon size={22} aria-hidden="true" />
+        {!total ? (
+          <div className="wa-distribution-empty">
+            <div className="wa-empty-ring" aria-hidden="true">
+              <Icon size={22} />
+            </div>
             <p>{t('Ainda sem dados neste período.')}</p>
           </div>
         ) : (
-          <ol className="wa-ranking">
-            {sorted.map((r, index) => (
-              <li key={r.label}>
-                <span className="wa-rank-number" aria-hidden="true">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <div className="wa-rank-content">
-                  <div className="wa-rank-label">
-                    <span title={r.label}>{readableLabel(r.label, title)}</span>
-                    <strong>{fmt(r.value)}</strong>
-                  </div>
-                  <div className="wa-track" aria-hidden="true">
-                    <span style={{ width: (100 * r.value) / max + '%' }} />
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <>
+            <div className="wa-distribution-body">
+              <svg
+                className="wa-donut"
+                viewBox="0 0 120 120"
+                role="img"
+                aria-label={`${t(title)} · ${fmt(total)} ${t(unit)}`}
+              >
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="44"
+                  fill="none"
+                  stroke="#f2ebe5"
+                  strokeWidth="14"
+                />
+                {segments.map((row, index) => {
+                  const share = (100 * row.value) / total;
+                  const start = offset;
+                  offset += share;
+                  return (
+                    <circle
+                      key={index}
+                      cx="60"
+                      cy="60"
+                      r="44"
+                      fill="none"
+                      stroke={colours[index]}
+                      strokeWidth="14"
+                      pathLength="100"
+                      strokeDasharray={`${share} ${100 - share}`}
+                      strokeDashoffset={-start}
+                      transform="rotate(-90 60 60)"
+                    >
+                      <title>{`${readableLabel(row.label, title)} · ${fmt(row.value)} · ${percent(row.value)}`}</title>
+                    </circle>
+                  );
+                })}
+                <text
+                  x="60"
+                  y="59"
+                  textAnchor="middle"
+                  className="wa-donut-total"
+                  style={{ fontSize: fmt(total).length > 6 ? 15 : 22 }}
+                >
+                  {fmt(total)}
+                </text>
+                <text
+                  x="60"
+                  y="76"
+                  textAnchor="middle"
+                  className="wa-axis-label"
+                >
+                  {t('Subtotal')}
+                </text>
+              </svg>
+              <ol className="wa-distribution-legend">
+                {segments.map((row, index) => (
+                  <li key={index}>
+                    <i
+                      style={{ background: colours[index] }}
+                      aria-hidden="true"
+                    />
+                    <span className="wa-distribution-label" title={row.label}>
+                      {readableLabel(row.label, title)}
+                      <small>
+                        {fmt(row.value)} {t(unit)}
+                      </small>
+                    </span>
+                    <strong>{percent(row.value)}</strong>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div className="wa-distribution-footer">
+              <span
+                title={t(
+                  'As percentagens usam apenas os resultados apresentados neste cartão, que podem não incluir todo o tráfego.',
+                )}
+              >
+                {t('Subtotal apresentado')}
+              </span>
+              {sorted.length > 5 && (
+                <details>
+                  <summary>{t('Ver todos')}</summary>
+                  <ol>
+                    {sorted.map((row) => (
+                      <li key={row.label}>
+                        <span>{readableLabel(row.label, title)}</span>
+                        <strong>{fmt(row.value)}</strong>
+                      </li>
+                    ))}
+                  </ol>
+                </details>
+              )}
+            </div>
+          </>
         )}
       </section>
+    );
+  }
+  const traffic = data
+    ? Array.from(
+        {
+          length:
+            Math.round(
+              (Date.parse(data.range.to) - Date.parse(data.range.from)) /
+                86400000,
+            ) + 1,
+        },
+        (_, index) => {
+          const label = new Date(Date.parse(data.range.from) + index * 86400000)
+            .toISOString()
+            .slice(0, 10);
+          const day = data.daily.find((row) => row.label === label);
+          return {
+            label,
+            views: day?.views || 0,
+            sessions: day?.sessions || 0,
+          };
+        },
+      )
+    : [];
+  const selectedTraffic =
+    traffic.find((row) => row.label === selectedDay) ||
+    traffic[traffic.length - 1];
+  const chartMax = Math.max(
+    2,
+    Math.ceil(
+      Math.max(0, ...traffic.flatMap((row) => [row.views, row.sessions])) / 2,
+    ) * 2,
+  );
+  const chartX = (index: number) =>
+    traffic.length === 1
+      ? 330
+      : 40 + (index * 580) / Math.max(1, traffic.length - 1);
+  const chartY = (value: number) => 122 - (value / chartMax) * 100;
+  const shortDate = (value: string) =>
+    new Date(value + 'T12:00:00Z').toLocaleDateString(t.locale, {
+      day: '2-digit',
+      month: 'short',
+      timeZone: 'Africa/Maputo',
+    });
+  function trafficChart() {
+    if (!selectedTraffic) return null;
+    return (
+      <figure className="wa-trend">
+        <div className="wa-chart-legend">
+          <span>
+            <i className="wa-series-views" />
+            {t('Visualizações')}
+          </span>
+          <span>
+            <i className="wa-series-sessions" />
+            {t('Sessões')}
+          </span>
+        </div>
+        <svg
+          viewBox="0 0 640 152"
+          role="img"
+          aria-label={t('Visualizações e sessões por dia')}
+        >
+          {[0, 0.5, 1].map((ratio) => (
+            <g key={ratio}>
+              <line
+                x1="40"
+                x2="620"
+                y1={chartY(chartMax * ratio)}
+                y2={chartY(chartMax * ratio)}
+                stroke="#ebe5df"
+                strokeDasharray={ratio ? '3 4' : undefined}
+              />
+              <text
+                x="32"
+                y={chartY(chartMax * ratio) + 4}
+                textAnchor="end"
+                className="wa-axis-label"
+              >
+                {fmt(Math.round(chartMax * ratio))}
+              </text>
+            </g>
+          ))}
+          {(['views', 'sessions'] as const).map((key) => (
+            <g key={key}>
+              <polyline
+                fill="none"
+                stroke={key === 'views' ? '#bf4b20' : '#437393'}
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeDasharray={key === 'sessions' ? '5 4' : undefined}
+                points={traffic
+                  .map((row, index) => `${chartX(index)},${chartY(row[key])}`)
+                  .join(' ')}
+              />
+              {traffic.map((row, index) => (
+                <circle
+                  key={row.label}
+                  cx={chartX(index)}
+                  cy={chartY(row[key])}
+                  r={
+                    row.label === selectedTraffic.label
+                      ? 4
+                      : traffic.length <= 14
+                        ? 2.5
+                        : 1.5
+                  }
+                  fill={key === 'views' ? '#bf4b20' : '#437393'}
+                  stroke="white"
+                  strokeWidth="1"
+                >
+                  <title>{`${shortDate(row.label)} · ${t(key === 'views' ? 'Visualizações' : 'Sessões')}: ${fmt(row[key])}`}</title>
+                </circle>
+              ))}
+            </g>
+          ))}
+          {[
+            ...new Set([
+              0,
+              Math.floor((traffic.length - 1) / 2),
+              traffic.length - 1,
+            ]),
+          ].map((index) => (
+            <text
+              key={index}
+              x={chartX(index)}
+              y="145"
+              textAnchor={
+                index === 0
+                  ? 'start'
+                  : index === traffic.length - 1
+                    ? 'end'
+                    : 'middle'
+              }
+              className="wa-axis-label"
+            >
+              {shortDate(traffic[index].label)}
+            </text>
+          ))}
+        </svg>
+        <figcaption className="wa-chart-inspect">
+          <label>
+            {t('Dia')}
+            <select
+              value={selectedTraffic.label}
+              onChange={(event) => setSelectedDay(event.target.value)}
+            >
+              {traffic.map((row) => (
+                <option key={row.label} value={row.label}>
+                  {shortDate(row.label)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span>
+            <strong>{fmt(selectedTraffic.views)}</strong> {t('visualizações')}
+          </span>
+          <span>
+            <strong>{fmt(selectedTraffic.sessions)}</strong> {t('sessões')}
+          </span>
+        </figcaption>
+      </figure>
     );
   }
   const active = data?.active.reduce((n, r) => n + r.value, 0) || 0;
@@ -397,10 +720,31 @@ export function WebsiteAnalytics() {
             <section className="wa-card wa-live">
               <span>
                 <span className="wa-dot" />
-                {t('Online agora')}
+                {t('Actividade em tempo real')}
               </span>
               <strong>{fmt(active)}</strong>
               <small>{t('Sessões activas · últimos 5 min')}</small>
+              {active > 0 ? (
+                <details className="wa-live-pages">
+                  <summary>{t('Ver páginas activas')}</summary>
+                  <ul>
+                    {[...data.active]
+                      .sort((a, b) => b.value - a.value)
+                      .map((row) => (
+                        <li key={row.path}>
+                          <span title={row.path}>
+                            {readableLabel(row.path, 'Páginas activas agora')}
+                          </span>
+                          <strong>{fmt(row.value)}</strong>
+                        </li>
+                      ))}
+                  </ul>
+                </details>
+              ) : (
+                <p className="wa-live-empty">
+                  {t('Nenhuma sessão activa neste momento.')}
+                </p>
+              )}
             </section>
             <section className="wa-card">
               <span>
@@ -443,160 +787,61 @@ export function WebsiteAnalytics() {
             </p>
           </details>
           <div className="wa-grid">
-            <section className="wa-card wa-wide">
-              <h3>{t('Evolução do tráfego')}</h3>
-              <p>{t('Visualizações por dia · hora de Maputo')}</p>
-              <figure
-                className="wa-daily"
-                aria-label={t('Visualizações por dia')}
-              >
-                {Array.from(
-                  {
-                    length:
-                      Math.round(
-                        (Date.parse(data.range.to) -
-                          Date.parse(data.range.from)) /
-                          86400000,
-                      ) + 1,
-                  },
-                  (_, i) => {
-                    const label = new Date(
-                      Date.parse(data.range.from) + i * 86400000,
-                    )
-                      .toISOString()
-                      .slice(0, 10);
-                    const r = data.daily.find((r) => r.label === label);
-                    const value = r?.views || 0;
-                    return (
-                      <div
-                        key={label}
-                        title={`${label}: ${fmt(value)} ${t('visualizações')}, ${fmt(r?.sessions)} ${t('sessões')}`}
-                      >
-                        <span
-                          style={{
-                            height:
-                              Math.max(
-                                value ? 3 : 0,
-                                (value /
-                                  Math.max(
-                                    1,
-                                    ...data.daily.map((r) => r.views),
-                                  )) *
-                                  100,
-                              ) + 'px',
-                          }}
-                        />
-                        <small>{label.slice(8)}</small>
-                      </div>
-                    );
-                  },
-                )}
-              </figure>
-              <details>
-                <summary>{t('Ver dados da tabela')}</summary>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>{t('Dia')}</th>
-                      <th>{t('Visualizações')}</th>
-                      <th>{t('Sessões')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.daily.map((r) => (
-                      <tr key={r.label}>
-                        <td>{r.label}</td>
-                        <td>{fmt(r.views)}</td>
-                        <td>{fmt(r.sessions)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </details>
-            </section>
-            {breakdown(
-              'Páginas activas agora',
-              data.active.map((r) => ({ label: r.path, value: r.value })),
-            )}
-            <section className="wa-card wa-wide">
-              <h3>
-                <Clock size={17} />
-                {t('Horários de maior acesso')}
-              </h3>
-              <p>
-                {peak.value
-                  ? `${t('Hora mais movimentada')}: ${String(peak.hour).padStart(2, '0')}:00–${String(peak.hour).padStart(2, '0')}:59 · ${fmt(peak.value)} ${t('visualizações')}`
-                  : t('Ainda sem dados neste período.')}
-              </p>
-              <small>
-                {t(
-                  'Totais por dia da semana e hora, não médias. O dia actual pode estar incompleto.',
-                )}
-              </small>
-              <div className="wa-heat-scroll">
-                <table className="wa-heat">
-                  <thead>
-                    <tr>
-                      <th scope="col">{t('Dia')}</th>
-                      {hours.map((h) => (
-                        <th key={h.hour} scope="col">
-                          {h.hour}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[1, 2, 3, 4, 5, 6, 0].map((day) => (
-                      <tr key={day}>
-                        <th scope="row">{t(days[day])}</th>
-                        {hours.map((h) => {
-                          const value =
-                            data.heat.find(
-                              (r) => r.day === day && r.hour === h.hour,
-                            )?.value || 0;
-                          return (
-                            <td
-                              key={h.hour}
-                              tabIndex={0}
-                              title={`${t(days[day])} ${h.hour}:00: ${value}`}
-                              aria-label={`${t(days[day])} ${h.hour}:00: ${value}`}
-                              style={{
-                                background: value
-                                  ? `rgba(184,59,9,${0.15 + (0.8 * value) / maxHeat})`
-                                  : '#f5efea',
-                                color:
-                                  value / maxHeat > 0.5 ? 'white' : '#69442c',
-                              }}
-                            >
-                              {value || '·'}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <section className="wa-card wa-wide wa-traffic">
+              <div className="wa-traffic-heading">
+                <div>
+                  <h3>{t('Evolução do tráfego')}</h3>
+                  <p>{t('Visualizações e sessões · hora de Maputo')}</p>
+                </div>
+                <fieldset
+                  className="wa-view-switch"
+                  aria-label={t('Vista do tráfego')}
+                >
+                  <button
+                    type="button"
+                    aria-pressed={trafficView === 'chart'}
+                    onClick={() => setTrafficView('chart')}
+                  >
+                    {t('Gráfico')}
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={trafficView === 'table'}
+                    onClick={() => setTrafficView('table')}
+                  >
+                    {t('Tabela')}
+                  </button>
+                </fieldset>
               </div>
+              {trafficView === 'chart' ? (
+                trafficChart()
+              ) : (
+                <section
+                  className="wa-traffic-table"
+                  aria-label={t('Dados do tráfego')}
+                >
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{t('Dia')}</th>
+                        <th>{t('Visualizações')}</th>
+                        <th>{t('Sessões')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.daily.map((r) => (
+                        <tr key={r.label}>
+                          <td>{r.label}</td>
+                          <td>{fmt(r.views)}</td>
+                          <td>{fmt(r.sessions)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </section>
+              )}
             </section>
             {breakdown('Páginas mais visitadas', data.pages, 'visualizações')}
-            {breakdown('Páginas de entrada', data.landing)}
-            {breakdown(
-              'Origem das visitas',
-              data.sources.map((r) => ({
-                ...r,
-                label:
-                  r.label === 'direct' ? 'Directo / desconhecido' : r.label,
-              })),
-            )}
-            {breakdown('Dispositivos', data.devices)}
-            {breakdown(
-              'Países',
-              data.countries.map((r) => ({
-                ...r,
-                label: r.label === 'unknown' ? 'Desconhecido' : r.label,
-              })),
-            )}
-            {breakdown('Campanhas', data.campaigns)}
             <section className="wa-card wa-full wa-purchase">
               <h3>{t('Percurso de compra')}</h3>
               <details className="wa-context">
@@ -618,6 +863,13 @@ export function WebsiteAnalytics() {
                         {i + 1}. {t(name)}
                       </span>
                       <strong>{fmt(n)}</strong>
+                      <div className="wa-funnel-bar" aria-hidden="true">
+                        <span
+                          style={{
+                            width: `${base ? Math.min(100, (n / base) * 100) : 0}%`,
+                          }}
+                        />
+                      </div>
                       <small>
                         {base ? Math.round((n / base) * 100) + '%' : '—'}{' '}
                         {t('do início')}
@@ -693,17 +945,97 @@ export function WebsiteAnalytics() {
                   </small>
                 </p>
               </div>
+              <details className="wa-performance-notes">
+                <summary>{t('Sobre estas medições')}</summary>
+                <p>
+                  {t(
+                    'Medições do navegador após 15 segundos com a página visível; visitas curtas podem não entrar na amostra. Não são testes sintéticos nem percentis Core Web Vitals.',
+                  )}
+                </p>
+                <small>
+                  {t(
+                    'INP, CLS e erros HTTP do servidor: indisponíveis neste painel. Consulte a monitorização Cloudflare para erros e disponibilidade.',
+                  )}
+                </small>
+              </details>
+            </section>
+            <section className="wa-card wa-wide">
+              <h3>
+                <Clock size={17} />
+                {t('Horários de maior acesso')}
+              </h3>
               <p>
-                {t(
-                  'Medições do navegador após 15 segundos com a página visível; visitas curtas podem não entrar na amostra. Não são testes sintéticos nem percentis Core Web Vitals.',
-                )}
+                {peak.value
+                  ? `${t('Hora mais movimentada')}: ${String(peak.hour).padStart(2, '0')}:00–${String(peak.hour).padStart(2, '0')}:59 · ${fmt(peak.value)} ${t('visualizações')}`
+                  : t('Ainda sem dados neste período.')}
               </p>
               <small>
                 {t(
-                  'INP, CLS e erros HTTP do servidor: indisponíveis neste painel. Consulte a monitorização Cloudflare para erros e disponibilidade.',
+                  'Totais por dia da semana e hora, não médias. O dia actual pode estar incompleto.',
                 )}
               </small>
+              <div className="wa-heat-scroll">
+                <table className="wa-heat">
+                  <thead>
+                    <tr>
+                      <th scope="col">{t('Dia')}</th>
+                      {hours.map((h) => (
+                        <th key={h.hour} scope="col">
+                          {h.hour}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[1, 2, 3, 4, 5, 6, 0].map((day) => (
+                      <tr key={day}>
+                        <th scope="row">{t(days[day])}</th>
+                        {hours.map((h) => {
+                          const value =
+                            data.heat.find(
+                              (r) => r.day === day && r.hour === h.hour,
+                            )?.value || 0;
+                          return (
+                            <td
+                              key={h.hour}
+                              title={`${t(days[day])} ${h.hour}:00: ${value}`}
+                              aria-label={`${t(days[day])} ${h.hour}:00: ${value}`}
+                              style={{
+                                background: value
+                                  ? `rgba(184,59,9,${0.15 + (0.8 * value) / maxHeat})`
+                                  : '#f5efea',
+                                color:
+                                  value / maxHeat > 0.5 ? 'white' : '#69442c',
+                              }}
+                            >
+                              {value || '·'}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </section>
+            {breakdown('Páginas de entrada', data.landing)}
+            {breakdown(
+              'Origem das visitas',
+              data.sources.map((r) => ({
+                ...r,
+                label:
+                  r.label === 'direct' ? 'Directo / desconhecido' : r.label,
+              })),
+            )}
+            {breakdown('Dispositivos', data.devices)}
+            {breakdown(
+              'Países',
+              data.countries.map((r) => ({
+                ...r,
+                label: r.label === 'unknown' ? 'Desconhecido' : r.label,
+              })),
+            )}
+            {breakdown('Campanhas', data.campaigns)}
           </div>
           <details className="wa-note wa-method">
             <summary>{t('Recolha e limitações')}</summary>
