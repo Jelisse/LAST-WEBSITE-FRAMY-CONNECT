@@ -1,7 +1,7 @@
 import './profile-growth.css';
 import { getTranslations } from '@/lib/server-i18n';
 import type { Metadata } from 'next';
-import { siteURL } from '@/lib/server-site';
+import { publicPageRobots, siteURL } from '@/lib/server-site';
 import { Poppins } from 'next/font/google';
 import { getLocale } from '@/lib/server-i18n';
 import { LanguageProvider } from '@/components/language-provider';
@@ -21,7 +21,17 @@ const poppins = Poppins({
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations();
   return {
-    icons: { icon: '/favicon.svg' },
+    icons: {
+  icon: [
+    {
+      url: '/favicon.png',
+      type: 'image/png',
+      sizes: '96x96',
+    },
+  ],
+  shortcut: '/favicon.png',
+  apple: '/favicon.png',
+},
     title: {
       default: t('Framy Connect — O Seu Mundo, Num Toque.'),
       template: '%s | Framy Connect',
@@ -30,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
       'A sua identidade, as suas ligações e o seu trabalho. Descubra os produtos NFC da Framy Connect, feitos para conectar Moçambique.',
     ),
     metadataBase: siteURL() ?? undefined,
-    robots: { index: false, follow: false },
+    robots: publicPageRobots(),
   };
 }
 export default async function RootLayout({
