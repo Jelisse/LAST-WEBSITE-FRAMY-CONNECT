@@ -1,6 +1,10 @@
 'use client';
 import type { Profile } from '@/lib/domain';
-import { defaultBusiness } from '@/lib/profile-business';
+import {
+  defaultBusiness,
+  profileColors,
+  profileColorHex,
+} from '@/lib/profile-business';
 import { useI18n } from './language-provider';
 export function ProfileBusinessEditor({
   profile,
@@ -63,21 +67,37 @@ export function ProfileBusinessEditor({
             onChange={(e) => update('hours', e.target.value)}
           />
         </label>
-        <label>
-          {t('Cor do perfil')}
-          <select
-            value={business.accent}
-            onChange={(e) => update('accent', e.target.value)}
-          >
-            {(['orange', 'blue', 'green', 'plum', 'slate'] as const).map(
-              (color, i) => (
-                <option key={color} value={color}>
-                  {t(['Laranja', 'Azul', 'Verde', 'Ameixa', 'Ardósia'][i])}
-                </option>
-              ),
-            )}
-          </select>
-        </label>
+        <fieldset className="profile-color-picker">
+          <legend>{t('Cor do perfil')}</legend>
+          <div>
+            {profileColors.map((color) => (
+              <label key={color.value}>
+                <input
+                  type="radio"
+                  name={`profile-color-${profile.username}`}
+                  value={color.value}
+                  checked={business.accent === color.value}
+                  onChange={() => update('accent', color.value)}
+                />
+                <span
+                  className="profile-color-swatch"
+                  style={{ backgroundColor: color.hex }}
+                  aria-hidden="true"
+                />
+                <span>{t(color.label)}</span>
+              </label>
+            ))}
+          </div>
+          <label className="profile-custom-color">
+            <span>{t('Cor personalizada')}</span>
+            <input
+              type="color"
+              value={profileColorHex(business.accent)}
+              onChange={(e) => update('accent', e.target.value)}
+            />
+            <output>{profileColorHex(business.accent).toUpperCase()}</output>
+          </label>
+        </fieldset>
         <label>
           {t('Apresentação')}
           <select

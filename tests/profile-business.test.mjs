@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   validateBusiness,
+  profileColorHex,
+  profileColorIsLight,
   whatsappURL,
   directionsURL,
 } from '../lib/profile-business.ts';
@@ -65,4 +67,44 @@ void test('launch protection preserves access without rewriting or restarting tr
     }),
     false,
   );
+});
+
+void test('neutral profile colours survive validation alongside existing saved colours', () => {
+  for (const accent of [
+    'orange',
+    'white',
+    'blue',
+    'green',
+    'plum',
+    'slate',
+    'black',
+  ]) {
+    assert.equal(validateBusiness({ accent }).accent, accent);
+  }
+  assert.equal(validateBusiness(undefined).accent, 'orange');
+  assert.equal(validateBusiness({ accent: '#ffffff' }).accent, '#ffffff');
+});
+
+void test('custom colours validate safely and choose readable text for bright and dark shades', () => {
+  for (const accent of ['#Ab12Cd', '#ffff00', '#ffffff', '#000000']) {
+    assert.equal(validateBusiness({ accent }).accent, accent);
+    assert.equal(profileColorHex(accent), accent.toLowerCase());
+  }
+  for (const accent of [
+    '#fff',
+    '#12345678',
+    'red',
+    'url(test)',
+    '#12345g',
+    null,
+  ]) {
+    if (accent !== null) assert.throws(() => validateBusiness({ accent }));
+    assert.equal(profileColorHex(accent), '#b83c0a');
+  }
+  assert.equal(profileColorIsLight('#ffff00'), true);
+  assert.equal(profileColorIsLight('#aaffcc'), true);
+  assert.equal(profileColorIsLight('white'), true);
+  assert.equal(profileColorIsLight('black'), false);
+  assert.equal(profileColorIsLight('#100050'), false);
+  assert.equal(profileColorIsLight('orange'), false);
 });

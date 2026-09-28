@@ -7042,5 +7042,6 @@
   "Use uma ligação válida e uma palavra-passe com pelo menos 12 caracteres (máximo 72 bytes).": [
     "Use a valid link and a password of at least 12 characters (maximum 72 bytes).",
     "請使用有效連結及至少 12 個字元的密碼（最多 72 位元組）。"
-  ]
+  ],
+  "Cor personalizada": ["Custom colour", "自訂顏色"]
 }

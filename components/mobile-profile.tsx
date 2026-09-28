@@ -3,8 +3,13 @@ import { ProfilePublicExtras } from './profile-public-extras';
 import { useI18n } from '@/components/language-provider';
 
 import Image from 'next/image';
-import { useState } from 'react';
-import { whatsappURL, directionsURL } from '@/lib/profile-business';
+import { useState, type CSSProperties } from 'react';
+import {
+  whatsappURL,
+  directionsURL,
+  profileColorHex,
+  profileColorIsLight,
+} from '@/lib/profile-business';
 import {
   useProfileEngagement,
   ProfileMeasurementChoice,
@@ -174,6 +179,12 @@ export function MobileProfile({
     <div
       className="mobile-profile-frame"
       data-accent={business?.accent ?? 'orange'}
+      data-tone={profileColorIsLight(business?.accent) ? 'light' : 'dark'}
+      style={
+        {
+          '--profile-accent': profileColorHex(business?.accent),
+        } as CSSProperties
+      }
       data-layout={business?.layout ?? 'portrait'}
     >
       <article className="mobile-identity-page">
@@ -201,7 +212,6 @@ export function MobileProfile({
             </div>
           )}
         </div>
-        <div className="mobile-profile-wave" aria-hidden="true" />
         <div className="mobile-profile-body">
           {(translation?.title ||
             translation?.bio ||
@@ -368,6 +378,7 @@ export function MobileProfile({
             />
           )}
           <footer className="mobile-profile-footer">
+            <div className="mobile-profile-wave" aria-hidden="true" />
             <a
               href={brandHref}
               target="_blank"

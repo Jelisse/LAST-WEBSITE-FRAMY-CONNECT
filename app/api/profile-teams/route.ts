@@ -1,3 +1,4 @@
+import { isProfileColor } from '@/lib/profile-business';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
 import { profileBody, profileJSON as json } from '@/lib/profile-api';
@@ -161,10 +162,7 @@ export async function POST(request: Request) {
       return json({ ok: true });
     }
     if (b.action === 'brand') {
-      if (
-        !['orange', 'blue', 'green', 'plum', 'slate'].includes(String(b.accent))
-      )
-        throw Error('Cor inválida.');
+      if (!isProfileColor(b.accent)) throw Error('Cor inválida.');
       const r = await db
         .prepare(
           "UPDATE profiles SET draft_json=json_set(draft_json,'$.business.accent',?),published_json=CASE WHEN published_json IS NULL THEN NULL ELSE json_set(published_json,'$.business.accent',?) END,version=version+1,updated_at=? WHERE owner_id=? AND version=? AND EXISTS(SELECT 1 FROM profile_team_members WHERE team_id=? AND account_id=profiles.owner_id)",

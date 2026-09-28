@@ -125,9 +125,6 @@
   height: 180px;
   min-height: 0;
 }
-.mobile-profile-frame[data-layout='compact'] .mobile-profile-wave {
-  display: none;
-}
 .mobile-profile-frame {
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -248,4 +245,155 @@
   .trial-notice {
     padding: 18px;
   }
+}
+
+/* Keep the brand artwork contained below the sharing controls in every layout. */
+.mobile-profile-frame .mobile-profile-footer {
+  position: relative;
+  isolation: isolate;
+  background: var(--profile-accent);
+  width: calc(100% + 10cqw);
+  margin: 4cqw -5cqw -6cqw;
+  padding: 12cqw 5cqw max(6cqw, env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+.mobile-profile-frame .mobile-profile-wave {
+  inset: 0;
+  background-position: center top;
+  background-size: 100% auto;
+  opacity: 0.4;
+}
+.mobile-profile-frame[data-accent='black'] {
+  --profile-accent: #171717;
+}
+.mobile-profile-frame[data-accent='white'] {
+  --profile-accent: #fff;
+}
+.mobile-profile-frame[data-tone='light'] .mobile-identity-page,
+.mobile-profile-frame[data-tone='light'] .mobile-profile-body h1,
+.mobile-profile-frame[data-tone='light'] .mobile-profile-body h2,
+.mobile-profile-frame[data-tone='light'] .mobile-profile-title,
+.mobile-profile-frame[data-tone='light'] .mobile-profile-links a,
+.mobile-profile-frame[data-tone='light'] .mobile-profile-actions button,
+.mobile-profile-frame[data-tone='light'] .mobile-links-placeholder,
+.mobile-profile-frame[data-tone='light'] .public-business p a,
+.mobile-profile-frame[data-tone='light'] .profile-measurement,
+.mobile-profile-frame[data-tone='light'] .mobile-profile-footer small,
+.mobile-profile-frame[data-tone='light'] .profile-content-languages button {
+  color: #000;
+}
+.mobile-profile-frame[data-tone='light'] .profile-whatsapp,
+.mobile-profile-frame[data-tone='light'] .profile-enquiry button {
+  background: #000;
+  color: #fff;
+}
+.mobile-profile-frame[data-tone='light'] .mobile-profile-links a,
+.mobile-profile-frame[data-tone='light'] .mobile-profile-actions button {
+  background: #f2efec;
+  box-shadow: inset 0 0 0 1px #00024;
+}
+.mobile-profile-frame[data-tone='light']
+  .mobile-profile-actions
+  button:disabled {
+  color: #817973;
+}
+.mobile-profile-frame[data-tone='light'] .mobile-social-icon,
+.mobile-profile-frame[data-tone='light'] .mobile-profile-footer img {
+  filter: brightness(0);
+}
+.mobile-profile-frame[data-tone='light'] .mobile-profile-wave {
+  filter: none;
+  mix-blend-mode: multiply;
+  opacity: 0.65;
+}
+.mobile-profile-frame[data-tone='light'] .profile-measurement,
+.mobile-profile-frame[data-tone='light'] .mobile-links-placeholder,
+.mobile-profile-frame[data-tone='light'] .profile-content-languages button {
+  border-color: #00040;
+}
+.mobile-profile-frame[data-tone='light'] :focus-visible {
+  outline-color: #000;
+}
+.mobile-profile-frame .mobile-profile-links a:hover,
+.mobile-profile-frame .mobile-profile-actions button:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 2px currentColor;
+}
+.profile-color-picker {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.profile-color-picker legend {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.profile-color-picker > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.profile-color-picker label {
+  position: relative;
+  justify-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 6px;
+}
+.profile-color-picker input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+}
+.profile-color-swatch {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #b4aaa2;
+}
+.profile-color-picker input:checked + .profile-color-swatch {
+  outline: 2px solid #000;
+  outline-offset: 3px;
+}
+.profile-color-picker input:focus-visible + .profile-color-swatch {
+  outline: 3px solid #b83c0a;
+  outline-offset: 3px;
+}
+.profile-color-picker input:checked ~ span:last-child {
+  font-weight: 700;
+}
+
+.profile-color-picker .profile-custom-color {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px solid #d8cec6;
+  border-radius: 12px;
+  font-size: 13px;
+  background: #fff;
+}
+.profile-color-picker .profile-custom-color input {
+  position: static;
+  opacity: 1;
+  width: 48px;
+  height: 44px;
+  padding: 3px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.profile-custom-color output {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: #62564f;
+}
+.mobile-profile-frame[data-tone='dark'] .mobile-profile-footer small {
+  color: #fff;
 }

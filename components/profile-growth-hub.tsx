@@ -1,4 +1,5 @@
 'use client';
+import { profileColors } from '@/lib/profile-business';
 import { useCallback, useEffect, useState } from 'react';
 import { ProfileSubscriptions } from './profile-subscriptions';
 type Enquiry = {
@@ -301,11 +302,11 @@ function GrowthTool({ tool }: { tool: string }) {
                     <label>
                       Cor da marca
                       <select name="accent">
-                        <option value="orange">Laranja</option>
-                        <option value="blue">Azul</option>
-                        <option value="green">Verde</option>
-                        <option value="plum">Ameixa</option>
-                        <option value="slate">Ardósia</option>
+                        {profileColors.map((color) => (
+                          <option key={color.value} value={color.value}>
+                            {color.label}
+                          </option>
+                        ))}
                       </select>
                     </label>
                     <button disabled={busy || !m.username}>
