@@ -4,6 +4,7 @@ import { getManagedPlans } from '@/lib/server-plans';
 import { getTranslations } from '@/lib/server-i18n';
 import { getProducts } from '@/lib/server-catalog';
 import { hardwarePrices } from '@/lib/hardware-pricing';
+import { productPhotos } from '@/lib/product-gallery';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Configurar a sua solução',
@@ -35,6 +36,7 @@ export default async function Page({
           initial={query.formato}
           plans={plans.filter((plan) => plan.active)}
           prices={hardwarePrices(products)}
+          photos={productPhotos(products)}
         />
       </main>
       <SiteFooter />

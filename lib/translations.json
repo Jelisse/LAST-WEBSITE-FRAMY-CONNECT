@@ -1,4 +1,56 @@
 {
+  "A partir de": [
+    "From",
+    "起價"
+  ],
+  "Materiais disponíveis": [
+    "Available materials",
+    "可選材質"
+  ],
+  "Material anterior": [
+    "Previous material",
+    "上一種材質"
+  ],
+  "Material seguinte": [
+    "Next material",
+    "下一種材質"
+  ],
+  "Retomar fotografias": [
+    "Resume photos",
+    "繼續輪播照片"
+  ],
+  "Pausar fotografias": [
+    "Pause photos",
+    "暫停輪播照片"
+  ],
+  "Pagamento único · plano digital à parte": [
+    "One-time payment · digital plan separate",
+    "一次付款 · 數位方案另計"
+  ],
+  "Configurar cartão": [
+    "Configure card",
+    "配置卡片"
+  ],
+  "Configurar kit": [
+    "Configure kit",
+    "配置套組"
+  ],
+  "Configurar porta-chaves": [
+    "Configure keychain",
+    "配置鑰匙圈"
+  ],
+  "Escolha o material e personalize o design no passo seguinte.": [
+    "Choose the material and customize the design in the next step.",
+    "在下一步選擇材質並自訂設計。"
+  ],
+  "Total final: por confirmar": [
+    "Final total: to be confirmed",
+    "最終總額：待確認"
+  ],
+  "Entrega e eventuais suplementos de design ainda não incluídos.": [
+    "Delivery and any design surcharges are not yet included.",
+    "尚未包含運費與可能的設計附加費。"
+  ],
   "Incluído nos planos Individual e Profissional: WhatsApp, horário, direcções e personalização das cores do perfil.": [
     "Included in Individual and Professional: WhatsApp, opening hours, directions and profile color customization.",
     "個人與專業方案均包含：WhatsApp、營業時間、路線資訊與檔案配色自訂。"

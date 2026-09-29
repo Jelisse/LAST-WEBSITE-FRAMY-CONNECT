@@ -1,10 +1,11 @@
 import Link from '@/components/hard-link';
-import { SourceImage } from './source-image';
+import { ProductMaterialGallery } from './product-material-gallery';
+import { productPhotos } from '@/lib/product-gallery';
 import { ArrowUpRight } from 'lucide-react';
 import { getTranslations } from '@/lib/server-i18n';
 import { money, type Product } from '@/lib/catalog';
 import { hardwareEstimate, hardwarePrices } from '@/lib/hardware-pricing';
-import { designServices, type PurchaseFormat } from '@/lib/purchase-structure';
+import { type PurchaseFormat } from '@/lib/purchase-structure';
 
 export async function HomePurchaseOffers({
   products,
@@ -13,35 +14,28 @@ export async function HomePurchaseOffers({
 }) {
   const t = await getTranslations();
   const prices = hardwarePrices(products);
-  const photo = (id: string) =>
-    products.find((p) => p.id === id && p.published !== false)?.imageUrl;
+  const photos = productPhotos(products);
+  const cards = photos.filter((photo) => ['pvc', 'wood', 'metal'].includes(photo.id));
+  const keychains = photos.filter((photo) => ['keychain', 'keychain-leather'].includes(photo.id));
   const offers: {
     id: PurchaseFormat;
     name: string;
     detail: string;
-    materials: string;
-    photos: string[];
   }[] = [
     {
       id: 'card',
       name: 'Cartão NFC',
       detail: 'Partilhe contactos em reuniões, eventos e atendimentos.',
-      materials: 'PVC · Madeira · Metal',
-      photos: ['pvc'],
     },
     {
       id: 'kit',
       name: 'Kit: cartão + porta-chaves',
       detail: 'Use o cartão nas reuniões e o porta-chaves no dia a dia. Ambos abrem o mesmo perfil.',
-      materials: 'Cartão PVC + porta-chaves PVC com epóxi',
-      photos: ['pvc', 'keychain'],
     },
     {
       id: 'keychain',
       name: 'Porta-chaves NFC',
       detail: 'Partilhe contactos com um produto que leva junto às chaves.',
-      materials: 'PVC com epóxi · Couro',
-      photos: ['keychain'],
     },
   ];
   return (
@@ -82,48 +76,23 @@ export async function HomePurchaseOffers({
                   ? t('Recomendado · dois produtos, um perfil')
                   : t('Disponível em separado')}
               </div>
-              <div
-                className={`home-solution-photo${offer.id === 'kit' ? ' is-pair' : ''}`}
-              >
-                {offer.photos.map((id) =>
-                  photo(id) ? (
-                    <SourceImage
-                      key={id}
-                      src={photo(id)!}
-                      alt={t(
-                        id === 'pvc' ? 'Cartão NFC em PVC' : 'Porta-chaves NFC',
-                      )}
-                      width={600}
-                      height={600}
-                      sizes="(max-width: 700px) 90vw, 400px"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="home-photo-placeholder" key={id}>
-                      {t('Fotografia do produto em preparação')}
-                    </div>
-                  ),
-                )}
-              </div>
+              <ProductMaterialGallery name={t(offer.name)} frames={
+                offer.id === 'card' ? cards.map((photo) => [photo]) :
+                offer.id === 'keychain' ? keychains.map((photo) => [photo]) :
+                cards.flatMap((card) => keychains.map((keychain) => [card, keychain]))
+              } />
               <div className="home-solution-copy">
                 <h3>{t(offer.name)}</h3>
                 <p>{t(offer.detail)}</p>
-                <p className="home-solution-materials">{t(offer.materials)}</p>
                 <div className="home-solution-price">
+                  {estimate && <span className="home-starting-price">{t('A partir de')}</span>}
                   <strong>
                     {estimate
                       ? money(estimate.amount, t.locale)
                       : t('Preço a confirmar')}
                   </strong>
-                  <span>{t('Pagamento único · versão PVC')}</span>
+                  <span>{t('Pagamento único · plano digital à parte')}</span>
                 </div>
-                {!!estimate?.saving && (
-                  <p className="home-solution-saving">
-                    {t('Poupa {0} face aos produtos separados.', [
-                      money(estimate.saving, t.locale),
-                    ])}
-                  </p>
-                )}
                 <p className="home-solution-included">
                   {t('Design FramyConnect incluído.')}
                 </p>
@@ -133,7 +102,7 @@ export async function HomePurchaseOffers({
                   }
                   href={`/comprar?formato=${offer.id}`}
                 >
-                  {t('Ver opções')}
+                  {t(offer.id === 'card' ? 'Configurar cartão' : offer.id === 'kit' ? 'Configurar kit' : 'Configurar porta-chaves')}
                   <ArrowUpRight size={18} />
                 </Link>
               </div>
@@ -146,19 +115,9 @@ export async function HomePurchaseOffers({
           'O preço apresentado corresponde à versão PVC. Outros materiais, personalização e entrega podem alterar o total.',
         )}
       </p>
-      <div className="home-design-heading">
-        <h3>{t('Escolha o design do seu produto')}</h3>
-        <p>{t('Três opções de design para cartões e porta-chaves.')}</p>
-      </div>
-      <div className="home-design-options">
-        {designServices.map((service, index) => (
-          <article key={service.id}>
-            <span>{String(index + 1).padStart(2, '0')}</span>
-            <h4>{t(service.name)}</h4>
-            <p>{t(service.description)}</p>
-          </article>
-        ))}
-      </div>
+      <p className="home-disclosure">
+        {t('Escolha o material e personalize o design no passo seguinte.')}
+      </p>
     </section>
   );
 }

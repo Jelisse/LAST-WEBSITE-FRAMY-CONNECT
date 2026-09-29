@@ -14,15 +14,19 @@ import type { ManagedPlan } from '@/lib/domain';
 import { planPrice } from '@/lib/plan-pricing';
 import { money } from '@/lib/catalog';
 import { hardwareEstimate, type HardwarePrice } from '@/lib/hardware-pricing';
+import { SourceImage } from './source-image';
+import type { ProductPhoto } from '@/lib/product-gallery';
 
 export function PurchaseConfigurator({
   initial = 'kit',
   plans,
   prices,
+  photos = [],
 }: {
   initial?: string;
   plans: ManagedPlan[];
   prices: HardwarePrice[];
+  photos?: ProductPhoto[];
 }) {
   const { t } = useI18n();
   const [format, setFormat] = useState(purchaseFormat(initial));
@@ -35,6 +39,10 @@ export function PurchaseConfigurator({
   const selected = purchaseFormats.find((item) => item.id === format)!;
   const selectedDesign = designServices.find((item) => item.id === design)!;
   const estimate = hardwareEstimate(prices, format, card, keychain);
+  const preview = [
+    ...(format !== 'keychain' ? [card] : []),
+    ...(format !== 'card' ? [keychain] : []),
+  ];
   return (
     <div className="purchase-configurator">
       <div className="purchase-maintenance">
@@ -198,6 +206,16 @@ export function PurchaseConfigurator({
           aria-label={t('A sua configuração')}
         >
           <h2>{t('A sua configuração')}</h2>
+          <div className="configuration-photos">
+            {preview.map((material) => {
+              const photo = photos.find((item) => item.material === material);
+              return <figure key={material}>
+                {photo ? <SourceImage src={photo.src} alt={t(material)} width={240} height={240} />
+                  : <span>{t('Fotografia do produto em preparação')}</span>}
+                <figcaption>{t(material)}</figcaption>
+              </figure>;
+            })}
+          </div>
           <div aria-live="polite">
             <h3>{t(selected.name)}</h3>
             {format !== 'keychain' && (
@@ -245,7 +263,7 @@ export function PurchaseConfigurator({
             <br />
             {t('30 dias grátis · sem renovação automática')}
           </p>
-          <p>{t('Entrega e total apresentados antes do pagamento.')}</p>
+          <p><strong>{t('Total final: por confirmar')}</strong><br />{t('Entrega e eventuais suplementos de design ainda não incluídos.')}</p>
           <button className="btn btn-primary" disabled>
             {t('Checkout em manutenção')}
           </button>
