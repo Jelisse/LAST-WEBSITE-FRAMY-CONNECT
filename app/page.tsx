@@ -193,9 +193,6 @@ export default async function Home() {
             plans={plans}
             billingAvailable={billing?.enabled === 1}
           />
-          <p className="home-disclosure">
-            {t('Incluído nos planos Individual e Profissional: WhatsApp, horário, direcções e personalização das cores do perfil.')}
-          </p>
           {plans.length === 0 ? (
             <p>
               {t(

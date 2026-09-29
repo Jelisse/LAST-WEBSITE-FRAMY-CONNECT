@@ -1,4 +1,100 @@
 {
+  "O seu design: PDF vectorial ou editor online.": [
+    "Your design: vector PDF or online editor.",
+    "自備設計：向量 PDF 或線上編輯器。"
+  ],
+  "Design criado pela nossa equipa: sob consulta.": [
+    "Design by our team: quote on request.",
+    "由我們團隊設計：洽詢報價。"
+  ],
+  "Fotografia, nome e título no perfil": [
+    "Profile photo, name and title",
+    "檔案照片、姓名與職稱"
+  ],
+  "Email e telefone com controlo de visibilidade": [
+    "Email and phone visibility controls",
+    "電子郵件與電話顯示控制"
+  ],
+  "WhatsApp com mensagem personalizada": [
+    "WhatsApp with a custom message",
+    "WhatsApp 自訂訊息"
+  ],
+  "Morada, direcções e horário": [
+    "Address, directions and opening hours",
+    "地址、路線與營業時間"
+  ],
+  "Cores personalizadas e dois estilos de perfil": [
+    "Custom colors and two profile layouts",
+    "自訂配色與兩種檔案版型"
+  ],
+  "Links para redes sociais, website e portefólio": [
+    "Links to social media, your website and portfolio",
+    "社群媒體、網站與作品集連結"
+  ],
+  "Partilha por link, NFC e código QR": [
+    "Share via link, NFC and QR code",
+    "透過連結、NFC 與 QR 碼分享"
+  ],
+  "Guardar contacto no telemóvel (vCard)": [
+    "Save contact to phone (vCard)",
+    "儲存聯絡人至手機（vCard）"
+  ],
+  "Actualizar os dados sem substituir o produto": [
+    "Update details without replacing the product",
+    "更新資料無需更換產品"
+  ],
+  "Vitrine com até 6 produtos ou serviços": [
+    "Showcase up to 6 products or services",
+    "展示最多 6 項產品或服務"
+  ],
+  "Formulário de contacto e caixa de entrada": [
+    "Contact form and inbox",
+    "聯絡表單與收件匣"
+  ],
+  "Conteúdos do perfil em inglês": [
+    "Profile content in English",
+    "英文檔案內容"
+  ],
+  "Gestão de equipa: até 25 membros e convites": [
+    "Team management: up to 25 members and invitations",
+    "團隊管理：成員與邀請合計最多 25 名"
+  ],
+  "Domínio próprio, sujeito a configuração técnica": [
+    "Custom domain, subject to technical setup",
+    "自訂網域，須完成技術設定"
+  ],
+  "Ferramentas profissionais": [
+    "Professional tools",
+    "專業工具"
+  ],
+  "Não incluído": [
+    "Not included",
+    "不包含"
+  ],
+  "Equipa: subscrição por perfil. Domínio adquirido separadamente e sujeito a activação técnica.": [
+    "Teams: subscription per profile. Domain purchased separately and subject to technical activation.",
+    "團隊：每個檔案分別訂閱。網域須另購並完成技術啟用。"
+  ],
+  "Número de perfis e limites definidos na proposta": [
+    "Profile count and limits defined in the proposal",
+    "檔案數量與額度由提案訂定"
+  ],
+  "Funcionalidades digitais acordadas na proposta": [
+    "Digital features agreed in the proposal",
+    "數位功能由提案約定"
+  ],
+  "Cartões, porta-chaves e materiais a escolher": [
+    "Choice of cards, keychains and materials",
+    "可選卡片、鑰匙圈與材質"
+  ],
+  "Design e apoio à configuração a combinar": [
+    "Design and setup assistance by agreement",
+    "設計與設定協助另行商定"
+  ],
+  "Preço e condições de renovação sob consulta": [
+    "Pricing and renewal terms on request",
+    "價格與續約條件請洽詢"
+  ],
   "A partir de": [
     "From",
     "起價"

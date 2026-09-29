@@ -244,6 +244,11 @@
   margin-top: 3px;
   color: #a3441b;
 }
+.home-profile-plan .home-plan-feature-heading { font-weight: 600; margin-bottom: 10px; }
+.home-plan-advanced { border-top: 0; padding-top: 0; }
+.home-plan-inclusions .is-unavailable { color: #71685f; }
+.home-plan-inclusions small { display: block; font-size: 11px; }
+.home-profile-plan .home-plan-conditions { font-size: 12px; color: #71685f; }
 .home-profile-plan .home-solution-copy > a {
   min-height: 44px;
   width: 100%;

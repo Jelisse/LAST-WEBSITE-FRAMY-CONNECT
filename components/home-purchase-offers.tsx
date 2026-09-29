@@ -95,6 +95,8 @@ export async function HomePurchaseOffers({
                 </div>
                 <p className="home-solution-included">
                   {t('Design FramyConnect incluído.')}
+                  <br />{t('O seu design: PDF vectorial ou editor online.')}
+                  <br />{t('Design criado pela nossa equipa: sob consulta.')}
                 </p>
                 <Link
                   className={
