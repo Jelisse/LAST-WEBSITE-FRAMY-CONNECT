@@ -4,7 +4,7 @@ import Link from '@/components/hard-link';
 import { useI18n } from './language-provider';
 import {
   purchaseFormats,
-  purchaseFormat,
+  purchaseSelection,
   cardMaterials,
   keychainMaterials,
   designServices,
@@ -29,11 +29,10 @@ export function PurchaseConfigurator({
   photos?: ProductPhoto[];
 }) {
   const { t } = useI18n();
-  const [format, setFormat] = useState(purchaseFormat(initial));
-  const [card, setCard] = useState<string>(
-    initial === 'wood' ? 'Madeira' : initial === 'metal' ? 'Metal' : 'PVC',
-  );
-  const [keychain, setKeychain] = useState<string>('PVC + epóxi');
+  const selection = purchaseSelection(initial);
+  const format = selection.format;
+  const [card, setCard] = useState<string>(selection.card);
+  const [keychain, setKeychain] = useState<string>(selection.keychain);
   const [design, setDesign] = useState('standard');
   const [method, setMethod] = useState('PDF vectorial');
   const selected = purchaseFormats.find((item) => item.id === format)!;
@@ -57,31 +56,7 @@ export function PurchaseConfigurator({
       <div className="purchase-layout">
         <div>
           <fieldset className="purchase-section">
-            <legend>{t('1. Escolha a sua solução')}</legend>
-            <div className="purchase-choices">
-              {purchaseFormats.map((item) => (
-                <label
-                  className={`purchase-choice ${format === item.id ? 'is-selected' : ''}`}
-                  key={item.id}
-                >
-                  <input
-                    type="radio"
-                    name="format"
-                    value={item.id}
-                    checked={format === item.id}
-                    onChange={() => setFormat(item.id)}
-                  />
-                  <strong>{t(item.name)}</strong>
-                  {item.id === 'kit' && (
-                    <span className="purchase-badge">{t('Recomendado')}</span>
-                  )}
-                  <p>{t(item.description)}</p>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <fieldset className="purchase-section">
-            <legend>{t('2. Materiais')}</legend>
+            <legend>{t('1. Materiais')}</legend>
             <div className="purchase-materials">
               {format !== 'keychain' && (
                 <label>
@@ -116,7 +91,7 @@ export function PurchaseConfigurator({
             </div>
           </fieldset>
           <fieldset className="purchase-section">
-            <legend>{t('3. Design')}</legend>
+            <legend>{t('2. Design')}</legend>
             <div className="purchase-choices">
               {designServices.map((item) => (
                 <label
@@ -160,10 +135,12 @@ export function PurchaseConfigurator({
             )}
           </fieldset>
           <section className="purchase-section">
-            <h2>{t('4. Um perfil digital')}</h2>
+            <h2>{t('3. Um perfil digital')}</h2>
             <p>
               {t(
-                'O cartão e o porta-chaves partilham o mesmo perfil. Não precisa de duas subscrições.',
+                format === 'kit'
+                  ? 'O cartão e o porta-chaves partilham o mesmo perfil. Não precisa de duas subscrições.'
+                  : 'O produto escolhido liga ao seu perfil digital.',
               )}
             </p>
             <strong>{t('30 dias grátis · sem renovação automática')}</strong>

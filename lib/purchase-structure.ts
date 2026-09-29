@@ -40,7 +40,14 @@ export const designServices = [
 export const checkoutMaintenanceMessage =
   'Estamos a actualizar os produtos e o checkout. Novas encomendas e pagamentos estão temporariamente indisponíveis.';
 export function purchaseFormat(value: string): PurchaseFormat {
-  if (value === 'keychain') return 'keychain';
+  if (['keychain', 'keychain-leather'].includes(value)) return 'keychain';
   if (['card', 'pvc', 'wood', 'metal'].includes(value)) return 'card';
   return 'kit';
+}
+export function purchaseSelection(value = 'kit') {
+  return {
+    format: purchaseFormat(value),
+    card: value === 'wood' ? 'Madeira' : value === 'metal' ? 'Metal' : 'PVC',
+    keychain: value === 'keychain-leather' ? 'Couro' : 'PVC + epóxi',
+  };
 }

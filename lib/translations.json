@@ -1,4 +1,32 @@
 {
+  "1. Materiais": [
+    "1. Materials",
+    "1. 材質"
+  ],
+  "2. Design": [
+    "2. Design",
+    "2. 設計"
+  ],
+  "3. Um perfil digital": [
+    "3. One digital profile",
+    "3. 一個數位檔案"
+  ],
+  "O produto escolhido liga ao seu perfil digital.": [
+    "Your selected product links to your digital profile.",
+    "所選產品連結至您的數位檔案。"
+  ],
+  "Escolha os materiais do cartão e do porta-chaves e personalize o design do kit.": [
+    "Choose the card and keychain materials and customize your kit design.",
+    "選擇卡片與鑰匙圈的材質，並自訂套組設計。"
+  ],
+  "Escolha o material e o design do seu porta-chaves.": [
+    "Choose the material and design of your keychain.",
+    "選擇鑰匙圈的材質與設計。"
+  ],
+  "Escolha o material e o design do seu cartão.": [
+    "Choose the material and design of your card.",
+    "選擇卡片的材質與設計。"
+  ],
   "O seu design: PDF vectorial ou editor online.": [
     "Your design: vector PDF or online editor.",
     "自備設計：向量 PDF 或線上編輯器。"
