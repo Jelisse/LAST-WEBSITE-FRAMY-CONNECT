@@ -4,7 +4,7 @@ import { getTranslations } from '@/lib/server-i18n';
 import { LanguageSelector } from '@/components/language-provider';
 import { planMeticais, planPrice } from '@/lib/plan-pricing';
 import { publicPageRobots } from '@/lib/server-site';
-import { SourceImage } from '@/components/source-image';
+import { HomePurchaseOffers } from '@/components/home-purchase-offers';
 import { AccountMenu } from '@/components/account-menu';
 import { HomeMobileMenu } from '@/components/home-mobile-menu';
 import { HomeHeader } from '@/components/home-header';
@@ -17,26 +17,12 @@ import { HomeHeroScene } from '@/components/home-hero-scene';
 import { HomeSharingScene } from '@/components/home-sharing-scene';
 import { getProducts } from '@/lib/server-catalog';
 import { getManagedPlans } from '@/lib/server-plans';
-import { money, productOrder } from '@/lib/catalog';
+import './home-solutions.css';
 import './home.css';
 import './home-atmosphere.css';
 import './home-interactions.css';
 import './home-featured.css';
 
-const productNames: Record<string, string> = {
-  'PVC Business Cards': 'Cartão NFC em PVC',
-  'Wooden Business Cards': 'Cartão NFC em madeira',
-  'Metal NFC Card': 'Cartão NFC em metal',
-  'NFC Keychain': 'Porta-chaves NFC',
-  'NFC Tag': 'Etiqueta NFC',
-  'NFC Sticker': 'Autocolante NFC',
-  'NFC Bracelet': 'Pulseira NFC',
-  'Smart Event Badge': 'Crachá para eventos',
-  'Restaurant QR Menu': 'Menu digital QR',
-  'Google Review Stand': 'Suporte de avaliações Google',
-  'Digital Catalog': 'Catálogo digital',
-  'Employee Card': 'Cartão de colaborador',
-};
 const audiences = [
   [
     'Indivíduos',
@@ -60,6 +46,14 @@ const audiences = [
   ],
 ];
 const questions = [
+  [
+    'Preciso de dois planos para o kit?',
+    'Não. O cartão e o porta-chaves ligam ao mesmo perfil digital, com uma única subscrição.',
+  ],
+  [
+    'Já posso comprar?',
+    'Estamos a actualizar o checkout. Pode explorar os produtos e a configuração; novos pagamentos permanecem indisponíveis até à reabertura.',
+  ],
   [
     'Preciso de instalar uma aplicação?',
     'Quem recebe o seu perfil pode abri-lo no navegador. Para partilhar por toque, o telemóvel precisa de ser compatível com NFC. O código QR oferece outra forma de acesso.',
@@ -94,12 +88,6 @@ export default async function Home() {
     getManagedPlans(),
     getHeroMedia(),
   ]);
-  const featured = products
-    .filter((p) => p.published !== false)
-    .sort(
-      (a, b) => Number(b.available) - Number(a.available) || productOrder(a, b),
-    )
-    .slice(0, 4);
   const plans = allPlans
     .filter((p) => p.active)
     .sort((a, b) => planMeticais(a) - planMeticais(b));
@@ -137,9 +125,9 @@ export default async function Home() {
             <div className="home-hero-copy">
               <h1>
                 <span>
-                  {t('O Seu Mundo,')}
+                  {t('Uma identidade,')}
                   <br />
-                  {t('Num Toque.')}
+                  {t('mais conexões.')}
                 </span>
                 <svg
                   className="home-contactless-mark"
@@ -159,12 +147,12 @@ export default async function Home() {
               </h1>
               <p className="home-offer">
                 {t(
-                  'Partilhe contactos, redes sociais e trabalho por toque ou QR.',
+                  'Cartão e porta-chaves. Uma presença profissional, ligada ao mesmo perfil digital.',
                 )}
               </p>
               <div className="home-hero-actions">
-                <Link className="home-primary" href="/produtos">
-                  {t('Escolher o meu produto ')}
+                <Link className="home-primary" href="/comprar">
+                  {t('Explorar o kit completo ')}
                   <ArrowUpRight size={18} />
                 </Link>
                 <a className="home-secondary" href="#como-funciona">
@@ -191,163 +179,14 @@ export default async function Home() {
           </div>
         </section>
         <HomeSharingScene media={heroMedia} />
-        <section className="home-products" id="produtos">
-          <div className="home-section-heading">
-            <div>
-              <h2>{t('Um formato para o seu dia.')}</h2>
-              <p>
-                {t(
-                  'Explore os produtos em destaque e encontre o seu próximo toque.',
-                )}
-              </p>
-            </div>
-            <Link className="home-text-link" href="/produtos">
-              {t('Ver todos os produtos ')}
-              <ArrowUpRight size={18} />
-            </Link>
-          </div>
-          {[true, false].map((available) => {
-            const items = featured.filter((p) => p.available === available);
-            if (!items.length) return null;
-            return (
-              <div className="home-product-group" key={String(available)}>
-                {!available && (
-                  <h3 className="home-upcoming-heading">{t('Brevemente')}</h3>
-                )}
-                <div
-                  className={`home-products-grid${available ? ' has-available' : ''}`}
-                >
-                  {items.map((p) =>
-                    p.available ? (
-                      <article className="home-featured-product" key={p.id}>
-                        <div className="home-featured-visual">
-                          <SourceImage
-                            src={
-                              p.id === 'keychain'
-                                ? '/products/keychain-transparent.png'
-                                : p.imageUrl
-                            }
-                            alt={t(productNames[p.name] ?? p.name)}
-                            width={1254}
-                            height={1254}
-                            loading="lazy"
-                          />
-                          {p.id === 'keychain' && (
-                            <span className="home-featured-caption">
-                              <Nfc size={18} aria-hidden="true" />
-                              {t('Partilha por toque NFC')}
-                            </span>
-                          )}
-                        </div>
-                        <div className="home-featured-content">
-                          <span className="home-available-badge">
-                            {t('Disponível agora')}
-                          </span>
-                          <h3>{t(productNames[p.name] ?? p.name)}</h3>
-                          <p className="home-featured-description">
-                            {t(p.tagline)}
-                          </p>
-                          {p.id === 'keychain' && (
-                            <p className="home-featured-benefit">
-                              {t(
-                                'Partilhe contactos, redes sociais e trabalho com um toque num telemóvel compatível com NFC.',
-                              )}
-                            </p>
-                          )}
-                          {p.id === 'keychain' && (
-                            <ul className="home-featured-features">
-                              <li>
-                                <Smartphone size={16} aria-hidden="true" />
-                                {t('Abre no navegador')}
-                              </li>
-                              <li>
-                                <RefreshCw size={16} aria-hidden="true" />
-                                {t('Perfil actualizável')}
-                              </li>
-                            </ul>
-                          )}
-                          <div className="home-featured-purchase">
-                            <div className="home-featured-price">
-                              <strong>{money(p.amount, t.locale)}</strong>
-                              <span>
-                                {t(
-                                  'Preço por unidade. A entrega é confirmada separadamente.',
-                                )}
-                              </span>
-                            </div>
-                            <div className="home-featured-actions">
-                              <Link
-                                className="home-primary"
-                                href={`/encomendar/${p.id}`}
-                              >
-                                {t('Encomendar agora')}
-                                <ArrowUpRight size={18} aria-hidden="true" />
-                              </Link>
-                              <Link
-                                className="home-featured-details"
-                                href={`/produtos/${p.id}`}
-                              >
-                                {t('Ver detalhes')}
-                                <ArrowUpRight size={16} aria-hidden="true" />
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </article>
-                    ) : (
-                      <Link
-                        className={`home-product ${p.available ? 'is-available' : 'is-coming-soon'}`}
-                        key={p.id}
-                        href={`/produtos/${p.id}`}
-                      >
-                        <div className="home-product-art">
-                          <SourceImage
-                            src={p.imageUrl}
-                            alt=""
-                            width={1254}
-                            height={1254}
-                            loading="lazy"
-                          />
-                        </div>
-                        <div className="home-product-copy">
-                          {p.available && (
-                            <span className="home-available-badge">
-                              {t('Disponível agora')}
-                            </span>
-                          )}
-                          {p.available ? (
-                            <h3>{t(productNames[p.name] ?? p.name)}</h3>
-                          ) : (
-                            <h4>{t(productNames[p.name] ?? p.name)}</h4>
-                          )}
-                          <p>{t(p.tagline)}</p>
-                          {p.available && (
-                            <strong className="home-product-price">
-                              {money(p.amount, t.locale)}
-                            </strong>
-                          )}
-                          <span className="home-product-action">
-                            {p.available
-                              ? t('Encomendar agora')
-                              : t('Ver detalhes')}{' '}
-                            <ArrowUpRight size={18} />
-                          </span>
-                        </div>
-                      </Link>
-                    ),
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </section>
+        <HomePurchaseOffers products={products} />
         <section className="home-plans" id="planos">
           <div className="home-section-heading">
             <div>
               <h2>{t('Planos para o seu perfil digital')}</h2>
               <p>
                 {t(
-                  'Escolha os seus links, contactos e apresentação. O produto físico é comprado separadamente.',
+                  'Um perfil para o cartão e o porta-chaves. Escolha a presença digital que acompanha o seu trabalho.',
                 )}
               </p>
             </div>
@@ -382,15 +221,17 @@ export default async function Home() {
               .filter((p) => p.id !== 'free-30')
               .map((p) => (
                 <article
-                  className={`home-plan${p.id === 'free-30' ? ' home-plan-trial' : ''}`}
+                  className={`home-plan${p.id === 'professional-v2' ? ' home-plan-recommended' : ''}`}
                   key={p.id}
                 >
                   <span className="home-plan-label">
                     {p.id === 'free-30'
                       ? t('Experimente primeiro')
-                      : billing?.enabled
-                        ? t('Mensal · por perfil')
-                        : t('Adesões em breve')}
+                      : p.id === 'professional-v2'
+                        ? t('Recomendado para profissionais')
+                        : billing?.enabled
+                          ? t('Mensal · por perfil')
+                          : t('Adesões em breve')}
                   </span>
                   <h3>{t(p.name)}</h3>
                   <p>{t(p.description)}</p>
@@ -480,11 +321,11 @@ export default async function Home() {
           <h2>{t('Pronto para a próxima conexão?')}</h2>
           <p>
             {t(
-              'Escolha o seu produto. Depois, seleccione o plano e personalize o seu perfil.',
+              'Explore a sua solução, escolha os materiais e o design. Prepare a sua próxima apresentação.',
             )}
           </p>
-          <Link className="home-primary" href="/produtos">
-            {t('Escolher o meu produto ')}
+          <Link className="home-primary" href="/comprar">
+            {t('Explorar o kit completo ')}
             <ArrowUpRight size={18} />
           </Link>
         </section>
