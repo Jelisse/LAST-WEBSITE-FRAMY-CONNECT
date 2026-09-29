@@ -1078,8 +1078,8 @@ test('simplified catalogue preserves historical terms and upgrades trial allowan
     current.map((p) => [p.id, p.meticais, p.links, p.bio]),
     [
       ['free-30', 0, 20, 600],
-      ['personal', 65, 8, 200],
-      ['professional-v2', 150, 20, 600],
+      ['personal', 100, 8, 200],
+      ['professional-v2', 250, 20, 600],
     ],
   );
   assert.deepEqual(
@@ -1313,7 +1313,7 @@ test('subscription payments require manager verification, deduplicate receipts a
       accepted: true,
     });
     assert.equal(first.status, 200);
-    assert.equal(first.body.invoice.amount, 15000);
+    assert.equal(first.body.invoice.amount, 25000);
     const id = first.body.invoice.id;
     assert.equal(
       (
@@ -1332,7 +1332,7 @@ test('subscription payments require manager verification, deduplicate receipts a
       id,
       paymentReference: 'SUBSCRIPTION-001',
       verifiedInProvider: true,
-      verifiedAmount: 15000,
+      verifiedAmount: 25000,
       currency: 'MZN',
     };
     assert.equal((await post(billing, confirmation)).status, 403);
@@ -1372,7 +1372,7 @@ test('subscription payments require manager verification, deduplicate receipts a
         await post(billing, {
           ...confirmation,
           id: second.id,
-          verifiedAmount: 6500,
+          verifiedAmount: 10000,
         })
       ).status,
       409,
@@ -1383,7 +1383,7 @@ test('subscription payments require manager verification, deduplicate receipts a
         await post(billing, {
           ...confirmation,
           id: second.id,
-          verifiedAmount: 6500,
+          verifiedAmount: 10000,
           paymentReference: 'SUBSCRIPTION-002',
         })
       ).status,
@@ -2208,5 +2208,28 @@ test('maintenance rejects new orders without writing stock or orders and leaves 
   }
   assert.equal(sql.prepare('SELECT COUNT(*) n FROM sandbox_orders').get().n, 0);
   assert.equal((await workspace.GET()).status, 200);
+  sql.close();
+});
+
+test('manager hardware pricing is persistent, versioned, and does not reprice existing orders', async () => {
+  const sql = fixture();
+  const workspace = await api('app/api/workspace/route.ts');
+  const body = await checkoutFixture(workspace);
+  assert.equal((await post(workspace, body)).status, 200);
+  const catalog = await api('lib/server-catalog.ts');
+  const manager = await api('app/api/manage-products/route.ts');
+  const product = (await catalog.getProducts()).find(p => p.id === 'keychain');
+  const update = () => new Request(origin + '/api/manage-products', { method: 'PUT', headers: {origin, 'Content-Type': 'application/json'}, body: JSON.stringify({...product, amount: 57500}) });
+  assert.equal((await manager.PUT(update())).status, 403);
+  globalThis.__launch.user = {userId: 'manager-a', role: 'manager'};
+  assert.equal((await manager.PUT(update())).status, 200);
+  assert.equal((await manager.PUT(update())).status, 409);
+  assert.equal((await catalog.getProducts()).find(p => p.id === 'keychain').amount, 57500);
+  const previous = JSON.parse(sql.prepare('SELECT data_json FROM sandbox_orders WHERE id=?').get(body.id).data_json);
+  assert.equal(previous.amount, 50000);
+  const pvc = (await catalog.getProducts()).find(p => p.id === 'pvc');
+  const kitUpdate = new Request(origin + '/api/manage-products', {method: 'PUT', headers: {origin, 'Content-Type': 'application/json'}, body: JSON.stringify({...pvc, kitAmount: 125000})});
+  assert.equal((await manager.PUT(kitUpdate)).status, 200);
+  assert.equal((await catalog.getProducts()).find(p => p.id === 'pvc').kitAmount, 125000);
   sql.close();
 });

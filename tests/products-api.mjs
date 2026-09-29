@@ -32,7 +32,7 @@ assert.equal(
 );
 const initial = await read('/api/manage-products', { headers: { cookie } });
 assert.equal(initial.status, 200);
-assert.equal(initial.body.products.length, 12);
+assert.equal(initial.body.products.length, 13);
 const original = initial.body.products.find((p) => p.id === 'metal');
 const put = (data, extra = {}) =>
   read('/api/manage-products', {

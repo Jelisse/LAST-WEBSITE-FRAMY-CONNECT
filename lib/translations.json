@@ -7234,5 +7234,65 @@
   "PVC": [
     "PVC",
     "PVC"
+  ],
+  "Produtos · pagamento único": [
+    "Products · one-time payment",
+    "產品 · 一次性付款"
+  ],
+  "Preço a confirmar": [
+    "Price to be confirmed",
+    "價格待確認"
+  ],
+  "Poupa {0} face aos produtos separados.": [
+    "Save {0} compared with buying separately.",
+    "比單獨購買節省 {0}。"
+  ],
+  "Design FramyConnect incluído.": [
+    "FramyConnect design included.",
+    "包含 FramyConnect 設計。"
+  ],
+  "Personalização: suplemento a confirmar, não incluído no preço dos produtos.": [
+    "Personalisation: surcharge to be confirmed, not included in the product price.",
+    "自訂設計：附加費待確認，不包含於產品價格內。"
+  ],
+  "Preço do kit PVC + porta-chaves epóxi (MZN)": [
+    "PVC card + epoxy keychain kit price (MZN)",
+    "PVC 卡片與環氧樹脂鑰匙圈套裝價格（MZN）"
+  ],
+  "Preço independente do kit base. Outros materiais usam a diferença entre os preços individuais.": [
+    "Independent base kit price. Other materials use the difference between individual prices.",
+    "基本套裝價格獨立設定。其他材質按個別產品價格差額計算。"
+  ],
+  "Preço confirmado para o configurador": [
+    "Price confirmed for the configurator",
+    "確認配置器顯示價格"
+  ],
+  "Alterações de preço aplicam-se a novas compras. Encomendas existentes mantêm os valores registados. Confirmar um preço não activa pagamentos durante a manutenção.": [
+    "Price changes apply to new purchases. Existing orders retain their recorded amounts. Confirming a price does not enable payments during maintenance.",
+    "價格變更適用於新購買。現有訂單保留原金額。確認價格不會在維護期間啟用付款。"
+  ],
+  "Confirmação de preço inválida.": [
+    "Invalid price confirmation.",
+    "價格確認無效。"
+  ],
+  "Defina um preço superior a zero antes de confirmar.": [
+    "Set a price above zero before confirming.",
+    "確認前請設定大於零的價格。"
+  ],
+  "Indique um preço válido para o kit.": [
+    "Enter a valid kit price.",
+    "請輸入有效的套裝價格。"
+  ],
+  "Porta-chaves NFC em couro": [
+    "Leather NFC keychain",
+    "皮革 NFC 鑰匙圈"
+  ],
+  "Uma opção em couro para a sua identidade digital.": [
+    "A leather option for your digital identity.",
+    "為您的數位身分提供皮革款式。"
+  ],
+  "Porta-chaves NFC em couro. Preço, fotografia e disponibilidade a configurar pela equipa.": [
+    "Leather NFC keychain. Price, photo and availability to be configured by the team.",
+    "皮革 NFC 鑰匙圈。價格、照片及供應情況由團隊設定。"
   ]
 }

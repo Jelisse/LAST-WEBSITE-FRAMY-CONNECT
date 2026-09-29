@@ -29,6 +29,21 @@ export function validateProduct(input: unknown, existing: Product): Product {
     );
   if (!Number.isSafeInteger(data.version) || Number(data.version) < 0)
     throw new Error('Versão inválida.');
+  if (
+    data.configurationPriceConfirmed !== undefined &&
+    typeof data.configurationPriceConfirmed !== 'boolean'
+  )
+    throw Error('Confirmação de preço inválida.');
+  if (data.configurationPriceConfirmed === true && Number(amount) <= 0)
+    throw Error('Defina um preço superior a zero antes de confirmar.');
+  if (
+    existing.id === 'pvc' &&
+    data.kitAmount !== undefined &&
+    (!Number.isSafeInteger(data.kitAmount) ||
+      Number(data.kitAmount) <= 0 ||
+      Number(data.kitAmount) > 100000000)
+  )
+    throw Error('Indique um preço válido para o kit.');
   const imageUrl = text('imageUrl', 200);
   if (
     !/^\/products\/[a-z0-9-]+\.png$/.test(imageUrl) &&
@@ -67,6 +82,16 @@ export function validateProduct(input: unknown, existing: Product): Product {
     audience: text('audience', 60),
     category,
     amount: Number(amount),
+    configurationPriceConfirmed:
+      data.configurationPriceConfirmed ?? existing.configurationPriceConfirmed,
+    ...(existing.id === 'pvc'
+      ? {
+          kitAmount:
+            data.kitAmount === undefined
+              ? existing.kitAmount
+              : Number(data.kitAmount),
+        }
+      : {}),
     cost: Number(cost),
     available: data.available,
     imageUrl,

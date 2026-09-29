@@ -12,13 +12,17 @@ import {
 } from '@/lib/purchase-structure';
 import type { ManagedPlan } from '@/lib/domain';
 import { planPrice } from '@/lib/plan-pricing';
+import { money } from '@/lib/catalog';
+import { hardwareEstimate, type HardwarePrice } from '@/lib/hardware-pricing';
 
 export function PurchaseConfigurator({
   initial = 'kit',
   plans,
+  prices,
 }: {
   initial?: string;
   plans: ManagedPlan[];
+  prices: HardwarePrice[];
 }) {
   const { t } = useI18n();
   const [format, setFormat] = useState(purchaseFormat(initial));
@@ -30,6 +34,7 @@ export function PurchaseConfigurator({
   const [method, setMethod] = useState('PDF vectorial');
   const selected = purchaseFormats.find((item) => item.id === format)!;
   const selectedDesign = designServices.find((item) => item.id === design)!;
+  const estimate = hardwareEstimate(prices, format, card, keychain);
   return (
     <div className="purchase-configurator">
       <div className="purchase-maintenance">
@@ -213,9 +218,27 @@ export function PurchaseConfigurator({
           </div>
           <hr />
           <p>
-            <strong>{t('Produtos e design')}</strong>
+            <strong>{t('Produtos · pagamento único')}</strong>
             <br />
-            {t('Pagamento único · preço a confirmar')}
+            <span aria-live="polite">
+              {estimate
+                ? money(estimate.amount, t.locale)
+                : t('Preço a confirmar')}
+            </span>
+          </p>
+          {!!estimate?.saving && (
+            <p>
+              {t('Poupa {0} face aos produtos separados.', [
+                money(estimate.saving, t.locale),
+              ])}
+            </p>
+          )}
+          <p>
+            {design === 'standard'
+              ? t('Design FramyConnect incluído.')
+              : t(
+                  'Personalização: suplemento a confirmar, não incluído no preço dos produtos.',
+                )}
           </p>
           <p>
             <strong>{t('Subscrição digital')}</strong>

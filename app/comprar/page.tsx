@@ -2,6 +2,8 @@ import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { PurchaseConfigurator } from '@/components/purchase-configurator';
 import { getManagedPlans } from '@/lib/server-plans';
 import { getTranslations } from '@/lib/server-i18n';
+import { getProducts } from '@/lib/server-catalog';
+import { hardwarePrices } from '@/lib/hardware-pricing';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Configurar a sua solução',
@@ -12,10 +14,11 @@ export default async function Page({
 }: {
   searchParams: Promise<{ formato?: string }>;
 }) {
-  const [t, plans, query] = await Promise.all([
+  const [t, plans, query, products] = await Promise.all([
     getTranslations(),
     getManagedPlans(),
     searchParams,
+    getProducts(),
   ]);
   return (
     <>
@@ -31,6 +34,7 @@ export default async function Page({
         <PurchaseConfigurator
           initial={query.formato}
           plans={plans.filter((plan) => plan.active)}
+          prices={hardwarePrices(products)}
         />
       </main>
       <SiteFooter />

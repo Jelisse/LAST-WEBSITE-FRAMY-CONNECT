@@ -20,6 +20,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
     [busy, setBusy] = useState(false),
     [loading, setLoading] = useState(true);
   const [price, setPrice] = useState(''),
+    [kitPrice, setKitPrice] = useState(''),
     [cost, setCost] = useState('');
   async function load() {
     setLoading(true);
@@ -46,6 +47,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
   function edit(p: Product) {
     setDraft({ ...p, images: p.images?.length ? [...p.images] : [p.imageUrl] });
     setPrice(String(p.amount / 100));
+    setKitPrice(p.kitAmount ? String(p.kitAmount / 100) : '');
     setCost(String(p.cost / 100));
     setError('');
     setNotice('');
@@ -93,7 +95,12 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
     setError('');
     setNotice('');
     try {
-      const payload = { ...draft, amount: parse(price), cost: parse(cost) };
+      const payload = {
+        ...draft,
+        amount: parse(price),
+        cost: parse(cost),
+        ...(draft.id === 'pvc' ? { kitAmount: parse(kitPrice) } : {}),
+      };
       const r = await fetch('/api/manage-products', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -300,6 +307,35 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                   onChange={(e) => setCost(e.target.value)}
                 />
               </label>
+              {draft.id === 'pvc' && (
+                <label>
+                  {t('Preço do kit PVC + porta-chaves epóxi (MZN)')}
+                  <Input
+                    required
+                    inputMode="decimal"
+                    value={kitPrice}
+                    onChange={(e) => setKitPrice(e.target.value)}
+                  />
+                  <small>
+                    {t(
+                      'Preço independente do kit base. Outros materiais usam a diferença entre os preços individuais.',
+                    )}
+                  </small>
+                </label>
+              )}
+              <label className="product-availability">
+                <input
+                  type="checkbox"
+                  checked={draft.configurationPriceConfirmed === true}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      configurationPriceConfirmed: e.target.checked,
+                    })
+                  }
+                />
+                {t('Preço confirmado para o configurador')}
+              </label>
               <label htmlFor="field-componentsproductmanagertsx-4">
                 {t('Público')}
                 <Input
@@ -333,6 +369,11 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                 {t('Vendas activas')}
               </label>
             </div>
+            <p className="muted">
+              {t(
+                'Alterações de preço aplicam-se a novas compras. Encomendas existentes mantêm os valores registados. Confirmar um preço não activa pagamentos durante a manutenção.',
+              )}
+            </p>
             <p className="muted">
               {t(
                 'Publicado e sem vendas: aparece como Brevemente, sem preço. Não publicado: fica oculto. Para vender, active as vendas, defina o preço e registe stock em Operações.',

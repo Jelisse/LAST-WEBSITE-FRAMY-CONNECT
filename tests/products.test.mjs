@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { products, publicProduct } from '../lib/catalog.ts';
 import { validateProduct } from '../lib/product-validation.ts';
 const seed = products.find((p) => p.id === 'metal');
-test('catalogue includes each of the twelve products once', () => {
-  assert.equal(products.length, 12);
-  assert.equal(new Set(products.map((p) => p.id)).size, 12);
+test('catalogue includes each of the thirteen products once', () => {
+  assert.equal(products.length, 13);
+  assert.equal(new Set(products.map((p) => p.id)).size, 13);
 });
 test('public catalogue never contains internal costs', () => {
   assert.equal('cost' in publicProduct(seed), false);

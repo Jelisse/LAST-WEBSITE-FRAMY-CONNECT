@@ -83,7 +83,7 @@ test('private fields never enter publication; unsafe links and reserved names re
 test('free trial and two monthly plans enforce their content allowances', () => {
   assert.deepEqual(
     plans.map((p) => p.meticais),
-    [0, 65, 150],
+    [0, 100, 250],
   );
   for (const plan of plans) {
     assert.doesNotThrow(() =>

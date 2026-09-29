@@ -14,6 +14,9 @@ export type Product = {
   published?: boolean;
   images?: string[];
   availabilityConfigured?: boolean;
+  configurationPriceConfirmed?: boolean;
+  /** One-time base kit price: PVC card + PVC/epoxy keychain, in minor units. */
+  kitAmount?: number;
 };
 const seedProducts = [
   {
@@ -25,6 +28,7 @@ const seedProducts = [
     description:
       'Cartão NFC em PVC de 85,5 × 54 mm. Inclui impressão a cores na frente e no verso, personalização com o seu logótipo, nome e email, e configuração NFC e QR para o seu perfil.',
     amount: 95000,
+    kitAmount: 135000,
     cost: 0,
     audience: 'Profissionais',
     available: true,
@@ -67,6 +71,20 @@ const seedProducts = [
     cost: 8000,
     audience: 'Indivíduos',
     available: true,
+  },
+  {
+    id: 'keychain-leather',
+    name: 'Porta-chaves NFC em couro',
+    category: 'Acessórios',
+    icon: 'key',
+    tagline: 'Uma opção em couro para a sua identidade digital.',
+    description:
+      'Porta-chaves NFC em couro. Preço, fotografia e disponibilidade a configurar pela equipa.',
+    amount: 0,
+    cost: 0,
+    audience: 'Profissionais',
+    available: false,
+    published: false,
   },
   {
     id: 'tag',
@@ -175,8 +193,9 @@ const seedProducts = [
 export const products: Product[] = seedProducts.map((p) => ({
   ...p,
   available: p.id === 'keychain',
-  published: true,
-  imageUrl: `/products/${p.id}.png`,
+  published: p.published !== false,
+  configurationPriceConfirmed: ['pvc', 'keychain'].includes(p.id),
+  imageUrl: `/products/${p.id === 'keychain-leather' ? 'keychain' : p.id}.png`,
   version: 0,
 }));
 export function productOrder(
