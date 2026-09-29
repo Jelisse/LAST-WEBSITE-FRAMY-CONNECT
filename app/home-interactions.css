@@ -48,8 +48,23 @@ html:has(.framy-home) { scroll-padding-top: 0; }
   outline: 3px solid #96300c;
   outline-offset: 4px;
 }
-.framy-home :is(.home-product, .home-plan, .home-audience-card, .home-trial-banner, .home-faq details) {
+.framy-home :is(.home-solution, .home-product, .home-plan, .home-audience-card, .home-trial-banner, .home-faq details) {
   transition: transform 220ms ease, box-shadow 220ms ease, background-color 220ms ease, border-color 220ms ease;
+}
+.framy-home :is(.home-solution-photo img, .home-plan-visual > span) {
+  transition: scale 280ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+.framy-home :is(.product-gallery-controls button, .language-selector select, .brand-footer a, .home-brand) {
+  transition: color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, opacity 180ms ease, transform 180ms ease;
+}
+.framy-home :is(a[href], button:not(:disabled), summary, select:not(:disabled)) { cursor: pointer; }
+.framy-home .home-solution:focus-within {
+  border-color: #c96a37;
+  box-shadow: 0 12px 30px #71381020;
+}
+.framy-home .home-solution.is-recommended:focus-within {
+  border-color: #a93408;
+  box-shadow: 0 14px 34px #a2421029;
 }
 .framy-home :is(.home-product-art img, .home-scene-card, .home-scene-keychain, .home-scene-phone, .sharing-product-card, .sharing-product-demo > .sharing-phone) {
   transition: scale 300ms ease, translate 300ms ease;
@@ -70,6 +85,32 @@ html:has(.framy-home) { scroll-padding-top: 0; }
 .framy-home .home-faq details[open] { background: #fff0e2; border-color: #dc9c71; }
 
 @media (hover: hover) and (pointer: fine) {
+  .framy-home .home-solution:hover {
+    transform: translateY(-5px);
+    border-color: #c96a37;
+    box-shadow: 0 18px 38px #71381024;
+  }
+  .framy-home .home-solution.is-recommended:hover {
+    border-color: #a93408;
+    box-shadow: 0 20px 42px #a2421030;
+  }
+  .framy-home .home-solution:hover .home-solution-photo img { scale: 1.035; }
+  .framy-home .home-profile-plan:hover .home-plan-visual > span {
+    scale: 1.05;
+    border-color: #cf936b;
+    box-shadow: 0 6px 18px #71381018;
+  }
+  .framy-home :is(.product-gallery-controls button, .language-selector select):hover {
+    background-color: #ffe7d2;
+    color: #792604;
+    box-shadow: 0 3px 10px #71381018;
+  }
+  .framy-home .brand-footer a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 2px;
+  }
+  .framy-home a:hover .home-brand { opacity: .8; }
   .framy-home .home-nav nav a:hover { color: #a93408; background: #ffeadc; }
   .framy-home .home-nav nav a:hover::after { transform: scaleX(1); }
   .framy-home :is(.home-product, .home-plan, .home-audience-card, .home-trial-banner):hover {
@@ -106,9 +147,12 @@ html:has(.framy-home) { scroll-padding-top: 0; }
   box-shadow: none;
 }
 .framy-home .home-product:active { transform: translateY(0); }
+.framy-home .product-gallery-controls button:active { transform: scale(.94); }
 @media (prefers-reduced-motion: reduce) {
   .framy-home *, .framy-home *::before, .framy-home *::after { transition: none !important; }
   .framy-home :is(.home-product, .home-plan, .home-audience-card, .home-trial-banner, .home-primary, .home-secondary, .home-agent, .account-menu-trigger) { transform: none !important; }
   .framy-home :is(.home-product-art img, .home-scene-card, .home-scene-keychain, .home-scene-phone, .sharing-product-card, .sharing-product-demo > .sharing-phone) { scale: none !important; translate: none !important; }
   .framy-home :is(.home-primary, .home-product-action, .home-text-link, .home-secondary) svg { transform: none !important; }
+  .framy-home :is(.home-solution, .product-gallery-controls button) { transform: none !important; }
+  .framy-home :is(.home-solution-photo img, .home-plan-visual > span) { scale: none !important; }
 }
