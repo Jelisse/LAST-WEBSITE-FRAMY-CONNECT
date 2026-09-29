@@ -54,7 +54,6 @@ export function OrderPayment({ orderId }: { orderId: string }) {
           >
             {t('Pagar ')}
             {money(data.amount, t.locale)}
-            {t(' na Opsellio')}
           </a>
           <p>
             {t(
@@ -65,7 +64,7 @@ export function OrderPayment({ orderId }: { orderId: string }) {
       ) : (
         <p>
           {t(
-            'O pagamento online deste produto ainda não está configurado. Contacte a equipa antes de pagar.',
+            'Os pagamentos online estão em manutenção. Não utilize ligações de pagamento antigas. Contacte a equipa para esclarecer pagamentos já efectuados.',
           )}
         </p>
       )}

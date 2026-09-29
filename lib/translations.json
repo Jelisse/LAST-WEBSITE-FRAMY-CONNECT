@@ -7043,5 +7043,196 @@
     "Use a valid link and a password of at least 12 characters (maximum 72 bytes).",
     "請使用有效連結及至少 12 個字元的密碼（最多 72 位元組）。"
   ],
-  "Cor personalizada": ["Custom colour", "自訂顏色"]
+  "Cor personalizada": [
+    "Custom colour",
+    "自訂顏色"
+  ],
+  "Checkout em manutenção": [
+    "Checkout under maintenance",
+    "結帳系統維護中"
+  ],
+  "Estamos a actualizar os produtos e o checkout. Novas encomendas e pagamentos estão temporariamente indisponíveis.": [
+    "We are updating our products and checkout. New orders and payments are temporarily unavailable.",
+    "我們正在更新產品及結帳流程。新訂單及付款暫時無法使用。"
+  ],
+  "Explore a nova configuração. Os preços e a disponibilidade serão confirmados antes da reabertura.": [
+    "Explore the new configuration. Prices and availability will be confirmed before sales reopen.",
+    "探索新的產品配置。價格及供應情況將於恢復銷售前確認。"
+  ],
+  "1. Escolha a sua solução": [
+    "1. Choose your solution",
+    "1. 選擇您的方案"
+  ],
+  "2. Materiais": [
+    "2. Materials",
+    "2. 材質"
+  ],
+  "3. Design": [
+    "3. Design",
+    "3. 設計"
+  ],
+  "4. Um perfil digital": [
+    "4. One digital profile",
+    "4. 一個數位個人檔案"
+  ],
+  "Kit Completo": [
+    "Complete Kit",
+    "完整套裝"
+  ],
+  "A sua apresentação profissional.": [
+    "Your professional introduction.",
+    "您的專業介紹。"
+  ],
+  "Cartão e porta-chaves ligados ao mesmo perfil.": [
+    "Card and keychain linked to the same profile.",
+    "卡片與鑰匙圈連結至同一個個人檔案。"
+  ],
+  "A sua identidade, sempre consigo.": [
+    "Your identity, always with you.",
+    "您的身分，隨時相伴。"
+  ],
+  "PVC + epóxi": [
+    "PVC + epoxy",
+    "PVC 加環氧樹脂塗層"
+  ],
+  "Couro": [
+    "Leather",
+    "皮革"
+  ],
+  "Madeira": [
+    "Wood",
+    "木材"
+  ],
+  "Design FramyConnect": [
+    "FramyConnect design",
+    "FramyConnect 設計"
+  ],
+  "O design padrão da FramyConnect.": [
+    "The standard FramyConnect design.",
+    "FramyConnect 標準設計。"
+  ],
+  "O seu design": [
+    "Your design",
+    "您的設計"
+  ],
+  "Envie um PDF vectorial ou personalize no editor online.": [
+    "Upload a vector PDF or personalise in the online editor.",
+    "上傳向量 PDF 或使用線上編輯器自訂。"
+  ],
+  "Criamos por si": [
+    "We design for you",
+    "由我們為您設計"
+  ],
+  "A nossa equipa cria um design para a sua identidade.": [
+    "Our team creates a design for your identity.",
+    "我們的團隊為您的形象打造專屬設計。"
+  ],
+  "Como pretende personalizar?": [
+    "How would you like to personalise?",
+    "您想如何自訂？"
+  ],
+  "PDF vectorial": [
+    "Vector PDF",
+    "向量 PDF"
+  ],
+  "Editor online": [
+    "Online editor",
+    "線上編輯器"
+  ],
+  "O envio de ficheiros e o editor estarão disponíveis no novo checkout.": [
+    "File uploads and the editor will be available in the new checkout.",
+    "檔案上傳及編輯器將於新結帳流程中提供。"
+  ],
+  "O serviço terá um preço único, com briefing e aprovação antes da produção.": [
+    "The service will have a one-time price, with a brief and approval before production.",
+    "此服務將採一次性收費，製作前需提供需求並確認設計。"
+  ],
+  "O cartão e o porta-chaves partilham o mesmo perfil. Não precisa de duas subscrições.": [
+    "The card and keychain share the same profile. You do not need two subscriptions.",
+    "卡片與鑰匙圈共用同一個個人檔案，不需兩份訂閱。"
+  ],
+  "30 dias grátis · sem renovação automática": [
+    "30 days free · no automatic renewal",
+    "免費 30 天 · 不會自動續訂"
+  ],
+  "Enquanto os planos mensais não estiverem disponíveis, prolongamos o acesso sem cobrança.": [
+    "While monthly plans are unavailable, we extend access at no charge.",
+    "月費方案尚未推出期間，我們將免費延長使用權限。"
+  ],
+  "Comparar os planos futuros": [
+    "Compare upcoming plans",
+    "比較即將推出的方案"
+  ],
+  "A sua configuração": [
+    "Your configuration",
+    "您的配置"
+  ],
+  "Um perfil digital": [
+    "One digital profile",
+    "一個數位個人檔案"
+  ],
+  "Produtos e design": [
+    "Products and design",
+    "產品及設計"
+  ],
+  "Pagamento único · preço a confirmar": [
+    "One-time payment · price to be confirmed",
+    "一次性付款 · 價格待確認"
+  ],
+  "Subscrição digital": [
+    "Digital subscription",
+    "數位訂閱"
+  ],
+  "Entrega e total apresentados antes do pagamento.": [
+    "Delivery and the total will be shown before payment.",
+    "運費及總額將於付款前顯示。"
+  ],
+  "Esta configuração não cria uma encomenda nem reserva stock.": [
+    "This configuration does not create an order or reserve stock.",
+    "此配置不會建立訂單或保留庫存。"
+  ],
+  "Uma identidade. Duas formas de se conectar.": [
+    "One identity. Two ways to connect.",
+    "一個身分，兩種連結方式。"
+  ],
+  "Escolha cartão, porta-chaves ou o kit completo, ligados ao mesmo perfil digital.": [
+    "Choose a card, keychain or complete kit, linked to the same digital profile.",
+    "選擇卡片、鑰匙圈或完整套裝，連結至同一個數位個人檔案。"
+  ],
+  "Explorar configuração": [
+    "Explore configuration",
+    "探索配置"
+  ],
+  "Ver catálogo de referência": [
+    "View reference catalogue",
+    "查看參考目錄"
+  ],
+  "Os pagamentos online estão em manutenção. Não utilize ligações de pagamento antigas. Contacte a equipa para esclarecer pagamentos já efectuados.": [
+    "Online payments are under maintenance. Do not use old payment links. Contact our team about payments already made.",
+    "線上付款系統維護中。請勿使用舊付款連結。如已付款，請聯絡團隊確認。"
+  ],
+  "A equipa irá verificar os pagamentos já efectuados. Esta página não confirma automaticamente uma transacção.": [
+    "Our team will verify payments already made. This page does not automatically confirm a transaction.",
+    "團隊將核實已完成的付款。此頁面不會自動確認交易。"
+  ],
+  "Recomendado": [
+    "Recommended",
+    "推薦"
+  ],
+  "Cartão": [
+    "Card",
+    "卡片"
+  ],
+  "Porta-chaves": [
+    "Keychain",
+    "鑰匙圈"
+  ],
+  "Metal": [
+    "Metal",
+    "金屬"
+  ],
+  "PVC": [
+    "PVC",
+    "PVC"
+  ]
 }

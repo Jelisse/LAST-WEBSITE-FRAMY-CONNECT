@@ -138,6 +138,7 @@ function fixture() {
     user: { userId: 'customer-a', role: 'customer', displayName: 'Customer' },
     env: {
       DB: db,
+      PRODUCT_CHECKOUT_ENABLED: 'true', // Exercise legacy order invariants explicitly.
       PROFILE_PHOTOS: {
         async head() {
           return {
@@ -988,13 +989,14 @@ test('launch: manual payments require evidence, exact amount and unique provider
     1,
   );
   const { paymentLink } = await api('lib/payment-policy.ts');
-  assert.ok(
+  assert.equal(
     paymentLink({
       productId: 'keychain',
       amount: 50000,
       paid: false,
       status: 'PENDING_PAYMENT',
     }),
+    null,
   );
   assert.equal(
     paymentLink({
@@ -2193,4 +2195,18 @@ test('failed recovery delivery leaves credentials intact; send limits and origin
     globalThis.fetch = original;
     sql.close();
   }
+});
+
+
+test('maintenance rejects new orders without writing stock or orders and leaves tracking readable', async () => {
+  const sql = fixture();
+  delete globalThis.__launch.env.PRODUCT_CHECKOUT_ENABLED;
+  const workspace = await api('app/api/workspace/route.ts');
+  for (const action of ['submit-order', 'create-order']) {
+    const response = await post(workspace, { action, id: crypto.randomUUID(), productId: 'keychain' });
+    assert.equal(response.status, 503);
+  }
+  assert.equal(sql.prepare('SELECT COUNT(*) n FROM sandbox_orders').get().n, 0);
+  assert.equal((await workspace.GET()).status, 200);
+  sql.close();
 });

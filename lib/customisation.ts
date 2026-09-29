@@ -1,6 +1,4 @@
 export const FREE_PLAN_ID = 'free-30';
-export const PAYMENT_URL =
-  'https://pay.opsellio.com/checkout/chk_01m1vv12v7sm7g0pmmr5mgdbj2';
 export const keychainChoices = [
   { id: 'tiktok', name: 'TikTok', index: 0 },
   { id: 'pattern', name: 'Padrão artístico', index: 1 },

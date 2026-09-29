@@ -47,4 +47,4 @@ Physical launch inventory in Maputo, Mozambique is 175 Instagram, 175 TikTok and
 
 Registration creates customers only. Staff provisioning requires authorized management; accounts open their own permitted dashboard. Email verification and password recovery delivery are not configured.
 
-The external Opsellio link applies to the 500 MT keychain order. Staff verify the provider transaction, currency, amount and unique reference before recording payment. Automatic webhook verification and paid monthly subscriptions remain unavailable.
+Product checkout is in maintenance by default. The retired Opsellio link has been removed and the payments API returns no payment URL. Staff can still reconcile payments already made using the provider transaction, currency, amount and unique reference. See PURCHASE_RESTRUCTURE.md for the replacement checkout requirements.

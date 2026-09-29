@@ -25,6 +25,7 @@ export async function GET(request: Request) {
       status: order.status,
       paid: order.paid,
       url: paymentLink(order),
+      checkoutAvailable: false,
       confirmation: 'manual',
       expiresAt: order.reservationExpiresAt,
     });

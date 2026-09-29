@@ -8,6 +8,7 @@ import { LanguageProvider } from '@/components/language-provider';
 import './globals.css';
 import './footer.css';
 import './products.css';
+import './purchase-configurator.css';
 import './mobile-dashboard.css';
 import './analytics-consent.css';
 import './profile-business.css';

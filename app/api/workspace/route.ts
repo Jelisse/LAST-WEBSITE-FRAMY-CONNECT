@@ -1,4 +1,6 @@
 import { customerOrder } from '@/lib/customer-order';
+import { productCheckoutEnabled } from '@/lib/server-checkout';
+import { checkoutMaintenanceMessage } from '@/lib/purchase-structure';
 import { serviceFailure } from '@/lib/service-failure';
 import { hasProfileAccess, profileAccess, expiryDate } from '@/lib/entitlement';
 import {
@@ -180,6 +182,8 @@ export async function POST(request: Request) {
   } catch {
     return json({ error: 'Pedido inválido.' }, 422);
   }
+  if ((body.action === 'submit-order' || body.action === 'create-order') && !productCheckoutEnabled())
+    return json({ error: checkoutMaintenanceMessage, code: 'CHECKOUT_MAINTENANCE' }, 503);
   try {
     const db = database(),
       now = new Date().toISOString();

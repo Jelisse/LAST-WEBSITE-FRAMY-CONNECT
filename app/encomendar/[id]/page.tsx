@@ -3,7 +3,8 @@ import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { getProducts } from '@/lib/server-catalog';
 import { getManagedPlans } from '@/lib/server-plans';
 import { publicProduct } from '@/lib/catalog';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { productCheckoutEnabled } from '@/lib/server-checkout';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { OrderSubmission } from '@/components/order-submission';
 import '../../purchase-progress.css';
@@ -21,6 +22,7 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  if (!productCheckoutEnabled()) redirect(`/comprar?formato=${encodeURIComponent(id)}`);
   const [user, products, plans] = await Promise.all([
     getChatGPTUser(), getProducts(), getManagedPlans(),
   ]);

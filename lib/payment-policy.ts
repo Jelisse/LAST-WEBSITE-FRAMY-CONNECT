@@ -1,30 +1,14 @@
-import { PAYMENT_URL } from './customisation';
-// This merchant checkout has a fixed price. Never use it for another amount/product.
-export function paymentLink(order: {
+// Gateway migration: never return the retired fixed-price link, including for old orders.
+// A replacement must create a server-side session for the immutable order total.
+export function paymentLink(_order: {
   productId: string;
   amount: number;
   status: string;
   paid: boolean;
   reservationExpiresAt?: string;
   createdAt?: string;
-}) {
-  if (
-    order.reservationExpiresAt &&
-    Date.parse(order.reservationExpiresAt) <= Date.now()
-  )
-    return null;
-  if (
-    !order.reservationExpiresAt &&
-    order.createdAt &&
-    Date.parse(order.createdAt) + 86400000 <= Date.now()
-  )
-    return null;
-  return order.productId === 'keychain' &&
-    order.amount === 50000 &&
-    order.status === 'PENDING_PAYMENT' &&
-    !order.paid
-    ? PAYMENT_URL
-    : null;
+}): string | null {
+  return null;
 }
 export function validatePaymentEvidence(
   input: Record<string, unknown>,

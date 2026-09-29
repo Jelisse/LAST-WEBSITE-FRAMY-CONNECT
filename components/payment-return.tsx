@@ -36,7 +36,7 @@ export function PaymentReturn() {
     {state === 'error' && <p role="alert">{t('Não foi possível consultar o pedido. Tente novamente.')}</p>}
     {state === 'ready' && order && <>
       <h2>{t(order.refunded ? 'Reembolsado' : order.status === 'CANCELLED' ? 'Pedido cancelado' : order.paid ? 'Pagamento confirmado' : 'A aguardar confirmação do pagamento')}</h2>
-      {!order.paid && order.status !== 'CANCELLED' && <p>{t('A equipa irá verificar o pagamento. O regresso da Opsellio não confirma automaticamente a transacção.')}</p>}
+      {!order.paid && order.status !== 'CANCELLED' && <p>{t('A equipa irá verificar os pagamentos já efectuados. Esta página não confirma automaticamente uma transacção.')}</p>}
       <p>{t('Referência: ')}{order.id}</p><p>{t(order.productName)}</p>
       <p>{t('Estado do pedido')}: {t(orderLabels[order.status])}</p>
       <OrderProgressLine order={order}/><AgentContact order={order}/>

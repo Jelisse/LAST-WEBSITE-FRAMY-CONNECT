@@ -26,7 +26,7 @@ export default async function Page() {
         </h1>
         <p className="page-intro">
           {t(
-            'Do cartão que o apresenta ao acessório que o acompanha. Encontre o seu próximo toque.',
+            'Escolha cartão, porta-chaves ou o kit completo, ligados ao mesmo perfil digital.',
           )}
         </p>
         <Catalog products={products} />

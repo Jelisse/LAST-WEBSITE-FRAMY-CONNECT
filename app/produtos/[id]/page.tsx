@@ -4,7 +4,7 @@ import { publicPageRobots } from '@/lib/server-site';
 import { notFound } from 'next/navigation';
 import Link from '@/components/hard-link';
 import { ArrowUpRight, Check, ChevronLeft } from 'lucide-react';
-import { money } from '@/lib/catalog';
+import { checkoutMaintenanceMessage } from '@/lib/purchase-structure';
 import { getProducts } from '@/lib/server-catalog';
 export const dynamic = 'force-dynamic';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
@@ -59,7 +59,7 @@ export default async function Page({
             <h1>{t(p.name)}</h1>
             <h2>{t(p.tagline)}</h2>
             <p className="product-detail-price">
-              {p.available ? money(p.amount, t.locale) : t('Brevemente')}
+              {t('Checkout em manutenção')}
             </p>
             <p>{t(p.description)}</p>
             <ul className="benefit-list">
@@ -77,24 +77,11 @@ export default async function Page({
               </li>
             </ul>
             <div className="quiet-note">
-              {p.available
-                ? t(
-                    'A encomenda reserva o produto durante 24 horas. O pagamento é confirmado após verificação pela equipa.',
-                  )
-                : t(
-                    'Este produto está em preparação. A compra será activada quando estiver disponível.',
-                  )}
+              {t(checkoutMaintenanceMessage)}
             </div>
-            {p.available ? (
-              <Link className="btn btn-primary" href={`/encomendar/${p.id}`}>
-                {t('Personalizar e comprar ')}
-                <ArrowUpRight size={20} />
-              </Link>
-            ) : (
-              <button className="btn btn-outline" disabled>
-                {t('Brevemente')}
-              </button>
-            )}
+            <Link className="btn btn-primary" href={`/comprar?formato=${encodeURIComponent(p.id)}`}>
+              {t('Explorar configuração')} <ArrowUpRight size={20}/>
+            </Link>
           </div>
         </div>
       </main>

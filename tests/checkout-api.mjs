@@ -122,7 +122,7 @@ assert.equal(order.status, 'PENDING_PAYMENT');
 assert.equal('cost' in order, false);
 assert.equal('journal' in order, false);
 const payment = await get('/api/payments?order=' + id, cookie);
-assert.match(payment.url, /^https:\/\/pay.opsellio.com\//);
+assert.equal(payment.url, null);
 assert.equal(payment.amount, 50000);
 const page = await fetch(base + '/' + profile.username);
 assert.equal(page.status, 200);
