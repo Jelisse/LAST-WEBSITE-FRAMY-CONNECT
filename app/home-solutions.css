@@ -132,8 +132,13 @@
 }
 .home-solution-included {
   border-top: 1px solid #e9dfd3;
-  padding-top: 16px;
+  padding: 16px 0 0 18px;
+  margin: 0 0 20px;
+  list-style: disc outside;
+  font-size: 14px;
+  line-height: 1.7;
 }
+.home-solution-included li + li { margin-top: 6px; }
 .home-solution-copy > a {
   margin-top: auto;
   justify-content: center;

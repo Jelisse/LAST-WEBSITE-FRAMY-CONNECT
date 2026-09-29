@@ -93,11 +93,11 @@ export async function HomePurchaseOffers({
                   </strong>
                   <span>{t('Pagamento único · plano digital à parte')}</span>
                 </div>
-                <p className="home-solution-included">
-                  {t('Design FramyConnect incluído.')}
-                  <br />{t('O seu design: PDF vectorial ou editor online.')}
-                  <br />{t('Design criado pela nossa equipa: sob consulta.')}
-                </p>
+                <ul className="home-solution-included">
+                  <li>{t('Design FramyConnect incluído.')}</li>
+                  <li>{t('O seu design: PDF vectorial ou editor online.')}</li>
+                  <li>{t('Design criado pela nossa equipa: sob consulta.')}</li>
+                </ul>
                 <Link
                   className={
                     offer.id === 'kit' ? 'home-primary' : 'home-secondary'
@@ -112,14 +112,6 @@ export async function HomePurchaseOffers({
           );
         })}
       </div>
-      <p className="home-disclosure">
-        {t(
-          'O preço apresentado corresponde à versão PVC. Outros materiais, personalização e entrega podem alterar o total.',
-        )}
-      </p>
-      <p className="home-disclosure">
-        {t('Escolha o material e personalize o design no passo seguinte.')}
-      </p>
     </section>
   );
 }
