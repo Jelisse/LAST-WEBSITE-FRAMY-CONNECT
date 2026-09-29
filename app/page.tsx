@@ -162,33 +162,21 @@ export default async function Home() {
           <div className="home-section-heading">
             <div>
               <h2>{t('Planos para o seu perfil digital')}</h2>
-              <p>
-                {t(
-                  'Compare o espaço para os seus conteúdos e as ferramentas incluídas em cada plano.',
-                )}
-              </p>
             </div>
           </div>
-          <p className="home-disclosure">
-            {t(
-              billing?.enabled
-                ? 'Experimente grátis durante 30 dias. Renove mensalmente quando quiser, sem renovação automática.'
-                : 'Experimente durante 30 dias, sem renovação automática. Enquanto os planos mensais não abrirem, prolongamos o acesso sem cobrança.',
-            )}
-          </p>
           {plans.find((p) => p.id === 'free-30') && (
             <div className="home-trial-banner">
               <strong>{t('30 dias grátis')}</strong>
+              <span>
+                {t(
+                  'Adicione links como Instagram, WhatsApp e website. Nome, email e telefone não contam para o limite de links.',
+                )}
+              </span>
               <Link className="home-text-link" href="/perfil?plans=1">
                 {t('Começar 30 dias grátis')} <ArrowUpRight size={18} />
               </Link>
             </div>
           )}
-          <p className="home-disclosure">
-            {t(
-              'Adicione links como Instagram, WhatsApp e website. Nome, email e telefone não contam para o limite de links.',
-            )}
-          </p>
           <HomeProfilePlans
             plans={plans}
             billingAvailable={billing?.enabled === 1}
