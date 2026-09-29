@@ -34,8 +34,6 @@ export async function HomeProfilePlans({
           plan.bio > 0
             ? t('Biografia até {0} caracteres', [plan.bio])
             : t('Contactos essenciais, sem biografia'),
-          t('WhatsApp, horário e direcções'),
-          t('Cores e apresentação do perfil'),
           ...(recommended ? [t('Estatísticas de visitas e cliques')] : []),
         ];
         return (
@@ -57,7 +55,13 @@ export async function HomeProfilePlans({
             </div>
             <div className="home-solution-copy">
               <h3>{t(plan.name)}</h3>
-              <p className="home-plan-description">{t(plan.description)}</p>
+              <p className="home-plan-description">
+                {t(
+                  recommended
+                    ? 'Para profissionais: apresente serviços e portefólio e acompanhe as visitas e os cliques no seu perfil.'
+                    : 'Para pessoas e criadores: reúna contactos, redes sociais e conteúdos num perfil fácil de partilhar.',
+                )}
+              </p>
               <div className="home-solution-price">
                 <strong>
                   {planPrice(plan, t.locale)}
@@ -100,7 +104,7 @@ export async function HomeProfilePlans({
           <h3>{t('Corporativo')}</h3>
           <p className="home-plan-description">
             {t(
-              'Uma proposta à medida do número de colaboradores e das necessidades da empresa.',
+              'Para instituições e organizações: apresente contactos, serviços e recursos, com uma proposta adequada às suas necessidades.',
             )}
           </p>
           <div className="home-solution-price">

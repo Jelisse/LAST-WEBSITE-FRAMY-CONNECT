@@ -23,28 +23,6 @@ import './home-atmosphere.css';
 import './home-interactions.css';
 import './home-featured.css';
 
-const audiences = [
-  [
-    'Indivíduos',
-    'Reúna os seus contactos e partilhe-os nas conversas do dia a dia.',
-  ],
-  [
-    'Criadores',
-    'Dê acesso às suas redes sociais, vídeos e portefólio num único perfil.',
-  ],
-  [
-    'Profissionais',
-    'Apresente o seu trabalho e facilite o contacto depois de cada encontro.',
-  ],
-  [
-    'Instituições',
-    'Organize os links e os recursos que quer disponibilizar à sua comunidade.',
-  ],
-  [
-    'Organizações',
-    'Apresente a equipa, os serviços e os contactos da sua organização.',
-  ],
-];
 const questions = [
   [
     'Preciso de dois planos para o kit?',
@@ -186,7 +164,7 @@ export default async function Home() {
               <h2>{t('Planos para o seu perfil digital')}</h2>
               <p>
                 {t(
-                  'Um perfil para o cartão e o porta-chaves. Escolha a presença digital que acompanha o seu trabalho.',
+                  'Compare o espaço para os seus conteúdos e as ferramentas incluídas em cada plano.',
                 )}
               </p>
             </div>
@@ -201,11 +179,6 @@ export default async function Home() {
           {plans.find((p) => p.id === 'free-30') && (
             <div className="home-trial-banner">
               <strong>{t('30 dias grátis')}</strong>
-              <span>
-                {t(
-                  'Experimente 20 links e 600 caracteres de biografia, sem renovação automática.',
-                )}
-              </span>
               <Link className="home-text-link" href="/perfil?plans=1">
                 {t('Começar 30 dias grátis')} <ArrowUpRight size={18} />
               </Link>
@@ -213,36 +186,23 @@ export default async function Home() {
           )}
           <p className="home-disclosure">
             {t(
-              'Instagram, WhatsApp e website: 3 links à sua escolha. Nome, email, telefone e dados do negócio não ocupam links.',
+              'Adicione links como Instagram, WhatsApp e website. Nome, email e telefone não contam para o limite de links.',
             )}
           </p>
           <HomeProfilePlans
             plans={plans}
             billingAvailable={billing?.enabled === 1}
           />
+          <p className="home-disclosure">
+            {t('Incluído nos planos Individual e Profissional: WhatsApp, horário, direcções e personalização das cores do perfil.')}
+          </p>
           {plans.length === 0 ? (
             <p>
               {t(
                 'Os planos estão a ser actualizados. Contacte-nos para mais informações.',
               )}
             </p>
-          ) : (
-            <Link className="home-text-link" href="/perfil?plans=1">
-              {t('Explorar planos na minha conta ')}
-              <ArrowUpRight size={18} />
-            </Link>
-          )}
-        </section>
-        <section className="home-audience" id="quem-atendemos">
-          <h2>{t('Uma conexão à sua medida.')}</h2>
-          <div className="home-audience-grid">
-            {audiences.map(([name, text]) => (
-              <article className="home-audience-card" key={name}>
-                <h3>{t(name)}</h3>
-                <p>{t(text)}</p>
-              </article>
-            ))}
-          </div>
+          ) : null}
         </section>
         <section className="home-about" id="sobre">
           <h2>
@@ -261,7 +221,7 @@ export default async function Home() {
           </div>
         </section>
         <section className="home-faq" id="perguntas">
-          <h2>{t('Antes do primeiro toque.')}</h2>
+          <h2>{t('Perguntas frequentes')}</h2>
           <div>
             {questions.map(([q, a]) => (
               <details key={q}>
@@ -276,14 +236,14 @@ export default async function Home() {
           </Link>
         </section>
         <section className="home-how" id="primeiros-passos">
-          <h2>{t('Pronto para a próxima conexão?')}</h2>
+          <h2>{t('Veja as opções para o seu cartão ou porta-chaves')}</h2>
           <p>
             {t(
-              'Explore a sua solução, escolha os materiais e o design. Prepare a sua próxima apresentação.',
+              'Compare materiais e escolha entre o design FramyConnect, o seu próprio design ou a criação pela nossa equipa.',
             )}
           </p>
           <Link className="home-primary" href="/comprar">
-            {t('Explorar o kit completo ')}
+            {t('Ver opções')}
             <ArrowUpRight size={18} />
           </Link>
         </section>

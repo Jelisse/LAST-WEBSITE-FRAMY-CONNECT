@@ -24,22 +24,22 @@ export async function HomePurchaseOffers({
   }[] = [
     {
       id: 'card',
-      name: 'Cartão',
-      detail: 'A sua apresentação profissional.',
+      name: 'Cartão NFC',
+      detail: 'Partilhe contactos em reuniões, eventos e atendimentos.',
       materials: 'PVC · Madeira · Metal',
       photos: ['pvc'],
     },
     {
       id: 'kit',
-      name: 'Kit Completo',
-      detail: 'Cartão e porta-chaves ligados ao mesmo perfil.',
+      name: 'Kit: cartão + porta-chaves',
+      detail: 'Use o cartão nas reuniões e o porta-chaves no dia a dia. Ambos abrem o mesmo perfil.',
       materials: 'Cartão PVC + porta-chaves PVC com epóxi',
       photos: ['pvc', 'keychain'],
     },
     {
       id: 'keychain',
-      name: 'Porta-chaves',
-      detail: 'A sua identidade, sempre consigo.',
+      name: 'Porta-chaves NFC',
+      detail: 'Partilhe contactos com um produto que leva junto às chaves.',
       materials: 'PVC com epóxi · Couro',
       photos: ['keychain'],
     },
@@ -49,16 +49,21 @@ export async function HomePurchaseOffers({
       <div className="home-section-heading">
         <div>
           <span className="home-solution-eyebrow">
-            {t('UMA IDENTIDADE. A SUA ESCOLHA.')}
+            {t('CARTÕES E PORTA-CHAVES NFC')}
           </span>
-          <h2>{t('O essencial para se apresentar.')}</h2>
+          <h2>{t('Escolha o seu cartão, porta-chaves ou kit')}</h2>
           <p>
             {t(
-              'Escolha cartão, porta-chaves ou o kit completo, ligados ao mesmo perfil digital.',
+              'Produto: pagamento único. Perfil digital: plano mensal, com uma única subscrição para o cartão e o porta-chaves.',
             )}
           </p>
         </div>
       </div>
+      <p className="home-solution-notice">
+        {t(
+          'Compras temporariamente indisponíveis. Pode consultar os produtos e simular a configuração.',
+        )}
+      </p>
       <div className="home-solutions-grid">
         {offers.map((offer) => {
           const estimate = hardwareEstimate(
@@ -74,8 +79,8 @@ export async function HomePurchaseOffers({
             >
               <div className="home-solution-label">
                 {offer.id === 'kit'
-                  ? t('Recomendado · a solução completa')
-                  : t('Também disponível individualmente')}
+                  ? t('Recomendado · dois produtos, um perfil')
+                  : t('Disponível em separado')}
               </div>
               <div
                 className={`home-solution-photo${offer.id === 'kit' ? ' is-pair' : ''}`}
@@ -121,8 +126,6 @@ export async function HomePurchaseOffers({
                 )}
                 <p className="home-solution-included">
                   {t('Design FramyConnect incluído.')}
-                  <br />
-                  {t('Um perfil digital · 30 dias grátis')}
                 </p>
                 <Link
                   className={
@@ -130,7 +133,7 @@ export async function HomePurchaseOffers({
                   }
                   href={`/comprar?formato=${offer.id}`}
                 >
-                  {t('Explorar configuração')}
+                  {t('Ver opções')}
                   <ArrowUpRight size={18} />
                 </Link>
               </div>
@@ -138,18 +141,13 @@ export async function HomePurchaseOffers({
           );
         })}
       </div>
-      <p className="home-solution-notice">
-        {t(
-          'Checkout em manutenção. Explore as opções; novas encomendas e pagamentos estarão disponíveis após a reabertura.',
-        )}
-      </p>
       <p className="home-disclosure">
         {t(
-          'Outros materiais, personalização e entrega podem alterar o valor. Uma subscrição por perfil, mesmo com dois produtos.',
+          'O preço apresentado corresponde à versão PVC. Outros materiais, personalização e entrega podem alterar o total.',
         )}
       </p>
       <div className="home-design-heading">
-        <h3>{t('A sua marca, à sua maneira.')}</h3>
+        <h3>{t('Escolha o design do seu produto')}</h3>
         <p>{t('Três opções de design para cartões e porta-chaves.')}</p>
       </div>
       <div className="home-design-options">
