@@ -1,8 +1,8 @@
 import { database } from '@/lib/server-db';
-import { CorporatePlan } from '@/components/corporate-plan';
+import { HomeProfilePlans } from '@/components/home-profile-plans';
 import { getTranslations } from '@/lib/server-i18n';
 import { LanguageSelector } from '@/components/language-provider';
-import { planMeticais, planPrice } from '@/lib/plan-pricing';
+import { planMeticais } from '@/lib/plan-pricing';
 import { publicPageRobots } from '@/lib/server-site';
 import { HomePurchaseOffers } from '@/components/home-purchase-offers';
 import { AccountMenu } from '@/components/account-menu';
@@ -216,52 +216,10 @@ export default async function Home() {
               'Instagram, WhatsApp e website: 3 links à sua escolha. Nome, email, telefone e dados do negócio não ocupam links.',
             )}
           </p>
-          <div className="home-plans-grid">
-            {plans
-              .filter((p) => p.id !== 'free-30')
-              .map((p) => (
-                <article
-                  className={`home-plan${p.id === 'professional-v2' ? ' home-plan-recommended' : ''}`}
-                  key={p.id}
-                >
-                  <span className="home-plan-label">
-                    {p.id === 'free-30'
-                      ? t('Experimente primeiro')
-                      : p.id === 'professional-v2'
-                        ? t('Recomendado para profissionais')
-                        : billing?.enabled
-                          ? t('Mensal · por perfil')
-                          : t('Adesões em breve')}
-                  </span>
-                  <h3>{t(p.name)}</h3>
-                  <p>{t(p.description)}</p>
-                  <div className="home-plan-price">
-                    {planPrice(p, t.locale)}
-                    <span>
-                      {p.id === 'free-30' ? t(' / 30 dias') : t(' / mês')}
-                    </span>
-                  </div>
-                  <ul>
-                    <li>
-                      {t('Até ')}
-                      {p.links}
-                      {t(' links à sua escolha')}
-                    </li>
-                    <li>
-                      {p.bio > 0
-                        ? t('Biografia até {0} caracteres', [p.bio])
-                        : t('Contactos essenciais, sem biografia')}
-                    </li>
-                    <li>{t('WhatsApp, horário e direcções')}</li>
-                    <li>{t('Cores e apresentação do perfil')}</li>
-                    {p.id === 'professional-v2' && (
-                      <li>{t('Estatísticas de visitas e cliques')}</li>
-                    )}
-                  </ul>
-                </article>
-              ))}
-            <CorporatePlan />
-          </div>
+          <HomeProfilePlans
+            plans={plans}
+            billingAvailable={billing?.enabled === 1}
+          />
           {plans.length === 0 ? (
             <p>
               {t(

@@ -155,6 +155,82 @@
   border: 2px solid #ba3f0d;
   background: #fff8f2;
 }
+.home-profile-plans {
+  margin: 24px 0;
+}
+.home-plan-visual {
+  display: grid;
+  place-items: center;
+  height: 156px;
+  background: #f5f0e9;
+  color: #81705f;
+}
+.home-plan-visual > span {
+  width: 94px;
+  height: 94px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e3d7ca;
+  border-radius: 26px;
+  background: #fffaf5;
+}
+.is-recommended .home-plan-visual {
+  background: #f8e9db;
+  color: #ba3f0d;
+}
+.is-recommended .home-plan-visual > span {
+  border-color: #e9c1a6;
+  background: #fff4e9;
+}
+.home-profile-plan .home-plan-description {
+  min-height: 76px;
+}
+.home-profile-plan .home-solution-price {
+  min-height: 74px;
+}
+.home-profile-plan .home-solution-price strong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+.home-profile-plan .home-solution-price small {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #71685f;
+}
+.home-plan-inclusions {
+  list-style: none;
+  margin: 0 0 26px;
+  padding: 20px 0 0;
+  border-top: 1px solid #e9dfd3;
+}
+.home-plan-inclusions li {
+  display: flex;
+  align-items: start;
+  gap: 9px;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.home-plan-inclusions svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: #a3441b;
+}
+.home-profile-plan .home-solution-copy > a {
+  min-height: 44px;
+  width: 100%;
+}
+@media (max-width: 700px) {
+  .home-profile-plan .home-plan-description {
+    min-height: 0;
+  }
+  .home-plan-visual {
+    height: 132px;
+  }
+}
 @media (max-width: 1000px) {
   .home-solution-copy {
     padding: 20px;
