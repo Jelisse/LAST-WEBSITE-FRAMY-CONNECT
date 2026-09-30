@@ -8,8 +8,8 @@ if (!account || !/^[a-f0-9]{32}$/i.test(account))
 const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'));
 if (config.name !== 'framy-connect-staging' ||
     config.d1_databases?.[0]?.database_id !== 'd53a1009-119e-41c2-9f05-db685dc9a0f4' ||
-    config.vars?.PAYSUITE_ENABLED !== 'false') {
-  throw Error('Unexpected deployment target or payment activation. Review configuration first.');
+    !['false', 'true'].includes(config.vars?.PAYSUITE_ENABLED)) {
+  throw Error('Unexpected deployment target or invalid payment activation flag.');
 }
 async function get(path, label) {
   const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/${path}`, {
@@ -31,4 +31,4 @@ for (const name of ['PAYSUITE_API_TOKEN', 'PAYSUITE_WEBHOOK_SECRET']) {
     throw Error(`Missing encrypted Worker secret: ${name}`);
   }
 }
-console.log('Correct Worker and database found. Both PaySuite secret names are present; their values were not retrieved. Payments remain disabled.');
+console.log(`Correct Worker and database found. Both PaySuite secret names are present; their values were not retrieved. Gateway flag in this build: ${config.vars.PAYSUITE_ENABLED}.`);

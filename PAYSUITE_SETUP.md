@@ -37,7 +37,7 @@ The **Cloudflare website** workflow runs manually from `main`. Start with operat
 
 Operation `deploy` additionally records a D1 Time Travel recovery bookmark in the run summary, applies only compatible pending migrations and publishes the checked build. It refuses partial migrations. Recovery points expire after 7 days on Free or 30 days on Paid; no customer database export is uploaded to GitHub. Do not restore automatically after a failure because restoration can overwrite subsequent customer changes.
 
-This workflow deliberately requires `PAYSUITE_ENABLED=false`. Payment activation requires a separate configuration review after the deployment and merchant checkout details have been verified. The workflow is not triggered by pushes or pull requests.
+After the owner confirms secret replacement in PaySuite and Cloudflare, set `PAYSUITE_ENABLED=true`. Operation `activate` deploys the verified build and then enables product checkout and profile billing, preserving manager prices and existing terms. It records an audit entry and does not reset the billing-opening grace period when repeated. No charge is created by activation. Operation `deploy` preserves the database's existing billing switches. The workflow is not triggered by pushes or pull requests.
 
 - A redirect does not mean paid. `/checkout/retorno` checks authenticated server state and offers the verified hosted checkout link.
 - A repeated request ID returns the same session. An ambiguous provider timeout never triggers a second create POST. The manager can obtain the payment ID in PaySuite and reconcile it against the original reference and amount.
