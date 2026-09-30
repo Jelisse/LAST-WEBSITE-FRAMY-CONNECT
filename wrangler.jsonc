@@ -22,7 +22,6 @@
   ],
 
   "vars": {
-    "PAYSUITE_WEBHOOK_SECRET": "2549|tyw4CUNeJjpjqxvKvi6bQ OxRmTm8gMZwlqFejaGge4bed351",
     "PUBLIC_SITE_URL": "https://framyconnect.co.mz"
   },
 
