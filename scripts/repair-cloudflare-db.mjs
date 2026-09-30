@@ -1,6 +1,7 @@
 import { readFileSync, mkdirSync, appendFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { migrationPlan, schemaInventorySQL, stockMarker } from './cloudflare-migration-plan.mjs';
+import { migrationPlan, stockMarker } from './cloudflare-migration-plan.mjs';
+import { readCloudflareSchema } from './cloudflare-schema.mjs';
 
 const config = JSON.parse(readFileSync('wrangler.jsonc','utf8'));
 for (const name of ['CLOUDFLARE_ACCOUNT_ID', 'CLOUDFLARE_API_TOKEN'])
@@ -18,10 +19,11 @@ function wrangler(args) {
   }
   return r.stdout;
 }
-function query(sql) {
-  return JSON.parse(wrangler(['d1','execute','DB','--remote','--config','wrangler.jsonc','--command',sql,'--json'])).flatMap(r => r.results ?? []);
+function queryBatch(sql) {
+  return JSON.parse(wrangler(['d1','execute','DB','--remote','--config','wrangler.jsonc','--command',sql,'--json'])).map(r => r.results ?? []);
 }
-const keys = query(schemaInventorySQL).map(r => r.key);
+function query(sql) { return queryBatch(sql).flat(); }
+const keys = readCloudflareSchema(queryBatch);
 const recorded = keys.includes('table:manager_audit') && query(`SELECT 1 AS recorded FROM manager_audit WHERE id='${stockMarker}'`).length > 0;
 const plan = migrationPlan(keys, recorded);
 console.log('Pending compatible migrations:', plan.apply.join(', ') || 'none');
