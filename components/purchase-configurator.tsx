@@ -11,7 +11,7 @@ import {
   checkoutMaintenanceMessage,
 } from '@/lib/purchase-structure';
 import type { ManagedPlan } from '@/lib/domain';
-import { planPrice } from '@/lib/plan-pricing';
+import { planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
 import { money } from '@/lib/catalog';
 import { hardwareEstimate, type HardwarePrice } from '@/lib/hardware-pricing';
 import { SourceImage } from './source-image';
@@ -160,6 +160,7 @@ export function PurchaseConfigurator({
                         {t(plan.name)} · {planPrice(plan, t.locale)}
                         {t('/mês')}
                       </strong>
+                      <p>{planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')} · {t('Pagamento anual · adesões em breve')}</p>
                       <p>
                         {t('Por perfil · mensal')} · {t('Em breve')}
                       </p>

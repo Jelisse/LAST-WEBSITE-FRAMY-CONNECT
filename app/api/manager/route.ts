@@ -148,12 +148,25 @@ export async function POST(request: Request) {
           Math.abs(meticais * 100 - Math.round(meticais * 100)) > 0.0001
         )
           throw Error('Preço mensal inválido.');
+        let annualMeticais = b.annualMeticais;
+        if (annualMeticais === undefined) {
+          const previous = await db.prepare("SELECT data_json FROM manager_records WHERE id=? AND kind='plan'")
+            .bind(id).first<{ data_json: string }>();
+          annualMeticais = previous ? JSON.parse(previous.data_json).annualMeticais : undefined;
+          annualMeticais ??= Math.round(meticais * 1000) / 100;
+        }
+        if (typeof annualMeticais !== 'number' || !Number.isFinite(annualMeticais) ||
+          annualMeticais < (id === 'free-30' ? 0 : 1) ||
+          (id === 'free-30' && annualMeticais !== 0) || annualMeticais > 120000 ||
+          Math.abs(annualMeticais * 100 - Math.round(annualMeticais * 100)) > 0.0001)
+          throw Error('Preço anual inválido.');
         record = {
           id,
           name: text('name', 90),
           audience: text('audience', 90),
           description: text('description', 2000),
           meticais,
+          annualMeticais,
           links: integer('links', 1, 50),
           bio: integer('bio', 0, 1200),
           active: b.active,

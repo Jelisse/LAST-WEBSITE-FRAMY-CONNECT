@@ -2,7 +2,7 @@
 import { useI18n } from '@/components/language-provider';
 
 import { CorporatePlan } from './corporate-plan';
-import { planPrice } from '@/lib/plan-pricing';
+import { planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
 
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
@@ -159,6 +159,7 @@ export function PlanPicker({
                     </span>
                   </div>
                   <p className="plan-per-profile">
+                    {plan.id !== 'free-30' && <>{planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')} · {t('Pagamento anual · adesões em breve')}<br /></>}
                     {plan.id === 'free-30'
                       ? t('Sem renovação automática')
                       : t('Por perfil · mensal')}

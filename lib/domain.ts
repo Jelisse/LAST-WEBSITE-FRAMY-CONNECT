@@ -94,6 +94,7 @@ export type ManagedPlan = {
   name: string;
   audience: string;
   meticais?: number;
+  annualMeticais?: number;
   /** Legacy stored terms, converted only for display. */
   dollars?: number;
   links: number;

@@ -230,6 +230,8 @@
   letter-spacing: 0;
   color: #71685f;
 }
+.home-plan-annual { font-size: 18px; font-weight: 600; color: #96300c; }
+.home-plan-annual small { display: block; margin-top: 4px; }
 .home-plan-inclusions {
   list-style: none;
   margin: 0 0 26px;

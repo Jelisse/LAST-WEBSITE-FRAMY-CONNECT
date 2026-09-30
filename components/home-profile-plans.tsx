@@ -8,7 +8,7 @@ import {
   Minus,
 } from 'lucide-react';
 import { getTranslations } from '@/lib/server-i18n';
-import { planPrice } from '@/lib/plan-pricing';
+import { planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
 import type { ManagedPlan } from '@/lib/domain';
 
 export async function HomeProfilePlans({
@@ -87,6 +87,10 @@ export async function HomeProfilePlans({
                   {planPrice(plan, t.locale)}
                   <small>{t(' / mês')}</small>
                 </strong>
+                <div className="home-plan-annual">
+                  {planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')}
+                  <small>{t('Pagamento anual · adesões em breve')}</small>
+                </div>
                 <span>
                   {t('Mensal · por perfil')}
                   {!billingAvailable && ` · ${t('Adesões em breve')}`}

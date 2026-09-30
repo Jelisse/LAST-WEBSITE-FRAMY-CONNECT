@@ -2,7 +2,7 @@
 import { ProfileSubscriptions } from './profile-subscriptions';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
 
-import { planMeticais, planPrice } from '@/lib/plan-pricing';
+import { planMeticais, planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
 
 import { SourceImage } from '@/components/source-image';
 import { useEffect, useState, useCallback } from 'react';
@@ -1355,6 +1355,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   ...(editKind === 'plan'
                     ? {
                         meticais: Number(values.meticais),
+                        annualMeticais: Number(values.annualMeticais),
                         links: Number(values.links),
                         bio: Number(values.bio),
                       }
@@ -1430,6 +1431,13 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                         required
                         defaultValue={planMeticais(editing as ManagedPlan)}
                       />
+                    </label>
+                    <label>
+                      {t('MT / ano')}
+                      <input type="number" name="annualMeticais"
+                        min={(editing as ManagedPlan).id === 'free-30' ? '0' : '1'}
+                        max="120000" step="0.01" required
+                        defaultValue={planAnnualMeticais(editing as ManagedPlan)} />
                     </label>
                     <label>
                       {t('Número de links')}
