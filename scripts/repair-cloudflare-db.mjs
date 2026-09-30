@@ -3,12 +3,19 @@ import { spawnSync } from 'node:child_process';
 import { migrationPlan, schemaInventorySQL, stockMarker } from './cloudflare-migration-plan.mjs';
 
 const config = JSON.parse(readFileSync('wrangler.jsonc','utf8'));
+for (const name of ['CLOUDFLARE_ACCOUNT_ID', 'CLOUDFLARE_API_TOKEN'])
+  if (process.env[name]) process.env[name] = process.env[name].trim();
 if (config.name !== 'framy-connect-staging' || config.d1_databases?.length !== 1 ||
     config.d1_databases[0].database_id !== 'd53a1009-119e-41c2-9f05-db685dc9a0f4')
   throw Error('Unexpected database target. Repair stopped.');
 function wrangler(args) {
   const r = spawnSync(process.execPath, ['node_modules/wrangler/bin/wrangler.js', ...args], { encoding:'utf8', maxBuffer:16*1024*1024 });
-  if (r.status !== 0) throw Error('Cloudflare operation failed. Check authentication/access and inspect Wrangler locally. No response data is printed.');
+  if (r.status !== 0) {
+    const output = `${r.stderr ?? ''}\n${r.stdout ?? ''}`;
+    const codes = [...output.matchAll(/(?:\[code:\s*|"code"\s*:\s*)(\d+)/g)].map(m => m[1]);
+    const categories = ['Authentication error', 'permission', 'not authorized', 'SQLITE_ERROR', 'no such table', 'syntax error', 'fetch failed', 'account ID', 'API token'].filter(s => output.toLowerCase().includes(s.toLowerCase()));
+    throw Error(`Cloudflare operation failed (${args[0]} ${args[1]}). Exit ${r.status}; codes: ${codes.join(', ') || 'none'}; category: ${categories.join(', ') || 'unclassified'}. No response data or credentials are printed.`);
+  }
   return r.stdout;
 }
 function query(sql) {
