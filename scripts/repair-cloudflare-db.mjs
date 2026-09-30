@@ -1,4 +1,4 @@
-import { readFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, mkdirSync, appendFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { migrationPlan, schemaInventorySQL, stockMarker } from './cloudflare-migration-plan.mjs';
 
@@ -23,10 +23,19 @@ if (!process.argv.includes('--apply')) {
   process.exit(0);
 }
 if (plan.apply.length) {
+  if (process.argv.includes('--time-travel')) {
+    const { bookmark } = JSON.parse(wrangler(['d1','time-travel','info','DB','--config','wrangler.jsonc','--json']));
+    if (typeof bookmark !== 'string' || !/^[a-f0-9-]+$/i.test(bookmark))
+      throw Error('No valid database recovery point. Migration stopped.');
+    const recovery = `D1 recovery point before migration: ${bookmark}\nCaptured at: ${new Date().toISOString()}\nDatabase: framy-connect-staging\nTime Travel retention: 7 days on Free, 30 days on Paid. Restoration requires manual review because it overwrites later data.\n`;
+    console.log(recovery);
+    if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, recovery);
+  } else {
   mkdirSync('tmp/private-backups',{recursive:true});
   const backup = `tmp/private-backups/staging-${new Date().toISOString().replace(/[:.]/g,'-')}.sql`;
   wrangler(['d1','export','DB','--remote','--config','wrangler.jsonc','--output',backup]);
   console.log(`Private backup saved: ${backup}. Never commit or share this file.`);
+  }
   for (const file of plan.apply) {
     wrangler(['d1','execute','DB','--remote','--config','wrangler.jsonc','--file',`drizzle/${file}`,'--yes','--json']);
     console.log(`Applied ${file}`);

@@ -14,6 +14,8 @@ import type { ManagedPlan } from '@/lib/domain';
 import { planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
 import { money } from '@/lib/catalog';
 import { hardwareEstimate, type HardwarePrice } from '@/lib/hardware-pricing';
+import { PaySuiteCheckout } from './paysuite-checkout';
+import type { CheckoutPricing } from '@/lib/checkout-pricing';
 import { SourceImage } from './source-image';
 import type { ProductPhoto } from '@/lib/product-gallery';
 
@@ -22,11 +24,15 @@ export function PurchaseConfigurator({
   plans,
   prices,
   photos = [],
+  pricing = null,
+  paymentAvailable = false,
 }: {
   initial?: string;
   plans: ManagedPlan[];
   prices: HardwarePrice[];
   photos?: ProductPhoto[];
+  pricing?: CheckoutPricing | null;
+  paymentAvailable?: boolean;
 }) {
   const { t } = useI18n();
   const selection = purchaseSelection(initial);
@@ -34,7 +40,11 @@ export function PurchaseConfigurator({
   const [card, setCard] = useState<string>(selection.card);
   const [keychain, setKeychain] = useState<string>(selection.keychain);
   const [design, setDesign] = useState('standard');
-  const [method, setMethod] = useState('PDF vectorial');
+  const method = 'PDF vectorial';
+  const [contact,setContact] = useState('');
+  const [address,setAddress] = useState('');
+  const [delivery,setDelivery] = useState('maputo');
+  const [designInstructions,setDesignInstructions] = useState('');
   const selected = purchaseFormats.find((item) => item.id === format)!;
   const selectedDesign = designServices.find((item) => item.id === design)!;
   const estimate = hardwareEstimate(prices, format, card, keychain);
@@ -42,9 +52,11 @@ export function PurchaseConfigurator({
     ...(format !== 'keychain' ? [card] : []),
     ...(format !== 'card' ? [keychain] : []),
   ];
+  const designAmount = pricing ? design === 'standard' ? 0 : design === 'customer' ? pricing.customer_design : pricing.team_design : null;
+  const total = estimate && designAmount !== null && pricing && delivery === 'maputo' ? estimate.amount + designAmount + pricing.maputo_delivery : null;
   return (
     <div className="purchase-configurator">
-      <div className="purchase-maintenance">
+      {!paymentAvailable && <div className="purchase-maintenance">
         <strong>{t('Checkout em manutenção')}</strong>
         <p>{t(checkoutMaintenanceMessage)}</p>
         <p>
@@ -52,7 +64,7 @@ export function PurchaseConfigurator({
             'Explore a nova configuração. Os preços e a disponibilidade serão confirmados antes da reabertura.',
           )}
         </p>
-      </div>
+      </div>}
       <div className="purchase-layout">
         <div>
           <fieldset className="purchase-section">
@@ -109,30 +121,11 @@ export function PurchaseConfigurator({
                 </label>
               ))}
             </div>
-            {design === 'customer' && (
-              <label className="purchase-method">
-                {t('Como pretende personalizar?')}
-                <select
-                  value={method}
-                  onChange={(e) => setMethod(e.target.value)}
-                >
-                  <option value="PDF vectorial">{t('PDF vectorial')}</option>
-                  <option value="Editor online">{t('Editor online')}</option>
-                </select>
-                <small>
-                  {t(
-                    'O envio de ficheiros e o editor estarão disponíveis no novo checkout.',
-                  )}
-                </small>
-              </label>
-            )}
-            {design === 'team' && (
-              <p>
-                {t(
-                  'O serviço terá um preço único, com briefing e aprovação antes da produção.',
-                )}
-              </p>
-            )}
+            {design !== 'standard' && <label className="purchase-method">
+              Instruções para o design
+              <textarea value={designInstructions} onChange={e=>setDesignInstructions(e.target.value)} maxLength={2000} placeholder="Nome, cores e informações a incluir" />
+              <small>Após o pedido, a equipa contacta-o para receber o PDF vectorial ou preparar o design. O editor online ainda não está disponível. A produção começa após a sua aprovação.</small>
+            </label>}
           </fieldset>
           <section className="purchase-section">
             <h2>{t('3. Um perfil digital')}</h2>
@@ -144,11 +137,7 @@ export function PurchaseConfigurator({
               )}
             </p>
             <strong>{t('30 dias grátis · sem renovação automática')}</strong>
-            <p>
-              {t(
-                'Enquanto os planos mensais não estiverem disponíveis, prolongamos o acesso sem cobrança.',
-              )}
-            </p>
+            <p>O pagamento do perfil é feito separadamente após os 30 dias grátis. As renovações requerem a sua autorização.</p>
             <details>
               <summary>{t('Comparar os planos futuros')}</summary>
               <div className="purchase-plan-list">
@@ -160,7 +149,7 @@ export function PurchaseConfigurator({
                         {t(plan.name)} · {planPrice(plan, t.locale)}
                         {t('/mês')}
                       </strong>
-                      <p>{planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')} · {t('Pagamento anual · adesões em breve')}</p>
+                      <p>{planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')} · {paymentAvailable ? 'Pagamento anual' : t('Pagamento anual · adesões em breve')}</p>
                       <p>
                         {t('Por perfil · mensal')} · {t('Em breve')}
                       </p>
@@ -177,6 +166,14 @@ export function PurchaseConfigurator({
                 </article>
               </div>
             </details>
+          </section>
+          <section className="purchase-section">
+            <h2>4. Entrega</h2>
+            <label>Local de entrega<select value={delivery} onChange={e=>setDelivery(e.target.value)}><option value="maputo">Cidade de Maputo</option><option value="other">Outra localidade — sob consulta</option></select></label>
+            {delivery === 'other' ? <p><Link href="/contacto">Solicitar proposta de entrega</Link></p> : <>
+              <label>Contacto de entrega<input value={contact} onChange={e=>setContact(e.target.value)} maxLength={50} autoComplete="tel" /></label>
+              <label>Morada e ponto de referência<textarea value={address} onChange={e=>setAddress(e.target.value)} maxLength={300} autoComplete="street-address" /></label>
+            </>}
           </section>
         </div>
         <aside
@@ -229,25 +226,13 @@ export function PurchaseConfigurator({
               ])}
             </p>
           )}
-          <p>
-            {design === 'standard'
-              ? t('Design FramyConnect incluído.')
-              : t(
-                  'Personalização: suplemento a confirmar, não incluído no preço dos produtos.',
-                )}
-          </p>
-          <p>
-            <strong>{t('Subscrição digital')}</strong>
-            <br />
-            {t('30 dias grátis · sem renovação automática')}
-          </p>
-          <p><strong>{t('Total final: por confirmar')}</strong><br />{t('Entrega e eventuais suplementos de design ainda não incluídos.')}</p>
-          <button className="btn btn-primary" disabled>
-            {t('Checkout em manutenção')}
-          </button>
-          <p>
-            {t('Esta configuração não cria uma encomenda nem reserva stock.')}
-          </p>
+          <p>Design: {designAmount === null ? 'Sob consulta' : money(designAmount,t.locale)}</p>
+          <p>Entrega: {pricing && delivery === 'maputo' ? money(pricing.maputo_delivery,t.locale) : 'Sob consulta'}</p>
+          <p><strong>Total do produto: {total === null ? 'Sob consulta' : money(total,t.locale)}</strong></p>
+          <p>Perfil digital: 30 dias grátis. Subscrição paga separadamente após a experiência.</p>
+          {!paymentAvailable && <p>Valores propostos, sujeitos a publicação pelo gestor. Pagamentos ainda indisponíveis.</p>}
+          <PaySuiteCheckout key={`${format}-${card}-${keychain}-${design}-${delivery}-${total}`} disabled={!paymentAvailable || total === null || contact.trim().length < 7 || address.trim().length < 8}
+            payload={{kind:'product',format,card,keychain,design,delivery,contact,address,designInstructions,expectedAmount:total,pricingVersion:pricing?.version}} />
           <Link href="/dashboard">{t('Acompanhar o pedido')}</Link>
         </aside>
       </div>

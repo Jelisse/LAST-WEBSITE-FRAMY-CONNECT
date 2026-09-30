@@ -22,7 +22,8 @@
   ],
 
   "vars": {
-    "PUBLIC_SITE_URL": "https://framyconnect.co.mz"
+    "PUBLIC_SITE_URL": "https://framyconnect.co.mz",
+    "PAYSUITE_ENABLED": "false"
   },
 
 

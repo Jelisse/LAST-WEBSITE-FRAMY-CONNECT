@@ -31,6 +31,7 @@ test('database repair identifies missing post-auth migrations without replaying 
     '0014_profile_engagement.sql',
     '0015_profile_growth.sql',
     '0016_customer_recovery.sql',
+    '0017_paysuite.sql',
   ]);
 });
 test('database repair is a no-op when schema and inventory migration are applied', () => {

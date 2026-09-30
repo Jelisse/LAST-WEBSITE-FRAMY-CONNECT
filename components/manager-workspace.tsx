@@ -402,6 +402,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
           <AccountMenu />
         </header>
         <main id="main" className="manager-main">
+          <Link className="btn" href="/manager/pagamentos">Checkout e pagamentos PaySuite</Link>
           <div className="manager-heading">
             <div>
               <span className="manager-eyebrow">{t('CENTRO DE GESTÃO')}</span>

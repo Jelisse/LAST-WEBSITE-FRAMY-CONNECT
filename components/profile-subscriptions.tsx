@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
+import { PaySuitePlanCheckout } from './paysuite-plan-checkout';
 type Invoice = {
   id: string;
   plan_id: string;
@@ -13,13 +14,14 @@ type Invoice = {
   name?: string;
 };
 type Data = {
+  gatewayAvailable?: boolean;
   emailConfigured: boolean;
   settings: { enabled: number; instructions: string; version: number };
   invoices: Invoice[];
   state: string;
   expiresAt: string | null;
   membership: { next_plan_id?: string; next_starts_at?: string } | null;
-  plans: { id: string; name: string; meticais: number; version: number }[];
+  plans: { id: string; name: string; meticais: number; annualMeticais?: number; version: number }[];
   notices: {
     id: string;
     subject: string;
@@ -198,7 +200,7 @@ export function ProfileSubscriptions({
               ) : (
                 <>
                   <div className="growth-plan-grid">
-                    {data.plans.map((p) => (
+                    {data.plans.map((p) => data.gatewayAvailable ? <PaySuitePlanCheckout key={p.id} plan={p} trial={data.state==='trial'}/> : (
                       <form
                         key={p.id}
                         onSubmit={(ev) => {
@@ -283,7 +285,7 @@ export function ProfileSubscriptions({
               )}
               {i.status === 'pending' &&
                 Date.parse(i.expires_at) > observedAt &&
-                (manager ? (
+                (i.instructions === 'PaySuite' ? <a href={manager ? '/manager/pagamentos' : '/checkout/retorno?payment='+encodeURIComponent(i.id)}>Consultar pagamento PaySuite</a> : manager ? (
                   <button disabled={busy} onClick={() => setSelected(i)}>
                     Verificar pagamento
                   </button>

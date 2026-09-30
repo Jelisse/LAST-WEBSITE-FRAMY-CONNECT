@@ -14,9 +14,11 @@ import type { ManagedPlan } from '@/lib/domain';
 export async function HomeProfilePlans({
   plans,
   billingAvailable,
+  annualAvailable = false,
 }: {
   plans: ManagedPlan[];
   billingAvailable: boolean;
+  annualAvailable?: boolean;
 }) {
   const t = await getTranslations();
   const individual = plans
@@ -89,7 +91,7 @@ export async function HomeProfilePlans({
                 </strong>
                 <div className="home-plan-annual">
                   {planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')}
-                  <small>{t('Pagamento anual · adesões em breve')}</small>
+                  <small>{annualAvailable ? 'Pagamento anual · sem renovação automática' : t('Pagamento anual · adesões em breve')}</small>
                 </div>
                 <span>
                   {t('Mensal · por perfil')}

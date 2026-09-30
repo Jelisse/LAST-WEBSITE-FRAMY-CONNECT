@@ -9,8 +9,10 @@ import { type PurchaseFormat } from '@/lib/purchase-structure';
 
 export async function HomePurchaseOffers({
   products,
+  checkoutAvailable = false,
 }: {
   products: Product[];
+  checkoutAvailable?: boolean;
 }) {
   const t = await getTranslations();
   const prices = hardwarePrices(products);
@@ -53,11 +55,11 @@ export async function HomePurchaseOffers({
           </p>
         </div>
       </div>
-      <p className="home-solution-notice">
+      {!checkoutAvailable && <p className="home-solution-notice">
         {t(
           'Compras temporariamente indisponíveis. Pode consultar os produtos e simular a configuração.',
         )}
-      </p>
+      </p>}
       <div className="home-solutions-grid">
         {offers.map((offer) => {
           const estimate = hardwareEstimate(

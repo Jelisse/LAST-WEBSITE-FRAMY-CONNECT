@@ -1,3 +1,5 @@
+import { env } from 'cloudflare:workers';
+import { paysuiteReady } from '@/lib/server-paysuite';
 import { database } from '@/lib/server-db';
 import { HomeProfilePlans } from '@/components/home-profile-plans';
 import { getTranslations } from '@/lib/server-i18n';
@@ -61,6 +63,8 @@ export default async function Home() {
     .prepare('SELECT enabled FROM profile_billing_settings WHERE id=1')
     .first<{ enabled: number }>()
     .catch(() => null);
+  const checkoutSettings = await database().prepare('SELECT enabled FROM checkout_pricing WHERE id=1').first<{enabled:number}>().catch(() => null);
+  const checkoutAvailable = paysuiteReady(env) && checkoutSettings?.enabled === 1;
   const [products, allPlans, heroMedia] = await Promise.all([
     getProducts(),
     getManagedPlans(),
@@ -157,7 +161,7 @@ export default async function Home() {
           </div>
         </section>
         <HomeSharingScene media={heroMedia} />
-        <HomePurchaseOffers products={products} />
+        <HomePurchaseOffers products={products} checkoutAvailable={checkoutAvailable} />
         <section className="home-plans" id="planos">
           <div className="home-section-heading">
             <div>
@@ -180,6 +184,7 @@ export default async function Home() {
           <HomeProfilePlans
             plans={plans}
             billingAvailable={billing?.enabled === 1}
+            annualAvailable={billing?.enabled === 1 && paysuiteReady(env)}
           />
           {plans.length === 0 ? (
             <p>
@@ -211,7 +216,7 @@ export default async function Home() {
             {questions.map(([q, a]) => (
               <details key={q}>
                 <summary>{t(q)}</summary>
-                <p>{t(a)}</p>
+                <p>{q === 'Já posso comprar?' && checkoutAvailable ? 'Sim. Configure o produto e confirme o total antes de pagar na PaySuite. Entregas fora da cidade de Maputo requerem proposta.' : t(a)}</p>
               </details>
             ))}
           </div>

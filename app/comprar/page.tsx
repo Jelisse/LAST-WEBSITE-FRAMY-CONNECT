@@ -1,3 +1,6 @@
+import { env } from 'cloudflare:workers';
+import { paysuiteReady } from '@/lib/server-paysuite';
+import type { CheckoutPricing } from '@/lib/checkout-pricing';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { PurchaseConfigurator } from '@/components/purchase-configurator';
 import { getManagedPlans } from '@/lib/server-plans';
@@ -23,6 +26,7 @@ export default async function Page({
     searchParams,
     getProducts(),
   ]);
+  const pricing = await env.DB.prepare('SELECT * FROM checkout_pricing WHERE id=1').first<CheckoutPricing>().catch(() => null);
   const format = purchaseSelection(query.formato).format;
   const title = format === 'keychain' ? 'Configurar porta-chaves' : format === 'card' ? 'Configurar cartão' : 'Configurar kit';
   return (
@@ -47,6 +51,8 @@ export default async function Page({
           plans={plans.filter((plan) => plan.active)}
           prices={hardwarePrices(products)}
           photos={productPhotos(products)}
+          pricing={pricing}
+          paymentAvailable={paysuiteReady(env) && !!pricing?.enabled}
         />
       </main>
       <SiteFooter />

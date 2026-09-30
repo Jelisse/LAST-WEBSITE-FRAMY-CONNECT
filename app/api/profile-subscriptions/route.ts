@@ -8,6 +8,7 @@ import { calendarMonthAfter, cleanText } from '@/lib/profile-growth';
 import { profileBody, profileJSON as json } from '@/lib/profile-api';
 import { profileAccess, expiryDate } from '@/lib/entitlement';
 import { profileMembership } from '@/lib/server-profile-access';
+import { paysuiteReady } from '@/lib/server-paysuite';
 export const dynamic = 'force-dynamic';
 type Invoice = {
   id: string;
@@ -42,6 +43,7 @@ export async function GET() {
         .all(),
     ]);
     return json({
+      gatewayAvailable: paysuiteReady(env),
       settings,
       emailConfigured: !!(env.RESEND_API_KEY && env.PROFILE_EMAIL_FROM),
       invoices: invoices.results,
@@ -138,7 +140,7 @@ export async function POST(request: Request) {
         throw Error('Preço indisponível.');
       await db
         .prepare(
-          "UPDATE profile_invoices SET status='cancelled' WHERE owner_id=? AND status='pending' AND expires_at<=?",
+          "UPDATE profile_invoices SET status='cancelled' WHERE owner_id=? AND status='pending' AND expires_at<=? AND instructions<>'PaySuite'",
         )
         .bind(user.userId, now)
         .run();
@@ -167,6 +169,8 @@ export async function POST(request: Request) {
       return json({ ok: true, invoice });
     }
     if (b.action === 'cancel') {
+      if (await db.prepare('SELECT id FROM paysuite_payments WHERE target_id=? AND kind=\'subscription\'').bind(String(b.id)).first())
+        return json({error:'Consulte o estado do pagamento PaySuite antes de alterar este pedido.'},409);
       const r = await db
         .prepare(
           "UPDATE profile_invoices SET status='cancelled' WHERE id=? AND status='pending' AND owner_id=?",
@@ -178,6 +182,8 @@ export async function POST(request: Request) {
     if (b.action === 'confirm') {
       if (user.role !== 'manager')
         return json({ error: 'Sem permissão.' }, 403);
+      if (await db.prepare('SELECT id FROM paysuite_payments WHERE target_id=? AND kind=\'subscription\'').bind(String(b.id)).first())
+        return json({error:'Use a reconciliação PaySuite para confirmar este pagamento.'},409);
       const invoice = await db
         .prepare('SELECT * FROM profile_invoices WHERE id=?')
         .bind(cleanText(b.id, 80, true))

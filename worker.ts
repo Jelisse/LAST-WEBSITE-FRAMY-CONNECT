@@ -4,6 +4,7 @@ import { customDomainRequest } from './lib/custom-domain-request';
 import handler from 'vinext/server/fetch-handler';
 import { securityHeaders } from './lib/security-headers';
 import { cleanupReservations } from './lib/reservation-cleanup';
+import { reconcilePayment, type GatewayPayment } from './lib/server-paysuite';
 const worker = {
   async scheduled(
     _controller: ScheduledController,
@@ -11,6 +12,13 @@ const worker = {
     ctx: ExecutionContext,
   ) {
     ctx.waitUntil(cleanupReservations(env.DB));
+    if (env.PAYSUITE_API_TOKEN) ctx.waitUntil((async () => {
+      const pending = await env.DB.prepare("SELECT * FROM paysuite_payments WHERE provider_id IS NOT NULL AND status IN ('creating','pending') ORDER BY updated_at LIMIT 12").all<GatewayPayment>();
+      for (const payment of pending.results) {
+        try { await reconcilePayment(env,payment); } catch { /* Retry on the next scheduled run; never log provider payloads. */ }
+        await env.DB.prepare('UPDATE paysuite_payments SET updated_at=? WHERE id=?').bind(new Date().toISOString(),payment.id).run();
+      }
+    })());
     ctx.waitUntil(
       env.DB.prepare(
         'DELETE FROM auth_recovery WHERE token_hash IN (SELECT token_hash FROM auth_recovery WHERE expires_at<? LIMIT 1000)',
