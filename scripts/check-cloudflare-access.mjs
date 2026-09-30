@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 
-const account = process.env.CLOUDFLARE_ACCOUNT_ID;
-const token = process.env.CLOUDFLARE_API_TOKEN;
-if (!account || !/^[a-f0-9]{32}$/i.test(account) || !token) {
-  throw Error('Set GitHub Actions secrets CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN.');
-}
+const account = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
+const token = process.env.CLOUDFLARE_API_TOKEN?.trim();
+if (!token) throw Error('CLOUDFLARE_API_TOKEN is empty or unavailable to this workflow.');
+if (!account || !/^[a-f0-9]{32}$/i.test(account))
+  throw Error('CLOUDFLARE_ACCOUNT_ID must contain only the 32-character hexadecimal Cloudflare Account ID, without a URL, label, quotation marks or hyphens.');
 const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'));
 if (config.name !== 'framy-connect-staging' ||
     config.d1_databases?.[0]?.database_id !== 'd53a1009-119e-41c2-9f05-db685dc9a0f4' ||
