@@ -139,7 +139,7 @@ export function PurchaseConfigurator({
             <strong>{t('30 dias grátis · sem renovação automática')}</strong>
             <p>O pagamento do perfil é feito separadamente após os 30 dias grátis. As renovações requerem a sua autorização.</p>
             <details>
-              <summary>{t('Comparar os planos futuros')}</summary>
+              <summary>{t('Comparar planos')}</summary>
               <div className="purchase-plan-list">
                 {plans
                   .filter((plan) => plan.id !== 'free-30')
