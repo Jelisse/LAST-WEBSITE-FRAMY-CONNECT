@@ -133,10 +133,10 @@ export default async function Home() {
                 )}
               </p>
               <div className="home-hero-actions">
-                <Link className="home-primary" href="/comprar">
+                <a className="home-primary" href="#produtos">
                   {t('Escolher o meu produto')}
                   <ArrowUpRight size={18} />
-                </Link>
+                </a>
                 <a className="home-secondary" href="#como-funciona">
                   {t('Como funciona ')}
                   <Nfc size={19} />
