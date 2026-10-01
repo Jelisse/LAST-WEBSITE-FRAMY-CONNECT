@@ -1,3 +1,4 @@
+import type { PlanControls } from './plan-features';
 import { validateExtras, type ProfileExtras } from './profile-growth.ts';
 import { validateBusiness, type ProfileBusiness } from './profile-business.ts';
 export const legacyPlans = [
@@ -89,7 +90,7 @@ export const plans = [
   },
 ] as const;
 export type PlanId = string;
-export type ManagedPlan = {
+export type ManagedPlan = PlanControls & {
   id: string;
   name: string;
   audience: string;

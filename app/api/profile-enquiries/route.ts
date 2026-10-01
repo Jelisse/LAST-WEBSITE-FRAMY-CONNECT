@@ -2,7 +2,7 @@ import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
 import { profileBody, profileJSON as json } from '@/lib/profile-api';
 import { cleanText } from '@/lib/profile-growth';
-import { activeProfileSQL, hasProfessionalFeatures } from '@/lib/entitlement';
+import { activeProfileSQL, hasPlanFeature } from '@/lib/entitlement';
 import {
   profileMembership,
   publishedProfile,
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
       )
       .bind(username, now, now)
       .first<{ owner_id: string; published_json: string }>();
-    if (!row || !hasProfessionalFeatures(await profileMembership(row.owner_id)))
+    if (!row || !hasPlanFeature(await profileMembership(row.owner_id), 'enquiries'))
       return json({ error: 'Este formulário está indisponível.' }, 404);
     const profile = await publishedProfile(
       row.owner_id,

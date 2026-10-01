@@ -1,14 +1,17 @@
 'use client';
+import type { PlanFeatures } from '@/lib/plan-features';
 import type { Profile } from '@/lib/domain';
 import { defaultExtras } from '@/lib/profile-growth';
 export function ProfileExtrasEditor({
   profile,
   onChange,
   limit,
+  features,
 }: {
   profile: Profile;
   onChange: (p: Profile) => void;
   limit: number;
+  features?: PlanFeatures;
 }) {
   const e = {
     ...defaultExtras,
@@ -40,129 +43,133 @@ export function ProfileExtrasEditor({
     <section className="profile-business-editor">
       <h3>Mais valor para o seu negócio</h3>
       <p>
-        Vitrine, mensagens e conteúdo em inglês incluídos na experiência e no
-        plano Profissional. Guarde e publique para aplicar.
+        As ferramentas disponíveis dependem do seu plano. Os campos desactivados
+        ficam guardados e não aparecem no perfil público.
       </p>
-      <details>
-        <summary>Produtos e serviços · {e.services.length}/6</summary>
-        <p>
-          Apresente o que oferece. O preço é informativo; o botão abre o
-          endereço que escolher.
-        </p>
-        {e.services.map((s, i) => (
-          <fieldset key={i}>
-            <legend>Oferta {i + 1}</legend>
-            <label>
-              Nome
-              <input
-                maxLength={80}
-                value={s.title}
-                onChange={(ev) =>
-                  set({
-                    services: e.services.map((x, j) =>
-                      j === i ? { ...x, title: ev.target.value } : x,
-                    ),
-                  })
+      <fieldset disabled={features?.showcase === false}>
+        <details>
+          <summary>Produtos e serviços · {e.services.length}/6</summary>
+          <p>
+            Apresente o que oferece. O preço é informativo; o botão abre o
+            endereço que escolher.
+          </p>
+          {e.services.map((s, i) => (
+            <fieldset key={i}>
+              <legend>Oferta {i + 1}</legend>
+              <label>
+                Nome
+                <input
+                  maxLength={80}
+                  value={s.title}
+                  onChange={(ev) =>
+                    set({
+                      services: e.services.map((x, j) =>
+                        j === i ? { ...x, title: ev.target.value } : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Descrição
+                <textarea
+                  maxLength={300}
+                  value={s.description}
+                  onChange={(ev) =>
+                    set({
+                      services: e.services.map((x, j) =>
+                        j === i ? { ...x, description: ev.target.value } : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Preço ou indicação
+                <input
+                  placeholder="A partir de 500 MT · sob consulta"
+                  maxLength={60}
+                  value={s.price}
+                  onChange={(ev) =>
+                    set({
+                      services: e.services.map((x, j) =>
+                        j === i ? { ...x, price: ev.target.value } : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Link HTTPS
+                <input
+                  type="url"
+                  maxLength={300}
+                  value={s.url}
+                  onChange={(ev) =>
+                    set({
+                      services: e.services.map((x, j) =>
+                        j === i ? { ...x, url: ev.target.value } : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <details>
+                <summary>Versão inglesa desta oferta</summary>
+                {(
+                  [
+                    ['englishTitle', 'Nome em inglês', 80],
+                    ['englishDescription', 'Descrição em inglês', 300],
+                    ['englishPrice', 'Preço em inglês', 60],
+                  ] as const
+                ).map(([key, label, max]) => (
+                  <label key={key}>
+                    {label}
+                    <input
+                      disabled={features?.english === false}
+                      maxLength={max}
+                      value={s[key] ?? ''}
+                      onChange={(ev) =>
+                        set({
+                          services: e.services.map((x, j) =>
+                            j === i ? { ...x, [key]: ev.target.value } : x,
+                          ),
+                        })
+                      }
+                    />
+                  </label>
+                ))}
+              </details>
+              <button
+                type="button"
+                onClick={() =>
+                  set({ services: e.services.filter((_, j) => j !== i) })
                 }
-              />
-            </label>
-            <label>
-              Descrição
-              <textarea
-                maxLength={300}
-                value={s.description}
-                onChange={(ev) =>
-                  set({
-                    services: e.services.map((x, j) =>
-                      j === i ? { ...x, description: ev.target.value } : x,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <label>
-              Preço ou indicação
-              <input
-                placeholder="A partir de 500 MT · sob consulta"
-                maxLength={60}
-                value={s.price}
-                onChange={(ev) =>
-                  set({
-                    services: e.services.map((x, j) =>
-                      j === i ? { ...x, price: ev.target.value } : x,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <label>
-              Link HTTPS
-              <input
-                type="url"
-                maxLength={300}
-                value={s.url}
-                onChange={(ev) =>
-                  set({
-                    services: e.services.map((x, j) =>
-                      j === i ? { ...x, url: ev.target.value } : x,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <details>
-              <summary>Versão inglesa desta oferta</summary>
-              {(
-                [
-                  ['englishTitle', 'Nome em inglês', 80],
-                  ['englishDescription', 'Descrição em inglês', 300],
-                  ['englishPrice', 'Preço em inglês', 60],
-                ] as const
-              ).map(([key, label, max]) => (
-                <label key={key}>
-                  {label}
-                  <input
-                    maxLength={max}
-                    value={s[key] ?? ''}
-                    onChange={(ev) =>
-                      set({
-                        services: e.services.map((x, j) =>
-                          j === i ? { ...x, [key]: ev.target.value } : x,
-                        ),
-                      })
-                    }
-                  />
-                </label>
-              ))}
-            </details>
-            <button
-              type="button"
-              onClick={() =>
-                set({ services: e.services.filter((_, j) => j !== i) })
-              }
-            >
-              Remover oferta
-            </button>
-          </fieldset>
-        ))}
-        <button
-          type="button"
-          disabled={e.services.length >= 6}
-          onClick={() =>
-            set({
-              services: [
-                ...e.services,
-                { title: '', description: '', price: '', url: '' },
-              ],
-            })
-          }
-        >
-          Adicionar produto ou serviço
-        </button>
-      </details>
+              >
+                Remover oferta
+              </button>
+            </fieldset>
+          ))}
+          <button
+            type="button"
+            disabled={e.services.length >= 6}
+            onClick={() =>
+              set({
+                services: [
+                  ...e.services,
+                  { title: '', description: '', price: '', url: '' },
+                ],
+              })
+            }
+          >
+            Adicionar produto ou serviço
+          </button>
+        </details>
+      </fieldset>
       <label className="growth-check">
         <input
           type="checkbox"
+          disabled={features?.enquiries === false}
           checked={e.enquiries}
           onChange={(ev) => set({ enquiries: ev.target.checked })}
         />
@@ -172,43 +179,46 @@ export function ProfileExtrasEditor({
         As mensagens ficam na sua caixa de entrada durante 90 dias. Não são
         enviadas automaticamente por email.
       </p>
-      <details>
-        <summary>Conteúdo em inglês</summary>
-        <p>
-          Escreva a sua própria versão. O visitante pode alternar entre
-          Português e English. Campos vazios mantêm o texto original.
-        </p>
-        <label>
-          Título em inglês
-          <input
-            value={e.english.title}
-            maxLength={120}
-            onChange={(ev) =>
-              set({ english: { ...e.english, title: ev.target.value } })
-            }
-          />
-        </label>
-        <label>
-          Biografia em inglês
-          <textarea
-            value={e.english.bio}
-            maxLength={600}
-            onChange={(ev) =>
-              set({ english: { ...e.english, bio: ev.target.value } })
-            }
-          />
-        </label>
-        <label>
-          Horário em inglês
-          <textarea
-            value={e.english.hours}
-            maxLength={240}
-            onChange={(ev) =>
-              set({ english: { ...e.english, hours: ev.target.value } })
-            }
-          />
-        </label>
-      </details>
+      <fieldset disabled={features?.english === false}>
+        <details>
+          <summary>Conteúdo em inglês</summary>
+          <p>
+            Escreva a sua própria versão. O visitante pode alternar entre
+            Português e English. Campos vazios mantêm o texto original.
+          </p>
+          <label>
+            Título em inglês
+            <input
+              value={e.english.title}
+              maxLength={120}
+              onChange={(ev) =>
+                set({ english: { ...e.english, title: ev.target.value } })
+              }
+            />
+          </label>
+          <label>
+            Biografia em inglês
+            <textarea
+              value={e.english.bio}
+              maxLength={600}
+              onChange={(ev) =>
+                set({ english: { ...e.english, bio: ev.target.value } })
+              }
+            />
+          </label>
+          <label>
+            Horário em inglês
+            <textarea
+              disabled={features?.location === false}
+              value={e.english.hours}
+              maxLength={240}
+              onChange={(ev) =>
+                set({ english: { ...e.english, hours: ev.target.value } })
+              }
+            />
+          </label>
+        </details>
+      </fieldset>
       <details>
         <summary>Links visíveis e contacto após o período pago</summary>
         <p>

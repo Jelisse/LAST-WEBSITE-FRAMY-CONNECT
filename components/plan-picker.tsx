@@ -1,4 +1,5 @@
 'use client';
+import { planFeatures, featureCatalog, type FeatureKey } from '@/lib/plan-features';
 import { useI18n } from '@/components/language-provider';
 
 import { CorporatePlan } from './corporate-plan';
@@ -109,7 +110,7 @@ export function PlanPicker({
             </ul>
             <p className="plan-disclosure">
               {t(
-                'O período gratuito dura 30 dias e não renova automaticamente. Produtos NFC e entrega são pagos separadamente. Os planos mensais ainda não estão disponíveis.',
+                'O período gratuito dura 30 dias e não renova automaticamente. Produtos NFC e entrega são pagos separadamente.',
               )}
             </p>
             {error && (
@@ -134,7 +135,7 @@ export function PlanPicker({
             </DialogTitle>
             <DialogDescription className="plans-intro">
               {t(
-                'Experimente durante 30 dias, sem renovação automática. Enquanto os planos mensais não abrirem, prolongamos o acesso sem cobrança.',
+                'Compare os planos e escolha o período mensal ou anual disponível. A renovação exige a sua autorização.',
               )}
             </DialogDescription>
             <div className="plans-grid">
@@ -153,16 +154,16 @@ export function PlanPicker({
                   <h3>{t(plan.name)}</h3>
                   <p>{t(plan.description)}</p>
                   <div className="plan-price">
-                    <strong>{planPrice(plan, t.locale)}</strong>
+                    <strong>{planPrice(plan.monthlyEnabled === false ? {meticais:planAnnualMeticais(plan)} : plan, t.locale)}</strong>
                     <span>
-                      {plan.id === 'free-30' ? t('/ 30 dias') : t('/mês')}
+                      {plan.id === 'free-30' ? t('/ 30 dias') : plan.monthlyEnabled === false ? t(' / ano') : t('/mês')}
                     </span>
                   </div>
                   <p className="plan-per-profile">
-                    {plan.id !== 'free-30' && <>{planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')} · {t('Pagamento anual · adesões em breve')}<br /></>}
+                    {plan.id !== 'free-30' && plan.annualEnabled !== false && plan.monthlyEnabled !== false && <>{planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')} · {t('Sem renovação automática')}<br /></>}
                     {plan.id === 'free-30'
                       ? t('Sem renovação automática')
-                      : t('Por perfil · mensal')}
+                      : t('Por perfil')}
                   </p>
                   <Button
                     className={
@@ -187,7 +188,7 @@ export function PlanPicker({
                       : plan.id === 'free-30'
                         ? t('Começar 30 dias grátis')
                         : paidAvailable
-                          ? 'Ver pagamento mensal'
+                          ? 'Ver opções de pagamento'
                           : t('Em breve')}
                     {plan.id !== current && <ArrowRight size={16} />}
                   </Button>
@@ -213,6 +214,8 @@ export function PlanPicker({
                       <Check />
                       {t('Partilha de perfil')}
                     </li>
+                    {(Object.keys(featureCatalog) as FeatureKey[]).filter(k=>planFeatures(plan)[k]).map(k=><li key={k}><Check/>{t(featureCatalog[k])}</li>)}
+                    {(plan.benefits??[]).map(b=><li key={b}><Check/>{b}</li>)}
                   </ul>
                 </article>
               ))}
@@ -220,7 +223,7 @@ export function PlanPicker({
             </div>
             <p className="plan-disclosure">
               {t(
-                'Pessoal e Profissional incluem um perfil digital. Corporativo: preço e condições sob consulta. Subscrições mensais ainda não disponíveis.',
+                'Cada plano inclui um perfil digital. Produtos físicos são pagos separadamente. Corporativo: condições sob consulta.',
               )}
             </p>
           </>

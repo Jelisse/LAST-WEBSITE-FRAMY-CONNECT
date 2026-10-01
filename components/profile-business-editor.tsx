@@ -9,8 +9,10 @@ import { useI18n } from './language-provider';
 export function ProfileBusinessEditor({
   profile,
   onChange,
+  features,
 }: {
   profile: Profile;
+  features?: {whatsapp:boolean; location:boolean};
   onChange: (profile: Profile) => void;
 }) {
   const { t } = useI18n();
@@ -25,10 +27,12 @@ export function ProfileBusinessEditor({
           'Estes campos são opcionais e aparecem no perfil publicado. Não ocupam os seus links.',
         )}
       </p>
+      {(features?.whatsapp === false || features?.location === false) && <p>Os campos desactivados não estão incluídos no seu plano. Os dados guardados são preservados.</p>}
       <div className="profile-business-fields">
         <label>
           {t('WhatsApp público')}
           <input
+            disabled={features?.whatsapp === false}
             type="tel"
             value={business.whatsapp}
             maxLength={24}
@@ -39,6 +43,7 @@ export function ProfileBusinessEditor({
         <label>
           {t('Mensagem para iniciar a conversa')}
           <textarea
+            disabled={features?.whatsapp === false}
             value={business.message}
             maxLength={300}
             rows={2}
@@ -51,6 +56,7 @@ export function ProfileBusinessEditor({
         <label>
           {t('Endereço do negócio')}
           <input
+            disabled={features?.location === false}
             value={business.address}
             maxLength={240}
             placeholder={t('Rua, cidade e país')}
@@ -60,6 +66,7 @@ export function ProfileBusinessEditor({
         <label>
           {t('Horário de atendimento')}
           <textarea
+            disabled={features?.location === false}
             value={business.hours}
             maxLength={240}
             rows={2}

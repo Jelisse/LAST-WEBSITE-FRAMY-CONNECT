@@ -8,7 +8,7 @@ import {
 } from '../lib/card-art.ts';
 import { validateDesign, resetProductDesign } from '../lib/customisation.ts';
 import { products } from '../lib/catalog.ts';
-test('PVC price includes the printed personalised product', () => {
+test('PVC base price includes standard FramyConnect printing', () => {
   const pvc = products.find((p) => p.id === 'pvc');
   assert.equal(pvc.amount, 95000);
   assert.equal(pvc.available, false);

@@ -1,5 +1,6 @@
 'use client';
-import { ProfileSubscriptions } from './profile-subscriptions';
+import { FinanceManager } from './finance-manager';
+import { SubscriptionManager } from './subscription-manager';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
 
 import { planMeticais, planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
@@ -92,7 +93,7 @@ const sections = [
   { id: 'subscriptions', label: 'Subscrições digitais', icon: Wallet },
   { id: 'operations', label: 'Operações', icon: Boxes },
   { id: 'hero', label: 'Página inicial', icon: LayoutDashboard },
-  { id: 'catalog', label: 'Produtos e planos', icon: ShoppingBag },
+  { id: 'catalog', label: 'Produtos', icon: ShoppingBag },
   { id: 'accounts', label: 'Contas e acessos', icon: Users },
   { id: 'applications', label: 'Candidaturas', icon: Users },
   { id: 'finance', label: 'Financeiro', icon: Wallet },
@@ -420,7 +421,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                           )
                         : section === 'catalog'
                           ? t(
-                              'Os produtos e as subscrições que oferece aos seus clientes.',
+                              'Catálogo, materiais, preços e stock dos produtos físicos.',
                             )
                           : section === 'applications'
                             ? t('Analise e acompanhe as candidaturas a agente.')
@@ -435,7 +436,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                                 )}
               </p>
             </div>
-            {section !== 'analytics' && section !== 'subscriptions' && (
+            {section !== 'analytics' && section !== 'subscriptions' && section !== 'finance' && (
               <button
                 className="manager-secondary"
                 disabled={busy}
@@ -450,7 +451,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
               </button>
             )}
           </div>
-          {(section === 'operations' || section === 'finance') && (
+          {section === 'operations' && (
             <p className="manager-sandbox">
               {t(
                 'Gestão de encomendas · Confirme cada transacção no prestador antes de a registar. Valores de produtos em MZN; planos mensais em meticais.',
@@ -464,7 +465,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
           )}
           {notice && <output className="manager-notice">{t(notice)}</output>}
           {section === 'subscriptions' ? (
-            <ProfileSubscriptions manager />
+            <SubscriptionManager />
           ) : section === 'analytics' ? (
             <WebsiteAnalytics />
           ) : !data ? (
@@ -479,7 +480,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
             </section>
           ) : (
             <>
-              {(section === 'overview' || section === 'finance') && (
+              {section === 'overview' && (
                 <div className="manager-toolbar">
                   <label>
                     {t('Período')}{' '}
@@ -939,133 +940,8 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   </section>
                 </>
               )}
-              {section === 'catalog' && (
-                <>
-                  <Tabs
-                    value={tab}
-                    onChange={setTab}
-                    items={[
-                      ['products', 'Produtos'],
-                      ['plans', 'Planos mensais'],
-                    ]}
-                  />
-                  {tab === 'products' ? (
-                    <ProductManager onSaved={() => void load()} />
-                  ) : (
-                    <>
-                      <div className="manager-toolbar">
-                        <p className="manager-muted">
-                          {t(
-                            'Alterações aplicam-se às novas adesões. Os clientes existentes mantêm as condições acordadas.',
-                          )}
-                        </p>
-                        <button
-                          className="manager-primary"
-                          onClick={() => {
-                            setEditKind('plan');
-                            setEditing({
-                              id: 'plan-' + crypto.randomUUID(),
-                              name: '',
-                              audience: '',
-                              description: '',
-                              meticais: 63.91,
-                              links: 3,
-                              bio: 0,
-                              active: true,
-                              version: 0,
-                            });
-                          }}
-                        >
-                          <Plus size={16} />
-                          {t(' Novo plano')}
-                        </button>
-                      </div>
-                      <div className="manager-plan-grid">
-                        {data.plans.map((p) => (
-                          <article className="manager-card" key={p.id}>
-                            <span className="manager-eyebrow">
-                              {p.active ? t('DISPONÍVEL') : t('INACTIVO')}
-                            </span>
-                            <h2>{t(p.name)}</h2>
-                            <p className="manager-plan-price">
-                              {planPrice(p, t.locale)}
-                              <small>{t(' / mês')}</small>
-                            </p>
-                            <p>{t(p.description)}</p>
-                            <p>
-                              <strong>
-                                {p.links}
-                                {t(' links')}
-                              </strong>{' '}
-                              · {p.bio} {t('caracteres de biografia')}
-                            </p>
-                            <button
-                              className="manager-secondary"
-                              onClick={() => {
-                                setEditKind('plan');
-                                setEditing(p);
-                              }}
-                            >
-                              {t('Editar plano')}
-                            </button>
-                          </article>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-              {section === 'finance' && (
-                <>
-                  <div className="manager-metrics">
-                    <Metric
-                      label={t('Por receber')}
-                      value={money(
-                        orders
-                          .filter((o) => !o.paid && o.status !== 'CANCELLED')
-                          .reduce((n, o) => n + o.amount, 0),
-                        t.locale,
-                      )}
-                    />
-                    <Metric
-                      label={t('Receita reconhecida')}
-                      value={money(
-                        orders
-                          .filter((o) => o.status === 'DELIVERED')
-                          .reduce((n, o) => n + o.amount, 0),
-                        t.locale,
-                      )}
-                    />
-                    <Metric
-                      label={t('Custos reconhecidos')}
-                      value={money(
-                        orders
-                          .filter((o) => o.status === 'DELIVERED')
-                          .reduce((n, o) => n + o.cost, 0),
-                        t.locale,
-                      )}
-                    />
-                    <Metric
-                      label={t('Margem bruta')}
-                      value={money(
-                        orders
-                          .filter((o) => o.status === 'DELIVERED')
-                          .reduce((n, o) => n + o.amount - o.cost, 0),
-                        t.locale,
-                      )}
-                    />
-                  </div>
-                  <section className="manager-card">
-                    <h2>{t('Pagamentos e reembolsos')}</h2>
-                    <p className="manager-muted">
-                      {t(
-                        'A receita e o custo são reconhecidos na entrega. Os relatórios usam a data de criação do pedido. Não são demonstrações financeiras oficiais.',
-                      )}
-                    </p>
-                    {table}
-                  </section>
-                </>
-              )}
+              {section === 'catalog' && <ProductManager onSaved={() => void load()} />}
+              {section === 'finance' && <FinanceManager />}
             </>
           )}
         </main>

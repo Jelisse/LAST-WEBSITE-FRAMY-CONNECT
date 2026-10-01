@@ -11,11 +11,16 @@ export function PaySuitePlanCheckout({
     name: string;
     meticais: number;
     annualMeticais?: number;
+    monthlyEnabled?: boolean;
+    annualEnabled?: boolean;
     version: number;
   };
   trial: boolean;
 }) {
-  const [cycle, setCycle] = useState('monthly');
+  const [chosenCycle, setCycle] = useState(
+    plan.monthlyEnabled === false ? 'annual' : 'monthly',
+  );
+  const cycle = plan.monthlyEnabled === false ? 'annual' : plan.annualEnabled === false ? 'monthly' : chosenCycle;
   const amount = cycle === 'annual' ? planAnnualMeticais(plan) : plan.meticais;
   return (
     <article>
@@ -23,8 +28,12 @@ export function PaySuitePlanCheckout({
       <label>
         Período de acesso
         <select value={cycle} onChange={(e) => setCycle(e.target.value)}>
-          <option value="monthly">Um mês</option>
-          <option value="annual">Um ano</option>
+          {plan.monthlyEnabled !== false && (
+            <option value="monthly">Um mês</option>
+          )}
+          {plan.annualEnabled !== false && (
+            <option value="annual">Um ano</option>
+          )}
         </select>
       </label>
       <p>

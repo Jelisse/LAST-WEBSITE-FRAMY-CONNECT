@@ -1,3 +1,4 @@
+import { validatePlanControls, planFeatures } from '@/lib/plan-features';
 import { publicError } from '@/lib/public-error';
 import { serviceFailure } from '@/lib/service-failure';
 import { expireReservations } from '@/lib/server-reservations';
@@ -139,6 +140,15 @@ export async function POST(request: Request) {
           active: b.active,
         };
       else {
+        const previousRow = await db
+          .prepare(
+            "SELECT data_json FROM manager_records WHERE id=? AND kind='plan'",
+          )
+          .bind(id)
+          .first<{ data_json: string }>();
+        const previousControls = previousRow
+          ? JSON.parse(previousRow.data_json)
+          : {};
         const meticais = Number(b.meticais);
         if (
           !Number.isFinite(meticais) ||
@@ -150,15 +160,26 @@ export async function POST(request: Request) {
           throw Error('Preço mensal inválido.');
         let annualMeticais = b.annualMeticais;
         if (annualMeticais === undefined) {
-          const previous = await db.prepare("SELECT data_json FROM manager_records WHERE id=? AND kind='plan'")
-            .bind(id).first<{ data_json: string }>();
-          annualMeticais = previous ? JSON.parse(previous.data_json).annualMeticais : undefined;
+          const previous = await db
+            .prepare(
+              "SELECT data_json FROM manager_records WHERE id=? AND kind='plan'",
+            )
+            .bind(id)
+            .first<{ data_json: string }>();
+          annualMeticais = previous
+            ? JSON.parse(previous.data_json).annualMeticais
+            : undefined;
           annualMeticais ??= Math.round(meticais * 1000) / 100;
         }
-        if (typeof annualMeticais !== 'number' || !Number.isFinite(annualMeticais) ||
+        if (
+          typeof annualMeticais !== 'number' ||
+          !Number.isFinite(annualMeticais) ||
           annualMeticais < (id === 'free-30' ? 0 : 1) ||
-          (id === 'free-30' && annualMeticais !== 0) || annualMeticais > 120000 ||
-          Math.abs(annualMeticais * 100 - Math.round(annualMeticais * 100)) > 0.0001)
+          (id === 'free-30' && annualMeticais !== 0) ||
+          annualMeticais > 120000 ||
+          Math.abs(annualMeticais * 100 - Math.round(annualMeticais * 100)) >
+            0.0001
+        )
           throw Error('Preço anual inválido.');
         record = {
           id,
@@ -167,6 +188,17 @@ export async function POST(request: Request) {
           description: text('description', 2000),
           meticais,
           annualMeticais,
+          ...validatePlanControls({
+            ...b,
+            features:
+              b.features ?? previousControls.features ?? planFeatures({ id }),
+            monthlyEnabled:
+              b.monthlyEnabled ?? previousControls.monthlyEnabled ?? true,
+            annualEnabled:
+              b.annualEnabled ?? previousControls.annualEnabled ?? true,
+            benefits: b.benefits ?? previousControls.benefits ?? [],
+            sortOrder: b.sortOrder ?? previousControls.sortOrder ?? 0,
+          }),
           links: integer('links', 1, 50),
           bio: integer('bio', 0, 1200),
           active: b.active,
@@ -182,6 +214,21 @@ export async function POST(request: Request) {
           b.action === 'agent' ? 'Agente actualizado' : 'Plano actualizado',
           record.name,
         ),
+        ...(b.action === 'plan'
+          ? [
+              db
+                .prepare(
+                  'INSERT INTO plan_revisions(plan_id,version,data_json,actor,created_at) SELECT ?,?,?,?,? WHERE changes()>0',
+                )
+                .bind(
+                  id,
+                  version + 1,
+                  JSON.stringify(record),
+                  user.userId,
+                  now,
+                ),
+            ]
+          : []),
       ]);
       if (!result[0].meta.changes)
         return json(

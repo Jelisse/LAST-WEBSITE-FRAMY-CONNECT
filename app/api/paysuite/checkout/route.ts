@@ -53,7 +53,26 @@ export async function GET(request: Request) {
         /* Remain pending; webhook/cron retries. */
       }
     }
+    const profile =
+      row.kind === 'product' && row.status === 'paid'
+        ? await env.DB.prepare(
+            'SELECT username,published_json FROM profiles WHERE owner_id=?',
+          )
+            .bind(user.userId)
+            .first<{ username: string; published_json: string | null }>()
+        : null;
     return json({
+      receiptStatus:
+        row.status === 'paid'
+          ? ((
+              await env.DB.prepare(
+                'SELECT status FROM payment_email_receipts WHERE payment_id=?',
+              )
+                .bind(row.id)
+                .first<{ status: string }>()
+            )?.status ?? null)
+          : null,
+      profileReady: !!profile?.published_json,
       id: row.id,
       kind: row.kind,
       amount: row.amount,
@@ -127,8 +146,6 @@ export async function POST(request: Request) {
       )
         .bind(user.userId)
         .first<{ username: string; published_json: string }>();
-      if (!profile)
-        throw Error('Guarde e publique o seu perfil antes de encomendar.');
       const contact = cleanText(b.contact, 50, true),
         address = cleanText(b.address, 300, true);
       if (contact.length < 7 || address.length < 8)
@@ -138,8 +155,8 @@ export async function POST(request: Request) {
         contact,
         address,
         city: 'Maputo',
-        profileUsername: profile.username,
-        profileSnapshot: JSON.parse(profile.published_json),
+        profileUsername: profile?.username ?? null,
+        profileSnapshot: profile ? JSON.parse(profile.published_json) : null,
         designInstructions: cleanText(b.designInstructions ?? '', 2000),
       };
       amount = quote.total;
@@ -190,12 +207,15 @@ export async function POST(request: Request) {
       if (member.next_starts_at && member.next_starts_at > now)
         throw Error('Já tem uma alteração de plano agendada.');
       const plan = (await getManagedPlans()).find(
-        (p) =>
-          p.id === b.planId &&
-          p.active &&
-          ['personal', 'professional-v2'].includes(p.id),
+        (p) => p.id === b.planId && p.active && p.id !== 'free-30',
       );
-      if (!plan || plan.version !== b.planVersion)
+      if (
+        !plan ||
+        (cycle === 'annual'
+          ? plan.annualEnabled === false
+          : plan.monthlyEnabled === false) ||
+        plan.version !== b.planVersion
+      )
         throw Error('O plano mudou. Actualize antes de continuar.');
       amount = Math.round(
         (cycle === 'annual' ? planAnnualMeticais(plan) : planMeticais(plan)) *

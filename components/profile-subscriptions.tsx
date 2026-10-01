@@ -5,6 +5,7 @@ import { CreditCard, Mail, RefreshCw, ReceiptText } from 'lucide-react';
 type Invoice = {
   id: string;
   plan_id: string;
+  terms_json?: string;
   amount: number;
   instructions: string;
   status: string;
@@ -22,7 +23,7 @@ type Data = {
   state: string;
   expiresAt: string | null;
   membership: { next_plan_id?: string; next_starts_at?: string } | null;
-  plans: { id: string; name: string; meticais: number; annualMeticais?: number; version: number }[];
+  plans: { id: string; name: string; meticais: number; annualMeticais?: number; monthlyEnabled?: boolean; annualEnabled?: boolean; description?: string; version: number }[];
   notices: {
     id: string;
     subject: string;
@@ -107,7 +108,7 @@ export function ProfileSubscriptions({
         {manager ? 'Gestão das subscrições' : 'O seu plano digital'}
       </h2>
       <p>
-        {manager ? 'Controle as adesões, as instruções e os pedidos de pagamento dos planos digitais.' : 'Pagamento de um mês de cada vez. Sem débito nem renovação automática. O produto físico é pago separadamente.'}
+        {manager ? 'Controle as adesões, as instruções e os pedidos de pagamento dos planos digitais.' : 'Escolha o período mensal ou anual. Sem débito nem renovação automática. O produto físico é pago separadamente.'}
       </p>
       </div>
       {manager && <button type="button" disabled={busy} onClick={() => void refresh()}><RefreshCw size={16} aria-hidden="true" />{busy ? 'A actualizar…' : 'Actualizar'}</button>}
@@ -217,7 +218,7 @@ export function ProfileSubscriptions({
               ) : (
                 <>
                   <div className="growth-plan-grid">
-                    {data.plans.map((p) => data.gatewayAvailable ? <PaySuitePlanCheckout key={p.id} plan={p} trial={data.state==='trial'}/> : (
+                    {data.plans.filter(p=>data.gatewayAvailable || p.monthlyEnabled !== false).map((p) => data.gatewayAvailable ? <PaySuitePlanCheckout key={p.id} plan={p} trial={data.state==='trial'}/> : (
                       <form
                         key={p.id}
                         onSubmit={(ev) => {
@@ -235,9 +236,7 @@ export function ProfileSubscriptions({
                           {money(Math.round(p.meticais * 100))} / mês
                         </strong>
                         <p>
-                          {p.id === 'personal'
-                            ? '8 links · 200 caracteres · cores e contactos'
-                            : '20 links · 600 caracteres · estatísticas, vitrine, mensagens, idiomas, equipa e domínio'}
+                          {p.description}
                         </p>
                         <label className="growth-check">
                           <input type="checkbox" required />
@@ -275,7 +274,7 @@ export function ProfileSubscriptions({
             <article className="growth-invoice" key={i.id}>
               <strong>
                 {i.name ??
-                  (i.plan_id === 'personal' ? 'Pessoal' : 'Profissional')}{' '}
+                  (() => { try { return JSON.parse(i.terms_json ?? '{}').name ?? i.plan_id; } catch { return i.plan_id; } })()}{' '}
                 · {money(i.amount)}
               </strong>
               {i.email && <p>{i.email}</p>}

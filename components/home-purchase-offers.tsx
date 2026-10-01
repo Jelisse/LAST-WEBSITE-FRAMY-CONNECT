@@ -3,7 +3,7 @@ import { ProductMaterialGallery } from './product-material-gallery';
 import { productPhotos } from '@/lib/product-gallery';
 import { ArrowUpRight } from 'lucide-react';
 import { getTranslations } from '@/lib/server-i18n';
-import { money, type Product } from '@/lib/catalog';
+import { type Product } from '@/lib/catalog';
 import { hardwareEstimate, hardwarePrices } from '@/lib/hardware-pricing';
 import { type PurchaseFormat } from '@/lib/purchase-structure';
 
@@ -17,8 +17,12 @@ export async function HomePurchaseOffers({
   const t = await getTranslations();
   const prices = hardwarePrices(products);
   const photos = productPhotos(products);
-  const cards = photos.filter((photo) => ['pvc', 'wood', 'metal'].includes(photo.id));
-  const keychains = photos.filter((photo) => ['keychain', 'keychain-leather'].includes(photo.id));
+  const cards = photos.filter((photo) =>
+    ['pvc', 'wood', 'metal'].includes(photo.id),
+  );
+  const keychains = photos.filter((photo) =>
+    ['keychain', 'keychain-leather'].includes(photo.id),
+  );
   const offers: {
     id: PurchaseFormat;
     name: string;
@@ -32,7 +36,8 @@ export async function HomePurchaseOffers({
     {
       id: 'kit',
       name: 'Kit: cartão + porta-chaves',
-      detail: 'Use o cartão nas reuniões e o porta-chaves no dia a dia. Ambos abrem o mesmo perfil.',
+      detail:
+        'Use o cartão nas reuniões e o porta-chaves no dia a dia. Ambos abrem o mesmo perfil.',
     },
     {
       id: 'keychain',
@@ -55,11 +60,13 @@ export async function HomePurchaseOffers({
           </p>
         </div>
       </div>
-      {!checkoutAvailable && <p className="home-solution-notice">
-        {t(
-          'Compras temporariamente indisponíveis. Pode consultar os produtos e simular a configuração.',
-        )}
-      </p>}
+      {!checkoutAvailable && (
+        <p className="home-solution-notice">
+          {t(
+            'Compras temporariamente indisponíveis. Pode consultar os produtos e simular a configuração.',
+          )}
+        </p>
+      )}
       <div className="home-solutions-grid">
         {offers.map((offer) => {
           const estimate = hardwareEstimate(
@@ -78,19 +85,33 @@ export async function HomePurchaseOffers({
                   ? t('Recomendado · dois produtos, um perfil')
                   : t('Disponível em separado')}
               </div>
-              <ProductMaterialGallery name={t(offer.name)} frames={
-                offer.id === 'card' ? cards.map((photo) => [photo]) :
-                offer.id === 'keychain' ? keychains.map((photo) => [photo]) :
-                cards.flatMap((card) => keychains.map((keychain) => [card, keychain]))
-              } />
+              <ProductMaterialGallery
+                name={t(offer.name)}
+                frames={
+                  offer.id === 'card'
+                    ? cards.map((photo) => [photo])
+                    : offer.id === 'keychain'
+                      ? keychains.map((photo) => [photo])
+                      : cards.flatMap((card) =>
+                          keychains.map((keychain) => [card, keychain]),
+                        )
+                }
+              />
               <div className="home-solution-copy">
                 <h3>{t(offer.name)}</h3>
                 <p>{t(offer.detail)}</p>
                 <div className="home-solution-price">
-                  {estimate && <span className="home-starting-price">{t('A partir de')}</span>}
+                  {estimate && (
+                    <span className="home-starting-price">
+                      {t('A partir de')}
+                    </span>
+                  )}
                   <strong>
                     {estimate
-                      ? money(estimate.amount, t.locale)
+                      ? new Intl.NumberFormat(t.locale, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(estimate.amount / 100) + ' MT'
                       : t('Preço a confirmar')}
                   </strong>
                   <span>{t('Pagamento único · plano digital à parte')}</span>
@@ -106,7 +127,13 @@ export async function HomePurchaseOffers({
                   }
                   href={`/comprar?formato=${offer.id}`}
                 >
-                  {t(offer.id === 'card' ? 'Configurar cartão' : offer.id === 'kit' ? 'Configurar kit' : 'Configurar porta-chaves')}
+                  {t(
+                    offer.id === 'card'
+                      ? 'Configurar cartão'
+                      : offer.id === 'kit'
+                        ? 'Configurar kit'
+                        : 'Configurar porta-chaves',
+                  )}
                   <ArrowUpRight size={18} />
                 </Link>
               </div>

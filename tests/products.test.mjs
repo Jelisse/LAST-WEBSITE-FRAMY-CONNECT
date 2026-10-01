@@ -38,7 +38,7 @@ test('reject malformed prices, unsafe image sources and free available products'
 });
 test('zero price allowed when a product is under consultation', () => {
   assert.equal(
-    validateProduct({ ...seed, amount: 0, available: false }, seed).available,
+    validateProduct({ ...seed, amount: 0, available: false, configurationPriceConfirmed: false }, seed).available,
     false,
   );
 });

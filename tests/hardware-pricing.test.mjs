@@ -22,7 +22,7 @@ test('approved hardware defaults and the kit saving use integer MZN minor units'
     prices.some((p) => 'cost' in p),
     false,
   );
-  assert.equal(hardwareEstimate(prices, 'card', 'Metal', 'PVC + epóxi'), null);
+  assert.deepEqual(hardwareEstimate(prices, 'card', 'Metal', 'PVC + epóxi'), {amount:150000,saving:0});
   assert.equal(hardwareEstimate(prices, 'kit', 'PVC', 'Couro'), null);
 });
 

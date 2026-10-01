@@ -1,4 +1,4 @@
-import { hasProfessionalFeatures, type Membership } from './entitlement';
+import { hasPlanFeature, type Membership } from './entitlement';
 export async function customDomainRequest(
   request: Request,
   env: Cloudflare.Env,
@@ -39,7 +39,7 @@ export async function customDomainRequest(
   )
     .bind(row.owner_id)
     .first<Membership>();
-  if (!hasProfessionalFeatures(membership))
+  if (!hasPlanFeature(membership, 'domain'))
     return new Response('Domínio indisponível', { status: 404 });
   const root = url.pathname === '/' || url.pathname === '/' + row.username;
   const asset =

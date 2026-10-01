@@ -2,6 +2,7 @@
 import Link from '@/components/hard-link';
 import { useEffect, useState } from 'react';
 import { checkoutURL } from '@/lib/paysuite';
+import { CheckCircle2, ArrowRight, Clock3 } from 'lucide-react';
 type Payment = {
   id: string;
   kind: string;
@@ -10,11 +11,13 @@ type Payment = {
   cycle: string;
   url?: string | null;
   orderStatus?: string | null;
+  profileReady?: boolean;
+  receiptStatus?: string | null;
 };
 const labels: Record<string, string> = {
   creating: 'A confirmar a ligação ao prestador',
   pending: 'A aguardar pagamento',
-  paid: 'Pagamento confirmado',
+  paid: 'Pagamento feito com sucesso',
   failed: 'Pagamento não concluído',
   review: 'Pagamento em revisão pela equipa',
 };
@@ -83,7 +86,9 @@ export function PaySuiteStatus() {
     /* Never navigate to an untrusted provider URL. */
   }
   return (
-    <section className="panel">
+    <section
+      className={`panel payment-result ${payment?.status === 'paid' ? 'is-paid' : ''}`}
+    >
       <h1>Estado do pagamento</h1>
       {signin ? (
         <Link href={'/entrar?return_to=' + encodeURIComponent(returnTo)}>
@@ -98,6 +103,13 @@ export function PaySuiteStatus() {
           )}
           {payment ? (
             <>
+              <div className="payment-state-icon" aria-hidden="true">
+                {payment.status === 'paid' ? (
+                  <CheckCircle2 size={36} />
+                ) : (
+                  <Clock3 size={36} />
+                )}
+              </div>
               <h2 aria-live="polite">
                 {labels[payment.status] ?? payment.status}
               </h2>
@@ -112,7 +124,37 @@ export function PaySuiteStatus() {
                     ? 'Perfil · um ano'
                     : 'Perfil · um mês'}
               </p>
-              {url && (
+              {payment.status === 'paid' && payment.kind === 'product' && (
+                <div className="payment-profile-next">
+                  <span className="eyebrow">
+                    PRÓXIMO PASSO · PERFIL DIGITAL
+                  </span>
+                  <h3>
+                    {payment.profileReady
+                      ? 'O seu perfil já está publicado'
+                      : 'Agora, prepare o seu perfil'}
+                  </h3>
+                  <p>
+                    {payment.profileReady
+                      ? 'Pode rever os seus contactos e links. O produto fica associado ao perfil da sua conta.'
+                      : 'Adicione a sua fotografia, os contactos e os links que quer partilhar. Ao publicar, o perfil fica ligado à sua encomenda.'}
+                  </p>
+                  <Link
+                    className="btn btn-primary"
+                    href={'/perfil?pagamento=' + encodeURIComponent(payment.id)}
+                  >
+                    {payment.profileReady
+                      ? 'Continuar a configurar o perfil'
+                      : 'Continuar: criar e configurar perfil'}{' '}
+                    <ArrowRight size={18} aria-hidden="true" />
+                  </Link>
+                  <p className="payment-next-note">
+                    Pode continuar mais tarde na sua conta. Não precisa de
+                    repetir o pagamento.
+                  </p>
+                </div>
+              )}
+              {url && payment.status === 'pending' && (
                 <a className="btn btn-primary" href={url}>
                   Pagar na PaySuite
                 </a>
@@ -122,8 +164,17 @@ export function PaySuiteStatus() {
                   {payment.kind === 'product'
                     ? payment.orderStatus === 'fulfilled'
                       ? 'Entrega confirmada pela equipa.'
-                      : 'A equipa recebeu a encomenda e irá preparar a produção e entrega.'
+                      : 'A encomenda está paga. A equipa acompanhará a configuração do perfil, a produção e a entrega.'
                     : 'O período pago foi registado no seu perfil.'}
+                </p>
+              )}
+              {payment.status === 'paid' && payment.receiptStatus && (
+                <p className="payment-next-note">
+                  {payment.receiptStatus === 'sent'
+                    ? 'O comprovativo foi enviado para o email da sua conta. Verifique também a pasta de spam.'
+                    : payment.receiptStatus === 'review'
+                      ? 'O pagamento está confirmado. Contacte a equipa se ainda não recebeu o comprovativo por email.'
+                      : 'O comprovativo de pagamento está a ser preparado para envio ao email da sua conta.'}
                 </p>
               )}
               {payment.status === 'creating' && (

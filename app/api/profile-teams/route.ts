@@ -3,7 +3,7 @@ import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
 import { profileBody, profileJSON as json } from '@/lib/profile-api';
 import { cleanText } from '@/lib/profile-growth';
-import { hasProfessionalFeatures } from '@/lib/entitlement';
+import { hasPlanFeature } from '@/lib/entitlement';
 import { profileMembership } from '@/lib/server-profile-access';
 export const dynamic = 'force-dynamic';
 export async function GET() {
@@ -113,7 +113,7 @@ export async function POST(request: Request) {
         .run();
       return json({ ok: true });
     }
-    if (!hasProfessionalFeatures(await profileMembership(u.userId)))
+    if (!hasPlanFeature(await profileMembership(u.userId), 'teams'))
       return json(
         {
           error:

@@ -640,3 +640,41 @@
   .subscription-manager .subscription-heading button,
   .subscription-manager .subscription-settings > button { width: 100%; justify-content: center; }
 }
+
+.management-suite { display: grid; gap: 22px; min-width: 0; }
+.suite-tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #e5ded8; padding-bottom: 14px; }
+.management-suite button, .management-suite select, .management-suite input, .management-suite textarea { font: inherit; }
+.management-suite button { padding: 10px 15px; border: 1px solid #ddd3cb; border-radius: 10px; min-height: 42px; cursor: pointer; background: white; color: #4c3930; }
+.management-suite button[aria-pressed='true'], .management-suite .manager-primary { background: #b83c0a; color: white; border-color: #b83c0a; }
+.management-suite button:disabled { opacity: .55; cursor: wait; }
+.management-suite :focus-visible { outline: 3px solid #d95b23; outline-offset: 3px; }
+.suite-stats { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 16px; }
+.suite-stats article { background: white; border: 1px solid #e8e2dc; border-radius: 14px; padding: 20px; }
+.suite-stats span { display: block; color: #74695f; font-size: 12px; }
+.suite-stats strong { display: block; margin-top: 8px; font-size: 22px; }
+.suite-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.suite-toolbar { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.suite-toolbar p { flex: 1; min-width: 200px; }
+.suite-form { display: grid; gap: 18px; }
+.management-suite label { display: grid; gap: 8px; min-width: 0; }
+.management-suite input:not([type='checkbox']), .management-suite select, .management-suite textarea { width: 100%; padding: 10px 12px; min-height: 44px; background: white; border: 1px solid #cdbfb3; border-radius: 8px; color: #292622; }
+.management-suite textarea { resize: vertical; min-height: 90px; }
+.suite-checks { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.management-suite .suite-check, .suite-checks label { display: flex; flex-direction: row; align-items: flex-start; gap: 10px; }
+.management-suite input[type='checkbox'] { width: 18px; height: 18px; flex-shrink: 0; accent-color: #b83c0a; }
+.management-suite fieldset { padding: 18px; border: 1px solid #dfd5cc; border-radius: 12px; min-width: 0; }
+.suite-preview { padding: 20px; background: #fff6ed; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.suite-note { margin: 0; color: #756456; font-size: 12px; }
+.suite-table { overflow: auto; max-height: 650px; }
+.suite-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.suite-table th,.suite-table td { text-align: left; padding: 12px; border-bottom: 1px solid #ede6e0; vertical-align: top; }
+.suite-table th { background: #fff6ed; position: sticky; top: 0; }
+.suite-table small { display: block; color: #827368; margin-top: 5px; overflow-wrap: anywhere; }
+.suite-bar { display: grid; gap: 7px; margin: 18px 0; }
+.suite-bar meter { width: 100%; height: 24px; accent-color: #b83c0a; }
+.management-suite .manager-card > p { color: #74695f; line-height: 1.7; }
+.management-suite .manager-card ul { padding-left: 18px; line-height: 1.9; margin: 16px 0; }
+@media(max-width:700px) { .suite-grid,.suite-checks { grid-template-columns: 1fr; } .suite-toolbar>* { width: 100%; } .suite-tabs button { flex: 1 1 140px; } }
+.suite-bar meter::-webkit-meter-bar { background: #f2e9e1; border: 0; border-radius: 8px; }
+.suite-bar meter::-webkit-meter-optimum-value { background: #c3420c; border-radius: 8px; }
+.suite-bar meter::-moz-meter-bar { background: #c3420c; border-radius: 8px; }

@@ -2282,3 +2282,51 @@ test('manager hardware pricing is persistent, versioned, and does not reprice ex
   assert.equal((await catalog.getProducts()).find(p => p.id === 'pvc').kitAmount, 125000);
   sql.close();
 });
+
+test('subscription management authorizes managers, persists custom plans and guards stale reminder updates', async()=>{
+ const sql=fixture();try{
+ const route=await api('app/api/manager-subscriptions/route.ts'),manager=await api('app/api/manager/route.ts'),catalogue=await api('lib/server-plans.ts');
+ assert.equal((await route.GET()).status,403);
+ globalThis.__launch.user={userId:'manager-a',role:'manager'};
+ const features={whatsapp:false,location:false,showcase:true,enquiries:false,english:false,analytics:true,teams:false,domain:false};
+ const plan={action:'plan',id:'plan-custom-test',version:0,active:true,name:'Custom',audience:'Creators',description:'Custom access',meticais:150,annualMeticais:1500,links:12,bio:400,features,monthlyEnabled:false,annualEnabled:true,benefits:['Apoio'],sortOrder:2};
+ assert.equal((await post(manager,plan)).status,200);
+ const saved=(await catalogue.getManagedPlans()).find(p=>p.id===plan.id);assert.equal(saved.features.showcase,true);assert.equal(saved.monthlyEnabled,false);
+ assert.equal((await post(manager,plan)).status,409);
+ const b={enabled:true,daysBefore:10,subject:'Renovar {plano}',message:'Olá {nome}: {link_renovacao}',version:0};
+ assert.equal((await post(route,b)).status,200);assert.equal((await post(route,b)).status,409);
+ const result=await (await route.GET()).json();assert.equal(result.reminders.daysBefore,10);
+ }finally{sql.close();}
+});
+test('finance isolates customer data, links external invoices and rejects duplicate or excess settlements',async()=>{
+ const sql=fixture();try{
+ const route=await api('app/api/manager-finance/route.ts');const url=origin+'/api/manager-finance?from=2026-01-01&to=2026-01-31';
+ assert.equal((await route.GET(new Request(url))).status,403);
+ globalThis.__launch.user={userId:'manager-a',role:'manager'};
+ sql.prepare("INSERT INTO paysuite_product_orders(id,owner_id,configuration_json,amount,status,created_at) VALUES('fin-order','customer-a','{}',50000,'paid','2026-01-02T00:00:00Z')").run();
+ sql.prepare("INSERT INTO paysuite_payments(id,owner_id,kind,target_id,amount,method,cycle,status,created_at,updated_at) VALUES('fin-payment','customer-a','product','fin-order',50000,'mpesa','once','paid','2026-01-02T00:00:00Z','2026-01-02T00:00:00Z')").run();
+ const report=await route.GET(new Request(url));assert.equal(report.status,200);assert.equal((await report.json()).summary.received,50000);
+ const doc={action:'document',operationId:'fin-payment',version:0,documentType:'Factura',reference:'EXT-001',date:'2026-01-02',notes:''};
+ assert.equal((await post(route,doc)).status,200);assert.equal((await post(route,doc)).status,409);
+ const entry={action:'entry',operationId:'fin-payment',kind:'settlement',amount:50000,reference:'BANK-001',date:'2026-01-03',notes:'Verified transfer',verified:true};
+ assert.equal((await post(route,entry)).status,200);assert.equal((await post(route,{...entry,reference:'BANK-002',amount:1})).status,409);
+ const original=sql.prepare('SELECT id FROM finance_entries').get().id;
+ assert.throws(()=>sql.prepare('DELETE FROM finance_entries').run());
+ assert.equal((await post(route,{...entry,kind:'reversal',reference:'REV-001',reversalOf:original,date:'2026-01-04'})).status,200);
+ assert.equal((await post(route,{...entry,reference:'BANK-003'})).status,200);
+ const exported=await route.GET(new Request(url+'&export=operations'));assert.equal(exported.status,200);assert.match(await exported.text(),/EXT-001/);
+ }finally{sql.close();}
+});
+
+test('finance period close protects dated records and corrections stay in the open period',async()=>{
+ const sql=fixture();try{
+ const route=await api('app/api/manager-finance/route.ts');globalThis.__launch.user={userId:'manager-a',role:'manager'};
+ const entry={action:'entry',kind:'expense',amount:1000,reference:'EXP-01',date:'2026-01-15',notes:'Documented expense',verified:true};
+ assert.equal((await post(route,entry)).status,200);
+ const id=sql.prepare('SELECT id FROM finance_entries').get().id;
+ assert.equal((await post(route,{action:'close-period',date:'2026-01-31',verified:true})).status,200);
+ assert.equal((await post(route,{...entry,reference:'EXP-02'})).status,422);
+ assert.equal((await post(route,{...entry,kind:'reversal',reference:'REV-02',reversalOf:id,date:'2026-02-01'})).status,200);
+ const result=await route.GET(new Request(origin+'/api/manager-finance?from=2026-01-01&to=2026-01-31&export=summary'));assert.match(await result.text(),/Despesas registadas/);
+ }finally{sql.close();}
+});

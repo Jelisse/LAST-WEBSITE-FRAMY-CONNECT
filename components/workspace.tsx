@@ -1,4 +1,5 @@
 'use client';
+import { membershipFeatures } from '@/lib/entitlement';
 import { profilePresentation } from '@/lib/entitlement';
 import { ProfileExtrasEditor } from './profile-extras-editor';
 import { ProfileGrowthHub } from './profile-growth-hub';
@@ -838,6 +839,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                           </label>
                         </div>
                         <ProfileBusinessEditor
+                          features={membershipFeatures({plan_id:data.membership.planId, terms_json:JSON.stringify(data.membership.terms)})}
                           profile={profile}
                           onChange={(next) => {
                             setProfile(next);
@@ -845,6 +847,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                           }}
                         />
                         <ProfileExtrasEditor
+                          features={membershipFeatures({plan_id:data.membership.planId, terms_json:JSON.stringify(data.membership.terms)})}
                           profile={profile}
                           limit={data.membership.terms.links}
                           onChange={(p) => {

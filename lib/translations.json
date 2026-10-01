@@ -7798,5 +7798,73 @@
   "Envie o seu design em PDF vectorial à equipa após o pedido.": [
     "Send your vector PDF design to the team after placing your order.",
     "下單後，將向量 PDF 設計寄給團隊。"
+  ],
+  "Por perfil": [
+    "Per profile",
+    "每個個人檔案"
+  ],
+  "Catálogo, materiais, preços e stock dos produtos físicos.": [
+    "Catalogue, materials, prices and stock for physical products.",
+    "實體產品的目錄、材質、價格和庫存。"
+  ],
+  "O período gratuito dura 30 dias e não renova automaticamente. Produtos NFC e entrega são pagos separadamente.": [
+    "The free period lasts 30 days and does not renew automatically. NFC products and delivery are paid separately.",
+    "免費試用期為30天，不會自動續訂。NFC產品與配送費用另計。"
+  ],
+  "Compare os planos e escolha o período mensal ou anual disponível. A renovação exige a sua autorização.": [
+    "Compare plans and choose an available monthly or annual period. Renewal requires your approval.",
+    "比較方案並選擇可用的月繳或年繳期間。續訂需要您的授權。"
+  ],
+  "Cada plano inclui um perfil digital. Produtos físicos são pagos separadamente. Corporativo: condições sob consulta.": [
+    "Each plan includes one digital profile. Physical products are paid separately. Corporate terms on request.",
+    "每個方案包含一個數位個人檔案。實體產品另行付費。企業方案條件請洽詢。"
+  ],
+  "Produto e entrega": [
+    "Product and delivery",
+    "產品及配送"
+  ],
+  "Configurar perfil": [
+    "Set up profile",
+    "設定個人檔案"
+  ],
+  "3. Entrega": [
+    "3. Delivery",
+    "3. 配送"
+  ],
+  "O perfil fica para depois do pagamento": [
+    "Set up your profile after payment",
+    "付款後設定個人檔案"
+  ],
+  "Após a confirmação, crie o seu perfil ou continue com o que já tem. O cartão e o porta-chaves podem partilhar o mesmo perfil.": [
+    "Once confirmed, create your profile or continue with your existing one. The card and keychain can share the same profile.",
+    "確認付款後，建立或繼續設定現有檔案。卡片和鑰匙圈可共用同一檔案。"
+  ],
+  "A compra do produto não inclui uma subscrição paga nem renova a experiência gratuita.": [
+    "The product purchase does not include a paid subscription or renew the free trial.",
+    "購買產品不包含付費訂閱，也不會重新開始免費試用。"
+  ],
+  "Entre ou crie uma conta para guardar a encomenda. O perfil será configurado depois do pagamento.": [
+    "Sign in or create an account to save your order. Set up your profile after payment.",
+    "登入或建立帳戶以儲存訂單。付款後再設定個人檔案。"
+  ],
+  "Preencha o contacto e a morada para continuar.": [
+    "Enter your delivery contact and address to continue.",
+    "請填寫聯絡方式和地址以繼續。"
+  ],
+  "PAGAMENTO CONFIRMADO": [
+    "PAYMENT CONFIRMED",
+    "付款已確認"
+  ],
+  "Configure o perfil do seu produto": [
+    "Set up your product’s profile",
+    "設定產品的個人檔案"
+  ],
+  "Adicione os seus dados e escolha Publicar perfil. A ligação à encomenda é automática; não precisa de voltar a pagar.": [
+    "Add your details and choose Publish profile. It is linked to your order automatically; you do not need to pay again.",
+    "填寫資料並選擇發佈檔案。系統會自動連結至訂單，無需再次付款。"
+  ],
+  "Ver confirmação da encomenda": [
+    "View order confirmation",
+    "查看訂單確認"
   ]
 }

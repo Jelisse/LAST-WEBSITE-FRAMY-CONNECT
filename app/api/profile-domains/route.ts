@@ -8,7 +8,7 @@ import {
   removeProfileDomain,
   domainsConfigured,
 } from '@/lib/profile-domains';
-import { hasProfessionalFeatures } from '@/lib/entitlement';
+import { hasPlanFeature } from '@/lib/entitlement';
 import { profileMembership } from '@/lib/server-profile-access';
 import { rateLimit } from '@/lib/request-limits';
 export const dynamic = 'force-dynamic';
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       if (row) await removeProfileDomain(env, row);
       return json({ ok: true });
     }
-    if (!hasProfessionalFeatures(await profileMembership(u.userId)))
+    if (!hasPlanFeature(await profileMembership(u.userId), 'domain'))
       return json(
         {
           error:

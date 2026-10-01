@@ -21,12 +21,12 @@ export type Product = {
 const seedProducts = [
   {
     id: 'pvc',
-    name: 'Cartão NFC PVC Personalizado',
+    name: 'Cartão NFC PVC',
     category: 'Cartões',
     icon: 'card',
     tagline: 'O seu cartão, impresso e personalizado.',
     description:
-      'Cartão NFC em PVC de 85,5 × 54 mm. Inclui impressão a cores na frente e no verso, personalização com o seu logótipo, nome e email, e configuração NFC e QR para o seu perfil.',
+      'Cartão NFC em PVC de 85,5 × 54 mm com impressão do design padrão FramyConnect e acesso ao perfil por NFC e QR. Pode escolher personalização durante a configuração; o total inclui os extras seleccionados.',
     amount: 95000,
     kitAmount: 135000,
     cost: 0,
@@ -41,7 +41,7 @@ const seedProducts = [
     tagline: 'Uma apresentação com um toque natural.',
     description:
       'Um cartão NFC em madeira que liga uma apresentação natural ao seu perfil digital.',
-    amount: 0,
+    amount: 100000,
     cost: 0,
     audience: 'Profissionais',
     available: false,
@@ -54,7 +54,7 @@ const seedProducts = [
     tagline: 'Uma presença que se sente.',
     description:
       'Um cartão de metal para apresentar a sua identidade, os seus contactos e o seu trabalho num único toque.',
-    amount: 45000,
+    amount: 150000,
     cost: 12000,
     audience: 'Profissionais',
     available: true,
@@ -80,7 +80,7 @@ const seedProducts = [
     tagline: 'Uma opção em couro para a sua identidade digital.',
     description:
       'Porta-chaves NFC em couro. Preço, fotografia e disponibilidade a configurar pela equipa.',
-    amount: 0,
+    amount: 120000,
     cost: 0,
     audience: 'Profissionais',
     available: false,
@@ -194,7 +194,13 @@ export const products: Product[] = seedProducts.map((p) => ({
   ...p,
   available: p.id === 'keychain',
   published: p.published !== false,
-  configurationPriceConfirmed: ['pvc', 'keychain'].includes(p.id),
+  configurationPriceConfirmed: [
+    'pvc',
+    'keychain',
+    'wood',
+    'metal',
+    'keychain-leather',
+  ].includes(p.id),
   imageUrl: `/products/${p.id === 'keychain-leather' ? 'keychain' : p.id}.png`,
   version: 0,
 }));

@@ -1,3 +1,4 @@
+import { paymentReceipts } from './lib/payment-receipts';
 import { profileReminders } from './lib/profile-reminders';
 import { refreshProfileDomains } from './lib/profile-domains';
 import { customDomainRequest } from './lib/custom-domain-request';
@@ -12,13 +13,26 @@ const worker = {
     ctx: ExecutionContext,
   ) {
     ctx.waitUntil(cleanupReservations(env.DB));
-    if (env.PAYSUITE_API_TOKEN) ctx.waitUntil((async () => {
-      const pending = await env.DB.prepare("SELECT * FROM paysuite_payments WHERE provider_id IS NOT NULL AND status IN ('creating','pending') ORDER BY updated_at LIMIT 12").all<GatewayPayment>();
-      for (const payment of pending.results) {
-        try { await reconcilePayment(env,payment); } catch { /* Retry on the next scheduled run; never log provider payloads. */ }
-        await env.DB.prepare('UPDATE paysuite_payments SET updated_at=? WHERE id=?').bind(new Date().toISOString(),payment.id).run();
-      }
-    })());
+    if (env.PAYSUITE_API_TOKEN)
+      ctx.waitUntil(
+        (async () => {
+          const pending = await env.DB.prepare(
+            "SELECT * FROM paysuite_payments WHERE provider_id IS NOT NULL AND status IN ('creating','pending') ORDER BY updated_at LIMIT 12",
+          ).all<GatewayPayment>();
+          for (const payment of pending.results) {
+            try {
+              await reconcilePayment(env, payment);
+            } catch {
+              /* Retry on the next scheduled run; never log provider payloads. */
+            }
+            await env.DB.prepare(
+              'UPDATE paysuite_payments SET updated_at=? WHERE id=?',
+            )
+              .bind(new Date().toISOString(), payment.id)
+              .run();
+          }
+        })(),
+      );
     ctx.waitUntil(
       env.DB.prepare(
         'DELETE FROM auth_recovery WHERE token_hash IN (SELECT token_hash FROM auth_recovery WHERE expires_at<? LIMIT 1000)',
@@ -27,6 +41,7 @@ const worker = {
         .run(),
     );
     ctx.waitUntil(profileReminders(env));
+    ctx.waitUntil(paymentReceipts(env));
     ctx.waitUntil(refreshProfileDomains(env));
     ctx.waitUntil(
       env.DB.prepare(

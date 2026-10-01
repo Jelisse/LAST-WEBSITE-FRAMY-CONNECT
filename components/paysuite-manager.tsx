@@ -10,6 +10,7 @@ type Payment = {
   email: string;
   provider_id: string | null;
   configuration_json: string | null;
+  receipt_status?: string | null;
   order_status: string | null;
 };
 export function PaySuiteManager() {
@@ -131,6 +132,16 @@ export function PaySuiteManager() {
                 <p>
                   {p.email} · {p.status} · {p.id}
                 </p>
+                {p.receipt_status && (
+                  <p>
+                    Comprovativo por email:{' '}
+                    {p.receipt_status === 'sent'
+                      ? 'aceite pelo serviço de email'
+                      : p.receipt_status === 'review'
+                        ? 'requer verificação no Resend antes de reenviar'
+                        : 'a aguardar envio'}
+                  </p>
+                )}
                 {c && (
                   <>
                     <p>
@@ -140,7 +151,11 @@ export function PaySuiteManager() {
                       {c.city} · {c.address} · {c.contact}
                     </p>
                     <p>{c.designInstructions}</p>
-                    <p>Perfil: {c.profileUsername}</p>
+                    <p>
+                      Perfil:{' '}
+                      {c.profileUsername ||
+                        'A aguardar configuração pelo cliente'}
+                    </p>
                     <p>
                       Produtos: {c.hardware / 100} MT · Design:{' '}
                       {c.customization / 100} MT · Entrega: {c.delivery / 100}{' '}
@@ -172,7 +187,7 @@ export function PaySuiteManager() {
                 )}
                 {p.order_status === 'paid' && (
                   <button
-                    disabled={busy}
+                    disabled={busy || !c?.profileUsername}
                     onClick={() => void act({ action: 'fulfilled', id: p.id })}
                   >
                     Confirmar entrega ao cliente

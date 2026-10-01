@@ -51,7 +51,7 @@ export async function GET() {
       state: profileAccess(membership),
       expiresAt: expiryDate(membership),
       plans: (await getManagedPlans()).filter(
-        (p) => ['personal', 'professional-v2'].includes(p.id) && p.active,
+        (p) => p.id !== 'free-30' && p.active,
       ),
       notices: notices.results,
     });
@@ -125,9 +125,9 @@ export async function POST(request: Request) {
         (p) =>
           p.active &&
           p.id === b.planId &&
-          ['personal', 'professional-v2'].includes(p.id),
+          p.id !== 'free-30',
       );
-      if (!plan || plan.version !== b.planVersion)
+      if (!plan || plan.monthlyEnabled === false || plan.version !== b.planVersion)
         throw Error('O plano mudou. Actualize antes de continuar.');
       const member = await profileMembership(user.userId);
       if (!member) throw Error('Active primeiro o perfil digital.');
@@ -228,7 +228,7 @@ export async function POST(request: Request) {
           ? current.paid_expires_at
           : now;
       const end = calendarMonthAfter(start);
-      const scheduled = start > now && current?.plan_id !== invoice.plan_id;
+      const scheduled = start > now;
       const results = await db.batch([
         db
           .prepare(
@@ -248,10 +248,11 @@ export async function POST(request: Request) {
         db
           .prepare(
             scheduled
-              ? 'UPDATE sandbox_memberships SET next_plan_id=?,next_terms_json=?,next_starts_at=?,next_expires_at=?,version=version+1,updated_at=? WHERE owner_id=? AND version=? AND EXISTS(SELECT 1 FROM profile_receipts WHERE reference=? AND invoice_id=?)'
+              ? 'UPDATE sandbox_memberships SET plan_id=?,terms_json=?,paid_started_at=?,paid_expires_at=?,next_plan_id=?,next_terms_json=?,next_starts_at=?,next_expires_at=?,version=version+1,updated_at=? WHERE owner_id=? AND version=? AND EXISTS(SELECT 1 FROM profile_receipts WHERE reference=? AND invoice_id=?)'
               : 'UPDATE sandbox_memberships SET plan_id=?,terms_json=?,paid_started_at=?,paid_expires_at=?,next_plan_id=NULL,next_terms_json=NULL,next_starts_at=NULL,next_expires_at=NULL,version=version+1,updated_at=? WHERE owner_id=? AND version=? AND EXISTS(SELECT 1 FROM profile_receipts WHERE reference=? AND invoice_id=?)',
           )
           .bind(
+            ...(scheduled ? [current!.plan_id, current!.terms_json ?? null, current!.paid_started_at ?? null, current!.paid_expires_at ?? null] : []),
             invoice.plan_id,
             invoice.terms_json,
             scheduled

@@ -3,7 +3,6 @@ import { paysuiteReady } from '@/lib/server-paysuite';
 import type { CheckoutPricing } from '@/lib/checkout-pricing';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { PurchaseConfigurator } from '@/components/purchase-configurator';
-import { getManagedPlans } from '@/lib/server-plans';
 import { getTranslations } from '@/lib/server-i18n';
 import { getProducts } from '@/lib/server-catalog';
 import { hardwarePrices } from '@/lib/hardware-pricing';
@@ -21,20 +20,12 @@ export default async function Page({
 }: {
   searchParams: Promise<{ formato?: string }>;
 }) {
-  const [t, plans, query, products, user] = await Promise.all([
+  const [t, query, products, user] = await Promise.all([
     getTranslations(),
-    getManagedPlans(),
     searchParams,
     getProducts(),
     getChatGPTUser(),
   ]);
-  const profileReady =
-    !!user &&
-    !!(await env.DB.prepare(
-      'SELECT owner_id FROM profiles WHERE owner_id=? AND published_json IS NOT NULL',
-    )
-      .bind(user.userId)
-      .first());
   const pricing = await env.DB.prepare(
     'SELECT * FROM checkout_pricing WHERE id=1',
   )
@@ -68,13 +59,11 @@ export default async function Page({
         <PurchaseConfigurator
           key={query.formato ?? 'kit'}
           initial={query.formato}
-          plans={plans.filter((plan) => plan.active)}
           prices={hardwarePrices(products)}
           photos={productPhotos(products)}
           pricing={pricing}
           paymentAvailable={paysuiteReady(env) && !!pricing?.enabled}
           signedIn={!!user}
-          profileReady={profileReady}
         />
       </main>
       <SiteFooter />

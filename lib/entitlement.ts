@@ -1,3 +1,5 @@
+import { planFeatures, type FeatureKey } from './plan-features.ts';
+import { defaultBusiness } from './profile-business.ts';
 import type { Profile } from './domain.ts';
 import { visibleProfileLinks, defaultExtras } from './profile-growth.ts';
 export type Membership = {
@@ -53,7 +55,11 @@ export function profileAccess(
 ): AccessState {
   if (!m) return 'inactive';
   const trial = m.plan_id === 'free-30';
-  if (!trial && !['personal', 'professional-v2'].includes(m.plan_id))
+  if (
+    !trial &&
+    !['personal', 'professional-v2'].includes(m.plan_id) &&
+    !validPlanTerms(m)
+  )
     return 'inactive';
   const s = Date.parse((trial ? m.trial_started_at : m.paid_started_at) ?? ''),
     e = Date.parse((trial ? m.trial_expires_at : m.paid_expires_at) ?? '');
@@ -73,6 +79,43 @@ export function profileAccess(
 }
 export function hasProfileAccess(m: Membership | null, now = Date.now()) {
   return profileAccess(m, now) !== 'inactive';
+}
+export function validPlanTerms(m: Pick<Membership, 'plan_id' | 'terms_json'>) {
+  try {
+    const t = JSON.parse(m.terms_json ?? 'null');
+    return (
+      t?.entitlementVersion === 1 &&
+      t.id === m.plan_id &&
+      Number.isInteger(t.links) &&
+      t.links > 0
+    );
+  } catch {
+    return false;
+  }
+}
+export function membershipFeatures(
+  m: Pick<Membership, 'plan_id' | 'terms_json'> | null,
+) {
+  let terms;
+  try {
+    terms = JSON.parse(m?.terms_json ?? 'null');
+  } catch {
+    /* Legacy terms. */
+  }
+  return planFeatures(
+    { ...terms, id: m?.plan_id ?? 'personal' },
+    !terms?.entitlementVersion,
+  );
+}
+export function hasPlanFeature(
+  m: Membership | null,
+  key: FeatureKey,
+  now = Date.now(),
+) {
+  return (
+    !['inactive', 'basic'].includes(profileAccess(m, now)) &&
+    membershipFeatures(m)[key]
+  );
 }
 export function hasProfessionalFeatures(
   m: Membership | null,
@@ -149,16 +192,47 @@ export function profilePresentation(
   } catch {
     /* Fall back to current catalogue limits. */
   }
+  const features = membershipFeatures(m);
+  const business = { ...defaultBusiness, ...p.business };
+  if (!features.whatsapp) {
+    business.whatsapp = '';
+    business.message = '';
+  }
+  if (!features.location) {
+    business.address = '';
+    business.hours = '';
+  }
   return {
     ...p,
+    business,
     links: visibleProfileLinks(p, limits.links),
     bio: (p.bio ?? '').slice(0, limits.bio),
-    extras: personal
-      ? { ...defaultExtras }
-      : p.extras
-        ? { ...p.extras, visibleLinks: null, primaryContact: '' }
-        : undefined,
+    extras: {
+      ...defaultExtras,
+      ...p.extras,
+      services: features.showcase
+        ? (p.extras?.services ?? []).map((s) =>
+            features.english
+              ? s
+              : {
+                  ...s,
+                  englishTitle: '',
+                  englishDescription: '',
+                  englishPrice: '',
+                },
+          )
+        : [],
+      enquiries: features.enquiries && !!p.extras?.enquiries,
+      english: features.english
+        ? {
+            ...(p.extras?.english ?? defaultExtras.english),
+            hours: features.location ? (p.extras?.english.hours ?? '') : '',
+          }
+        : defaultExtras.english,
+      visibleLinks: null,
+      primaryContact: '',
+    },
   };
 }
 // Two `now` ISO bindings are retained for existing callers. Basic pages remain reachable.
-export const activeProfileSQL = `EXISTS (SELECT 1 FROM profile_membership_view m JOIN auth_accounts a ON a.id=m.owner_id AND a.active=1 WHERE m.owner_id=profiles.owner_id AND ((m.plan_id='free-30' AND m.trial_started_at<=? AND julianday(m.trial_expires_at)>julianday(m.trial_started_at) AND julianday(m.trial_expires_at)<=julianday(m.trial_started_at)+30) OR (m.plan_id IN ('personal','professional-v2') AND m.paid_started_at<=? AND julianday(m.paid_expires_at)>julianday(m.paid_started_at))))`;
+export const activeProfileSQL = `EXISTS (SELECT 1 FROM profile_membership_view m JOIN auth_accounts a ON a.id=m.owner_id AND a.active=1 WHERE m.owner_id=profiles.owner_id AND ((m.plan_id='free-30' AND m.trial_started_at<=? AND julianday(m.trial_expires_at)>julianday(m.trial_started_at) AND julianday(m.trial_expires_at)<=julianday(m.trial_started_at)+30) OR ((m.plan_id IN ('personal','professional-v2') OR (json_valid(m.terms_json) AND json_extract(m.terms_json,'$.entitlementVersion')=1 AND json_extract(m.terms_json,'$.id')=m.plan_id)) AND m.paid_started_at<=? AND julianday(m.paid_expires_at)>julianday(m.paid_started_at))))`;

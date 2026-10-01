@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers';
 import { getTranslations } from '@/lib/server-i18n';
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
 import { Workspace } from '@/components/workspace';
@@ -13,38 +14,37 @@ export async function generateMetadata() {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ compra?: string }>;
+  searchParams: Promise<{ compra?: string; pagamento?: string }>;
 }) {
   const user = await requireChatGPTUser('/dashboard');
   const query = await searchParams;
   const t = await getTranslations();
-  const purchase =
-    query.compra &&
-    [
-      'card',
-      'pvc',
-      'wood',
-      'metal',
-      'keychain',
-      'keychain-leather',
-      'kit',
-    ].includes(query.compra)
-      ? query.compra
+  const paidProduct =
+    query.pagamento && /^[a-zA-Z0-9-]{1,80}$/.test(query.pagamento)
+      ? await env.DB.prepare(
+          "SELECT id FROM paysuite_payments WHERE id=? AND owner_id=? AND kind='product' AND status='paid'",
+        )
+          .bind(query.pagamento, user.userId)
+          .first<{ id: string }>()
       : null;
   return (
     <>
-      {purchase && (
-        <aside className="section-wrap purchase-maintenance">
+      {paidProduct && (
+        <aside className="section-wrap post-purchase-banner">
+          <span className="eyebrow">{t('PAGAMENTO CONFIRMADO')}</span>
+          <h2>{t('Configure o perfil do seu produto')}</h2>
           <p>
             {t(
-              'Guarde e publique o seu perfil. Depois volte à compra para confirmar a entrega e o pagamento.',
+              'Adicione os seus dados e escolha Publicar perfil. A ligação à encomenda é automática; não precisa de voltar a pagar.',
             )}
           </p>
           <Link
-            className="btn btn-primary"
-            href={'/comprar?formato=' + purchase}
+            className="home-text-link"
+            href={
+              '/checkout/retorno?payment=' + encodeURIComponent(paidProduct.id)
+            }
           >
-            {t('Voltar à compra')}
+            {t('Ver confirmação da encomenda')}
           </Link>
         </aside>
       )}

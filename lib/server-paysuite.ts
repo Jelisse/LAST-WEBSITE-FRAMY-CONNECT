@@ -1,3 +1,4 @@
+import { paymentReceipts } from './payment-receipts';
 import {
   paysuiteRequest,
   checkoutURL,
@@ -113,11 +114,19 @@ export async function reconcilePayment(
       ).bind(payment.target_id, payment.id),
     ]);
   }
-  return (await env.DB.prepare(
+  const finalStatus = (await env.DB.prepare(
     'SELECT status FROM paysuite_payments WHERE id=?',
   )
     .bind(payment.id)
     .first<{ status: string }>())!.status;
+  if (finalStatus === 'paid') {
+    try {
+      await paymentReceipts(env, payment.id);
+    } catch {
+      /* Durable outbox retries independently. */
+    }
+  }
+  return finalStatus;
 }
 export async function settlePayment(
   db: D1Database,
@@ -178,6 +187,7 @@ export async function settlePayment(
     .first<{
       version: number;
       plan_id: string;
+      terms_json: string | null;
       paid_started_at: string | null;
       paid_expires_at: string | null;
       next_starts_at: string | null;
@@ -192,7 +202,7 @@ export async function settlePayment(
     start,
     payment.cycle === 'annual' ? 'annual' : 'monthly',
   );
-  const scheduled = start > now && member.plan_id !== invoice.plan_id;
+  const scheduled = start > now;
   const reference = `paysuite:${providerId}`;
   const results = await db.batch([
     db
@@ -212,10 +222,18 @@ export async function settlePayment(
     db
       .prepare(
         scheduled
-          ? `UPDATE sandbox_memberships SET next_plan_id=?,next_terms_json=?,next_starts_at=?,next_expires_at=?,version=version+1,updated_at=? WHERE owner_id=? AND version=? AND EXISTS(SELECT 1 FROM profile_receipts WHERE reference=? AND invoice_id=?) AND EXISTS(SELECT 1 FROM profile_invoices WHERE id=? AND status='pending')`
+          ? `UPDATE sandbox_memberships SET plan_id=?,terms_json=?,paid_started_at=?,paid_expires_at=?,next_plan_id=?,next_terms_json=?,next_starts_at=?,next_expires_at=?,version=version+1,updated_at=? WHERE owner_id=? AND version=? AND EXISTS(SELECT 1 FROM profile_receipts WHERE reference=? AND invoice_id=?) AND EXISTS(SELECT 1 FROM profile_invoices WHERE id=? AND status='pending')`
           : `UPDATE sandbox_memberships SET plan_id=?,terms_json=?,paid_started_at=?,paid_expires_at=?,next_plan_id=NULL,next_terms_json=NULL,next_starts_at=NULL,next_expires_at=NULL,version=version+1,updated_at=? WHERE owner_id=? AND version=? AND EXISTS(SELECT 1 FROM profile_receipts WHERE reference=? AND invoice_id=?) AND EXISTS(SELECT 1 FROM profile_invoices WHERE id=? AND status='pending')`,
       )
       .bind(
+        ...(scheduled
+          ? [
+              member!.plan_id,
+              member!.terms_json ?? null,
+              member!.paid_started_at ?? null,
+              member!.paid_expires_at ?? null,
+            ]
+          : []),
         invoice.plan_id,
         invoice.terms_json,
         scheduled

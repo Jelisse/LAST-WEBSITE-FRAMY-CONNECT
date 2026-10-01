@@ -421,8 +421,8 @@ test('annual and monthly subscription checkout waits for trial end and extends a
   await notify(f, nextId);
   assert.ok(
     Date.parse(
-      f.sql.prepare('SELECT paid_expires_at FROM sandbox_memberships').get()
-        .paid_expires_at,
+      f.sql.prepare('SELECT next_expires_at FROM sandbox_memberships').get()
+        .next_expires_at,
     ) >
       Date.parse(end) + 27 * 86400000,
   );
@@ -486,4 +486,100 @@ test('provider URL validation and calendar billing handle security and leap year
   );
   assert.equal(minorAmount('100.50'), 10050);
   assert.throws(() => minorAmount('1.001'));
+});
+
+test('custom annual-only plan checks out and preserves effective terms when scheduling a later renewal', async(t)=>{
+ const f=fixture(t),route=await api('app/api/paysuite/checkout/route.ts');
+ const plan={id:'plan-custom',name:'Custom',audience:'Creators',description:'Custom',active:true,meticais:150,annualMeticais:1500,links:12,bio:400,entitlementVersion:1,features:{whatsapp:false,location:false,showcase:true,enquiries:false,english:false,analytics:true,teams:false,domain:false},monthlyEnabled:false,annualEnabled:true};
+ f.sql.prepare("INSERT INTO manager_records(id,kind,data_json,version,updated_at) VALUES(?,'plan',?,1,?)").run(plan.id,JSON.stringify(plan),new Date().toISOString());
+ const base={kind:'subscription',planId:plan.id,planVersion:1,accepted:true,method:'credit_card',requestId:crypto.randomUUID(),cycle:'monthly',expectedAmount:15000};
+ assert.equal((await route.POST(request(base))).status,422);
+ const body={...base,cycle:'annual',expectedAmount:150000};assert.equal((await route.POST(request(body))).status,200);
+ const [id,record]=[...f.records][0];record.status='paid';await notify(f,id);
+ assert.equal(f.sql.prepare('SELECT plan_id FROM profile_membership_view').get().plan_id,plan.id);
+ // Model a previous scheduled change that has already become effective.
+ const start=new Date(Date.now()-86400000).toISOString(),end=new Date(Date.now()+20*86400000).toISOString();
+ f.sql.prepare("UPDATE sandbox_memberships SET plan_id='personal',terms_json='{}',next_plan_id=?,next_terms_json=?,next_starts_at=?,next_expires_at=?").run(plan.id,JSON.stringify(plan),start,end);
+ assert.equal((await route.POST(request({...body,requestId:crypto.randomUUID()}))).status,200);
+ const [nextId,nextRecord]=[...f.records][1];nextRecord.status='paid';await notify(f,nextId);
+ const member=f.sql.prepare('SELECT * FROM profile_membership_view').get();assert.equal(member.plan_id,plan.id);assert.equal(JSON.parse(member.terms_json).features.analytics,true);assert.equal(member.paid_expires_at,end);assert.ok(member.next_starts_at>=end);
+});
+
+
+test('products can be paid before profile creation; only the owner publication attaches the paid order', async (t) => {
+ const f = fixture(t), checkout = await api('app/api/paysuite/checkout/route.ts'), manager = await api('app/api/paysuite/manager/route.ts');
+ f.sql.exec("DELETE FROM profiles WHERE owner_id='buyer'");
+ const body = product();
+ assert.equal((await checkout.POST(request(body))).status,200);
+ const config = () => JSON.parse(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders WHERE id=?').get(body.requestId).configuration_json);
+ assert.equal(config().profileUsername,null);
+ const [id,record] = [...f.records][0]; record.status='paid'; await notify(f,id);
+ const status = () => checkout.GET(new Request('https://framyconnect.co.mz/api/paysuite/checkout?payment='+body.requestId));
+ assert.equal((await (await status()).json()).profileReady,false);
+ const buyer=globalThis.__paysuite.user;
+ globalThis.__paysuite.user={userId:'manager',role:'manager'};
+ assert.equal((await manager.POST(request({action:'fulfilled',id:body.requestId}))).status,409);
+ f.sql.prepare("INSERT INTO profiles(owner_id,username,draft_json,published_json,updated_at) VALUES('other','other','{}','{}',?)").run(new Date().toISOString());
+ assert.equal(config().profileUsername,null);
+ f.sql.prepare("INSERT INTO profiles(owner_id,username,draft_json,published_json,updated_at) VALUES('buyer','buyer','{}',NULL,?)").run(new Date().toISOString());
+ assert.equal(config().profileUsername,null);
+ f.sql.prepare("UPDATE profiles SET published_json=? WHERE owner_id='buyer'").run(JSON.stringify({username:'buyer',name:'Cliente'}));
+ assert.equal(config().profileUsername,'buyer'); assert.equal(config().profileSnapshot.name,'Cliente');
+ f.sql.prepare("UPDATE profiles SET published_json=? WHERE owner_id='buyer'").run(JSON.stringify({username:'buyer',name:'Actualizado'}));
+ assert.equal(config().profileSnapshot.name,'Cliente'); // preserve production snapshot
+ assert.equal((await manager.POST(request({action:'fulfilled',id:body.requestId}))).status,200);
+ globalThis.__paysuite.user=buyer;
+ assert.equal((await (await status()).json()).profileReady,true);
+});
+
+test('profile published while payment is pending is attached only after verified payment', async (t) => {
+ const f=fixture(t), checkout=await api('app/api/paysuite/checkout/route.ts');
+ f.sql.exec("DELETE FROM profiles WHERE owner_id='buyer'");
+ const body=product({format:'keychain',expectedAmount:70000});
+ assert.equal((await checkout.POST(request(body))).status,200);
+ f.sql.prepare("INSERT INTO profiles(owner_id,username,draft_json,published_json,updated_at) VALUES('buyer','buyer','{}','{}',?)").run(new Date().toISOString());
+ const config=()=>JSON.parse(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders').get().configuration_json);
+ assert.equal(config().profileUsername,null);
+ const [id,record]=[...f.records][0];record.status='paid';await notify(f,id);
+ assert.equal(config().profileUsername,'buyer');
+ assert.equal(config().format,'keychain');
+});
+
+
+test('verified payments queue a detailed immutable email receipt, send once and retry safely', async (t) => {
+ const f=fixture(t), checkout=await api('app/api/paysuite/checkout/route.ts');
+ const {paymentReceipts}=await api('lib/payment-receipts.ts');
+ const body=product(); await checkout.POST(request(body));
+ assert.equal(f.sql.prepare('SELECT count(*) n FROM payment_email_receipts').get().n,0);
+ const [id,record]=[...f.records][0];record.status='paid';await notify(f,id);await notify(f,id);
+ assert.equal(f.sql.prepare('SELECT count(*) n FROM payment_email_receipts').get().n,1);
+ const now=Date.now(), requests=[];let succeed=false;
+ globalThis.fetch=async(url,options)=>{assert.equal(url,'https://api.resend.com/emails');requests.push(options);if(!succeed)throw Error('ambiguous timeout');return Response.json({id:'test-message'});};
+ f.env.RESEND_API_KEY='test-only';f.env.PROFILE_EMAIL_FROM='Framy Connect <info@example.test>';
+ await paymentReceipts(f.env,body.requestId,now);
+ assert.equal(f.sql.prepare('SELECT status FROM payment_email_receipts').get().status,'pending');
+ f.sql.exec("UPDATE auth_accounts SET name='Changed',email='changed@example.test' WHERE id='buyer'");
+ succeed=true;await Promise.all([paymentReceipts(f.env,body.requestId,now+16*60000),paymentReceipts(f.env,body.requestId,now+16*60000)]);
+ assert.equal(requests.length,2);assert.equal(requests[0].body,requests[1].body);assert.equal(requests[0].headers['Idempotency-Key'],requests[1].headers['Idempotency-Key']);
+ const mail=JSON.parse(requests[1].body);assert.deepEqual(mail.to,['buyer@example.test']);assert.match(mail.text,/Produtos: 1350,00 MT/);assert.match(mail.text,/Entrega: 200,00 MT/);assert.match(mail.text,/Total pago: 1550,00 MT/);assert.match(mail.text,/não substitui a factura fiscal/);assert.match(mail.text,/perfil\?pagamento=/);
+ assert.equal(f.sql.prepare('SELECT status FROM payment_email_receipts').get().status,'sent');
+ await paymentReceipts(f.env,body.requestId,now+20*60000);assert.equal(requests.length,2);
+});
+
+test('receipt retries stop before provider deduplication expires without changing the payment', async(t)=>{
+ const f=fixture(t),checkout=await api('app/api/paysuite/checkout/route.ts');const body=product();await checkout.POST(request(body));const[id,record]=[...f.records][0];record.status='paid';await notify(f,id);
+ const now=Date.now();f.sql.prepare('UPDATE payment_email_receipts SET first_attempt_at=?,attempted_at=?').run(now-24*3600000,now-24*3600000);
+ f.env.RESEND_API_KEY='test-only';f.env.PROFILE_EMAIL_FROM='info@example.test';globalThis.fetch=()=>{throw Error('must not resend');};
+ await (await api('lib/payment-receipts.ts')).paymentReceipts(f.env,undefined,now);
+ assert.equal(f.sql.prepare('SELECT status FROM payment_email_receipts').get().status,'review');assert.equal(f.sql.prepare('SELECT status FROM paysuite_payments').get().status,'paid');
+});
+
+test('approved base prices and kit discount flow through configuration plus delivery and design',async()=>{
+ const {products}=await api('lib/catalog.ts');const {configurationQuote}=await api('lib/checkout-pricing.ts');
+ const catalogue=products.map(p=>({...p,available:true,published:true}));const settings={customer_design:15000,team_design:40000,maputo_delivery:20000};
+ const quote=overrides=>configurationQuote(catalogue,settings,{format:'kit',card:'PVC',keychain:'PVC + epóxi',design:'standard',delivery:'maputo',...overrides});
+ assert.equal(quote({format:'card'}).hardware,95000);assert.equal(quote({format:'keychain'}).hardware,50000);assert.equal(quote({}).hardware,95000+50000-10000);assert.equal(quote({}).total,155000);
+ assert.equal(quote({format:'card',card:'Madeira',design:'customer'}).total,100000+15000+20000);
+ assert.equal(quote({format:'card',card:'Metal',design:'team'}).total,150000+40000+20000);
+ assert.equal(quote({format:'keychain',keychain:'Couro'}).total,120000+20000);
 });

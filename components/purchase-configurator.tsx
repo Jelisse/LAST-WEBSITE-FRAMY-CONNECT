@@ -11,8 +11,6 @@ import {
   designServices,
   checkoutMaintenanceMessage,
 } from '@/lib/purchase-structure';
-import type { ManagedPlan } from '@/lib/domain';
-import { planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
 import { money } from '@/lib/catalog';
 import { hardwareEstimate, type HardwarePrice } from '@/lib/hardware-pricing';
 import { PaySuiteCheckout } from './paysuite-checkout';
@@ -22,22 +20,18 @@ import type { ProductPhoto } from '@/lib/product-gallery';
 
 export function PurchaseConfigurator({
   initial = 'kit',
-  plans,
   prices,
   photos = [],
   pricing = null,
   paymentAvailable = false,
   signedIn = false,
-  profileReady = false,
 }: {
   initial?: string;
-  plans: ManagedPlan[];
   prices: HardwarePrice[];
   photos?: ProductPhoto[];
   pricing?: CheckoutPricing | null;
   paymentAvailable?: boolean;
   signedIn?: boolean;
-  profileReady?: boolean;
 }) {
   const { t } = useI18n();
   const selection = purchaseSelection(initial);
@@ -124,6 +118,20 @@ export function PurchaseConfigurator({
       : null;
   return (
     <div className="purchase-configurator">
+      <ol className="checkout-journey" aria-label={t('Etapas da compra')}>
+        <li aria-current="step">
+          <span>1</span>
+          <strong>{t('Produto e entrega')}</strong>
+        </li>
+        <li>
+          <span>2</span>
+          <strong>{t('Pagamento')}</strong>
+        </li>
+        <li>
+          <span>3</span>
+          <strong>{t('Configurar perfil')}</strong>
+        </li>
+      </ol>
       {!paymentAvailable && (
         <div className="purchase-maintenance">
           <strong>{t('Checkout em manutenção')}</strong>
@@ -209,88 +217,7 @@ export function PurchaseConfigurator({
             )}
           </fieldset>
           <section className="purchase-section">
-            <h2>{t('3. Um perfil digital')}</h2>
-            <p>
-              {t(
-                format === 'kit'
-                  ? 'O cartão e o porta-chaves partilham o mesmo perfil. Não precisa de duas subscrições.'
-                  : 'O produto escolhido liga ao seu perfil digital.',
-              )}
-            </p>
-            <strong>{t('30 dias grátis · sem renovação automática')}</strong>
-            {!signedIn ? (
-              <p>
-                <Link
-                  className="btn btn-primary"
-                  href={
-                    '/entrar?return_to=' +
-                    encodeURIComponent('/comprar?formato=' + initial)
-                  }
-                >
-                  {t('Entrar ou criar conta para continuar')}
-                </Link>
-              </p>
-            ) : !profileReady ? (
-              <p>
-                <Link
-                  className="btn btn-primary"
-                  href={'/perfil?compra=' + initial}
-                >
-                  {t('Criar e publicar o perfil para este produto')}
-                </Link>
-              </p>
-            ) : (
-              <p>
-                {t(
-                  'O seu perfil publicado está pronto para ser ligado ao produto.',
-                )}
-              </p>
-            )}
-            <p>
-              O pagamento do perfil é feito separadamente após os 30 dias
-              grátis. As renovações requerem a sua autorização.
-            </p>
-            <details>
-              <summary>{t('Comparar planos')}</summary>
-              <div className="purchase-plan-list">
-                {plans
-                  .filter((plan) => plan.id !== 'free-30')
-                  .map((plan) => (
-                    <article key={plan.id}>
-                      <strong>
-                        {t(plan.name)} · {planPrice(plan, t.locale)}
-                        {t('/mês')}
-                      </strong>
-                      <p>
-                        {planPrice(
-                          { meticais: planAnnualMeticais(plan) },
-                          t.locale,
-                        )}
-                        {t(' / ano')} ·{' '}
-                        {paymentAvailable
-                          ? 'Pagamento anual'
-                          : t('Pagamento anual · adesões em breve')}
-                      </p>
-                      <p>
-                        {t('Por perfil · mensal')}
-                        {!paymentAvailable && <> · {t('Em breve')}</>}
-                      </p>
-                      <p>
-                        {plan.links} {t('links à sua escolha')} ·{' '}
-                        {t('Bio: {0} caracteres', [plan.bio])}
-                      </p>
-                    </article>
-                  ))}
-                <article>
-                  <strong>{t('Corporativo')}</strong>
-                  <p>{t('Sob consulta')}</p>
-                  <Link href="/contacto">{t('Solicitar proposta')}</Link>
-                </article>
-              </div>
-            </details>
-          </section>
-          <section className="purchase-section">
-            <h2>4. Entrega</h2>
+            <h2>{t('3. Entrega')}</h2>
             <label>
               Local de entrega
               <select
@@ -370,7 +297,6 @@ export function PurchaseConfigurator({
               {t(selectedDesign.name)}
               {design === 'customer' ? ` · ${t(method)}` : ''}
             </p>
-            <p>{t('Um perfil digital')}</p>
           </div>
           <hr />
           <p>
@@ -401,30 +327,62 @@ export function PurchaseConfigurator({
               ? money(pricing.maputo_delivery, t.locale)
               : 'Sob consulta'}
           </p>
-          <p>
+          <p className="purchase-total">
             <strong>
-              Total do produto:{' '}
+              Total a pagar:{' '}
               {total === null ? 'Sob consulta' : money(total, t.locale)}
             </strong>
           </p>
-          <p>
-            Perfil digital: 30 dias grátis. Subscrição paga separadamente após a
-            experiência.
-          </p>
+          <div className="purchase-next-step">
+            <strong>{t('O perfil fica para depois do pagamento')}</strong>
+            <p>
+              {t(
+                'Após a confirmação, crie o seu perfil ou continue com o que já tem. O cartão e o porta-chaves podem partilhar o mesmo perfil.',
+              )}
+            </p>
+            <small>
+              {t(
+                'A compra do produto não inclui uma subscrição paga nem renova a experiência gratuita.',
+              )}
+            </small>
+          </div>
           {!paymentAvailable && (
             <p>
               Valores propostos, sujeitos a publicação pelo gestor. Pagamentos
               ainda indisponíveis.
             </p>
           )}
-          {!profileReady && (
-            <p>{t('Conclua o passo 3 para continuar para o pagamento.')}</p>
+          {!signedIn && (
+            <div className="purchase-signin">
+              <p>
+                {t(
+                  'Entre ou crie uma conta para guardar a encomenda. O perfil será configurado depois do pagamento.',
+                )}
+              </p>
+              <Link
+                className="btn btn-primary"
+                href={
+                  '/entrar?return_to=' +
+                  encodeURIComponent('/comprar?formato=' + initial)
+                }
+              >
+                {t('Entrar ou criar conta para continuar')}
+              </Link>
+            </div>
           )}
+          {signedIn &&
+            paymentAvailable &&
+            total !== null &&
+            (contact.trim().length < 7 || address.trim().length < 8) && (
+              <p className="purchase-help">
+                {t('Preencha o contacto e a morada para continuar.')}
+              </p>
+            )}
           <PaySuiteCheckout
             key={`${format}-${card}-${keychain}-${design}-${delivery}-${total}`}
             disabled={
               !draftReady ||
-              !profileReady ||
+              !signedIn ||
               !paymentAvailable ||
               total === null ||
               contact.trim().length < 7 ||

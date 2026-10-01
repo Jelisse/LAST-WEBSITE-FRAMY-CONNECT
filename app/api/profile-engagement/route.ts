@@ -2,7 +2,7 @@ import {
   publishedProfile,
   profileMembership,
 } from '@/lib/server-profile-access';
-import { hasProfessionalFeatures } from '@/lib/entitlement';
+import { hasPlanFeature } from '@/lib/entitlement';
 import { database } from '@/lib/server-db';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { activeProfileSQL } from '@/lib/entitlement';
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
     const user = await getChatGPTUser();
     if (user?.userId === row.owner_id || (user && user.role !== 'customer'))
       return json({ recorded: false });
-    if (!hasProfessionalFeatures(await profileMembership(row.owner_id)))
+    if (!hasPlanFeature(await profileMembership(row.owner_id), 'analytics'))
       return json({ recorded: false });
     const target = b.kind === 'view' ? '' : b.target;
     const label =
@@ -105,7 +105,7 @@ export async function GET(request: Request) {
   if (![7, 30, 90].includes(days))
     return json({ error: 'Período inválido.' }, 422);
   try {
-    if (!hasProfessionalFeatures(await profileMembership(user.userId)))
+    if (!hasPlanFeature(await profileMembership(user.userId), 'analytics'))
       return json(
         {
           error:

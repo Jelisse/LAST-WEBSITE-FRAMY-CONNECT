@@ -19,7 +19,7 @@ export async function GET() {
       ).first(),
       payments: (
         await env.DB.prepare(
-          'SELECT p.*,o.configuration_json,o.status AS order_status,a.name,a.email FROM paysuite_payments p JOIN auth_accounts a ON a.id=p.owner_id LEFT JOIN paysuite_product_orders o ON o.id=p.target_id ORDER BY p.created_at DESC LIMIT 100',
+          'SELECT p.*,(SELECT e.status FROM payment_email_receipts e WHERE e.payment_id=p.id) AS receipt_status,o.configuration_json,o.status AS order_status,a.name,a.email FROM paysuite_payments p JOIN auth_accounts a ON a.id=p.owner_id LEFT JOIN paysuite_product_orders o ON o.id=p.target_id ORDER BY p.created_at DESC LIMIT 100',
         ).all()
       ).results,
     });
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     } else if (b.action === 'fulfilled') {
       const result = await env.DB.batch([
         env.DB.prepare(
-          "UPDATE paysuite_product_orders SET status='fulfilled' WHERE id=? AND status='paid' AND EXISTS(SELECT 1 FROM paysuite_payments p WHERE p.target_id=paysuite_product_orders.id AND p.status='paid' AND p.kind='product')",
+          "UPDATE paysuite_product_orders SET status='fulfilled' WHERE id=? AND status='paid' AND json_extract(configuration_json,'$.profileUsername') IS NOT NULL AND EXISTS(SELECT 1 FROM paysuite_payments p WHERE p.target_id=paysuite_product_orders.id AND p.status='paid' AND p.kind='product')",
         ).bind(String(b.id)),
         env.DB.prepare(
           "INSERT INTO manager_audit(id,actor,action,subject,created_at) SELECT ?,?,'Encomenda PaySuite entregue',?,? WHERE changes()=1",
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
         return json(
           {
             error:
-              'A encomenda não está paga ou já foi entregue. Actualize a lista.',
+              'Confirme que a encomenda está paga, tem perfil associado e ainda não foi entregue. Actualize a lista.',
           },
           409,
         );
