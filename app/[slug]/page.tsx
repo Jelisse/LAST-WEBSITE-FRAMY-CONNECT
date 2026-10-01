@@ -79,11 +79,15 @@ const pages: Record<
     ],
   },
   privacidade: {
-    title: 'A sua identidade. A sua escolha.',
+    title: 'Privacidade e utilização dos dados',
     eyebrow: 'PRIVACIDADE',
     intro:
       'Conheça os dados utilizados para gerir a sua conta, publicar o seu perfil e acompanhar as suas encomendas.',
     blocks: [
+      {
+        title: 'Cookies e armazenamento no dispositivo',
+        text: 'A sessão utiliza um cookie necessário, protegido contra acesso por scripts, que expira após 24 horas. A preferência de idioma é guardada durante um ano. A configuração da compra fica neste separador por até 30 minutos e é removida ao terminar sessão. As estatísticas são opcionais: só começam após Permitir, e Recusar mantém o website funcional. Guardamos essa escolha por 180 dias; depois pedimos novamente. Pode retirar a autorização nas Preferências de estatísticas. As preferências de medição de cada perfil são separadas e podem ser alteradas nesse perfil. Respeitamos os sinais de não rastrear e de privacidade global do navegador.',
+      },
       {
         title: 'Pedidos de informação e equipas',
         text: 'Ao enviar um pedido pelo perfil, autoriza a entrega do seu nome, email e mensagem ao titular. As mensagens ficam disponíveis durante 90 dias e podem ser eliminadas pelo titular. O convite para equipa só dá acesso ao nome, endereço e estado de publicação do perfil após aceitação; permite aplicar a cor da marca. Pode sair da equipa a qualquer momento. Domínios personalizados exigem prova de propriedade e validação HTTPS.',
@@ -110,7 +114,7 @@ const pages: Record<
       },
       {
         title: 'Visitas aos produtos',
-        text: 'Medimos visitas às páginas dos produtos, incluindo os produtos Brevemente, sem exigir uma compra. Um identificador aleatório por sessão evita repetições no mesmo dia; não guardamos o IP nesta estatística. Ao registar novas visitas, eliminamos os registos com mais de 90 dias. O painel apresenta os últimos 30 dias.',
+        text: 'Com autorização para estatísticas, contamos visitas às páginas dos produtos. Um identificador aleatório neste separador evita repetições no mesmo dia; não guardamos o IP nesta estatística. Os registos têm conservação de até 90 dias e o painel apresenta os últimos 30 dias.',
       },
       {
         title: 'Estatísticas opcionais do website',
@@ -189,7 +193,14 @@ export default async function Page({
           <p className="page-intro">{t(page.intro)}</p>
           <div className="information-blocks">
             {page.blocks.map((b) => (
-              <section key={b.title}>
+              <section
+                key={b.title}
+                id={
+                  b.title === 'Cookies e armazenamento no dispositivo'
+                    ? 'cookies'
+                    : undefined
+                }
+              >
                 <h2>{t(b.title)}</h2>
                 <p>{t(b.text)}</p>
               </section>

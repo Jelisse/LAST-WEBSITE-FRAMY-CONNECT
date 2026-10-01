@@ -9,6 +9,7 @@ type Payment = {
   status: string;
   cycle: string;
   url?: string | null;
+  orderStatus?: string | null;
 };
 const labels: Record<string, string> = {
   creating: 'A confirmar a ligação ao prestador',
@@ -22,17 +23,31 @@ export function PaySuiteStatus() {
     [payments, setPayments] = useState<Payment[]>([]),
     [error, setError] = useState(''),
     [signin, setSignin] = useState(false);
+  const [returnTo, setReturnTo] = useState('/checkout/retorno');
+  const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     const id = new URLSearchParams(location.search).get('payment');
+    if (id && /^[a-zA-Z0-9-]+$/.test(id))
+      queueMicrotask(() =>
+        setReturnTo('/checkout/retorno?payment=' + encodeURIComponent(id)),
+      );
     let count = 0;
+    let inFlight = false;
     async function refresh() {
-      if (document.hidden || count++ >= 20) return;
+      if (inFlight || document.hidden || count++ >= 20) return;
+      inFlight = true;
       try {
         const r = await fetch(
           '/api/paysuite/checkout' +
             (id ? '?payment=' + encodeURIComponent(id) : ''),
-          { cache: 'no-store', signal: controller.signal },
+          {
+            cache: 'no-store',
+            signal: AbortSignal.any([
+              controller.signal,
+              AbortSignal.timeout(12000),
+            ]),
+          },
         );
         if (r.status === 401) {
           setSignin(true);
@@ -49,6 +64,9 @@ export function PaySuiteStatus() {
       } catch (e) {
         if (!controller.signal.aborted)
           setError(e instanceof Error ? e.message : 'Erro ao consultar.');
+      } finally {
+        inFlight = false;
+        if (!controller.signal.aborted) setLoaded(true);
       }
     }
     void refresh();
@@ -68,12 +86,16 @@ export function PaySuiteStatus() {
     <section className="panel">
       <h1>Estado do pagamento</h1>
       {signin ? (
-        <Link href="/entrar?return_to=%2Fcheckout%2Fretorno">
+        <Link href={'/entrar?return_to=' + encodeURIComponent(returnTo)}>
           Entre para consultar os seus pagamentos
         </Link>
       ) : (
         <>
           {error && <p role="alert">{error}</p>}
+          {!loaded && <output>A consultar o estado…</output>}
+          {loaded && !error && !payment && payments.length === 0 && (
+            <p>Ainda não tem pagamentos registados.</p>
+          )}
           {payment ? (
             <>
               <h2 aria-live="polite">
@@ -98,7 +120,9 @@ export function PaySuiteStatus() {
               {payment.status === 'paid' && (
                 <p>
                   {payment.kind === 'product'
-                    ? 'A equipa recebeu a encomenda e irá preparar a produção e entrega.'
+                    ? payment.orderStatus === 'fulfilled'
+                      ? 'Entrega confirmada pela equipa.'
+                      : 'A equipa recebeu a encomenda e irá preparar a produção e entrega.'
                     : 'O período pago foi registado no seu perfil.'}
                 </p>
               )}
@@ -122,6 +146,7 @@ export function PaySuiteStatus() {
                   href={'/checkout/retorno?payment=' + encodeURIComponent(p.id)}
                 >
                   {(p.amount / 100).toFixed(2)} MT · {labels[p.status]} ·{' '}
+                  {p.orderStatus === 'fulfilled' ? 'Entregue · ' : ''}
                   {p.id.slice(0, 8)}
                 </a>
               </p>

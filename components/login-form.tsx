@@ -14,11 +14,20 @@ export function LoginForm({
   const emailInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     try {
-      const saved = JSON.parse(sessionStorage.getItem('framy-auth-prefill') || 'null');
-      if (saved && typeof saved.email === 'string' && saved.expires > Date.now() && emailInput.current)
+      const saved = JSON.parse(
+        sessionStorage.getItem('framy-auth-prefill') || 'null',
+      );
+      if (
+        saved &&
+        typeof saved.email === 'string' &&
+        saved.expires > Date.now() &&
+        emailInput.current
+      )
         emailInput.current.value = saved.email;
       sessionStorage.removeItem('framy-auth-prefill');
-    } catch { /* Prefilling is optional. */ }
+    } catch {
+      /* Prefilling is optional. */
+    }
   }, []);
   const [register, setRegister] = useState(initialRegister),
     [busy, setBusy] = useState(false),
@@ -30,9 +39,11 @@ export function LoginForm({
         <Link href="/">{t('Framy Connect')}</Link>
         <h1>{register ? t('Criar a minha conta') : t('Bem-vindo à Framy')}</h1>
         <p>
-          {purchaseReturn ? t('Após entrar, voltará à sua encomenda.') : register
-            ? t('Guarde o seu perfil e acompanhe os seus pedidos.')
-            : t('Entre para abrir o seu painel.')}
+          {purchaseReturn
+            ? t('Após entrar, voltará à sua encomenda.')
+            : register
+              ? t('Guarde o seu perfil e acompanhe os seus pedidos.')
+              : t('Entre para abrir o seu painel.')}
         </p>
         <form
           onSubmit={async (e) => {
@@ -109,9 +120,7 @@ export function LoginForm({
         </form>
         {!register && (
           <p>
-            <a href="mailto:support@framyconnect.co.mz?subject=Recuperar%20acesso">
-              {t('Esqueci-me da palavra-passe — contactar apoio')}
-            </a>
+            <Link href="/recuperar">{t('Esqueci-me da palavra-passe')}</Link>
           </p>
         )}
         <button
@@ -124,7 +133,11 @@ export function LoginForm({
         >
           {register ? t('Já tenho conta') : t('Sou novo — criar conta')}
         </button>
-        {purchaseReturn && <Link className="auth-return" href={purchaseReturn}>{t('Voltar à encomenda')}</Link>}
+        {purchaseReturn && (
+          <Link className="auth-return" href={purchaseReturn}>
+            {t('Voltar à encomenda')}
+          </Link>
+        )}
       </section>
     </main>
   );

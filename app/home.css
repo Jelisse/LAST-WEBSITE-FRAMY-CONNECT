@@ -1920,6 +1920,13 @@
   .home-hero-benefits svg { width: 20px; height: 20px; }
   .home-hero { background: radial-gradient(ellipse at 85% 40%, #ffb65b88, transparent 65%), linear-gradient(165deg, #fffdf9 10%, #fff1df 65%, #ffe0be); }
 }
+.sharing-demo-profile { position: absolute; inset: 0; background: #bd470d; color: white; }
+.sharing-demo-profile > img { width: 100%; height: 65%; object-fit: cover; object-position: center 35%; }
+.sharing-demo-content { position: absolute; inset: 45% 0 0; padding: 28% 8% 8%; background: linear-gradient(transparent, #bd470d 35%); display: flex; flex-direction: column; align-items: center; gap: 4%; text-align: center; }
+.sharing-demo-content strong { font-size: 2.6cqw; line-height: 1.1; }
+.sharing-demo-content > span { font-size: 1.5cqw; }
+.sharing-demo-link-preview { width: 100%; border-radius: 2em; background: white; color: #843008; padding: 4%; }
+.sharing-demo-content small { font-size: 1.3cqw; margin-top: auto; letter-spacing: .1em; }
 .home-mobile-menu { display: none; }
 .home-hero h1 { display: flex; align-items: center; gap: .2em; }
 .home-contactless-mark { width: .9em; height: 1.35em; flex: 0 0 auto; overflow: visible; }
@@ -2084,7 +2091,8 @@
 .sharing-solange-camera { background: linear-gradient(145deg, #2e2c29, #1b1b1b); }
 .sharing-solange-camera > span:first-child { inset: 0 0 auto; padding: 17% 0 7%; font-size: 2cqw; background: #151515; }
 .sharing-camera-card { position: absolute; inset: 16% 0; overflow: hidden; background: #202020; }
-.sharing-camera-card > img { position: absolute; width: 230%; max-width: none; height: auto; left: -60%; top: 50%; transform: translateY(-79%); }
+.sharing-camera-art { position: absolute; width: 230%; left: -60%; top: 50%; transform: translateY(-79%); }
+.sharing-camera-art > img:first-child { display: block; width: 100%; max-width: none; height: auto; }
 .sharing-camera-card .sharing-scan-frame { left: 15%; right: 15%; top: 50%; height: auto; aspect-ratio: 1; transform: translateY(-50%); border-radius: 1cqw; }
 .sharing-solange-camera > .home-phone-island { padding: 0; width: 30%; top: 1.4%; height: 4%; background: #000; }
 @media (prefers-reduced-motion: reduce) { .sharing-nfc-pulse path { animation: none; opacity: .75; } }

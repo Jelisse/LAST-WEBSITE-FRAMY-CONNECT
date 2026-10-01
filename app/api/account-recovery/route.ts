@@ -3,6 +3,7 @@ import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
 import { tokenHash } from '@/lib/server-auth';
 import { hash } from 'bcryptjs';
+import { profileBody } from '@/lib/profile-api';
 export const dynamic = 'force-dynamic';
 const json = (data: unknown, status = 200) =>
   Response.json(data, {
@@ -23,29 +24,40 @@ export async function POST(request: Request) {
   if (request.headers.get('origin') !== new URL(request.url).origin)
     return json({ error: 'Origem inválida.' }, 403);
   try {
-    const raw = await request.text();
-    if (raw.length > 4096)
-      return json({ error: 'Pedido demasiado grande.' }, 413);
-    const b = JSON.parse(raw);
+    const b = await profileBody(request, 4096);
     if (!b || typeof b !== 'object')
       return json({ error: 'Pedido inválido.' }, 422);
     const db = database(),
       now = Date.now();
-    if (b.action === 'send') {
+    if (b.action === 'send' || b.action === 'request') {
+      const selfService = b.action === 'request';
+      const acknowledge = () =>
+        json(
+          {
+            ok: true,
+            message:
+              'Se existir uma conta activa com este email, receberá uma ligação de recuperação. Verifique também o spam.',
+          },
+          202,
+        );
       const user = await getChatGPTUser();
-      if (!user || !['manager', 'director'].includes(user.role))
+      if (
+        !selfService &&
+        (!user || !['manager', 'director'].includes(user.role))
+      )
         return json({ error: 'Acesso reservado à gestão.' }, 403);
       if (
-        typeof b.id !== 'string' ||
-        !Number.isSafeInteger(b.version) ||
-        b.confirmed !== true
+        !selfService &&
+        (typeof b.id !== 'string' ||
+          !Number.isSafeInteger(b.version) ||
+          b.confirmed !== true)
       )
         return json(
           { error: 'Confirme o pedido de recuperação do cliente.' },
           422,
         );
       // The destination is always taken from the account, never from the browser.
-      if (b.email || b.newEmail)
+      if ((!selfService && b.email) || b.newEmail)
         return json(
           {
             error: 'A recuperação só pode ser enviada para o email registado.',
@@ -80,22 +92,44 @@ export async function POST(request: Request) {
           },
           503,
         );
+      const email =
+        typeof b.email === 'string' ? b.email.trim().toLowerCase() : '';
+      if (
+        selfService &&
+        (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      )
+        return json({ error: 'Indique um email válido.' }, 422);
+      if (
+        selfService &&
+        (!(await limit(
+          db,
+          'request-ip:' + (request.headers.get('cf-connecting-ip') ?? 'local'),
+          5,
+        )) ||
+          !(await limit(db, 'request-email:' + email, 3)))
+      )
+        return acknowledge();
       const row = await db
         .prepare(
-          "SELECT id,email,version FROM auth_accounts WHERE id=? AND role='customer' AND active=1",
+          selfService
+            ? 'SELECT id,email,version FROM auth_accounts WHERE email=? COLLATE NOCASE AND active=1'
+            : "SELECT id,email,version FROM auth_accounts WHERE id=? AND role='customer' AND active=1",
         )
-        .bind(b.id)
+        .bind(selfService ? email : b.id)
         .first<{ id: string; email: string; version: number }>();
+      if (!row && selfService) return acknowledge();
       if (!row)
         return json({ error: 'Seleccione uma conta de cliente activa.' }, 404);
-      if (row.version !== b.version)
+      if (!selfService && row.version !== b.version)
         return json(
           { error: 'A conta mudou. Actualize a lista e tente novamente.' },
           409,
         );
+      const actor = selfService ? row.id : user!.userId;
       if (
-        !(await limit(db, 'actor:' + user.userId, 20)) ||
-        !(await limit(db, 'account:' + row.id, 3))
+        !selfService &&
+        (!(await limit(db, 'actor:' + actor, 20)) ||
+          !(await limit(db, 'account:' + row.id, 3)))
       )
         return json(
           { error: 'Limite de recuperação atingido. Aguarde 15 minutos.' },
@@ -111,7 +145,7 @@ export async function POST(request: Request) {
         .prepare(
           'INSERT INTO auth_recovery(token_hash,account_id,account_version,email,created_by,expires_at,created_at) VALUES(?,?,?,?,?,?,?)',
         )
-        .bind(key, row.id, row.version, row.email, user.userId, expires, now)
+        .bind(key, row.id, row.version, row.email, actor, expires, now)
         .run();
       let accepted = false;
       try {
@@ -126,7 +160,7 @@ export async function POST(request: Request) {
             from: env.PROFILE_EMAIL_FROM,
             to: [row.email],
             subject: 'Recuperar acesso à Framy Connect',
-            text: `A gestão iniciou a recuperação da sua conta a seu pedido.\n\nO seu email de acesso: ${row.email}\n\nDefina uma nova palavra-passe: ${origin.origin}/recuperar#${token}\n\nEsta ligação é pessoal, válida por 30 minutos e só pode ser usada uma vez. Nunca partilhe a ligação. A Framy não envia nem pede a sua palavra-passe. Se não solicitou esta recuperação, ignore a mensagem e contacte o suporte.`,
+            text: `Recebemos um pedido de recuperação da sua conta.\n\nO seu email de acesso: ${row.email}\n\nDefina uma nova palavra-passe: ${origin.origin}/recuperar#${token}\n\nEsta ligação é pessoal, válida por 30 minutos e só pode ser usada uma vez. Nunca partilhe a ligação. A Framy não envia nem pede a sua palavra-passe. Se não solicitou esta recuperação, ignore a mensagem e contacte o suporte.`,
           }),
           signal: AbortSignal.timeout(10000),
         });
@@ -141,6 +175,7 @@ export async function POST(request: Request) {
           .prepare('DELETE FROM auth_recovery WHERE token_hash=?')
           .bind(key)
           .run();
+        if (selfService) return acknowledge();
         return json(
           {
             error:
@@ -152,7 +187,7 @@ export async function POST(request: Request) {
       const result = await db.batch([
         db
           .prepare(
-            "UPDATE auth_recovery SET delivered=1 WHERE token_hash=? AND EXISTS(SELECT 1 FROM auth_accounts WHERE id=? AND role='customer' AND active=1 AND email=? AND version=?)",
+            'UPDATE auth_recovery SET delivered=1 WHERE token_hash=? AND EXISTS(SELECT 1 FROM auth_accounts WHERE id=? AND active=1 AND email=? AND version=?)',
           )
           .bind(key, row.id, row.email, row.version),
         db
@@ -161,11 +196,12 @@ export async function POST(request: Request) {
           )
           .bind(
             crypto.randomUUID(),
-            user.userId,
+            actor,
             row.id,
             new Date(now).toISOString(),
           ),
       ]);
+      if (selfService) return acknowledge();
       if (!result[0].meta.changes)
         return json(
           {
@@ -206,7 +242,7 @@ export async function POST(request: Request) {
       return json({ error: 'Demasiadas tentativas. Aguarde 15 minutos.' }, 429);
     const key = await tokenHash(b.token);
     const validSQL =
-      "SELECT r.account_id FROM auth_recovery r JOIN auth_accounts a ON a.id=r.account_id AND a.role='customer' AND a.active=1 AND a.email=r.email AND a.version=r.account_version JOIN auth_accounts issuer ON issuer.id=r.created_by AND issuer.active=1 AND issuer.role IN ('manager','director') WHERE r.token_hash=? AND r.delivered=1 AND r.expires_at>?";
+      "SELECT r.account_id FROM auth_recovery r JOIN auth_accounts a ON a.id=r.account_id AND a.active=1 AND a.email=r.email AND a.version=r.account_version JOIN auth_accounts issuer ON issuer.id=r.created_by AND issuer.active=1 AND (issuer.id=a.id OR (a.role='customer' AND issuer.role IN ('manager','director'))) WHERE r.token_hash=? AND r.delivered=1 AND r.expires_at>?";
     const recovery = await db
       .prepare(validSQL)
       .bind(key, now)
@@ -259,7 +295,9 @@ export async function POST(request: Request) {
           { error: 'A ligação já foi utilizada ou deixou de ser válida.' },
           410,
         );
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Pedido demasiado grande.')
+      return json({ error: error.message }, 413);
     return json(
       { error: 'Não foi possível concluir a recuperação. Tente novamente.' },
       503,

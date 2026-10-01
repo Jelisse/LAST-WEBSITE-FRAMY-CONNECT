@@ -14,6 +14,8 @@ type Row = {
   role: AccountRole;
   active: number;
   version: number;
+  profileUsername: string | null;
+  profilePublished: number;
 };
 export async function GET(request?: Request) {
   const user = await getChatGPTUser();
@@ -27,7 +29,7 @@ export async function GET(request?: Request) {
     const pattern = '%' + search.replace(/[\\%_]/g, '\\$&') + '%';
     const rows = await db
       .prepare(
-        "SELECT id,name,email,role,active,version FROM auth_accounts WHERE (name LIKE ? ESCAPE '\\' OR email LIKE ? ESCAPE '\\') ORDER BY name LIMIT 500",
+        "SELECT a.id,a.name,a.email,a.role,a.active,a.version,p.username AS profileUsername,CASE WHEN p.published_json IS NOT NULL THEN 1 ELSE 0 END AS profilePublished FROM auth_accounts a LEFT JOIN profiles p ON p.owner_id=a.id WHERE (a.name LIKE ? ESCAPE '\\' OR a.email LIKE ? ESCAPE '\\') ORDER BY a.name LIMIT 500",
       )
       .bind(pattern, pattern)
       .all<Row>();

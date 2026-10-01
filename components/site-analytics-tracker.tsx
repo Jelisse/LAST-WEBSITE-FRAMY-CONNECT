@@ -2,12 +2,18 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useI18n } from './language-provider';
+import Link from '@/components/hard-link';
+import {
+  readConsent,
+  writeConsent,
+  consentChanged,
+  measurementBlocked,
+} from '@/lib/measurement-consent';
 import {
   analyticsPath,
   cleanReferrer,
   safeCampaign,
 } from '@/lib/site-analytics';
-const preference = 'framy-analytics-consent';
 const sessionKey = 'framy-analytics-session';
 let listening = false;
 const pendingSteps: { kind: string; step: number; path: string; at: number }[] =
@@ -17,7 +23,7 @@ export function emitCheckoutAnalytics(
   step = -1,
 ) {
   try {
-    if (localStorage.getItem(preference) !== 'yes') return;
+    if (readConsent() !== 'yes') return;
   } catch {
     return;
   }
@@ -36,13 +42,10 @@ export function SiteAnalyticsTracker() {
   const [blocked, setBlocked] = useState(false);
   const publicPath = analyticsPath(path);
   useEffect(() => {
-    const disabled =
-      navigator.doNotTrack === '1' ||
-      (navigator as Navigator & { globalPrivacyControl?: boolean })
-        .globalPrivacyControl === true;
+    const disabled = measurementBlocked();
     let saved: string | null = null;
     try {
-      saved = localStorage.getItem(preference);
+      saved = readConsent();
     } catch {
       /* no storage, no collection */
     }
@@ -53,13 +56,17 @@ export function SiteAnalyticsTracker() {
     });
     const sync = () => {
       try {
-        setConsent(localStorage.getItem(preference));
+        setConsent(readConsent());
       } catch {
         setConsent('no');
       }
     };
     window.addEventListener('storage', sync);
-    return () => window.removeEventListener('storage', sync);
+    window.addEventListener(consentChanged, sync);
+    return () => {
+      window.removeEventListener('storage', sync);
+      window.removeEventListener(consentChanged, sync);
+    };
   }, []);
   useEffect(() => {
     if (!publicPath || consent !== 'yes' || blocked) return;
@@ -75,7 +82,7 @@ export function SiteAnalyticsTracker() {
     ) {
       if (cancelled || document.visibilityState !== 'visible') return;
       try {
-        if (localStorage.getItem(preference) !== 'yes') return;
+        if (readConsent() !== 'yes') return;
         const saved = JSON.parse(localStorage.getItem(sessionKey) || 'null');
         const session =
           saved?.expires > Date.now() && /^[0-9a-f-]{36}$/.test(saved.id)
@@ -180,9 +187,8 @@ export function SiteAnalyticsTracker() {
   }, [publicPath, consent, blocked]);
   function choose(value: string) {
     try {
-      localStorage.setItem(preference, value);
-      if (value !== 'yes') localStorage.removeItem(sessionKey);
-      setConsent(value);
+      setConsent(writeConsent(value));
+      if (value !== 'yes') pendingSteps.length = 0;
     } catch {
       setConsent('no');
     }
@@ -191,7 +197,7 @@ export function SiteAnalyticsTracker() {
   if (consent)
     return (
       <div className="analytics-preferences">
-        <button type="button" onClick={() => setConsent(null)}>
+        <button type="button" onClick={() => choose('')}>
           {t('Preferências de estatísticas')}
         </button>
       </div>
@@ -206,6 +212,11 @@ export function SiteAnalyticsTracker() {
         {t(
           'Podemos medir visitas, carregamento e etapas da compra? Não recolhemos nomes, formulários ou dados de pagamento. Pode alterar a escolha no rodapé.',
         )}
+      </p>
+      <p>
+        <Link href="/privacidade#cookies">
+          {t('Cookies e armazenamento no dispositivo')}
+        </Link>
       </p>
       <div>
         <button type="button" onClick={() => choose('no')}>

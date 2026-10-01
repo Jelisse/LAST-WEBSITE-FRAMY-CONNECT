@@ -195,8 +195,14 @@
     "Included in Individual and Professional: WhatsApp, opening hours, directions and profile color customization.",
     "個人與專業方案均包含：WhatsApp、營業時間、路線資訊與檔案配色自訂。"
   ],
-  "Cartões e porta-chaves NFC": ["NFC cards and keychains", "NFC 卡片與鑰匙圈"],
-  "Kit: cartão + porta-chaves": ["Kit: card + keychain", "套組：卡片 + 鑰匙圈"],
+  "Cartões e porta-chaves NFC": [
+    "NFC cards and keychains",
+    "NFC 卡片與鑰匙圈"
+  ],
+  "Kit: cartão + porta-chaves": [
+    "Kit: card + keychain",
+    "套組：卡片 + 鑰匙圈"
+  ],
   "Partilhe contactos em reuniões, eventos e atendimentos.": [
     "Share contact details at meetings, events and appointments.",
     "在會議、活動與接待時分享聯絡資訊。"
@@ -7247,7 +7253,7 @@
   ],
   "Enviar ligação de recuperação": [
     "Send recovery link",
-    "寄送復原連結"
+    "傳送復原連結"
   ],
   "Enviar recuperação": [
     "Send recovery",
@@ -7700,5 +7706,97 @@
   "Uma solução à medida da sua equipa": [
     "A solution tailored to your team",
     "為您的團隊量身打造的方案"
+  ],
+  "Indique o email da sua conta. Enviaremos uma ligação pessoal para definir uma nova palavra-passe, válida por 30 minutos.": [
+    "Enter your account email. We will send a personal link to set a new password, valid for 30 minutes.",
+    "輸入您的帳戶電子郵件。我們會寄送有效期限為 30 分鐘的專屬連結，讓您設定新密碼。"
+  ],
+  "Se existir uma conta activa com este email, receberá uma ligação de recuperação. Verifique também o spam.": [
+    "If an active account uses this email, you will receive a recovery link. Check your spam folder too.",
+    "如果此電子郵件對應有效帳戶，您將收到復原連結。請同時檢查垃圾郵件匣。"
+  ],
+  "Escolha uma nova palavra-passe. A ligação é pessoal, válida por 30 minutos e só pode ser usada uma vez.": [
+    "Choose a new password. This personal link is valid for 30 minutes and can only be used once.",
+    "請選擇新密碼。此專屬連結有效期限為 30 分鐘，且僅可使用一次。"
+  ],
+  "Pedir uma nova ligação": [
+    "Request a new link",
+    "申請新連結"
+  ],
+  "Esqueci-me da palavra-passe": [
+    "Forgot my password",
+    "忘記密碼"
+  ],
+  "Cookies e armazenamento no dispositivo": [
+    "Cookies and device storage",
+    "Cookie 與裝置儲存空間"
+  ],
+  "Vídeos Framy Connect, cartão de exemplo e porta-chaves NFC": [
+    "Framy Connect videos, example card and NFC keychain",
+    "Framy Connect 影片、示範卡片及 NFC 鑰匙圈"
+  ],
+  "Criadora de conteúdos": [
+    "Content creator",
+    "內容創作者"
+  ],
+  "Perfil fictício de demonstração. Fotografia gerada por IA.": [
+    "Fictional demonstration profile. AI-generated photograph.",
+    "虛構示範個人檔案。照片由 AI 生成。"
+  ],
+  "Não foi possível copiar. Abra o perfil e copie o endereço do navegador.": [
+    "Could not copy. Open the profile and copy the address from your browser.",
+    "無法複製。請開啟個人檔案，並從瀏覽器複製網址。"
+  ],
+  "Privacidade e utilização dos dados": [
+    "Privacy and data use",
+    "隱私與資料使用"
+  ],
+  "A sessão utiliza um cookie necessário, protegido contra acesso por scripts, que expira após 24 horas. A preferência de idioma é guardada durante um ano. A configuração da compra fica neste separador por até 30 minutos e é removida ao terminar sessão. As estatísticas são opcionais: só começam após Permitir, e Recusar mantém o website funcional. Guardamos essa escolha por 180 dias; depois pedimos novamente. Pode retirar a autorização nas Preferências de estatísticas. As preferências de medição de cada perfil são separadas e podem ser alteradas nesse perfil. Respeitamos os sinais de não rastrear e de privacidade global do navegador.": [
+    "Sign-in uses a necessary cookie protected from script access, which expires after 24 hours. Language preference is stored for one year. Purchase configuration stays in this tab for up to 30 minutes and is removed on sign-out. Statistics are optional: they start only after Allow, and Decline keeps the website functional. We store this choice for 180 days, then ask again. You can withdraw permission in Statistics preferences. Measurement preferences for each profile are separate and can be changed on that profile. We respect browser Do Not Track and Global Privacy Control signals.",
+    "登入使用必要且禁止指令碼存取的 Cookie，24 小時後到期。語言偏好儲存一年。購買設定會在此分頁保留最多 30 分鐘，登出時移除。統計為選用：只有允許後才會開始，拒絕不影響網站功能。此選擇保留 180 天，之後重新詢問。您可在統計偏好中撤回同意。各個人檔案的追蹤偏好相互獨立，可在該檔案變更。我們遵守瀏覽器的禁止追蹤和全球隱私控制訊號。"
+  ],
+  "Com autorização para estatísticas, contamos visitas às páginas dos produtos. Um identificador aleatório neste separador evita repetições no mesmo dia; não guardamos o IP nesta estatística. Os registos têm conservação de até 90 dias e o painel apresenta os últimos 30 dias.": [
+    "With permission for statistics, we count product page visits. A random identifier in this tab avoids duplicates on the same day; we do not store IP addresses in this statistic. Records are kept for up to 90 days and the dashboard shows the last 30 days.",
+    "經您同意統計後，我們會計算產品頁面瀏覽次數。此分頁中的隨機識別碼可避免同日重複計算；此統計不儲存 IP 位址。記錄最多保留 90 天，面板顯示最近 30 天。"
+  ],
+  "Entrar ou criar conta para continuar": [
+    "Sign in or create an account to continue",
+    "登入或建立帳戶以繼續"
+  ],
+  "Criar e publicar o perfil para este produto": [
+    "Create and publish the profile for this product",
+    "建立並發布此產品的個人檔案"
+  ],
+  "O seu perfil publicado está pronto para ser ligado ao produto.": [
+    "Your published profile is ready to link to this product.",
+    "您已發布的個人檔案可連結至此產品。"
+  ],
+  "Conclua o passo 3 para continuar para o pagamento.": [
+    "Complete step 3 to continue to payment.",
+    "完成步驟 3 後即可繼續付款。"
+  ],
+  "Guarde e publique o seu perfil. Depois volte à compra para confirmar a entrega e o pagamento.": [
+    "Save and publish your profile. Then return to your purchase to confirm delivery and payment.",
+    "儲存並發布個人檔案，然後返回購買頁面確認配送和付款。"
+  ],
+  "Voltar à compra": [
+    "Return to purchase",
+    "返回購買"
+  ],
+  "Consultar compras e pagamentos PaySuite": [
+    "View PaySuite purchases and payments",
+    "查看 PaySuite 購買與付款"
+  ],
+  "O seu design em PDF vectorial.": [
+    "Your design in a vector PDF.",
+    "以向量 PDF 提供您的設計。"
+  ],
+  "Design criado pela nossa equipa.": [
+    "Design created by our team.",
+    "由我們的團隊製作設計。"
+  ],
+  "Envie o seu design em PDF vectorial à equipa após o pedido.": [
+    "Send your vector PDF design to the team after placing your order.",
+    "下單後，將向量 PDF 設計寄給團隊。"
   ]
 }

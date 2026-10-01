@@ -30,7 +30,7 @@ export async function GET(request: Request) {
         available: paysuiteReady(env),
         payments: (
           await env.DB.prepare(
-            'SELECT id,kind,amount,cycle,status,created_at FROM paysuite_payments WHERE owner_id=? ORDER BY created_at DESC LIMIT 30',
+            'SELECT p.id,p.kind,p.amount,p.cycle,p.status,p.created_at,o.status AS orderStatus FROM paysuite_payments p LEFT JOIN paysuite_product_orders o ON o.id=p.target_id AND o.owner_id=p.owner_id WHERE p.owner_id=? ORDER BY p.created_at DESC LIMIT 30',
           )
             .bind(user.userId)
             .all()
@@ -59,6 +59,16 @@ export async function GET(request: Request) {
       amount: row.amount,
       status: row.status,
       cycle: row.cycle,
+      orderStatus:
+        row.kind === 'product'
+          ? ((
+              await env.DB.prepare(
+                'SELECT status FROM paysuite_product_orders WHERE id=? AND owner_id=?',
+              )
+                .bind(row.target_id, user.userId)
+                .first<{ status: string }>()
+            )?.status ?? null)
+          : null,
       url: row.status === 'pending' ? row.checkout_url : null,
     });
   } catch {

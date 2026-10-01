@@ -1,6 +1,6 @@
 import { getTranslations } from '@/lib/server-i18n';
 import { MobileProfile } from '@/components/mobile-profile';
-import { blankProfile } from '@/lib/domain';
+import { demoProfile } from '@/lib/demo-profile';
 export async function generateMetadata() {
   const t = await getTranslations();
   return {
@@ -12,23 +12,7 @@ export default async function ExampleProfile() {
   const t = await getTranslations();
   return (
     <main id="main" className="standalone-mobile-profile">
-      <MobileProfile
-        published
-        profile={{
-          ...blankProfile,
-          name: 'Firmino Chambale',
-          username: 'exemplo',
-          title: t('Arquitecto e Planeador Físico'),
-          photoUrl: '/home/demo-portrait.jpg',
-          photoPosition: 35,
-          links: [
-            { label: t('Conhecer a Framy'), url: '/' },
-            { label: t('Ver produtos'), url: '/produtos' },
-            { label: t('Fale connosco'), url: '/contacto' },
-          ],
-          bio: t('Perfil de demonstração Framy Connect.'),
-        }}
-      />
+      <MobileProfile published measure={false} profile={demoProfile(t)} />
     </main>
   );
 }

@@ -446,6 +446,26 @@ test('ambiguous provider timeout does not create another payment on retry', asyn
     'creating',
   );
 });
+test('only verified paid orders can be fulfilled and the customer sees the delivery state', async (t) => {
+  const f = fixture(t), checkout = await api('app/api/paysuite/checkout/route.ts'), manager = await api('app/api/paysuite/manager/route.ts');
+  const buyer = globalThis.__paysuite.user;
+  const body = product();
+  assert.equal((await checkout.POST(request(body))).status, 200);
+  assert.equal((await manager.POST(request({ action: 'fulfilled', id: body.requestId }))).status, 403);
+  globalThis.__paysuite.user = { userId: 'manager-test', role: 'manager' };
+  assert.equal((await manager.POST(request({ action: 'fulfilled', id: body.requestId }))).status, 409);
+  const [id, record] = [...f.records][0]; record.status = 'paid';
+  await notify(f, id);
+  assert.equal((await manager.POST(request({ action: 'fulfilled', id: body.requestId }))).status, 200);
+  assert.equal((await manager.POST(request({ action: 'fulfilled', id: body.requestId }))).status, 409);
+  globalThis.__paysuite.user = buyer;
+  const status = await (await checkout.GET(new Request('https://framyconnect.co.mz/api/paysuite/checkout?payment=' + body.requestId))).json();
+  assert.equal(status.status, 'paid'); assert.equal(status.orderStatus, 'fulfilled');
+  assert.equal(status.configuration_json, undefined);
+  const list = await (await checkout.GET(new Request('https://framyconnect.co.mz/api/paysuite/checkout'))).json();
+  assert.equal(list.payments[0].orderStatus, 'fulfilled');
+});
+
 test('provider URL validation and calendar billing handle security and leap years', async () => {
   const { checkoutURL, billingPeriodEnd, minorAmount } =
     await import('../lib/paysuite.ts');

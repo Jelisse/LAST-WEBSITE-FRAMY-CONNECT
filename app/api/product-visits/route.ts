@@ -9,6 +9,11 @@ const json = (data: unknown, status = 200) =>
 export async function POST(request: Request) {
   if (request.headers.get('origin') !== new URL(request.url).origin)
     return json({ error: 'Origem não autorizada.' }, 403);
+  if (
+    request.headers.get('dnt') === '1' ||
+    request.headers.get('sec-gpc') === '1'
+  )
+    return json({ recorded: false });
   try {
     if (!(await rateLimit(request, 'product-visits', 120)))
       return json({ error: 'Tente mais tarde.' }, 429);
@@ -16,6 +21,7 @@ export async function POST(request: Request) {
     if (raw.length > 1000)
       return json({ error: 'Pedido demasiado grande.' }, 413);
     const b = JSON.parse(raw);
+    if (!b || b.consent !== true) return json({ recorded: false });
     if (typeof b.session !== 'string' || !/^[0-9a-f-]{36}$/.test(b.session))
       return json({ error: 'Visita inválida.' }, 422);
     const user = await getChatGPTUser();

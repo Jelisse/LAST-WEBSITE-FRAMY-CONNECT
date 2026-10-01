@@ -1041,11 +1041,21 @@ export function Workspace({ displayName }: { displayName: string }) {
                     </fieldset>
                   )}
                   {tab === 'orders' ? (
-                    <CustomerOrders
-                      orders={orders}
-                      events={data?.events ?? []}
-                      onOpen={inspect}
-                    />
+                    <>
+                      <p>
+                        <Link
+                          className="btn btn-primary"
+                          href="/checkout/retorno"
+                        >
+                          {t('Consultar compras e pagamentos PaySuite')}
+                        </Link>
+                      </p>
+                      <CustomerOrders
+                        orders={orders}
+                        events={data?.events ?? []}
+                        onOpen={inspect}
+                      />
+                    </>
                   ) : (
                     orderTable
                   )}

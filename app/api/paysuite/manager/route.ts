@@ -85,9 +85,9 @@ export async function POST(request: Request) {
         throw Error('Indique o ID PaySuite obtido no painel do prestador.');
       await reconcilePayment(env, p, providerId);
     } else if (b.action === 'fulfilled') {
-      await env.DB.batch([
+      const result = await env.DB.batch([
         env.DB.prepare(
-          "UPDATE paysuite_product_orders SET status='fulfilled' WHERE id=? AND status='paid'",
+          "UPDATE paysuite_product_orders SET status='fulfilled' WHERE id=? AND status='paid' AND EXISTS(SELECT 1 FROM paysuite_payments p WHERE p.target_id=paysuite_product_orders.id AND p.status='paid' AND p.kind='product')",
         ).bind(String(b.id)),
         env.DB.prepare(
           "INSERT INTO manager_audit(id,actor,action,subject,created_at) SELECT ?,?,'Encomenda PaySuite entregue',?,? WHERE changes()=1",
@@ -98,6 +98,14 @@ export async function POST(request: Request) {
           new Date().toISOString(),
         ),
       ]);
+      if (!result[0].meta.changes)
+        return json(
+          {
+            error:
+              'A encomenda não está paga ou já foi entregue. Actualize a lista.',
+          },
+          409,
+        );
     } else throw Error('Acção inválida.');
     return json({ ok: true });
   } catch {

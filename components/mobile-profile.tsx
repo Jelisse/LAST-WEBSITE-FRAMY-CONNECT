@@ -61,11 +61,13 @@ export function MobileProfile({
   published = false,
   preview = false,
   brandHref = '/',
+  measure = true,
 }: {
   profile: Profile;
   published?: boolean;
   preview?: boolean;
   brandHref?: string;
+  measure?: boolean;
 }) {
   const { t } = useI18n();
   const [english, setEnglish] = useState(false);
@@ -89,7 +91,7 @@ export function MobileProfile({
     [qrBusy, setQrBusy] = useState(false);
   const measurement = useProfileEngagement(
     profile.username,
-    published && !preview,
+    published && !preview && measure,
   );
   const business = profile.business;
   const whatsapp = whatsappURL(business);
@@ -370,7 +372,7 @@ export function MobileProfile({
           {message && (
             <output className="mobile-profile-message">{t(message)}</output>
           )}
-          {!preview && published && (
+          {!preview && published && measure && (
             <ProfileMeasurementChoice
               english={english}
               consent={measurement.consent}

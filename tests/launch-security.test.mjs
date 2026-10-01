@@ -162,6 +162,27 @@ const post = async (route, body) => {
   return { status: response.status, body: await response.json() };
 };
 
+test('managers can access published profile links without a physical order, without exposing drafts', async () => {
+  const sql = fixture(), accounts = await api('app/api/accounts/route.ts');
+  try {
+    sql.prepare('INSERT INTO profiles(owner_id,username,draft_json,published_json,updated_at) VALUES(?,?,?,?,?)')
+      .run('customer-a','digital-only',JSON.stringify({privateNote:'do not expose'}),'{}',new Date().toISOString());
+    assert.equal(sql.prepare('SELECT COUNT(*) n FROM sandbox_orders').get().n,0);
+    assert.equal((await accounts.GET(new Request(origin+'/api/accounts'))).status,403);
+    globalThis.__launch.user = {userId:'manager-a',role:'manager'};
+    const result = await accounts.GET(new Request(origin+'/api/accounts?q=customer-a'));
+    assert.equal(result.status,200);
+    const data = await result.json();
+    assert.equal(data.accounts.length,1);
+    assert.equal(data.accounts[0].profileUsername,'digital-only');
+    assert.equal(data.accounts[0].profilePublished,1);
+    assert.ok(!JSON.stringify(data).includes('privateNote'));
+    sql.prepare('UPDATE profiles SET published_json=NULL').run();
+    const draft = await (await accounts.GET(new Request(origin+'/api/accounts?q=customer-a'))).json();
+    assert.equal(draft.accounts[0].profilePublished,0);
+  } finally {sql.close();}
+});
+
 test('email-first account routing is rate limited and never creates accounts or sessions', async () => {
   const sql = fixture();
   const auth = await api('app/api/auth/route.ts');
@@ -397,16 +418,17 @@ test('product analytics count non-buyers once per session/day and exclude staff 
     route = await api('app/api/product-visits/route.ts');
   const session = crypto.randomUUID();
   globalThis.__launch.user = null;
+  assert.equal((await post(route, { session, productId: 'wood' })).body.recorded, false);
   for (let i = 0; i < 2; i++)
     assert.equal(
-      (await post(route, { session, productId: 'wood' })).status,
+      (await post(route, { session, productId: 'wood', consent: true })).status,
       200,
     );
   assert.equal(sql.prepare('SELECT COUNT(*) n FROM product_visits').get().n, 1);
   assert.equal((await route.GET()).status, 403);
   globalThis.__launch.user = { userId: 'manager-a', role: 'manager' };
   assert.equal(
-    (await post(route, { session: crypto.randomUUID(), productId: 'wood' }))
+    (await post(route, { session: crypto.randomUUID(), productId: 'wood', consent: true }))
       .body.recorded,
     false,
   );
@@ -1940,6 +1962,33 @@ test('public www alias redirects without querying customer-domain tables', async
     customDomainRequest(unrelated, env),
     /must not query D1/,
   );
+});
+
+test('self-service recovery uses the registered address, conceals account existence and redeems once', async () => {
+  const sql = fixture(), original = globalThis.fetch;
+  const recovery = await api('app/api/account-recovery/route.ts');
+  globalThis.__launch.user = null;
+  Object.assign(globalThis.__launch.env, { RESEND_API_KEY: 'test-only', PROFILE_EMAIL_FROM: 'support@example.com', PUBLIC_SITE_URL: origin });
+  const messages = [];
+  globalThis.fetch = async (_url, init) => { messages.push(JSON.parse(init.body)); return Response.json({ id: 'mock-email' }); };
+  try {
+    const known = await post(recovery, { action: 'request', email: ' CUSTOMER-A@EXAMPLE.COM ' });
+    const unknown = await post(recovery, { action: 'request', email: 'missing@example.com' });
+    assert.equal(known.status, 202); assert.deepEqual(known.body, unknown.body);
+    assert.equal(messages.length, 1); assert.deepEqual(messages[0].to, ['customer-a@example.com']);
+    assert.equal(known.body.token, undefined);
+    const token = messages[0].text.match(/recuperar#([a-f0-9]{64})/)[1];
+    assert.equal(sql.prepare('SELECT created_by FROM auth_recovery').get().created_by, 'customer-a');
+    assert.equal((await post(recovery, { action: 'reset', token, password: 'New-safe-password-2026' })).status, 200);
+    assert.equal((await post(recovery, { action: 'reset', token, password: 'New-safe-password-2026' })).status, 410);
+    sql.exec("UPDATE auth_accounts SET active=0 WHERE id='customer-b'");
+    assert.deepEqual((await post(recovery, { action: 'request', email: 'customer-b@example.com' })).body, known.body);
+    assert.equal(messages.length, 1);
+    // Delivery failures must not create usable links or disclose membership.
+    globalThis.fetch = async () => Response.json({ error: 'mock failure' }, { status: 502 });
+    assert.deepEqual((await post(recovery, { action: 'request', email: 'customer-a@example.com' })).body, known.body);
+    assert.equal(sql.prepare('SELECT COUNT(*) n FROM auth_recovery').get().n, 0);
+  } finally { globalThis.fetch = original; sql.close(); }
 });
 
 test('customer recovery sends only to registered email, keeps access until redemption and revokes all old sessions', async () => {

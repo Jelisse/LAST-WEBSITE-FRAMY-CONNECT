@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { readPurchaseDraft } from '@/lib/purchase-draft';
 import Link from '@/components/hard-link';
 import { useI18n } from './language-provider';
 import {
@@ -26,6 +27,8 @@ export function PurchaseConfigurator({
   photos = [],
   pricing = null,
   paymentAvailable = false,
+  signedIn = false,
+  profileReady = false,
 }: {
   initial?: string;
   plans: ManagedPlan[];
@@ -33,6 +36,8 @@ export function PurchaseConfigurator({
   photos?: ProductPhoto[];
   pricing?: CheckoutPricing | null;
   paymentAvailable?: boolean;
+  signedIn?: boolean;
+  profileReady?: boolean;
 }) {
   const { t } = useI18n();
   const selection = purchaseSelection(initial);
@@ -41,10 +46,64 @@ export function PurchaseConfigurator({
   const [keychain, setKeychain] = useState<string>(selection.keychain);
   const [design, setDesign] = useState('standard');
   const method = 'PDF vectorial';
-  const [contact,setContact] = useState('');
-  const [address,setAddress] = useState('');
-  const [delivery,setDelivery] = useState('maputo');
-  const [designInstructions,setDesignInstructions] = useState('');
+  const [contact, setContact] = useState('');
+  const [address, setAddress] = useState('');
+  const [delivery, setDelivery] = useState('maputo');
+  const [designInstructions, setDesignInstructions] = useState('');
+  const [draftReady, setDraftReady] = useState(false);
+  useEffect(() => {
+    let draft: ReturnType<typeof readPurchaseDraft> = null;
+    try {
+      draft = readPurchaseDraft(
+        sessionStorage.getItem('framy-checkout:configuration:' + initial),
+      );
+    } catch {
+      /* Optional restoration. */
+    }
+    queueMicrotask(() => {
+      if (draft) {
+        setCard(draft.card);
+        setKeychain(draft.keychain);
+        setDesign(draft.design);
+        setDelivery(draft.delivery);
+        setContact(draft.contact);
+        setAddress(draft.address);
+        setDesignInstructions(draft.designInstructions);
+      }
+      setDraftReady(true);
+    });
+  }, [initial]);
+  useEffect(() => {
+    if (!draftReady) return;
+    try {
+      sessionStorage.setItem(
+        'framy-checkout:configuration:' + initial,
+        JSON.stringify({
+          version: 1,
+          expires: Date.now() + 1800000,
+          card,
+          keychain,
+          design,
+          delivery,
+          contact,
+          address,
+          designInstructions,
+        }),
+      );
+    } catch {
+      /* Checkout also works with browser storage disabled. */
+    }
+  }, [
+    draftReady,
+    initial,
+    card,
+    keychain,
+    design,
+    delivery,
+    contact,
+    address,
+    designInstructions,
+  ]);
   const selected = purchaseFormats.find((item) => item.id === format)!;
   const selectedDesign = designServices.find((item) => item.id === design)!;
   const estimate = hardwareEstimate(prices, format, card, keychain);
@@ -52,19 +111,30 @@ export function PurchaseConfigurator({
     ...(format !== 'keychain' ? [card] : []),
     ...(format !== 'card' ? [keychain] : []),
   ];
-  const designAmount = pricing ? design === 'standard' ? 0 : design === 'customer' ? pricing.customer_design : pricing.team_design : null;
-  const total = estimate && designAmount !== null && pricing && delivery === 'maputo' ? estimate.amount + designAmount + pricing.maputo_delivery : null;
+  const designAmount = pricing
+    ? design === 'standard'
+      ? 0
+      : design === 'customer'
+        ? pricing.customer_design
+        : pricing.team_design
+    : null;
+  const total =
+    estimate && designAmount !== null && pricing && delivery === 'maputo'
+      ? estimate.amount + designAmount + pricing.maputo_delivery
+      : null;
   return (
     <div className="purchase-configurator">
-      {!paymentAvailable && <div className="purchase-maintenance">
-        <strong>{t('Checkout em manutenção')}</strong>
-        <p>{t(checkoutMaintenanceMessage)}</p>
-        <p>
-          {t(
-            'Explore a nova configuração. Os preços e a disponibilidade serão confirmados antes da reabertura.',
-          )}
-        </p>
-      </div>}
+      {!paymentAvailable && (
+        <div className="purchase-maintenance">
+          <strong>{t('Checkout em manutenção')}</strong>
+          <p>{t(checkoutMaintenanceMessage)}</p>
+          <p>
+            {t(
+              'Explore a nova configuração. Os preços e a disponibilidade serão confirmados antes da reabertura.',
+            )}
+          </p>
+        </div>
+      )}
       <div className="purchase-layout">
         <div>
           <fieldset className="purchase-section">
@@ -121,11 +191,22 @@ export function PurchaseConfigurator({
                 </label>
               ))}
             </div>
-            {design !== 'standard' && <label className="purchase-method">
-              Instruções para o design
-              <textarea value={designInstructions} onChange={e=>setDesignInstructions(e.target.value)} maxLength={2000} placeholder="Nome, cores e informações a incluir" />
-              <small>Após o pedido, a equipa contacta-o para receber o PDF vectorial ou preparar o design. O editor online ainda não está disponível. A produção começa após a sua aprovação.</small>
-            </label>}
+            {design !== 'standard' && (
+              <label className="purchase-method">
+                Instruções para o design
+                <textarea
+                  value={designInstructions}
+                  onChange={(e) => setDesignInstructions(e.target.value)}
+                  maxLength={2000}
+                  placeholder="Nome, cores e informações a incluir"
+                />
+                <small>
+                  Após o pedido, a equipa contacta-o para receber o PDF
+                  vectorial ou preparar o design. O editor online ainda não está
+                  disponível. A produção começa após a sua aprovação.
+                </small>
+              </label>
+            )}
           </fieldset>
           <section className="purchase-section">
             <h2>{t('3. Um perfil digital')}</h2>
@@ -137,7 +218,38 @@ export function PurchaseConfigurator({
               )}
             </p>
             <strong>{t('30 dias grátis · sem renovação automática')}</strong>
-            <p>O pagamento do perfil é feito separadamente após os 30 dias grátis. As renovações requerem a sua autorização.</p>
+            {!signedIn ? (
+              <p>
+                <Link
+                  className="btn btn-primary"
+                  href={
+                    '/entrar?return_to=' +
+                    encodeURIComponent('/comprar?formato=' + initial)
+                  }
+                >
+                  {t('Entrar ou criar conta para continuar')}
+                </Link>
+              </p>
+            ) : !profileReady ? (
+              <p>
+                <Link
+                  className="btn btn-primary"
+                  href={'/perfil?compra=' + initial}
+                >
+                  {t('Criar e publicar o perfil para este produto')}
+                </Link>
+              </p>
+            ) : (
+              <p>
+                {t(
+                  'O seu perfil publicado está pronto para ser ligado ao produto.',
+                )}
+              </p>
+            )}
+            <p>
+              O pagamento do perfil é feito separadamente após os 30 dias
+              grátis. As renovações requerem a sua autorização.
+            </p>
             <details>
               <summary>{t('Comparar planos')}</summary>
               <div className="purchase-plan-list">
@@ -149,9 +261,19 @@ export function PurchaseConfigurator({
                         {t(plan.name)} · {planPrice(plan, t.locale)}
                         {t('/mês')}
                       </strong>
-                      <p>{planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')} · {paymentAvailable ? 'Pagamento anual' : t('Pagamento anual · adesões em breve')}</p>
                       <p>
-                        {t('Por perfil · mensal')} · {t('Em breve')}
+                        {planPrice(
+                          { meticais: planAnnualMeticais(plan) },
+                          t.locale,
+                        )}
+                        {t(' / ano')} ·{' '}
+                        {paymentAvailable
+                          ? 'Pagamento anual'
+                          : t('Pagamento anual · adesões em breve')}
+                      </p>
+                      <p>
+                        {t('Por perfil · mensal')}
+                        {!paymentAvailable && <> · {t('Em breve')}</>}
                       </p>
                       <p>
                         {plan.links} {t('links à sua escolha')} ·{' '}
@@ -169,11 +291,42 @@ export function PurchaseConfigurator({
           </section>
           <section className="purchase-section">
             <h2>4. Entrega</h2>
-            <label>Local de entrega<select value={delivery} onChange={e=>setDelivery(e.target.value)}><option value="maputo">Cidade de Maputo</option><option value="other">Outra localidade — sob consulta</option></select></label>
-            {delivery === 'other' ? <p><Link href="/contacto">Solicitar proposta de entrega</Link></p> : <>
-              <label>Contacto de entrega<input value={contact} onChange={e=>setContact(e.target.value)} maxLength={50} autoComplete="tel" /></label>
-              <label>Morada e ponto de referência<textarea value={address} onChange={e=>setAddress(e.target.value)} maxLength={300} autoComplete="street-address" /></label>
-            </>}
+            <label>
+              Local de entrega
+              <select
+                value={delivery}
+                onChange={(e) => setDelivery(e.target.value)}
+              >
+                <option value="maputo">Cidade de Maputo</option>
+                <option value="other">Outra localidade — sob consulta</option>
+              </select>
+            </label>
+            {delivery === 'other' ? (
+              <p>
+                <Link href="/contacto">Solicitar proposta de entrega</Link>
+              </p>
+            ) : (
+              <>
+                <label>
+                  Contacto de entrega
+                  <input
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
+                    maxLength={50}
+                    autoComplete="tel"
+                  />
+                </label>
+                <label>
+                  Morada e ponto de referência
+                  <textarea
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    maxLength={300}
+                    autoComplete="street-address"
+                  />
+                </label>
+              </>
+            )}
           </section>
         </div>
         <aside
@@ -184,11 +337,21 @@ export function PurchaseConfigurator({
           <div className="configuration-photos">
             {preview.map((material) => {
               const photo = photos.find((item) => item.material === material);
-              return <figure key={material}>
-                {photo ? <SourceImage src={photo.src} alt={t(material)} width={240} height={240} />
-                  : <span>{t('Fotografia do produto em preparação')}</span>}
-                <figcaption>{t(material)}</figcaption>
-              </figure>;
+              return (
+                <figure key={material}>
+                  {photo ? (
+                    <SourceImage
+                      src={photo.src}
+                      alt={t(material)}
+                      width={240}
+                      height={240}
+                    />
+                  ) : (
+                    <span>{t('Fotografia do produto em preparação')}</span>
+                  )}
+                  <figcaption>{t(material)}</figcaption>
+                </figure>
+              );
             })}
           </div>
           <div aria-live="polite">
@@ -226,13 +389,61 @@ export function PurchaseConfigurator({
               ])}
             </p>
           )}
-          <p>Design: {designAmount === null ? 'Sob consulta' : money(designAmount,t.locale)}</p>
-          <p>Entrega: {pricing && delivery === 'maputo' ? money(pricing.maputo_delivery,t.locale) : 'Sob consulta'}</p>
-          <p><strong>Total do produto: {total === null ? 'Sob consulta' : money(total,t.locale)}</strong></p>
-          <p>Perfil digital: 30 dias grátis. Subscrição paga separadamente após a experiência.</p>
-          {!paymentAvailable && <p>Valores propostos, sujeitos a publicação pelo gestor. Pagamentos ainda indisponíveis.</p>}
-          <PaySuiteCheckout key={`${format}-${card}-${keychain}-${design}-${delivery}-${total}`} disabled={!paymentAvailable || total === null || contact.trim().length < 7 || address.trim().length < 8}
-            payload={{kind:'product',format,card,keychain,design,delivery,contact,address,designInstructions,expectedAmount:total,pricingVersion:pricing?.version}} />
+          <p>
+            Design:{' '}
+            {designAmount === null
+              ? 'Sob consulta'
+              : money(designAmount, t.locale)}
+          </p>
+          <p>
+            Entrega:{' '}
+            {pricing && delivery === 'maputo'
+              ? money(pricing.maputo_delivery, t.locale)
+              : 'Sob consulta'}
+          </p>
+          <p>
+            <strong>
+              Total do produto:{' '}
+              {total === null ? 'Sob consulta' : money(total, t.locale)}
+            </strong>
+          </p>
+          <p>
+            Perfil digital: 30 dias grátis. Subscrição paga separadamente após a
+            experiência.
+          </p>
+          {!paymentAvailable && (
+            <p>
+              Valores propostos, sujeitos a publicação pelo gestor. Pagamentos
+              ainda indisponíveis.
+            </p>
+          )}
+          {!profileReady && (
+            <p>{t('Conclua o passo 3 para continuar para o pagamento.')}</p>
+          )}
+          <PaySuiteCheckout
+            key={`${format}-${card}-${keychain}-${design}-${delivery}-${total}`}
+            disabled={
+              !draftReady ||
+              !profileReady ||
+              !paymentAvailable ||
+              total === null ||
+              contact.trim().length < 7 ||
+              address.trim().length < 8
+            }
+            payload={{
+              kind: 'product',
+              format,
+              card,
+              keychain,
+              design,
+              delivery,
+              contact,
+              address,
+              designInstructions,
+              expectedAmount: total,
+              pricingVersion: pricing?.version,
+            }}
+          />
           <Link href="/dashboard">{t('Acompanhar o pedido')}</Link>
         </aside>
       </div>

@@ -10,6 +10,7 @@ import { hardwarePrices } from '@/lib/hardware-pricing';
 import Link from '@/components/hard-link';
 import { purchaseSelection } from '@/lib/purchase-structure';
 import { productPhotos } from '@/lib/product-gallery';
+import { getChatGPTUser } from '@/app/chatgpt-auth';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Configurar a sua solução',
@@ -20,15 +21,32 @@ export default async function Page({
 }: {
   searchParams: Promise<{ formato?: string }>;
 }) {
-  const [t, plans, query, products] = await Promise.all([
+  const [t, plans, query, products, user] = await Promise.all([
     getTranslations(),
     getManagedPlans(),
     searchParams,
     getProducts(),
+    getChatGPTUser(),
   ]);
-  const pricing = await env.DB.prepare('SELECT * FROM checkout_pricing WHERE id=1').first<CheckoutPricing>().catch(() => null);
+  const profileReady =
+    !!user &&
+    !!(await env.DB.prepare(
+      'SELECT owner_id FROM profiles WHERE owner_id=? AND published_json IS NOT NULL',
+    )
+      .bind(user.userId)
+      .first());
+  const pricing = await env.DB.prepare(
+    'SELECT * FROM checkout_pricing WHERE id=1',
+  )
+    .first<CheckoutPricing>()
+    .catch(() => null);
   const format = purchaseSelection(query.formato).format;
-  const title = format === 'keychain' ? 'Configurar porta-chaves' : format === 'card' ? 'Configurar cartão' : 'Configurar kit';
+  const title =
+    format === 'keychain'
+      ? 'Configurar porta-chaves'
+      : format === 'card'
+        ? 'Configurar cartão'
+        : 'Configurar kit';
   return (
     <>
       <SiteHeader focused />
@@ -44,7 +62,9 @@ export default async function Page({
                 : 'Escolha o material e o design do seu cartão.',
           )}
         </p>
-        <Link className="home-text-link" href="/produtos">{t('Escolher outro produto')}</Link>
+        <Link className="home-text-link" href="/produtos">
+          {t('Escolher outro produto')}
+        </Link>
         <PurchaseConfigurator
           key={query.formato ?? 'kit'}
           initial={query.formato}
@@ -53,6 +73,8 @@ export default async function Page({
           photos={productPhotos(products)}
           pricing={pricing}
           paymentAvailable={paysuiteReady(env) && !!pricing?.enabled}
+          signedIn={!!user}
+          profileReady={profileReady}
         />
       </main>
       <SiteFooter />

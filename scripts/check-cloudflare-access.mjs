@@ -32,3 +32,5 @@ for (const name of ['PAYSUITE_API_TOKEN', 'PAYSUITE_WEBHOOK_SECRET']) {
   }
 }
 console.log(`Correct Worker and database found. Both PaySuite secret names are present; their values were not retrieved. Gateway flag in this build: ${config.vars.PAYSUITE_ENABLED}.`);
+const configured = name => !!config.vars?.[name] || secrets.some(secret => secret.name === name);
+console.log(`Recovery email configuration: RESEND_API_KEY=${configured('RESEND_API_KEY') ? 'present' : 'MISSING'}, PROFILE_EMAIL_FROM=${configured('PROFILE_EMAIL_FROM') ? 'present' : 'MISSING'}. No values retrieved. Sender domain verification and inbox delivery still require confirmation.`);

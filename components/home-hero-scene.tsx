@@ -4,12 +4,15 @@ import type { HeroMedia } from '@/lib/hero-media';
 import { SourceImage } from './source-image';
 import { responsiveImage } from '@/lib/responsive-images';
 import { HeroVideo } from './hero-video';
+import { DemoCardQr } from './demo-card-qr';
 export function HomeHeroScene({ media }: { media: HeroMedia }) {
   const { t } = useI18n();
   return (
     <section
       className="home-hero-scene"
-      aria-label={t('Vídeos Framy Connect, cartão Solange e porta-chaves NFC')}
+      aria-label={t(
+        'Vídeos Framy Connect, cartão de exemplo e porta-chaves NFC',
+      )}
     >
       <div className="home-scene-base" data-motion-layer="base">
         <SourceImage
@@ -59,6 +62,7 @@ export function HomeHeroScene({ media }: { media: HeroMedia }) {
           width={816}
           height={1290}
         />
+        <DemoCardQr source={media.card} />
       </div>
       <div
         className="home-scene-keychain home-photo-keychain"

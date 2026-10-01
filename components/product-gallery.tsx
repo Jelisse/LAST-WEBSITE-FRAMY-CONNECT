@@ -3,6 +3,7 @@ import { useI18n } from '@/components/language-provider';
 
 import { useEffect, useState } from 'react';
 import { SourceImage } from './source-image';
+import { readConsent, consentChanged } from '@/lib/measurement-consent';
 export function ProductGallery({
   id,
   name,
@@ -15,19 +16,32 @@ export function ProductGallery({
   const { t } = useI18n();
   const [selected, setSelected] = useState(0);
   useEffect(() => {
-    let session = '';
-    try {
-      session =
-        sessionStorage.getItem('framy-product-session') || crypto.randomUUID();
-      sessionStorage.setItem('framy-product-session', session);
-    } catch {
-      session = crypto.randomUUID();
-    }
-    void fetch('/api/product-visits', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productId: id, session }),
-    }).catch(() => {});
+    let sent = false;
+    const record = () => {
+      if (sent || readConsent() !== 'yes') return;
+      let session = '';
+      try {
+        session =
+          sessionStorage.getItem('framy-product-session') ||
+          crypto.randomUUID();
+        sessionStorage.setItem('framy-product-session', session);
+      } catch {
+        return;
+      }
+      void fetch('/api/product-visits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: id, session, consent: true }),
+      }).catch(() => {});
+      sent = true;
+    };
+    record();
+    window.addEventListener(consentChanged, record);
+    window.addEventListener('storage', record);
+    return () => {
+      window.removeEventListener(consentChanged, record);
+      window.removeEventListener('storage', record);
+    };
   }, [id]);
   return (
     <div className="product-gallery">

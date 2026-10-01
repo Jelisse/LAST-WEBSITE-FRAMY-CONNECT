@@ -1,14 +1,14 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useI18n } from './language-provider';
+import {
+  readConsent,
+  writeConsent,
+  measurementBlocked,
+  consentChanged,
+} from '@/lib/measurement-consent';
 const consentKey = 'framy-profile-measurement:';
-function blocked() {
-  return (
-    navigator.doNotTrack === '1' ||
-    (navigator as Navigator & { globalPrivacyControl?: boolean })
-      .globalPrivacyControl === true
-  );
-}
+const blocked = measurementBlocked;
 export function useProfileEngagement(username: string, enabled: boolean) {
   const [consent, setConsent] = useState('pending');
   const session = useRef(''),
@@ -16,11 +16,24 @@ export function useProfileEngagement(username: string, enabled: boolean) {
   useEffect(() => {
     let value = '';
     try {
-      value = localStorage.getItem(consentKey + username) ?? '';
+      value = readConsent(consentKey + username) ?? '';
     } catch {
       /* no storage, ask */
     }
     queueMicrotask(() => setConsent(blocked() ? 'blocked' : value));
+    const sync = () => {
+      setConsent(
+        blocked() ? 'blocked' : (readConsent(consentKey + username) ?? ''),
+      );
+      session.current = '';
+      viewed.current = '';
+    };
+    window.addEventListener('storage', sync);
+    window.addEventListener(consentChanged, sync);
+    return () => {
+      window.removeEventListener('storage', sync);
+      window.removeEventListener(consentChanged, sync);
+    };
   }, [username]);
   const record = useCallback(
     (target = '') => {
@@ -32,7 +45,7 @@ export function useProfileEngagement(username: string, enabled: boolean) {
       )
         return;
       try {
-        if (localStorage.getItem(consentKey + username) !== 'yes') return;
+        if (readConsent(consentKey + username) !== 'yes') return;
       } catch {
         return;
       }
@@ -72,11 +85,11 @@ export function useProfileEngagement(username: string, enabled: boolean) {
   }, [record, consent, enabled, username]);
   const choose = (value: string) => {
     try {
-      localStorage.setItem(consentKey + username, value);
+      writeConsent(value, consentKey + username);
     } catch {
       /* in-memory preference */
     }
-    setConsent(value);
+    setConsent(readConsent(consentKey + username) ?? '');
   };
   return { consent, choose, record };
 }

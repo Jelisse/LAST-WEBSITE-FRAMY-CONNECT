@@ -10,6 +10,8 @@ type Account = {
   role: keyof typeof roleLabels;
   active: number;
   version: number;
+  profileUsername: string | null;
+  profilePublished: number;
 };
 export function AccountManager() {
   const { t } = useI18n();
@@ -262,6 +264,7 @@ export function AccountManager() {
               <th>{t('Email')}</th>
               <th>{t('Acesso')}</th>
               <th>{t('Estado')}</th>
+              <th>{t('Link do perfil')}</th>
               <th>{t('Acções')}</th>
             </tr>
           </thead>
@@ -272,6 +275,51 @@ export function AccountManager() {
                 <td>{a.email}</td>
                 <td>{t(roleLabels[a.role])}</td>
                 <td>{a.active ? t('Activo') : t('Inactivo / por activar')}</td>
+                <td>
+                  {a.profileUsername ? (
+                    <>
+                      <span>
+                        {a.profilePublished
+                          ? t('Publicado')
+                          : t('Por publicar')}
+                      </span>
+                      {a.profilePublished && (
+                        <div>
+                          <a
+                            href={'/' + encodeURIComponent(a.profileUsername)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {t('Pré-visualizar perfil')}
+                          </a>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(
+                                  new URL(
+                                    '/' +
+                                      encodeURIComponent(a.profileUsername!),
+                                    location.origin,
+                                  ).href,
+                                );
+                                setNotice('Link copiado.');
+                              } catch {
+                                setError(
+                                  'Não foi possível copiar. Abra o perfil e copie o endereço do navegador.',
+                                );
+                              }
+                            }}
+                          >
+                            {t('Copiar link')}
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <span>—</span>
+                  )}
+                </td>
                 <td>
                   {a.id !== data.selfId && (
                     <>

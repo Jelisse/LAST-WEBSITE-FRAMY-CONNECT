@@ -23,6 +23,7 @@
 
   "vars": {
     "PUBLIC_SITE_URL": "https://framyconnect.co.mz",
+    "PROFILE_EMAIL_FROM": "Framy Connect <info@framyconnect.co.mz>",
     "PAYSUITE_ENABLED": "true"
   },
 

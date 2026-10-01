@@ -4,6 +4,8 @@ import type { HeroMedia } from '@/lib/hero-media';
 import { SourceImage } from './source-image';
 import Link from '@/components/hard-link';
 import { Nfc, ScanLine, Globe, Camera, Zap } from 'lucide-react';
+import { demoProfile } from '@/lib/demo-profile';
+import { DemoCardQr } from './demo-card-qr';
 
 function DemoPhone({
   image,
@@ -16,6 +18,8 @@ function DemoPhone({
   label: string;
   alt: string;
 }) {
+  const { t } = useI18n();
+  const profile = demoProfile(t);
   return (
     <div className={`sharing-phone${scan ? ' sharing-phone-scan' : ''}`}>
       <SourceImage
@@ -31,13 +35,16 @@ function DemoPhone({
           <div className="sharing-camera sharing-solange-camera">
             <span>{label}</span>
             <div className="sharing-camera-card">
-              <SourceImage
-                src={image}
-                alt={alt}
-                sizes="(max-width: 700px) 130px, 180px"
-                width={816}
-                height={1290}
-              />
+              <div className="sharing-camera-art">
+                <SourceImage
+                  src={image}
+                  alt={alt}
+                  sizes="(max-width: 700px) 130px, 180px"
+                  width={816}
+                  height={1290}
+                />
+                <DemoCardQr source={image} />
+              </div>
               <div className="sharing-scan-frame" aria-hidden="true" />
             </div>
             <div className="sharing-camera-controls" aria-hidden="true">
@@ -48,18 +55,19 @@ function DemoPhone({
             <span className="home-phone-island" />
           </div>
         ) : (
-          <SourceImage
-            src={image}
-            alt={alt}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-            sizes="(max-width: 700px) 150px, 190px"
-          />
+          <div className="sharing-demo-profile">
+            <SourceImage src={image} alt={profile.name} sizes="190px" />
+            <div className="sharing-demo-content">
+              <strong>{profile.name}</strong>
+              <span>{profile.title}</span>
+              {profile.links.map((link) => (
+                <span className="sharing-demo-link-preview" key={link.url}>
+                  {link.label}
+                </span>
+              ))}
+              <small>FRAMY CONNECT</small>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -103,11 +111,7 @@ export function HomeSharingScene({ media }: { media: HeroMedia }) {
               <path d="M39 25 Q61 50 39 75" />
               <path d="M60 12 Q94 50 60 88" />
             </svg>
-            <DemoPhone
-              image={media.tapProfile}
-              label=""
-              alt={t('Perfil Framy de Solange Siquela')}
-            />
+            <DemoPhone image={media.tapProfile} label="" alt="Ana Matavele" />
           </div>
           <p>{t('Aproxime o cartão de um telemóvel compatível com NFC.')}</p>
         </article>
@@ -125,6 +129,7 @@ export function HomeSharingScene({ media }: { media: HeroMedia }) {
                 width={816}
                 height={1290}
               />
+              <DemoCardQr source={media.scanCard} />
             </div>
             <DemoPhone
               image={media.scanCard}
