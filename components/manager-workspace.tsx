@@ -428,12 +428,14 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                               ? t(
                                   'Crie acessos, recupere contas e controle a disponibilidade da equipa.',
                                 )
+                              : section === 'subscriptions'
+                                ? 'Gerir adesões e pagamentos dos planos digitais.'
                               : t(
                                   'Acompanhe os valores recebidos, pendentes e reconhecidos.',
                                 )}
               </p>
             </div>
-            {section !== 'analytics' && (
+            {section !== 'analytics' && section !== 'subscriptions' && (
               <button
                 className="manager-secondary"
                 disabled={busy}

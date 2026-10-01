@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 import { PaySuitePlanCheckout } from './paysuite-plan-checkout';
+import { CreditCard, Mail, RefreshCw, ReceiptText } from 'lucide-react';
 type Invoice = {
   id: string;
   plan_id: string;
@@ -87,23 +88,43 @@ export function ProfileSubscriptions({
       setBusy(false);
     }
   }
+  async function refresh() {
+    setBusy(true);
+    setError('');
+    try {
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Não foi possível actualizar.');
+    } finally {
+      setBusy(false);
+    }
+  }
   return (
-    <section className="profile-growth-panel">
+    <section className={`profile-growth-panel${manager ? ' subscription-manager' : ''}`} aria-busy={busy}>
+      <header className={manager ? 'subscription-heading' : undefined}>
+      <div>
       <h2>
-        {manager ? 'Subscrições dos perfis digitais' : 'O seu plano digital'}
+        {manager ? 'Gestão das subscrições' : 'O seu plano digital'}
       </h2>
       <p>
-        Pagamento de um mês de cada vez. Sem débito nem renovação automática. O
-        produto físico é pago separadamente.
+        {manager ? 'Controle as adesões, as instruções e os pedidos de pagamento dos planos digitais.' : 'Pagamento de um mês de cada vez. Sem débito nem renovação automática. O produto físico é pago separadamente.'}
       </p>
+      </div>
+      {manager && <button type="button" disabled={busy} onClick={() => void refresh()}><RefreshCw size={16} aria-hidden="true" />{busy ? 'A actualizar…' : 'Actualizar'}</button>}
+      </header>
       {error && <p role="alert">{error}</p>}
       {notice && <output>{notice}</output>}
       {!data ? (
         <p>A carregar…</p>
       ) : (
         <>
+          {manager && <div className="subscription-status-grid">
+            <article><CreditCard size={20} aria-hidden="true" /><div><span>Adesões pagas</span><strong>{data.settings.enabled ? 'Abertas' : 'Fechadas'}</strong><p>{data.gatewayAvailable ? 'PaySuite configurado' : 'PaySuite indisponível'}</p></div></article>
+            <article><Mail size={20} aria-hidden="true" /><div><span>Comunicação</span><strong>{data.emailConfigured ? 'Email configurado' : 'Email por configurar'}</strong><p>Avisos disponíveis na conta</p></div></article>
+          </div>}
           {manager ? (
             <form
+              className="subscription-settings"
               key={data.settings.version}
               onSubmit={(ev) => {
                 ev.preventDefault();
@@ -116,36 +137,32 @@ export function ProfileSubscriptions({
                 });
               }}
             >
-              <h3>Disponibilizar planos mensais</h3>
-              <p>
-                {data.emailConfigured
-                  ? 'Lembretes por email configurados, além dos avisos na conta.'
-                  : 'Avisos na conta activos. O envio por email aguarda configuração do serviço de email.'}
-              </p>
+              <h3>Definições de pagamento</h3>
+              <p className="subscription-help">Cada renovação exige autorização do cliente. Não existe débito automático; o produto físico é pago separadamente.</p>
               <label>
-                Instruções de pagamento aprovadas
+                Instruções para o cliente
                 <textarea
                   name="instructions"
                   defaultValue={data.settings.instructions}
                   maxLength={1500}
                   rows={4}
-                  placeholder="Prestador, destinatário, número/conta e referência a indicar"
+                  placeholder="Explique ao cliente como efectuar e renovar o pagamento."
                 />
               </label>
-              <label className="growth-check">
+              <label className="growth-check subscription-availability">
                 <input
                   name="enabled"
                   type="checkbox"
                   defaultChecked={!!data.settings.enabled}
                 />
-                Abrir adesões pagas
+                <span><strong>Permitir adesões pagas</strong><small>Disponibiliza a adesão aos planos digitais.</small></span>
               </label>
-              <p>
+              <p className="subscription-help">
                 Ao abrir, as experiências já expiradas recebem pelo menos 7 dias
                 de aviso, seguidos de 7 dias de tolerância. Verifique os dados
                 de pagamento antes de activar.
               </p>
-              <button disabled={busy}>Guardar disponibilidade</button>
+              <button disabled={busy}>{busy ? 'A guardar…' : 'Guardar alterações'}</button>
             </form>
           ) : (
             <>
@@ -249,10 +266,11 @@ export function ProfileSubscriptions({
               )}
             </>
           )}
+          <div className={manager ? 'subscription-history' : undefined}>
           <h3>
             {manager ? 'Pedidos e pagamentos' : 'Os seus pedidos de pagamento'}
           </h3>
-          {!data.invoices.length && <p>Ainda não existem pedidos.</p>}
+          {!data.invoices.length && (manager ? <div className="subscription-empty"><ReceiptText size={28} aria-hidden="true" /><strong>Ainda não existem pedidos de pagamento</strong><p>Os pedidos dos planos digitais aparecerão aqui quando forem criados pelos clientes.</p></div> : <p>Ainda não existem pedidos.</p>)}
           {data.invoices.map((i) => (
             <article className="growth-invoice" key={i.id}>
               <strong>
@@ -358,6 +376,7 @@ export function ProfileSubscriptions({
               </button>
             </form>
           )}
+          </div>
         </>
       )}
     </section>
