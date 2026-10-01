@@ -107,9 +107,9 @@ export default async function Home() {
             <div className="home-hero-copy">
               <h1>
                 <span>
-                  {t('Uma identidade,')}
+                  {t('O Seu Mundo,')}
                   <br />
-                  {t('mais conexões.')}
+                  {t('Num Toque.')}
                 </span>
                 <svg
                   className="home-contactless-mark"
@@ -129,12 +129,12 @@ export default async function Home() {
               </h1>
               <p className="home-offer">
                 {t(
-                  'Cartão e porta-chaves. Uma presença profissional, ligada ao mesmo perfil digital.',
+                  'Partilhe contactos, redes sociais e trabalho por toque ou QR.',
                 )}
               </p>
               <div className="home-hero-actions">
                 <Link className="home-primary" href="/comprar">
-                  {t('Explorar o kit completo ')}
+                  {t('Escolher o meu produto')}
                   <ArrowUpRight size={18} />
                 </Link>
                 <a className="home-secondary" href="#como-funciona">
