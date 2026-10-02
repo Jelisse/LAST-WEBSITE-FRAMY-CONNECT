@@ -1,5 +1,5 @@
 export const profileColors = [
-  { value: 'orange', label: 'Laranja', hex: '#b83c0a' },
+  { value: 'orange', label: 'Laranja', hex: '#ee590d' },
   { value: 'white', label: 'Branco', hex: '#ffffff' },
   { value: 'blue', label: 'Azul', hex: '#1d4ed8' },
   { value: 'green', label: 'Verde', hex: '#166534' },

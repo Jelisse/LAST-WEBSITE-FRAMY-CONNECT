@@ -4,6 +4,7 @@ import type { HeroMedia } from '@/lib/hero-media';
 import { SourceImage } from './source-image';
 import Link from '@/components/hard-link';
 import { Nfc, ScanLine, Globe, Camera, Zap } from 'lucide-react';
+import { MobileProfile } from './mobile-profile';
 import { demoProfile } from '@/lib/demo-profile';
 import { DemoCardQr } from './demo-card-qr';
 
@@ -55,18 +56,12 @@ function DemoPhone({
             <span className="home-phone-island" />
           </div>
         ) : (
-          <div className="sharing-demo-profile">
-            <SourceImage src={image} alt={profile.name} sizes="190px" />
-            <div className="sharing-demo-content">
-              <strong>{profile.name}</strong>
-              <span>{profile.title}</span>
-              {profile.links.map((link) => (
-                <span className="sharing-demo-link-preview" key={link.url}>
-                  {link.label}
-                </span>
-              ))}
-              <small>FRAMY CONNECT</small>
-            </div>
+          <div className="sharing-example-profile" inert aria-hidden="true">
+            <MobileProfile
+              profile={profile}
+              published
+              measure={false}
+            />
           </div>
         )}
       </div>

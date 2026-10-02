@@ -655,3 +655,21 @@ fieldset.purchase-section {
   .purchase-mobile-bar .btn { padding:12px 14px; font-size:13px; }
   .purchase-configurator:has(input:not([type=radio]):not([type=checkbox]):focus,textarea:focus,select:focus) .purchase-mobile-bar { display:none; }
 }
+.card-view-controls { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 8px; }
+.purchase-layout .card-view-controls button { padding:8px 12px; min-height:40px; border:1px solid #decfc4; border-radius:9px; background:white; color:#40261b; font:inherit; font-size:13px; cursor:pointer; }
+.purchase-layout .card-view-controls button[aria-pressed=true] { background:var(--framy-orange); color:white; border-color:var(--framy-orange); }
+.card-simulation-note { font-size:12px; color:#75695f; margin:0 0 12px; }
+.card-material-art { display:flex; justify-content:center; align-items:center; height:210px; padding:8px; }
+.material-options .card-material-art { grid-row:1; grid-column:1 / -1; }
+.card-material-art > img { display:block; height:100%; width:auto; max-width:100%; object-fit:contain; border-radius:8px; }
+.configuration-photos .card-material-art { height:200px; }
+.configuration-photos .card-material-art > img { width:auto; height:100%; object-fit:contain; }
+.card-material-surface { position:relative; display:block; height:100%; aspect-ratio: .6375; max-width:100%; }
+.card-material-surface > img:first-child { width:100%; height:100%; object-fit:contain; }
+.card-material-surface > img.card-material-qr { position:absolute; left:35%; top:68.5%; width:29%; height:auto; border-radius:2px; background:white; }
+.card-material-surface[data-material=Madeira] > img.card-material-qr { left:36%; top:70%; width:28%; }
+.card-material-surface[data-material=Metal] > img.card-material-qr { left:38%; top:70.5%; width:25%; }
+.configuration-photos span.card-material-art { display:flex; min-height:0; border:0; padding:8px; }
+.configuration-photos span.card-material-surface { display:block; min-height:0; border:0; padding:0; border-radius:0; }
+.card-material-surface > img:first-child { border-radius:5%; }
+@media(min-width:1100px) { .material-option-group:has(input[name=card-material]) .material-options { grid-template-columns:repeat(3,minmax(0,1fr)); } }

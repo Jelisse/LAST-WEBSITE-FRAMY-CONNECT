@@ -1,0 +1,20 @@
+/* Keep the approved orange visible on the main brand surfaces. */
+.framy-home .home-hero h1, .framy-home .home-eyebrow { color:var(--framy-orange); }
+.framy-home .sharing-demo-link, .framy-home .home-primary { background:var(--framy-orange); color:#fff; }
+.framy-home .sharing-demo-link:hover, .framy-home .home-primary:hover { background:var(--framy-orange-hover); color:#fff; }
+/* Contain shows the original mountain silhouette without stretching or zooming. */
+.framy-home .home-hero::before { right:0; bottom:0; width:62%; height:85%; background-size:contain; background-position:right bottom; opacity:.18; }
+.framy-home .home-sharing::before { inset:0; background-size:contain; background-position:center bottom; mask-image:none; opacity:.035; }
+.framy-home .home-products::before { inset:auto 0 0 auto; width:60%; height:55%; background-size:contain; background-position:right bottom; opacity:.04; }
+.framy-home .home-how { background:linear-gradient(180deg,var(--framy-orange),#633322); }
+.framy-home .brand-footer::before { inset:0; background-size:contain; background-position:center bottom; opacity:.09; mask-image:linear-gradient(180deg,transparent,#000 45%); }
+.sharing-example-profile { position:absolute; inset:0; pointer-events:none; }
+.sharing-example-profile .mobile-profile-frame { width:100%; height:100%; }
+.sharing-example-profile .mobile-identity-page { min-height:0; height:100%; }
+.sharing-example-profile .mobile-profile-body > h1, .sharing-example-profile .mobile-profile-body > h2 { min-height:0; }
+@media(max-width:700px) {
+ .framy-home .home-hero::before { width:100%; height:55%; opacity:.12; }
+ .framy-home .brand-footer::before { background-size:contain; background-position:center bottom; opacity:.08; }
+}
+.framy-home .home-solution-eyebrow, .framy-home .home-hero .hero-nfc-mark { color:var(--framy-orange); }
+.sharing-example-profile .mobile-profile-footer small { font-size:2.3cqw; }

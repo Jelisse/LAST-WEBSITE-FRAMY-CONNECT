@@ -24,6 +24,7 @@ import './home.css';
 import './home-atmosphere.css';
 import './home-interactions.css';
 import './home-featured.css';
+import './home-refinements.css';
 
 const questions = [
   [

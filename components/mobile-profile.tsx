@@ -181,7 +181,13 @@ export function MobileProfile({
     <div
       className="mobile-profile-frame"
       data-accent={business?.accent ?? 'orange'}
-      data-tone={profileColorIsLight(business?.accent) ? 'light' : 'dark'}
+      data-tone={
+        !business?.accent || business.accent === 'orange'
+          ? 'dark'
+          : profileColorIsLight(business.accent)
+            ? 'light'
+            : 'dark'
+      }
       style={
         {
           '--profile-accent': profileColorHex(business?.accent),

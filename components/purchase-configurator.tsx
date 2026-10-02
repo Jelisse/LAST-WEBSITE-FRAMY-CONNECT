@@ -37,6 +37,7 @@ import { money } from '@/lib/catalog';
 import { hardwareEstimate, type HardwarePrice } from '@/lib/hardware-pricing';
 import { PaySuiteCheckout } from './paysuite-checkout';
 import type { CheckoutPricing } from '@/lib/checkout-pricing';
+import { CardMaterialImage, cardArtwork } from './card-material-image';
 import { SourceImage } from './source-image';
 import type { ProductPhoto } from '@/lib/product-gallery';
 import { designImageDefaults, type DesignImage } from '@/lib/design-images';
@@ -76,6 +77,16 @@ export function PurchaseConfigurator({
     'materials' | 'design' | 'delivery'
   >('design');
 
+  const [cardBack, setCardBack] = useState(false);
+  const [cardPaused, setCardPaused] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (cardPaused) return;
+    const timer = window.setInterval(() => {
+      if (!document.hidden && !query.matches) setCardBack((value) => !value);
+    }, 6000);
+    return () => window.clearInterval(timer);
+  }, [cardPaused]);
   const [pvc, setPvc] = useState<PvcModel>('tiktok');
   const [pvcBack, setPvcBack] = useState(false);
   const isPvcStandard =
@@ -221,7 +232,9 @@ export function PurchaseConfigurator({
     const price = hardwareEstimate(prices, kind, material, material);
     return (
       <>
-        {photo ? (
+        {kind === 'card' ? (
+          <CardMaterialImage material={material} back={cardBack} />
+        ) : photo ? (
           <SourceImage
             className="material-photo"
             src={photo}
@@ -371,6 +384,44 @@ export function PurchaseConfigurator({
               {format !== 'keychain' && (
                 <fieldset className="material-option-group">
                   <legend>{t('Cartão')}</legend>
+                  <div
+                    className="card-view-controls"
+                    aria-label={t('Fotografias do produto')}
+                  >
+                    <button
+                      type="button"
+                      aria-pressed={!cardBack}
+                      onClick={() => {
+                        setCardBack(false);
+                        setCardPaused(true);
+                      }}
+                    >
+                      {t('Frente')}
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={cardBack}
+                      onClick={() => {
+                        setCardBack(true);
+                        setCardPaused(true);
+                      }}
+                    >
+                      {t('Verso')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCardPaused(!cardPaused)}
+                    >
+                      {t(
+                        cardPaused
+                          ? 'Retomar fotografias'
+                          : 'Pausar fotografias',
+                      )}
+                    </button>
+                  </div>
+                  <p className="card-simulation-note">
+                    {t('Simulação ilustrativa')}
+                  </p>
                   <div className="material-options">
                     {cardMaterials.map((item) => (
                       <label
@@ -677,7 +728,9 @@ export function PurchaseConfigurator({
               const photo = photos.find((item) => item.material === material);
               return (
                 <figure key={material}>
-                  {isLeather && material === 'Couro' ? (
+                  {cardArtwork[material] ? (
+                    <CardMaterialImage material={material} back={cardBack} />
+                  ) : isLeather && material === 'Couro' ? (
                     <LeatherPreview
                       value={leather}
                       design={design}

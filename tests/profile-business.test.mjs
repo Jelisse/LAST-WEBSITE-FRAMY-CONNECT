@@ -99,12 +99,12 @@ void test('custom colours validate safely and choose readable text for bright an
     null,
   ]) {
     if (accent !== null) assert.throws(() => validateBusiness({ accent }));
-    assert.equal(profileColorHex(accent), '#b83c0a');
+    assert.equal(profileColorHex(accent), '#ee590d');
   }
   assert.equal(profileColorIsLight('#ffff00'), true);
   assert.equal(profileColorIsLight('#aaffcc'), true);
   assert.equal(profileColorIsLight('white'), true);
   assert.equal(profileColorIsLight('black'), false);
   assert.equal(profileColorIsLight('#100050'), false);
-  assert.equal(profileColorIsLight('orange'), false);
+  assert.equal(profileColorIsLight('orange'), true);
 });
