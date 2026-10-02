@@ -203,7 +203,7 @@ export const products: Product[] = seedProducts.map((p) => ({
     'metal',
     'keychain-leather',
   ].includes(p.id),
-  imageUrl: `/products/${p.id === 'keychain-leather' ? 'keychain' : p.id}.png`,
+  imageUrl: p.id === 'keychain-leather' ? '/products/leather/brown-full.png' : `/products/${p.id}.png`,
   version: 0,
 }));
 export function productOrder(

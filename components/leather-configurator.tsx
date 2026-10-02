@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useEffectEvent, useRef, useState, useId } from 'react';
-import { Upload, RotateCcw, Ruler, Check, Move3D, Sun } from 'lucide-react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { Upload, RotateCcw, Ruler, Check, Move3D } from 'lucide-react';
 import { SourceImage } from './source-image';
 import type { LeatherDesign } from '@/lib/leather-design';
 async function previewFile(blob: Blob, page: number) {
@@ -44,97 +44,26 @@ async function previewFile(blob: Blob, page: number) {
 export function LeatherPreview({
   value,
   design,
-  preview,
   back = false,
 }: {
   value: LeatherDesign;
   design: string;
-  preview?: string;
   back?: boolean;
 }) {
-  const uid = useId().replaceAll(':', '');
-  const photo = back
-    ? `/products/leather/${value.color}-back.png`
-    : design === 'standard' &&
-        !(value.color === 'black' && value.logo === 'full')
-      ? `/products/leather/${value.color}-${value.logo}.png`
-      : null;
-  if (photo)
-    return (
-      <SourceImage
-        className="leather-photo"
-        src={photo}
-        alt={`Porta-chaves de couro ${value.color === 'brown' ? 'castanho' : 'preto'} · ${back ? 'verso NFC' : value.logo === 'full' ? 'logo completo' : 'símbolo F'}`}
-        width={600}
-        height={620}
-      />
-    );
+  const logo =
+    value.color === 'black' || design !== 'standard' ? 'symbol' : value.logo;
+  const photo = `/products/leather/${value.color}-${back ? 'back' : logo}.png`;
   return (
-    <svg
+    <SourceImage
       className="leather-photo"
-      viewBox="0 0 400 440"
-
-      aria-label="Simulação do logótipo na frente do porta-chaves"
-    >
-      <defs>
-        <linearGradient id={uid} x2="1" y2="1">
-          <stop stopColor={value.color === 'brown' ? '#b7682c' : '#3c3c3c'} />
-          <stop
-            offset="1"
-            stopColor={value.color === 'brown' ? '#71340f' : '#151515'}
-          />
-        </linearGradient>
-        <clipPath id={uid + 'clip'}>
-          <circle cx="200" cy="280" r="89" />
-        </clipPath>
-      </defs>
-      <rect width="400" height="440" rx="20" fill="#f4f1eb" />
-      <circle
-        cx="200"
-        cy="91"
-        r="64"
-        fill="none"
-        stroke="#323232"
-        strokeWidth="13"
-      />
-      <circle
-        cx="200"
-        cy="91"
-        r="64"
-        fill="none"
-        stroke="#bdbdbd"
-        strokeWidth="3"
-      />
-      <path
-        d="M166 118h68v38c0 31 78 61 78 139a112 112 0 0 1-224 0c0-78 78-108 78-139z"
-        fill={`url(#${uid})`}
-        stroke="#432719"
-        strokeWidth="2"
-      />
-      <circle
-        cx="200"
-        cy="288"
-        r="98"
-        fill="none"
-        stroke={value.color === 'brown' ? '#dfab6b' : '#727272'}
-        strokeWidth="3"
-        strokeDasharray="7 5"
-      />
-      <g clipPath={`url(#${uid}clip)`}>
-        {(preview || design === 'standard') && (
-          <image
-            href={preview || '/brand/logo.svg'}
-            x={200 - (89 * value.scale) / 100 + value.x * 1.5}
-            y={280 - (65 * value.scale) / 100 + value.y * 1.5}
-            width={(178 * value.scale) / 100}
-            height={(130 * value.scale) / 100}
-            preserveAspectRatio="xMidYMid meet"
-          />
-        )}
-      </g>
-    </svg>
+      src={photo}
+      alt={`Porta-chaves de couro ${value.color === 'brown' ? 'castanho' : 'preto'} · ${back ? 'verso NFC' : logo === 'full' ? 'logo completo' : 'símbolo F'}`}
+      width={600}
+      height={620}
+    />
   );
 }
+
 export function LeatherConfigurator({
   value,
   onChange,
@@ -156,7 +85,6 @@ export function LeatherConfigurator({
     [back, setBack] = useState(false),
     [isPdf, setIsPdf] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [light, setLight] = useState(50);
   const fileRef = useRef<Blob | null>(null),
     sequence = useRef(0);
   const update = (patch: Partial<LeatherDesign>) =>
@@ -242,7 +170,14 @@ export function LeatherConfigurator({
                 type="button"
                 key={color}
                 aria-pressed={value.color === color}
-                onClick={() => update({ color })}
+                onClick={() =>
+                  update({
+                    color,
+                    ...(color === 'black' && design === 'standard'
+                      ? { logo: 'symbol' as const }
+                      : {}),
+                  })
+                }
               >
                 <span
                   style={{ background: color === 'brown' ? '#975121' : '#222' }}
@@ -301,8 +236,19 @@ export function LeatherConfigurator({
             {value.fileName && <p className="leather-file">{value.fileName}</p>}
             {preview && (
               <div className="leather-logo-source">
-                <SourceImage src={preview} alt="Logótipo carregado" />
-                <span>O seu logótipo</span>
+                <div className="leather-artwork-area">
+                  <SourceImage
+                    src={preview}
+                    alt="Composição do logótipo carregado"
+                    style={{
+                      width: `${value.scale}%`,
+                      height: `${value.scale}%`,
+                      left: `${50 + value.x}%`,
+                      top: `${50 + value.y}%`,
+                    }}
+                  />
+                </div>
+                <span>Composição do seu logótipo · área de gravação</span>
               </div>
             )}
             {value.assetId && <p>Ficheiro guardado para produção.</p>}
@@ -411,44 +357,19 @@ export function LeatherConfigurator({
             onPointerLeave={() => setTilt({ x: 0, y: 0 })}
           >
             <div
-              className="leather-studio-halo"
-              style={{ opacity: 0.25 + light / 160 }}
-            />
-            <div
-              className="leather-studio-shadow"
-              style={{
-                transform: `translateX(${tilt.y * 0.6}px) scale(${1 - Math.abs(tilt.y) / 150})`,
-              }}
-            />
-            <div
               className="leather-studio-object"
               style={{
                 transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y + (back ? 180 : 0)}deg)`,
               }}
             >
               <div className="leather-studio-face" aria-hidden={back}>
-                <LeatherPreview
-                  value={value}
-                  design={design}
-                  preview={design === 'customer' ? preview : undefined}
-                />
-                <div
-                  className="leather-studio-sheen"
-                  style={{
-                    opacity: light / 350,
-                    transform: `translateX(${tilt.y * 1.2}px)`,
-                  }}
-                />
+                <LeatherPreview value={value} design={design} />
               </div>
               <div
                 className="leather-studio-face leather-studio-reverse"
                 aria-hidden={!back}
               >
                 <LeatherPreview value={value} design={design} back />
-                <div
-                  className="leather-studio-sheen"
-                  style={{ opacity: light / 350 }}
-                />
               </div>
             </div>
           </div>
@@ -471,22 +392,10 @@ export function LeatherConfigurator({
               onChange={(e) => setTilt({ x: 0, y: Number(e.target.value) })}
             />
           </label>
-          <label>
-            <Sun size={15} aria-hidden="true" /> Luz
-            <input
-              type="range"
-              aria-label="Intensidade da iluminação"
-              min="0"
-              max="100"
-              value={light}
-              onChange={(e) => setLight(Number(e.target.value))}
-            />
-          </label>
           <button
             type="button"
             onClick={() => {
               setTilt({ x: 0, y: 0 });
-              setLight(50);
               setBack(false);
             }}
           >
@@ -495,10 +404,21 @@ export function LeatherConfigurator({
         </div>
         <figcaption>
           {back ? 'Verso com símbolo NFC' : 'Pré-visualização da frente'}
-          <small>
-            Simulação ilustrativa. Cor e acabamento da gravação podem variar. A
-            equipa verifica o ficheiro antes da produção.
-          </small>
+          {!back &&
+            design === 'standard' &&
+            value.color === 'black' &&
+            value.logo === 'full' && (
+              <small>
+                Fotografia de referência com símbolo F. Seleccionou o logótipo
+                completo; a fotografia dessa versão ainda não está disponível.
+              </small>
+            )}
+          {design !== 'standard' && (
+            <small>
+              Fotografia de referência do produto. O seu design substituirá o
+              logótipo frontal; a equipa confirma a arte antes da produção.
+            </small>
+          )}
         </figcaption>
       </figure>
     </section>

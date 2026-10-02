@@ -278,18 +278,26 @@ export function PurchaseConfigurator({
                   key={item.id}
                 >
                   <SourceImage
-                    className="purchase-design-image"
+                    className={`purchase-design-image ${isLeather ? 'is-leather-photo' : ''}`}
                     src={
-                      (
-                        designImages.find((row) => row.id === item.id) ??
-                        designImageDefaults.find((row) => row.id === item.id)!
-                      ).image
+                      isLeather
+                        ? `/products/leather/${leather.color}-${leather.color === 'black' || item.id !== 'standard' ? 'symbol' : leather.logo}.png`
+                        : (
+                            designImages.find((row) => row.id === item.id) ??
+                            designImageDefaults.find(
+                              (row) => row.id === item.id,
+                            )!
+                          ).image
                     }
                     alt={
-                      (
-                        designImages.find((row) => row.id === item.id) ??
-                        designImageDefaults.find((row) => row.id === item.id)!
-                      ).alt
+                      isLeather
+                        ? `Fotografia de referência · couro ${leather.color === 'black' ? 'preto' : 'castanho'}`
+                        : (
+                            designImages.find((row) => row.id === item.id) ??
+                            designImageDefaults.find(
+                              (row) => row.id === item.id,
+                            )!
+                          ).alt
                     }
                     width={600}
                     height={400}
