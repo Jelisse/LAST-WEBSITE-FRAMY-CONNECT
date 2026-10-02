@@ -236,6 +236,9 @@ export function PurchaseConfigurator({
           </p>
         </div>
       )}
+      <a className="purchase-summary-link" href="#purchase-summary">
+        {t('A sua configuração')} →
+      </a>
       <div className="purchase-layout">
         <div>
           <fieldset className="purchase-section">
@@ -281,81 +284,105 @@ export function PurchaseConfigurator({
               <Palette className="purchase-icon" size={20} aria-hidden="true" />
               {t('2. Design')}
             </legend>
-            <div className="purchase-choices">
-              {designServices.map((item) => (
-                <label
-                  className={`purchase-choice purchase-design-choice ${design === item.id ? 'is-selected' : ''}`}
-                  key={item.id}
-                >
-                  <SourceImage
-                    className={`purchase-design-image ${isLeather ? 'is-leather-photo' : ''}`}
-                    src={
-                      format !== 'card' &&
-                      keychain === 'PVC + epóxi' &&
-                      item.id === 'standard'
-                        ? pvcPhoto(pvc)
-                        : isLeather
-                          ? `/products/leather/${leather.color}-${item.id !== 'standard' ? 'blank' : leather.color === 'black' ? 'symbol' : leather.logo}.png`
-                          : (
-                              designImages.find((row) => row.id === item.id) ??
-                              designImageDefaults.find(
-                                (row) => row.id === item.id,
-                              )!
-                            ).image
-                    }
-                    alt={
-                      format !== 'card' &&
-                      keychain === 'PVC + epóxi' &&
-                      item.id === 'standard'
-                        ? t(pvcModel(pvc).name)
-                        : isLeather
-                          ? `Fotografia de referência · couro ${leather.color === 'black' ? 'preto' : 'castanho'}`
-                          : (
-                              designImages.find((row) => row.id === item.id) ??
-                              designImageDefaults.find(
-                                (row) => row.id === item.id,
-                              )!
-                            ).alt
-                    }
-                    width={600}
-                    height={400}
+            <details className="purchase-design-options">
+              <summary>
+                <span>
+                  <Palette
+                    className="purchase-icon"
+                    size={18}
+                    aria-hidden="true"
                   />
-                  <input
-                    type="radio"
-                    name="design"
-                    checked={design === item.id}
-                    onChange={() => setDesign(item.id)}
-                  />
-                  <strong>
-                    {item.id === 'standard' ? (
-                      <BadgeCheck
-                        className="purchase-icon"
-                        size={16}
-                        aria-hidden="true"
-                      />
-                    ) : item.id === 'customer' ? (
-                      <Upload
-                        className="purchase-icon"
-                        size={16}
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <PenTool
-                        className="purchase-icon"
-                        size={16}
-                        aria-hidden="true"
-                      />
-                    )}
-                    {t(item.name)}
-                  </strong>
-                  <p>
-                    {isLeather && item.id === 'customer'
-                      ? 'Carregue o seu logo em PDF, PNG ou JPG e veja a simulação.'
-                      : t(item.description)}
-                  </p>
-                </label>
-              ))}
-            </div>
+                  {t(selectedDesign.name)}
+                </span>
+                <span className="purchase-change-label">{t('Alterar')}</span>
+              </summary>
+              <div className="purchase-choices">
+                {designServices.map((item) => (
+                  <label
+                    className={`purchase-choice purchase-design-choice ${design === item.id ? 'is-selected' : ''}`}
+                    key={item.id}
+                  >
+                    <SourceImage
+                      className={`purchase-design-image ${isLeather ? 'is-leather-photo' : ''}`}
+                      src={
+                        format !== 'card' &&
+                        keychain === 'PVC + epóxi' &&
+                        item.id === 'standard'
+                          ? pvcPhoto(pvc)
+                          : isLeather
+                            ? `/products/leather/${leather.color}-${item.id !== 'standard' ? 'blank' : leather.color === 'black' ? 'symbol' : leather.logo}.png`
+                            : (
+                                designImages.find(
+                                  (row) => row.id === item.id,
+                                ) ??
+                                designImageDefaults.find(
+                                  (row) => row.id === item.id,
+                                )!
+                              ).image
+                      }
+                      alt={
+                        format !== 'card' &&
+                        keychain === 'PVC + epóxi' &&
+                        item.id === 'standard'
+                          ? t(pvcModel(pvc).name)
+                          : isLeather
+                            ? `Fotografia de referência · couro ${leather.color === 'black' ? 'preto' : 'castanho'}`
+                            : (
+                                designImages.find(
+                                  (row) => row.id === item.id,
+                                ) ??
+                                designImageDefaults.find(
+                                  (row) => row.id === item.id,
+                                )!
+                              ).alt
+                      }
+                      width={600}
+                      height={400}
+                    />
+                    <input
+                      type="radio"
+                      name="design"
+                      checked={design === item.id}
+                      onChange={() => setDesign(item.id)}
+                      onClick={(event) => {
+                        const choices = event.currentTarget.closest('details');
+                        if (choices) {
+                          choices.open = false;
+                          choices.querySelector('summary')?.focus();
+                        }
+                      }}
+                    />
+                    <strong>
+                      {item.id === 'standard' ? (
+                        <BadgeCheck
+                          className="purchase-icon"
+                          size={16}
+                          aria-hidden="true"
+                        />
+                      ) : item.id === 'customer' ? (
+                        <Upload
+                          className="purchase-icon"
+                          size={16}
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <PenTool
+                          className="purchase-icon"
+                          size={16}
+                          aria-hidden="true"
+                        />
+                      )}
+                      {t(item.name)}
+                    </strong>
+                    <p>
+                      {isLeather && item.id === 'customer'
+                        ? 'Carregue o seu logo em PDF, PNG ou JPG e veja a simulação.'
+                        : t(item.description)}
+                    </p>
+                  </label>
+                ))}
+              </div>
+            </details>
             {isPvcStandard && (
               <PvcConfigurator
                 model={pvc}
@@ -443,6 +470,7 @@ export function PurchaseConfigurator({
           </section>
         </div>
         <aside
+          id="purchase-summary"
           className="configuration-summary"
           aria-label={t('A sua configuração')}
         >
