@@ -96,13 +96,10 @@ export async function HomePurchaseOffers({
     <section className="home-products home-solutions" id="produtos">
       <div className="home-section-heading">
         <div>
-          <span className="home-solution-eyebrow">
-            {t('CARTÕES E PORTA-CHAVES NFC')}
-          </span>
-          <h2>{t('Escolha o seu cartão, porta-chaves ou kit')}</h2>
+          <h2>{t('Produtos NFC')}</h2>
           <p>
             {t(
-              'Produto: pagamento único. Perfil digital: plano mensal, com uma única subscrição para o cartão e o porta-chaves.',
+              'Pague uma vez pelo produto. Active o seu perfil digital com um plano à parte.',
             )}
           </p>
         </div>
@@ -124,13 +121,13 @@ export async function HomePurchaseOffers({
           );
           return (
             <article
-              className={`home-solution${offer.id === 'kit' ? ' is-recommended' : ''}`}
+              className={`home-solution${offer.id === 'keychain' ? ' is-recommended' : ''}`}
               key={offer.id}
             >
-              <div className="home-solution-label">
-                {offer.id === 'kit'
-                  ? t('Recomendado · dois produtos, um perfil')
-                  : t('Disponível em separado')}
+              <div className="home-solution-label" aria-hidden={offer.id !== 'keychain' ? true : undefined}>
+                {offer.id === 'keychain'
+                  ? t('Recomendado · Em stock, pronto para entrega')
+                  : null}
               </div>
               <ProductMaterialGallery
                 name={t(offer.name)}
@@ -168,7 +165,7 @@ export async function HomePurchaseOffers({
                 </ul>
                 <Link
                   className={
-                    offer.id === 'kit' ? 'home-primary' : 'home-secondary'
+                    offer.id === 'keychain' ? 'home-primary' : 'home-secondary'
                   }
                   href={`/comprar?formato=${offer.id}`}
                 >

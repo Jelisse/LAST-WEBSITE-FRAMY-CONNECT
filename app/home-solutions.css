@@ -302,7 +302,7 @@
 .home-solution-photo:not(.is-pair) .product-gallery-image.is-demo-card { max-width:100%; }
 
 /* Compact, comparable product and plan cards. */
-.home-solutions > .home-solutions-grid { grid-template-columns:1fr 1.12fr 1fr; }
+.home-solutions > .home-solutions-grid { grid-template-columns:1fr 1fr 1.12fr; }
 .home-solutions .home-solution-copy > p:first-of-type { min-height:72px; }
 .home-solutions .home-solution-price { min-height:100px; }
 .home-solutions .home-solution-label { min-height:42px; }
