@@ -37,6 +37,7 @@ test('database repair identifies missing post-auth migrations without replaying 
       '0020_payment_receipts_and_prices.sql',
       '0021_publish_base_products.sql',
       '0022_optional_fulfilment.sql',
+      '0023_agent_pickup_name.sql',
   ]);
 });
 test('database repair is a no-op when schema and inventory migration are applied', () => {

@@ -121,7 +121,8 @@ function fixture(t) {
     )
     .run(now);
   sql.exec(
-    'UPDATE profile_billing_settings SET enabled=1; UPDATE checkout_pricing SET enabled=1',
+    // Give each isolated fixture a known version, independent of data migrations.
+    'UPDATE profile_billing_settings SET enabled=1; UPDATE checkout_pricing SET enabled=1,version=0',
   );
   for (const [id, amount] of [
     ['pvc', 95000],
