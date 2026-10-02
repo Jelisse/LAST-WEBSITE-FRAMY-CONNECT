@@ -4224,3 +4224,21 @@ html[lang='zh-Hant'] h2 {
 .plans-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .plans-grid .plan-trial-banner { grid-column: 1 / -1; }
 @media (max-width: 700px) { .plans-grid { grid-template-columns: 1fr; } }
+
+/* Keep checkout navigation available while configuring a product. */
+.site-header.site-header-focused {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: auto;
+  min-height: 88px;
+  background: rgba(255, 251, 247, .97);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 24px #4523090a;
+}
+@media (max-width: 760px) {
+  .site-header.site-header-focused { min-height: 0; gap: 8px; padding-block: 10px; }
+  .site-header-focused .brand img { height: 34px; width: 112px; }
+  .site-header.site-header-focused .header-actions { gap: 8px 12px; }
+  .site-header-focused .header-contact-link { padding-block: 6px; }
+}

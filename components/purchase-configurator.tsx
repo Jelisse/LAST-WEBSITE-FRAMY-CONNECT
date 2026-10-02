@@ -1,5 +1,19 @@
 'use client';
 import { useEffect, useState } from 'react';
+import {
+  Package,
+  CreditCard,
+  UserRound,
+  Layers,
+  Palette,
+  Truck,
+  ClipboardList,
+  KeyRound,
+  MapPin,
+  Upload,
+  PenTool,
+  BadgeCheck,
+} from 'lucide-react';
 import { DeliverySelector } from './delivery-selector';
 import { readFulfilment, fulfilmentQuote } from '@/lib/fulfilment';
 import { readPurchaseDraft } from '@/lib/purchase-draft';
@@ -19,11 +33,13 @@ import { PaySuiteCheckout } from './paysuite-checkout';
 import type { CheckoutPricing } from '@/lib/checkout-pricing';
 import { SourceImage } from './source-image';
 import type { ProductPhoto } from '@/lib/product-gallery';
+import { designImageDefaults, type DesignImage } from '@/lib/design-images';
 
 export function PurchaseConfigurator({
   initial = 'kit',
   prices,
   photos = [],
+  designImages = designImageDefaults,
   pricing = null,
   paymentAvailable = false,
   signedIn = false,
@@ -31,6 +47,7 @@ export function PurchaseConfigurator({
   initial?: string;
   prices: HardwarePrice[];
   photos?: ProductPhoto[];
+  designImages?: DesignImage[];
   pricing?: CheckoutPricing | null;
   paymentAvailable?: boolean;
   signedIn?: boolean;
@@ -146,15 +163,28 @@ export function PurchaseConfigurator({
       <ol className="checkout-journey" aria-label={t('Etapas da compra')}>
         <li aria-current="step">
           <span>1</span>
-          <strong>{t('Produto e entrega')}</strong>
+          <strong>
+            <Package className="purchase-icon" size={18} aria-hidden="true" />
+            {t('Produto e entrega')}
+          </strong>
         </li>
         <li>
           <span>2</span>
-          <strong>{t('Pagamento')}</strong>
+          <strong>
+            <CreditCard
+              className="purchase-icon"
+              size={18}
+              aria-hidden="true"
+            />
+            {t('Pagamento')}
+          </strong>
         </li>
         <li>
           <span>3</span>
-          <strong>{t('Configurar perfil')}</strong>
+          <strong>
+            <UserRound className="purchase-icon" size={18} aria-hidden="true" />
+            {t('Configurar perfil')}
+          </strong>
         </li>
       </ol>
       {!paymentAvailable && (
@@ -171,7 +201,10 @@ export function PurchaseConfigurator({
       <div className="purchase-layout">
         <div>
           <fieldset className="purchase-section">
-            <legend>{t('1. Materiais')}</legend>
+            <legend>
+              <Layers className="purchase-icon" size={20} aria-hidden="true" />
+              {t('1. Materiais')}
+            </legend>
             <div className="purchase-materials">
               {format !== 'keychain' && (
                 <label>
@@ -206,20 +239,61 @@ export function PurchaseConfigurator({
             </div>
           </fieldset>
           <fieldset className="purchase-section">
-            <legend>{t('2. Design')}</legend>
+            <legend>
+              <Palette className="purchase-icon" size={20} aria-hidden="true" />
+              {t('2. Design')}
+            </legend>
             <div className="purchase-choices">
               {designServices.map((item) => (
                 <label
-                  className={`purchase-choice ${design === item.id ? 'is-selected' : ''}`}
+                  className={`purchase-choice purchase-design-choice ${design === item.id ? 'is-selected' : ''}`}
                   key={item.id}
                 >
+                  <SourceImage
+                    className="purchase-design-image"
+                    src={
+                      (
+                        designImages.find((row) => row.id === item.id) ??
+                        designImageDefaults.find((row) => row.id === item.id)!
+                      ).image
+                    }
+                    alt={
+                      (
+                        designImages.find((row) => row.id === item.id) ??
+                        designImageDefaults.find((row) => row.id === item.id)!
+                      ).alt
+                    }
+                    width={600}
+                    height={400}
+                  />
                   <input
                     type="radio"
                     name="design"
                     checked={design === item.id}
                     onChange={() => setDesign(item.id)}
                   />
-                  <strong>{t(item.name)}</strong>
+                  <strong>
+                    {item.id === 'standard' ? (
+                      <BadgeCheck
+                        className="purchase-icon"
+                        size={16}
+                        aria-hidden="true"
+                      />
+                    ) : item.id === 'customer' ? (
+                      <Upload
+                        className="purchase-icon"
+                        size={16}
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <PenTool
+                        className="purchase-icon"
+                        size={16}
+                        aria-hidden="true"
+                      />
+                    )}
+                    {t(item.name)}
+                  </strong>
                   <p>{t(item.description)}</p>
                 </label>
               ))}
@@ -242,7 +316,10 @@ export function PurchaseConfigurator({
             )}
           </fieldset>
           <section className="purchase-section">
-            <h2>3. Como pretende receber?</h2>
+            <h2>
+              <Truck className="purchase-icon" size={20} aria-hidden="true" />
+              3. Como pretende receber?
+            </h2>
             <DeliverySelector
               settings={fulfilmentSettings}
               city={city}
@@ -291,7 +368,14 @@ export function PurchaseConfigurator({
           className="configuration-summary"
           aria-label={t('A sua configuração')}
         >
-          <h2>{t('A sua configuração')}</h2>
+          <h2>
+            <ClipboardList
+              className="purchase-icon"
+              size={20}
+              aria-hidden="true"
+            />
+            {t('A sua configuração')}
+          </h2>
           <div className="configuration-photos">
             {preview.map((material) => {
               const photo = photos.find((item) => item.material === material);
@@ -316,11 +400,21 @@ export function PurchaseConfigurator({
             <h3>{t(selected.name)}</h3>
             {format !== 'keychain' && (
               <p>
+                <CreditCard
+                  className="purchase-icon"
+                  size={16}
+                  aria-hidden="true"
+                />
                 {t('Cartão')}: {t(card)}
               </p>
             )}
             {format !== 'card' && (
               <p>
+                <KeyRound
+                  className="purchase-icon"
+                  size={16}
+                  aria-hidden="true"
+                />
                 {t('Porta-chaves')}: {t(keychain)}
               </p>
             )}
@@ -353,7 +447,10 @@ export function PurchaseConfigurator({
               : money(designAmount, t.locale)}
           </p>
           {delivery === 'pickup' && fulfilment && (
-            <p>Levantamento gratuito · {fulfilment.point?.name}</p>
+            <p>
+              <MapPin className="purchase-icon" size={16} aria-hidden="true" />
+              Levantamento gratuito · {fulfilment.point?.name}
+            </p>
           )}
           {delivery !== 'pickup' && city && (
             <p>
@@ -372,7 +469,14 @@ export function PurchaseConfigurator({
             </strong>
           </p>
           <div className="purchase-next-step">
-            <strong>{t('O perfil fica para depois do pagamento')}</strong>
+            <strong>
+              <UserRound
+                className="purchase-icon"
+                size={18}
+                aria-hidden="true"
+              />
+              {t('O perfil fica para depois do pagamento')}
+            </strong>
             <p>
               {t(
                 'Após a confirmação, crie o seu perfil ou continue com o que já tem. O cartão e o porta-chaves podem partilhar o mesmo perfil.',

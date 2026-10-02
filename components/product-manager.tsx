@@ -7,6 +7,7 @@ import type { Product } from '@/lib/catalog';
 import { ProductAnalytics } from './product-analytics';
 import { DeliveryManager } from './delivery-manager';
 import { PersonalisationManager } from './personalisation-manager';
+import { DesignImageManager } from './design-image-manager';
 import { money } from '@/lib/catalog';
 import { Button } from './ui/button';
 import { MediaUploadBox } from './media-upload-box';
@@ -134,6 +135,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
       aria-labelledby="product-management-title"
     >
       <ProductAnalytics products={items} />
+      <DesignImageManager />
       <PersonalisationManager />
       <DeliveryManager />
       <header>

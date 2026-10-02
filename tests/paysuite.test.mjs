@@ -615,3 +615,19 @@ test('delivery settings enforce manager access, stale-write protection, coverage
  globalThis.__paysuite.user={userId:'manager',role:'manager'};initial.settings.points[0].address='Novo endereço de levantamento';
  assert.equal((await route.POST(request({...initial,version:1}))).status,200);assert.equal(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders').get().configuration_json,before);
 });
+
+test('design image editing requires manager, validates safe sources and rejects stale edits',async(t)=>{
+ const f=fixture(t),route=await api('app/api/manager-design-images/route.ts');
+ assert.equal((await route.GET()).status,403);
+ assert.equal((await route.PUT(request({}))).status,403);
+ globalThis.__paysuite.user={userId:'manager',role:'manager'};
+ const initial=await(await route.GET()).json();assert.equal(initial.images.length,3);
+ const row=initial.images.find(r=>r.id==='customer');
+ assert.equal((await route.PUT(request({...row,image:'https://other.example/pixel.png'}))).status,422);
+ const updated={...row,image:'/api/product-image/12345678-1234-1234-1234-123456789abc',alt:'O seu cartão personalizado'};
+ assert.equal((await route.PUT(request(updated))).status,200);
+ assert.equal((await route.PUT(request(updated))).status,409);
+ assert.equal(f.sql.prepare("SELECT image FROM design_images WHERE id='customer'").get().image,updated.image);
+ const foreign=request({...updated,version:1});foreign.headers.set('origin','https://other.example');assert.equal((await route.PUT(foreign)).status,422);
+ assert.equal((await route.PUT(request({...row,version:1}))).status,200);
+});

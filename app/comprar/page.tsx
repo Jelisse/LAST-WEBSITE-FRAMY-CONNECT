@@ -10,6 +10,7 @@ import Link from '@/components/hard-link';
 import { purchaseSelection } from '@/lib/purchase-structure';
 import { productPhotos } from '@/lib/product-gallery';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
+import { designImageDefaults, type DesignImage } from '@/lib/design-images';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Configurar a sua solução',
@@ -32,6 +33,10 @@ export default async function Page({
     .first<CheckoutPricing>()
     .catch(() => null);
   const format = purchaseSelection(query.formato).format;
+  const designImages = await env.DB.prepare('SELECT * FROM design_images')
+    .all<DesignImage>()
+    .then((result) => result.results)
+    .catch(() => designImageDefaults);
   const title =
     format === 'keychain'
       ? 'Configurar porta-chaves'
@@ -61,6 +66,7 @@ export default async function Page({
           initial={query.formato}
           prices={hardwarePrices(products)}
           photos={productPhotos(products)}
+          designImages={designImages}
           pricing={pricing}
           paymentAvailable={paysuiteReady(env) && !!pricing?.enabled}
           signedIn={!!user}
