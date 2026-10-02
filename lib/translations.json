@@ -1,4 +1,11 @@
 {
+  "Design e entrega apresentados separadamente. O total final depende da configuração e da entrega.": ["Design and delivery shown separately. The final total depends on your configuration and delivery.", "設計及配送費另列。最終總額視配置及配送方式而定。"],
+  "Total a pagar": ["Total to pay", "應付總額"],
+  "Subtotal dos produtos": ["Product subtotal", "商品小計"],
+  "Rever encomenda": ["Review order", "查看訂單"],
+  "Continuar para a entrega": ["Continue to delivery", "繼續選擇配送"],
+  "Levantamento": ["Pickup", "自取"],
+  "Escolher como receber": ["Choose how to receive", "選擇收貨方式"],
   "/ ano": [" / year", " / 年"],
   "MT / ano": ["MT / year", "MT / 年"],
   "Pagamento anual · adesões em breve": [

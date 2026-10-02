@@ -8,7 +8,6 @@ import {
   Palette,
   Truck,
   ClipboardList,
-  KeyRound,
   MapPin,
   Upload,
   PenTool,
@@ -74,7 +73,7 @@ export function PurchaseConfigurator({
   const [designOptionsOpen, setDesignOptionsOpen] = useState(false);
   const designControl = useRef<HTMLButtonElement>(null);
   const [activeConfiguration, setActiveConfiguration] = useState<
-    'materials' | 'design'
+    'materials' | 'design' | 'delivery'
   >('design');
 
   const [pvc, setPvc] = useState<PvcModel>('tiktok');
@@ -201,6 +200,53 @@ export function PurchaseConfigurator({
     !!fulfilment &&
     contact.trim().length >= 7 &&
     (delivery === 'pickup' || address.trim().length >= 8);
+  const goToDelivery = () => {
+    setActiveConfiguration('delivery');
+    document.getElementById('delivery-control')?.focus();
+  };
+  const showSummary = () => {
+    document.getElementById('purchase-summary')?.focus();
+  };
+  const materialPresentation = (
+    material: string,
+    kind: 'card' | 'keychain',
+  ) => {
+    const photo =
+      photos.find((item) => item.material === material)?.src ??
+      (material === 'Couro'
+        ? '/products/leather/brown-full.png'
+        : material === 'PVC + epóxi'
+          ? pvcPhoto(pvc)
+          : null);
+    const price = hardwareEstimate(prices, kind, material, material);
+    return (
+      <>
+        {photo ? (
+          <SourceImage
+            className="material-photo"
+            src={photo}
+            alt={t(material)}
+            width={240}
+            height={240}
+          />
+        ) : (
+          <span className="material-photo-placeholder">
+            {t('Fotografia do produto em preparação')}
+          </span>
+        )}
+        <small className="material-price">
+          {price ? money(price.amount, t.locale) : t('Preço a confirmar')}
+        </small>
+      </>
+    );
+  };
+  const totalLabel =
+    total === null ? t('Subtotal dos produtos') : t('Total a pagar');
+  const displayAmount = total ?? estimate?.amount;
+  const amountText =
+    displayAmount == null
+      ? t('Preço a confirmar')
+      : money(displayAmount, t.locale);
   return (
     <div className="purchase-configurator">
       <ol className="checkout-journey" aria-label={t('Etapas da compra')}>
@@ -297,6 +343,23 @@ export function PurchaseConfigurator({
                 <span className="purchase-change-label">{t('Alterar')}</span>
               </span>
             </button>
+            <button
+              type="button"
+              id="delivery-control"
+              aria-expanded={activeConfiguration === 'delivery'}
+              aria-controls="delivery-panel"
+              onClick={goToDelivery}
+            >
+              <strong>
+                <Truck className="purchase-icon" size={20} aria-hidden="true" />
+                {t('3. Entrega')}
+              </strong>
+              <span>
+                {city
+                  ? `${fulfilmentSettings?.cities.find((item) => item.id === city)?.name ?? city} · ${t(delivery === 'pickup' ? 'Levantamento' : 'Entrega')}`
+                  : t('Escolher como receber')}
+              </span>
+            </button>
           </div>
           <fieldset
             id="materials-panel"
@@ -324,8 +387,8 @@ export function PurchaseConfigurator({
                           checked={card === item}
                           onChange={() => setCard(item)}
                         />
-                        <CreditCard size={20} aria-hidden="true" />
                         <span>{t(item)}</span>
+                        {materialPresentation(item, 'card')}
                       </label>
                     ))}
                   </div>
@@ -347,8 +410,8 @@ export function PurchaseConfigurator({
                           checked={keychain === item}
                           onChange={() => setKeychain(item)}
                         />
-                        <KeyRound size={20} aria-hidden="true" />
                         <span>{t(item)}</span>
+                        {materialPresentation(item, 'keychain')}
                       </label>
                     ))}
                   </div>
@@ -501,10 +564,22 @@ export function PurchaseConfigurator({
                   </small>
                 </label>
               )}
+              <button
+                type="button"
+                className="btn btn-primary configuration-next"
+                onClick={goToDelivery}
+              >
+                {t('Continuar para a entrega')} →
+              </button>
             </div>
           </fieldset>
-          <section className="purchase-section">
-            <h2>
+          <section
+            id="delivery-panel"
+            aria-labelledby="delivery-control"
+            className="purchase-section configuration-panel"
+            hidden={activeConfiguration !== 'delivery'}
+          >
+            <h2 className="configuration-panel-heading">
               <Truck className="purchase-icon" size={20} aria-hidden="true" />
               3. Como pretende receber?
             </h2>
@@ -550,10 +625,18 @@ export function PurchaseConfigurator({
                 />
               </label>
             )}
+            <button
+              type="button"
+              className="btn btn-primary configuration-next"
+              onClick={showSummary}
+            >
+              {t('Rever encomenda')} →
+            </button>
           </section>
         </div>
         <aside
           id="purchase-summary"
+          tabIndex={-1}
           className="configuration-summary"
           aria-label={t('A sua configuração')}
         >
@@ -622,26 +705,6 @@ export function PurchaseConfigurator({
             key={`${format}-${card}-${keychain}-${design}-${t.locale}`}
           >
             <h3>{t(selected.name)}</h3>
-            {format !== 'keychain' && (
-              <p>
-                <CreditCard
-                  className="purchase-icon"
-                  size={16}
-                  aria-hidden="true"
-                />
-                {t('Cartão')}: {t(card)}
-              </p>
-            )}
-            {format !== 'card' && (
-              <p>
-                <KeyRound
-                  className="purchase-icon"
-                  size={16}
-                  aria-hidden="true"
-                />
-                {t('Porta-chaves')}: {t(keychain)}
-              </p>
-            )}
             <p>
               {t(selectedDesign.name)}
               {design === 'customer' ? ` · ${t(method)}` : ''}
@@ -685,16 +748,18 @@ export function PurchaseConfigurator({
               {fulfilment ? money(fulfilment.fee, t.locale) : 'Sob cotação'}
             </p>
           )}
-          <p className="purchase-total">
+          <div className="purchase-total" aria-live="polite">
             <strong>
-              Total a pagar:{' '}
-              {total === null
-                ? city
-                  ? 'A confirmar'
-                  : 'Seleccione como receber'
-                : money(total, t.locale)}
+              {totalLabel}: {amountText}
             </strong>
-          </p>
+            {total === null && (
+              <small>
+                {t(
+                  'Design e entrega apresentados separadamente. O total final depende da configuração e da entrega.',
+                )}
+              </small>
+            )}
+          </div>
           <div className="purchase-next-step">
             <strong>
               <UserRound
@@ -782,6 +847,29 @@ export function PurchaseConfigurator({
           />
           <Link href="/dashboard">{t('Acompanhar o pedido')}</Link>
         </aside>
+      </div>
+      <div className="purchase-mobile-bar">
+        <div>
+          <small>{totalLabel}</small>
+          <strong>{amountText}</strong>
+        </div>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            if (activeConfiguration === 'materials') {
+              setActiveConfiguration('design');
+              setDesignOptionsOpen(true);
+              designControl.current?.focus();
+            } else if (activeConfiguration === 'design') goToDelivery();
+            else showSummary();
+          }}
+        >
+          {activeConfiguration === 'delivery'
+            ? t('Rever encomenda')
+            : t('Continuar')}{' '}
+          →
+        </button>
       </div>
     </div>
   );
