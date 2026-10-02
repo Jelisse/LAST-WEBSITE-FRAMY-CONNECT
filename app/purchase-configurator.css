@@ -549,7 +549,6 @@ fieldset.purchase-section {
 .purchase-layout > *, .configuration-summary { min-width:0; }
 .purchase-page { scroll-margin-top:150px; }
 .purchase-page :is(input,select,textarea,button) { max-width:100%; }
-.purchase-summary-link { display:block; width:fit-content; margin:0 0 20px auto; color:#a53b12; text-underline-offset:4px; }
 /* A tall payment summary must scroll with the document, never under the header. */
 .purchase-layout .configuration-summary { position:static; scroll-margin-top:160px; overflow-wrap:anywhere; }
 .configuration-photos figure > .pvc-product-photo { height:160px; aspect-ratio:auto; }
@@ -616,7 +615,6 @@ fieldset.purchase-section {
 .purchase-page .page-intro { margin-block:10px; }
 .purchase-configurator .checkout-journey { margin:20px 0; }
 .purchase-configurator .checkout-journey li { padding:12px; }
-.purchase-summary-link { margin-bottom:14px; font-size:14px; }
 .configuration-switcher { grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:16px; }
 .configuration-switcher button { padding:14px 12px; }
 .configuration-switcher strong { font-size:15px; }

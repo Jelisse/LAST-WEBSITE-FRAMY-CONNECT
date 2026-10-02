@@ -287,9 +287,6 @@ export function PurchaseConfigurator({
           </p>
         </div>
       )}
-      <a className="purchase-summary-link" href="#purchase-summary">
-        {t('A sua configuração')} →
-      </a>
       <div className="purchase-layout">
         <div>
           <div className="configuration-switcher">
