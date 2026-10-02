@@ -5,6 +5,7 @@ import { SourceImage } from '@/components/source-image';
 import { useEffect, useState } from 'react';
 import type { Product } from '@/lib/catalog';
 import { ProductAnalytics } from './product-analytics';
+import { DeliveryManager } from './delivery-manager';
 import { PersonalisationManager } from './personalisation-manager';
 import { money } from '@/lib/catalog';
 import { Button } from './ui/button';
@@ -134,6 +135,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
     >
       <ProductAnalytics products={items} />
       <PersonalisationManager />
+      <DeliveryManager />
       <header>
         <Button
           disabled={busy || !!draft}

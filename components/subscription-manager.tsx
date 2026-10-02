@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
+import { Search } from 'lucide-react';
 import type { ManagedPlan } from '@/lib/domain';
 import {
   featureCatalog,
@@ -480,12 +481,15 @@ export function SubscriptionManager() {
             <section className="manager-card">
               <h2>Clientes e períodos contratados</h2>
               <div className="suite-toolbar">
-                <input
-                  aria-label="Pesquisar cliente"
-                  placeholder="Nome, email ou plano"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+                <div className="suite-search-field">
+                  <input
+                    aria-label="Pesquisar cliente"
+                    placeholder="Nome, email ou plano"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  <Search size={20} aria-hidden="true" />
+                </div>
                 <select
                   aria-label="Estado"
                   value={state}

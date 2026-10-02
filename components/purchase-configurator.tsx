@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { DeliverySelector } from './delivery-selector';
+import { readFulfilment, fulfilmentQuote } from '@/lib/fulfilment';
 import { readPurchaseDraft } from '@/lib/purchase-draft';
 import Link from '@/components/hard-link';
 import { useI18n } from './language-provider';
@@ -42,7 +44,9 @@ export function PurchaseConfigurator({
   const method = 'PDF vectorial';
   const [contact, setContact] = useState('');
   const [address, setAddress] = useState('');
-  const [delivery, setDelivery] = useState('maputo');
+  const [delivery, setDelivery] = useState('pickup');
+  const [city, setCity] = useState('');
+  const [pickupPoint, setPickupPoint] = useState('');
   const [designInstructions, setDesignInstructions] = useState('');
   const [draftReady, setDraftReady] = useState(false);
   useEffect(() => {
@@ -60,6 +64,8 @@ export function PurchaseConfigurator({
         setKeychain(draft.keychain);
         setDesign(draft.design);
         setDelivery(draft.delivery);
+        setCity(draft.city);
+        setPickupPoint(draft.pickupPoint);
         setContact(draft.contact);
         setAddress(draft.address);
         setDesignInstructions(draft.designInstructions);
@@ -73,12 +79,14 @@ export function PurchaseConfigurator({
       sessionStorage.setItem(
         'framy-checkout:configuration:' + initial,
         JSON.stringify({
-          version: 1,
+          version: 2,
           expires: Date.now() + 1800000,
           card,
           keychain,
           design,
           delivery,
+          city,
+          pickupPoint,
           contact,
           address,
           designInstructions,
@@ -94,6 +102,8 @@ export function PurchaseConfigurator({
     keychain,
     design,
     delivery,
+    city,
+    pickupPoint,
     contact,
     address,
     designInstructions,
@@ -112,10 +122,25 @@ export function PurchaseConfigurator({
         ? pricing.customer_design
         : pricing.team_design
     : null;
+  const fulfilmentSettings = readFulfilment(pricing?.fulfilment_json);
+  let fulfilment: ReturnType<typeof fulfilmentQuote> | null = null;
+  try {
+    fulfilment = fulfilmentQuote(fulfilmentSettings, {
+      city,
+      delivery,
+      pickupPoint,
+    });
+  } catch {
+    /* Incomplete selection or a service awaiting quotation. */
+  }
   const total =
-    estimate && designAmount !== null && pricing && delivery === 'maputo'
-      ? estimate.amount + designAmount + pricing.maputo_delivery
+    estimate && designAmount !== null && fulfilment
+      ? estimate.amount + designAmount + fulfilment.fee
       : null;
+  const deliveryReady =
+    !!fulfilment &&
+    contact.trim().length >= 7 &&
+    (delivery === 'pickup' || address.trim().length >= 8);
   return (
     <div className="purchase-configurator">
       <ol className="checkout-journey" aria-label={t('Etapas da compra')}>
@@ -217,42 +242,48 @@ export function PurchaseConfigurator({
             )}
           </fieldset>
           <section className="purchase-section">
-            <h2>{t('3. Entrega')}</h2>
-            <label>
-              Local de entrega
-              <select
-                value={delivery}
-                onChange={(e) => setDelivery(e.target.value)}
-              >
-                <option value="maputo">Cidade de Maputo</option>
-                <option value="other">Outra localidade — sob consulta</option>
-              </select>
-            </label>
-            {delivery === 'other' ? (
-              <p>
-                <Link href="/contacto">Solicitar proposta de entrega</Link>
-              </p>
-            ) : (
-              <>
-                <label>
-                  Contacto de entrega
-                  <input
-                    value={contact}
-                    onChange={(e) => setContact(e.target.value)}
-                    maxLength={50}
-                    autoComplete="tel"
-                  />
-                </label>
-                <label>
-                  Morada e ponto de referência
-                  <textarea
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    maxLength={300}
-                    autoComplete="street-address"
-                  />
-                </label>
-              </>
+            <h2>3. Como pretende receber?</h2>
+            <DeliverySelector
+              settings={fulfilmentSettings}
+              city={city}
+              mode={delivery}
+              point={pickupPoint}
+              onCity={(id) => {
+                setCity(id);
+                setPickupPoint(
+                  fulfilmentSettings?.points.find(
+                    (p) => p.cityId === id && p.active,
+                  )?.id ?? '',
+                );
+              }}
+              onMode={setDelivery}
+              onPoint={setPickupPoint}
+            />
+            {city && (
+              <label>
+                {delivery === 'pickup'
+                  ? 'Contacto para o aviso de levantamento'
+                  : 'Contacto do destinatário'}
+                <input
+                  type="tel"
+                  value={contact}
+                  onChange={(e) => setContact(e.target.value)}
+                  maxLength={50}
+                  autoComplete="tel"
+                  placeholder="+258"
+                />
+              </label>
+            )}
+            {city && delivery !== 'pickup' && (
+              <label>
+                Bairro, morada e ponto de referência
+                <textarea
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  maxLength={300}
+                  autoComplete="street-address"
+                />
+              </label>
             )}
           </section>
         </div>
@@ -321,16 +352,23 @@ export function PurchaseConfigurator({
               ? 'Sob consulta'
               : money(designAmount, t.locale)}
           </p>
-          <p>
-            Entrega:{' '}
-            {pricing && delivery === 'maputo'
-              ? money(pricing.maputo_delivery, t.locale)
-              : 'Sob consulta'}
-          </p>
+          {delivery === 'pickup' && fulfilment && (
+            <p>Levantamento gratuito · {fulfilment.point?.name}</p>
+          )}
+          {delivery !== 'pickup' && city && (
+            <p>
+              Entrega{delivery === 'express' ? ' expressa' : ''}:{' '}
+              {fulfilment ? money(fulfilment.fee, t.locale) : 'Sob cotação'}
+            </p>
+          )}
           <p className="purchase-total">
             <strong>
               Total a pagar:{' '}
-              {total === null ? 'Sob consulta' : money(total, t.locale)}
+              {total === null
+                ? city
+                  ? 'A confirmar'
+                  : 'Seleccione como receber'
+                : money(total, t.locale)}
             </strong>
           </p>
           <div className="purchase-next-step">
@@ -370,23 +408,21 @@ export function PurchaseConfigurator({
               </Link>
             </div>
           )}
-          {signedIn &&
-            paymentAvailable &&
-            total !== null &&
-            (contact.trim().length < 7 || address.trim().length < 8) && (
-              <p className="purchase-help">
-                {t('Preencha o contacto e a morada para continuar.')}
-              </p>
-            )}
+          {signedIn && paymentAvailable && total !== null && !deliveryReady && (
+            <p className="purchase-help">
+              {delivery === 'pickup'
+                ? 'Indique o contacto para o aviso de levantamento.'
+                : 'Preencha o contacto e a morada para continuar.'}
+            </p>
+          )}
           <PaySuiteCheckout
-            key={`${format}-${card}-${keychain}-${design}-${delivery}-${total}`}
+            key={`${format}-${card}-${keychain}-${design}-${city}-${delivery}-${pickupPoint}-${total}`}
             disabled={
               !draftReady ||
               !signedIn ||
               !paymentAvailable ||
               total === null ||
-              contact.trim().length < 7 ||
-              address.trim().length < 8
+              !deliveryReady
             }
             payload={{
               kind: 'product',
@@ -395,6 +431,8 @@ export function PurchaseConfigurator({
               keychain,
               design,
               delivery,
+              city,
+              pickupPoint,
               contact,
               address,
               designInstructions,

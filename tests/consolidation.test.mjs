@@ -19,7 +19,7 @@ test('configuration and payment return survive customer authentication without p
     assert.equal(loginDestination('customer', path), '/dashboard');
 });
 test('purchase restoration rejects expired and malformed data and keeps selections', () => {
-  const draft = { version: 1, expires: 1100, card: 'Madeira', keychain: 'Couro', design: 'team', delivery: 'maputo', contact: '841234567', address: 'Maputo, Rua de exemplo', designInstructions: 'Azul' };
+  const draft = { version: 2, expires: 1100, card: 'Madeira', keychain: 'Couro', design: 'team', delivery: 'standard', city:'maputo', pickupPoint:'', contact: '841234567', address: 'Maputo, Rua de exemplo', designInstructions: 'Azul' };
   assert.equal(readPurchaseDraft(JSON.stringify(draft), 1000).card, 'Madeira');
   assert.equal(readPurchaseDraft(JSON.stringify(draft), 1200), null);
   assert.equal(readPurchaseDraft(JSON.stringify({ ...draft, design: 'free' }), 1000), null);

@@ -17,6 +17,11 @@ type Receipt = {
   periodEnd?: string;
   terms?: { name?: string };
   configuration?: {
+    fulfilment?: {
+      mode: string;
+      city: string;
+      point?: { name: string; address: string; hours: string } | null;
+    };
     format: string;
     card: string;
     keychain: string;
@@ -57,7 +62,17 @@ export function receiptMessage(r: Receipt) {
       `Design: ${{ standard: 'FramyConnect', customer: 'O seu design', team: 'Criado pela equipa' }[c.design] ?? c.design}`,
       `Produtos: ${money(c.hardware)}`,
       `Personalização: ${money(c.customization)}`,
-      `Entrega: ${money(c.delivery)}`,
+      ...(c.fulfilment?.mode === 'pickup'
+        ? [
+            'Levantamento gratuito',
+            `Ponto: ${c.fulfilment.point?.name}`,
+            `Endereço: ${c.fulfilment.point?.address}`,
+            `Horário: ${c.fulfilment.point?.hours}`,
+            'Aguarde o aviso de que o produto está pronto para levantamento.',
+          ]
+        : [
+            `Entrega${c.fulfilment?.mode === 'express' ? ' expressa' : ''}: ${money(c.delivery)}`,
+          ]),
     );
   } else {
     lines.push(

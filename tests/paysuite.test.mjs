@@ -207,7 +207,8 @@ function product(overrides = {}) {
     card: 'PVC',
     keychain: 'PVC + epóxi',
     design: 'standard',
-    delivery: 'maputo',
+    delivery: 'standard',
+    city: 'maputo',
     contact: '+258840000000',
     address: 'Maputo, rua de teste 123',
     expectedAmount: 155000,
@@ -576,10 +577,40 @@ test('receipt retries stop before provider deduplication expires without changin
 
 test('approved base prices and kit discount flow through configuration plus delivery and design',async()=>{
  const {products}=await api('lib/catalog.ts');const {configurationQuote}=await api('lib/checkout-pricing.ts');
- const catalogue=products.map(p=>({...p,available:true,published:true}));const settings={customer_design:15000,team_design:40000,maputo_delivery:20000};
- const quote=overrides=>configurationQuote(catalogue,settings,{format:'kit',card:'PVC',keychain:'PVC + epóxi',design:'standard',delivery:'maputo',...overrides});
+ const catalogue=products.map(p=>({...p,available:true,published:true}));const {fulfilmentDefaults}=await api('lib/fulfilment.ts');const settings={customer_design:15000,team_design:40000,maputo_delivery:20000,fulfilment_json:JSON.stringify(fulfilmentDefaults)};
+ const quote=overrides=>configurationQuote(catalogue,settings,{format:'kit',card:'PVC',keychain:'PVC + epóxi',design:'standard',delivery:'standard',city:'maputo',...overrides});
  assert.equal(quote({format:'card'}).hardware,95000);assert.equal(quote({format:'keychain'}).hardware,50000);assert.equal(quote({}).hardware,95000+50000-10000);assert.equal(quote({}).total,155000);
  assert.equal(quote({format:'card',card:'Madeira',design:'customer'}).total,100000+15000+20000);
  assert.equal(quote({format:'card',card:'Metal',design:'team'}).total,150000+40000+20000);
  assert.equal(quote({format:'keychain',keychain:'Couro'}).total,120000+20000);
+});
+
+
+test('pickup is free, needs no customer address and snapshots the selected point for the receipt', async(t)=>{
+ const f=fixture(t),checkout=await api('app/api/paysuite/checkout/route.ts');
+ const body=product({delivery:'pickup',pickupPoint:'mahota',address:'',expectedAmount:135000});
+ assert.equal((await checkout.POST(request(body))).status,200);
+ const order=JSON.parse(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders').get().configuration_json);
+ assert.equal(order.delivery,0);assert.equal(order.fulfilment.point.id,'mahota');assert.match(order.address,/Mahota/);assert.equal(order.fulfilment.mode,'pickup');
+ const [id,record]=[...f.records][0];record.status='paid';await notify(f,id);
+ const receipt=JSON.parse(f.sql.prepare('SELECT payload_json FROM payment_email_receipts').get().payload_json);
+ const {receiptMessage}=await api('lib/payment-receipts.ts');assert.match(receiptMessage(receipt),/Levantamento gratuito/);assert.doesNotMatch(receiptMessage(receipt),/Entrega: 0/);
+ const result=await(await checkout.GET(new Request('https://framyconnect.co.mz/api/paysuite/checkout?payment='+body.requestId))).json();assert.equal(result.fulfilment.point.id,'mahota');
+});
+
+test('delivery settings enforce manager access, stale-write protection, coverage and server-side repricing',async(t)=>{
+ const f=fixture(t),route=await api('app/api/manager-delivery/route.ts'),checkout=await api('app/api/paysuite/checkout/route.ts');
+ assert.equal((await route.GET()).status,403);
+ assert.equal((await route.POST(request({}))).status,403);
+ const buyer=globalThis.__paysuite.user;globalThis.__paysuite.user={userId:'manager',role:'manager'};
+ const initial=await(await route.GET()).json();initial.settings.cities.find(c=>c.id==='maputo').standardFee=30000;
+ assert.equal((await route.POST(request(initial))).status,200);assert.equal((await route.POST(request(initial))).status,409);
+ globalThis.__paysuite.user=buyer;
+ assert.equal((await checkout.POST(request(product()))).status,422);
+ assert.equal((await checkout.POST(request(product({delivery:'express',pricingVersion:1})))).status,422);
+ assert.equal((await checkout.POST(request(product({delivery:'pickup',city:'beira',pickupPoint:'mahota',pricingVersion:1,expectedAmount:135000})))).status,422);
+ const body=product({pricingVersion:1,expectedAmount:165000});assert.equal((await checkout.POST(request(body))).status,200);
+ const before=f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders').get().configuration_json;
+ globalThis.__paysuite.user={userId:'manager',role:'manager'};initial.settings.points[0].address='Novo endereço de levantamento';
+ assert.equal((await route.POST(request({...initial,version:1}))).status,200);assert.equal(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders').get().configuration_json,before);
 });

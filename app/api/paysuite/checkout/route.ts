@@ -61,6 +61,14 @@ export async function GET(request: Request) {
             .bind(user.userId)
             .first<{ username: string; published_json: string | null }>()
         : null;
+    const order =
+      row.kind === 'product'
+        ? await env.DB.prepare(
+            'SELECT status,configuration_json FROM paysuite_product_orders WHERE id=? AND owner_id=?',
+          )
+            .bind(row.target_id, user.userId)
+            .first<{ status: string; configuration_json: string }>()
+        : null;
     return json({
       receiptStatus:
         row.status === 'paid'
@@ -78,15 +86,10 @@ export async function GET(request: Request) {
       amount: row.amount,
       status: row.status,
       cycle: row.cycle,
-      orderStatus:
-        row.kind === 'product'
-          ? ((
-              await env.DB.prepare(
-                'SELECT status FROM paysuite_product_orders WHERE id=? AND owner_id=?',
-              )
-                .bind(row.target_id, user.userId)
-                .first<{ status: string }>()
-            )?.status ?? null)
+      orderStatus: order?.status ?? null,
+      fulfilment:
+        row.status === 'paid' && order
+          ? (JSON.parse(order.configuration_json).fulfilment ?? null)
           : null,
       url: row.status === 'pending' ? row.checkout_url : null,
     });
@@ -147,14 +150,17 @@ export async function POST(request: Request) {
         .bind(user.userId)
         .first<{ username: string; published_json: string }>();
       const contact = cleanText(b.contact, 50, true),
-        address = cleanText(b.address, 300, true);
+        address =
+          quote.fulfilment.mode === 'pickup'
+            ? quote.fulfilment.point!.address
+            : cleanText(b.address, 300, true);
       if (contact.length < 7 || address.length < 8)
         throw Error('Preencha o contacto e a morada de entrega.');
       const configuration = {
         ...quote,
         contact,
         address,
-        city: 'Maputo',
+        city: quote.fulfilment.city,
         profileUsername: profile?.username ?? null,
         profileSnapshot: profile ? JSON.parse(profile.published_json) : null,
         designInstructions: cleanText(b.designInstructions ?? '', 2000),

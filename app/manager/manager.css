@@ -655,6 +655,10 @@
 .suite-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
 .suite-toolbar { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
 .suite-toolbar p { flex: 1; min-width: 200px; }
+.suite-search-field { position: relative; width: 100%; min-width: 0; }
+.management-suite .suite-search-field input { padding-right: 44px; }
+.suite-search-field > svg { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #756456; pointer-events: none; }
+.suite-search-field:focus-within > svg { color: #b83c0a; }
 .suite-form { display: grid; gap: 18px; }
 .management-suite label { display: grid; gap: 8px; min-width: 0; }
 .management-suite input:not([type='checkbox']), .management-suite select, .management-suite textarea { width: 100%; padding: 10px 12px; min-height: 44px; background: white; border: 1px solid #cdbfb3; border-radius: 8px; color: #292622; }
@@ -678,3 +682,7 @@
 .suite-bar meter::-webkit-meter-bar { background: #f2e9e1; border: 0; border-radius: 8px; }
 .suite-bar meter::-webkit-meter-optimum-value { background: #c3420c; border-radius: 8px; }
 .suite-bar meter::-moz-meter-bar { background: #c3420c; border-radius: 8px; }
+
+.delivery-manager { margin:28px 0; padding:24px; border:1px solid #e4dcd2; border-radius:18px; background:#fff; }
+.delivery-manager h2,.delivery-manager h3,.delivery-manager button { display:flex; align-items:center; gap:10px; }
+.delivery-manager fieldset>label { margin:14px 0; }

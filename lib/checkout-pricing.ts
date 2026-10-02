@@ -1,6 +1,8 @@
+import { readFulfilment, fulfilmentQuote } from './fulfilment.ts';
 import { hardwareEstimate, hardwarePrices } from './hardware-pricing.ts';
 import type { Product } from './catalog';
 export type CheckoutPricing = {
+  fulfilment_json?: string;
   customer_design: number;
   team_design: number;
   maputo_delivery: number;
@@ -64,15 +66,17 @@ export function configurationQuote(
     keychain,
   );
   if (!hardware) throw Error('Preço por confirmar.');
-  if (input.delivery !== 'maputo')
-    throw Error('Entrega fora da cidade de Maputo: solicite uma proposta.');
+  const fulfilment = fulfilmentQuote(
+    readFulfilment(settings.fulfilment_json),
+    input,
+  );
   const customization =
     design === 'standard'
       ? 0
       : design === 'customer'
         ? settings.customer_design
         : settings.team_design;
-  const delivery = settings.maputo_delivery;
+  const delivery = fulfilment.fee;
   const total = hardware.amount + customization + delivery;
   if (
     ![total, customization, delivery].every(Number.isSafeInteger) ||
@@ -82,6 +86,7 @@ export function configurationQuote(
   )
     throw Error('Preço inválido.');
   return {
+    fulfilment,
     format,
     card,
     keychain,
@@ -91,7 +96,8 @@ export function configurationQuote(
     delivery,
     total,
     ids,
-    priceIds: format === 'kit' ? [...new Set([...ids, 'pvc', 'keychain'])] : ids,
+    priceIds:
+      format === 'kit' ? [...new Set([...ids, 'pvc', 'keychain'])] : ids,
     pricingVersion: settings.version,
   };
 }

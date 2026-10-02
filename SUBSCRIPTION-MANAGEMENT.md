@@ -50,3 +50,9 @@ A durable claim and Resend idempotency key prevent concurrent duplicate sends. A
 
 
 Live deployment verification found that the existing PVC record was unpublished, so the approved card and kit prices were excluded from public estimates. Migration `0021_publish_base_products.sql` explicitly publishes the requested base catalogue entries, records the release and preserves stock/availability. It does not enable sales of unavailable inventory.
+
+## Optional pickup and delivery
+
+Migration `0022_optional_fulfilment.sql` adds versioned city rates and pickup points to checkout pricing. Products > Levantamento e entregas lets managers edit cities, coverage, standard/express rates, pickup addresses and hours, and deactivate services or points. Initial pickup is free at Mahota, Maputo; opening hours are Monday–Friday 09:00–17:00 and Saturday 08:00–13:00, editable by the manager. Standard Maputo delivery starts at 200 MT. Express has no price until configured and requires a quotation; there is no live courier quotation API or unconditional same-day promise.
+
+Checkout requires an explicit destination city and validates the selected service server-side. Pickup does not require a customer address. Unpriced or unsupported services cannot reach payment. Configuration changes invalidate stale quotes. Orders and payment emails retain immutable fulfilment snapshots, so later manager edits do not rewrite past purchases. The legacy delivery field remains for backward compatibility but is no longer used to price new orders.

@@ -73,26 +73,27 @@ export function PaySuiteManager() {
               const f = new FormData(e.currentTarget);
               void act({
                 action: 'pricing',
+                maputo_delivery: data.pricing.maputo_delivery,
                 version: data.pricing.version,
                 enabled: f.has('enabled'),
                 ...Object.fromEntries(
-                  ['customer_design', 'team_design', 'maputo_delivery'].map(
-                    (k) => [k, Math.round(Number(f.get(k)) * 100)],
-                  ),
+                  ['customer_design', 'team_design'].map((k) => [
+                    k,
+                    Math.round(Number(f.get(k)) * 100),
+                  ]),
                 ),
               });
             }}
           >
             <h2>Preços de configuração</h2>
             <p>
-              Valores por encomenda, em MT. Design padrão incluído. Entregas
-              fora da cidade de Maputo requerem proposta.
+              Valores por encomenda, em MT. Design padrão incluído. Configure os
+              pontos e as tarifas em Produtos → Levantamento e entregas.
             </p>
             {(
               [
                 ['customer_design', 'Design do cliente'],
                 ['team_design', 'Design pela equipa'],
-                ['maputo_delivery', 'Entrega na cidade de Maputo'],
               ] as const
             ).map(([key, label]) => (
               <label key={key}>
@@ -151,6 +152,19 @@ export function PaySuiteManager() {
                       {c.city} · {c.address} · {c.contact}
                     </p>
                     <p>{c.designInstructions}</p>
+                    {c.fulfilment && (
+                      <p>
+                        Recepção:{' '}
+                        {c.fulfilment.mode === 'pickup'
+                          ? 'Levantamento · ' +
+                            c.fulfilment.point?.name +
+                            ' · ' +
+                            c.fulfilment.point?.hours
+                          : c.fulfilment.mode === 'express'
+                            ? 'Entrega expressa'
+                            : 'Entrega normal'}
+                      </p>
+                    )}
                     <p>
                       Perfil:{' '}
                       {c.profileUsername ||

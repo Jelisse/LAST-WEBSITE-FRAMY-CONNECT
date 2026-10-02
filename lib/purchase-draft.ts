@@ -4,7 +4,7 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
     const value = JSON.parse(raw || 'null');
     if (
       !value ||
-      value.version !== 1 ||
+      value.version !== 2 ||
       !Number.isFinite(value.expires) ||
       value.expires <= now ||
       value.expires > now + 1800000
@@ -14,10 +14,12 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
       !cardMaterials.includes(value.card) ||
       !keychainMaterials.includes(value.keychain) ||
       !['standard', 'customer', 'team'].includes(value.design) ||
-      !['maputo', 'other'].includes(value.delivery)
+      !['pickup', 'standard', 'express'].includes(value.delivery)
     )
       return null;
     for (const [field, maximum] of [
+      ['city', 60],
+      ['pickupPoint', 60],
       ['contact', 50],
       ['address', 300],
       ['designInstructions', 2000],
@@ -29,6 +31,8 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
       keychain: string;
       design: string;
       delivery: string;
+      city: string;
+      pickupPoint: string;
       contact: string;
       address: string;
       designInstructions: string;

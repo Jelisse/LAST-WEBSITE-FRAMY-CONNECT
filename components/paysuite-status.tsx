@@ -13,6 +13,12 @@ type Payment = {
   orderStatus?: string | null;
   profileReady?: boolean;
   receiptStatus?: string | null;
+  fulfilment?: {
+    mode: string;
+    city: string;
+    eta: string;
+    point?: { name: string; address: string; hours: string } | null;
+  } | null;
 };
 const labels: Record<string, string> = {
   creating: 'A confirmar a ligação ao prestador',
@@ -167,6 +173,30 @@ export function PaySuiteStatus() {
                       : 'A encomenda está paga. A equipa acompanhará a configuração do perfil, a produção e a entrega.'
                     : 'O período pago foi registado no seu perfil.'}
                 </p>
+              )}
+              {payment.status === 'paid' && payment.fulfilment && (
+                <div className="pickup-location">
+                  <h3>
+                    {payment.fulfilment.mode === 'pickup'
+                      ? 'O seu ponto de levantamento'
+                      : 'A sua entrega'}
+                  </h3>
+                  {payment.fulfilment.point ? (
+                    <>
+                      <strong>{payment.fulfilment.point.name}</strong>
+                      <p>{payment.fulfilment.point.address}</p>
+                      <p>{payment.fulfilment.point.hours}</p>
+                    </>
+                  ) : (
+                    <p>
+                      {payment.fulfilment.city} ·{' '}
+                      {payment.fulfilment.mode === 'express'
+                        ? 'Expresso'
+                        : 'Normal'}
+                    </p>
+                  )}
+                  <p>{payment.fulfilment.eta}</p>
+                </div>
               )}
               {payment.status === 'paid' && payment.receiptStatus && (
                 <p className="payment-next-note">
