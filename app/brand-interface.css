@@ -1,0 +1,45 @@
+/* Shared Framy UI palette, based on the supplied orange product reference. */
+:root { --framy-orange:#ee590d; --framy-orange-hover:#ff742b; --framy-ink:#28170e; }
+body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page) { --action-orange:var(--framy-orange); --action-orange-hover:var(--framy-orange-hover); --action-orange-pressed:#de4c04; }
+body :is(.site-header.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) { position:sticky; top:0; z-index:50; background:var(--framy-orange); color:var(--framy-ink); border-bottom:1px solid #c9470c; box-shadow:0 3px 16px #47241018; backdrop-filter:none; }
+body :is(.workspace-header,.manager-top,.agent-header,.staff-page > header) { min-height:72px; height:auto; padding-block:12px; }
+body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) :is(.account-menu-trigger,.breadcrumb,.agent-eyebrow,.header-contact-link,.header-agent-link) { color:var(--framy-ink); }
+.site-header.brand-topbar > nav a { color:var(--framy-ink); }
+.site-header.brand-topbar > .brand img,.panel-brand img { filter:brightness(0) invert(1); }
+.panel-brand { display:inline-flex; flex-shrink:0; align-items:center; }
+.panel-brand img { display:block; width:112px; height:46px; object-fit:contain; }
+body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) .language-selector select { color:var(--framy-ink); background:#fff; border-color:#ffffff80; }
+body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) .compact-mobile-menu > summary { color:var(--framy-ink); background:#ffffffbb; border-color:#ffffff80; }
+body .compact-mobile-panel,body .account-menu-popup { background:#fff; color:#30271f; }
+body :is(.compact-mobile-panel,.account-menu-popup) :is(a,button,summary) { color:#30271f; }
+/* Override existing primary-action recipes, including page-specific CSS. */
+body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page) :is(.btn-primary,.home-primary,.agent-primary,.manager-primary,.plan-upgrade,.security-save,.analytics-consent button:last-child,.auth-card form > button,.profile-growth-panel form > button,.growth-tabs button[aria-pressed=true],.management-suite button[aria-pressed=true],.side-buttons button[aria-pressed=true]):not(:disabled):not([aria-disabled=true]) { background:var(--framy-orange) !important; color:var(--framy-ink) !important; border-color:var(--framy-orange); }
+body :is(.workspace-header,.manager-top) .plan-upgrade:not(:disabled) { border:1px solid #28170e !important; }
+/* Feedback only on controls and genuinely clickable media, never decorative photos. */
+:where(body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page)) :is(a[href],button,summary,label:has(input[type=radio]),label:has(input[type=checkbox])) { transition:background-color .16s ease,color .16s ease,box-shadow .16s ease,outline-color .16s ease; }
+:where(body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page)) :is(a[href],button,summary):focus-visible { outline:3px solid #73300f; outline-offset:4px; }
+:where(body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page)) label:has(input:focus-visible) { outline:3px solid #73300f; outline-offset:3px; }
+@media(hover:hover) and (pointer:fine) {
+  body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page) :is(.btn-primary,.home-primary,.agent-primary,.manager-primary,.plan-upgrade,.security-save,.analytics-consent button:last-child,.auth-card form > button):hover:not(:disabled):not([aria-disabled=true]) { background:var(--framy-orange-hover) !important; box-shadow:0 4px 14px #9d3b1926; }
+  :where(body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page)) :is(button,summary):hover:not(:disabled):not([aria-disabled=true]) { box-shadow:0 0 0 2px #ee590d66; }
+  :where(body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page)) :is(label:has(input[type=radio]),label:has(input[type=checkbox])):hover:not(:has(input:disabled)) { box-shadow:0 0 0 2px #ee590d88; cursor:pointer; }
+  :where(body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page)) a[href]:hover { text-decoration:underline; text-underline-offset:4px; }
+  :where(body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page)) :is(a[href]:has(img),button:has(img)):hover { box-shadow:0 4px 16px #71371926; border-radius:8px; }
+}
+@media(max-width:760px) {
+  .panel-brand img { width:88px; height:36px; }
+  body :is(.workspace-header,.manager-top,.agent-header,.staff-page > header) { gap:10px; }
+  body .site-header.brand-topbar { padding-block:10px; }
+  .site-header.brand-topbar > nav { display:none; }
+  .site-header.brand-topbar .header-agent-link { display:none; }
+}
+@media(prefers-reduced-motion:reduce) {
+  :where(body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page)) :is(a[href],button,summary,label:has(input)) { transition:none; }
+}
+@media print { body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) { position:static; } }
+
+body :is(.agent-header,.staff-page > header) { padding-inline:20px; border-top:0; align-items:center; }
+body :is(.agent-header,.staff-page > header) p { color:var(--framy-ink); }
+
+body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) .account-menu-label { color:var(--framy-ink); }
+body:has(.brand-topbar) .auth-card > .language-selector { display:none; }

@@ -1,4 +1,6 @@
 'use client';
+import { PanelBrand } from '@/components/panel-brand';
+
 import { membershipFeatures } from '@/lib/entitlement';
 import { profilePresentation } from '@/lib/entitlement';
 import { ProfileExtrasEditor } from './profile-extras-editor';
@@ -598,6 +600,7 @@ export function Workspace({ displayName }: { displayName: string }) {
       </Sidebar>
       <SidebarInset>
         <header className="workspace-header">
+          <PanelBrand />
           <LanguageSelector />
           <div>
             <SidebarTrigger />

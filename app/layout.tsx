@@ -12,6 +12,9 @@ import './purchase-configurator.css';
 import './mobile-dashboard.css';
 import './analytics-consent.css';
 import './profile-business.css';
+import './brand-interface.css';
+import { InternalPageChrome } from '@/components/internal-page-chrome';
+import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { SiteAnalyticsTracker } from '@/components/site-analytics-tracker';
 const poppins = Poppins({
   weight: ['400', '500', '600', '700', '800'],
@@ -58,7 +61,7 @@ export default async function RootLayout({
           {t('Saltar para o conteúdo')}
         </a>
         <LanguageProvider locale={locale}>
-          {children}
+          <InternalPageChrome header={<SiteHeader focused />} footer={<SiteFooter />}>{children}</InternalPageChrome>
           <SiteAnalyticsTracker />
         </LanguageProvider>
       </body>

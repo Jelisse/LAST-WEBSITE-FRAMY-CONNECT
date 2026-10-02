@@ -8,7 +8,7 @@ import { ArrowUpRight, Mail, MessageCircle, ShieldCheck } from 'lucide-react';
 export async function SiteHeader({ focused = false }: { focused?: boolean }) {
   const t = await getTranslations();
   return (
-    <header className={`site-header${focused ? ' site-header-focused' : ''}`}>
+    <header className={`site-header brand-topbar${focused ? ' site-header-focused' : ''}`}>
       <Link href="/" className="brand">
         <Image
           width={220}

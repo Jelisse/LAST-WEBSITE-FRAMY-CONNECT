@@ -1,4 +1,6 @@
 'use client';
+import { PanelBrand } from '@/components/panel-brand';
+
 import { useI18n } from '@/components/language-provider';
 
 import { useCallback, useEffect, useState } from 'react';
@@ -113,6 +115,7 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
   return (
     <main id="main" className="agent-workspace">
       <header className="agent-header">
+          <PanelBrand />
         <DashboardTools />
         <div>
           <p className="agent-eyebrow">{t('Operações · Agente de execução')}</p>

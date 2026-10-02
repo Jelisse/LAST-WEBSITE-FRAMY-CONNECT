@@ -1,4 +1,6 @@
 'use client';
+import { PanelBrand } from '@/components/panel-brand';
+
 import { FinanceManager } from './finance-manager';
 import { SubscriptionManager } from './subscription-manager';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
@@ -388,6 +390,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
       </aside>
       <div className="manager-body">
         <header className="manager-top">
+          <PanelBrand />
           <MobileNavigation
             items={sections.map(({ id, label, icon: Icon }) => ({
               label,
