@@ -26,12 +26,11 @@ export async function HomePurchaseOffers({
   const keychains: ProductPhoto[] = published('keychain')
     ? pvcModels.map((model) => ({ id: model.id, material: 'PVC + epóxi', src: pvcPhoto(model.id), detail: model.name }))
     : [];
-  const leather: ProductPhoto[] = published('keychain-leather')
-    ? [
+  // Requested kit previews are independent of the legacy standalone leather listing.
+  const leather: ProductPhoto[] = [
         { id: 'leather-brown', material: 'Couro', src: '/products/leather/brown-full.png', detail: 'Castanho' },
         { id: 'leather-black', material: 'Couro', src: '/products/leather/black-symbol.png', detail: 'Preto' },
-      ]
-    : [];
+      ];
   const kitKeychains = [...leather, ...keychains];
   const offers: {
     id: PurchaseFormat;
