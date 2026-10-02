@@ -1916,6 +1916,7 @@ test('email reminders send only the current phase and do not resend confirmed de
     await profileReminders(env, now + 1000);
     assert.equal(sent.length, 1);
     assert.ok(sent[0].options.headers['Idempotency-Key'].endsWith(':grace'));
+    assert.ok(JSON.parse(sent[0].options.body).text.includes('https://framyconnect.co.mz/perfil?plans=1'));
     assert.equal(
       sql
         .prepare(
@@ -1989,6 +1990,24 @@ test('self-service recovery uses the registered address, conceals account existe
     assert.deepEqual((await post(recovery, { action: 'request', email: 'customer-a@example.com' })).body, known.body);
     assert.equal(sql.prepare('SELECT COUNT(*) n FROM auth_recovery').get().n, 0);
   } finally { globalThis.fetch = original; sql.close(); }
+});
+
+test('manual renewal reminders validate recipients, exclude prepaid periods and include plan links', async () => {
+  const { manualRenewal, whatsappReminderURL } = await api('lib/manual-renewal.ts');
+  const now = Date.parse('2026-10-02T12:00:00Z');
+  const m = { name: 'Cliente & exemplo', plan_id: 'personal', paid_started_at: '2026-09-05T12:00:00Z', paid_expires_at: '2026-10-05T12:00:00Z', terms_json: JSON.stringify({name:'Individual'}) };
+  const reminder = manualRenewal(m,7,now);
+  assert.equal(reminder.expired,false);
+  const url = new URL(whatsappReminderURL('+258 (84) 000-0000',reminder.message));
+  assert.equal(url.pathname,'/258840000000');
+  assert.equal(url.searchParams.get('text'),reminder.message);
+  assert.ok(reminder.message.includes('https://framyconnect.co.mz/perfil?plans=1'));
+  assert.equal(whatsappReminderURL('840000000',reminder.message),null);
+  assert.equal(whatsappReminderURL('javascript:alert(1)',reminder.message),null);
+  assert.equal(manualRenewal({...m,next_starts_at:m.paid_expires_at},7,now),null);
+  assert.equal(manualRenewal(m,2,now),null);
+  assert.equal(manualRenewal(m,7,now+10*86400000).expired,true);
+  assert.equal(manualRenewal({...m,plan_id:'free-30',trial_started_at:m.paid_started_at,trial_expires_at:m.paid_expires_at,billing_enabled:0},7,now),null);
 });
 
 test('customer recovery sends only to registered email, keeps access until redemption and revokes all old sessions', async () => {

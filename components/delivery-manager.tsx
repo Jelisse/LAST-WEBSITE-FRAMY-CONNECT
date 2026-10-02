@@ -1,4 +1,5 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 import { useEffect, useState } from 'react';
 import { MapPin, Truck, Plus, Save } from 'lucide-react';
 import type {
@@ -7,6 +8,7 @@ import type {
   PickupPoint,
 } from '@/lib/fulfilment';
 export function DeliveryManager() {
+  const { t } = useI18n();
   const [settings, setSettings] = useState<FulfilmentSettings | null>(null),
     [version, setVersion] = useState(0),
     [cityId, setCityId] = useState('maputo'),
@@ -74,11 +76,13 @@ export function DeliveryManager() {
       <div className="suite-toolbar">
         <div>
           <h2>
-            <Truck size={22} aria-hidden="true" /> Levantamento e entregas
+            <Truck size={22} aria-hidden="true" />{' '}
+            {t(' Levantamento e entregas ')}
           </h2>
           <p>
-            Defina cidades, pontos de levantamento e tarifas. Os valores são por
-            encomenda, em MT.
+            {t(
+              ' Defina cidades, pontos de levantamento e tarifas. Os valores são por encomenda, em MT. ',
+            )}
           </p>
         </div>
         <button
@@ -89,10 +93,10 @@ export function DeliveryManager() {
             void load().catch((e) => setError(e.message));
           }}
         >
-          Actualizar definições
+          {t(' Actualizar definições ')}
         </button>
       </div>
-      {error && <p role="alert">{error}</p>}
+      {error && <p role="alert">{t(error)}</p>}
       {message && <output>{message}</output>}
       {settings && (
         <form
@@ -127,10 +131,10 @@ export function DeliveryManager() {
           }}
         >
           <fieldset disabled={busy}>
-            <legend>Cidades de recepção</legend>
+            <legend>{t('Cidades de recepção')}</legend>
             <div className="suite-toolbar">
               <label>
-                Cidade a configurar
+                {t(' Cidade a configurar ')}
                 <select
                   value={cityId}
                   onChange={(e) => setCityId(e.target.value)}
@@ -138,7 +142,7 @@ export function DeliveryManager() {
                   {settings.cities.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
-                      {c.active ? '' : ' · oculta'}
+                      {t(c.active ? '' : ' · oculta')}
                     </option>
                   ))}
                 </select>
@@ -169,13 +173,13 @@ export function DeliveryManager() {
                   setCityId(id);
                 }}
               >
-                <Plus size={16} aria-hidden="true" /> Adicionar cidade
+                <Plus size={16} aria-hidden="true" /> {t(' Adicionar cidade ')}
               </button>
             </div>
             {city && (
               <>
                 <label>
-                  Nome da cidade
+                  {t(' Nome da cidade ')}
                   <input
                     required
                     maxLength={80}
@@ -189,11 +193,11 @@ export function DeliveryManager() {
                     checked={city.active}
                     onChange={(e) => updateCity({ active: e.target.checked })}
                   />
-                  Mostrar esta cidade no checkout
+                  {t(' Mostrar esta cidade no checkout ')}
                 </label>
                 <div className="suite-grid">
                   <fieldset>
-                    <legend>Entrega normal</legend>
+                    <legend>{t('Entrega normal')}</legend>
                     <label className="suite-check">
                       <input
                         type="checkbox"
@@ -202,10 +206,10 @@ export function DeliveryManager() {
                           updateCity({ standardEnabled: e.target.checked })
                         }
                       />
-                      Disponível nesta cidade
+                      {t(' Disponível nesta cidade ')}
                     </label>
                     <label>
-                      Tarifa (MT)
+                      {t(' Tarifa (MT) ')}
                       <input
                         type="number"
                         min="0"
@@ -219,7 +223,7 @@ export function DeliveryManager() {
                       />
                     </label>
                     <label>
-                      Zona abrangida / bairros
+                      {t(' Zona abrangida / bairros ')}
                       <input
                         required={city.standardEnabled}
                         maxLength={300}
@@ -228,7 +232,7 @@ export function DeliveryManager() {
                       />
                     </label>
                     <label>
-                      Prazo após preparação
+                      {t(' Prazo após preparação ')}
                       <input
                         required
                         maxLength={200}
@@ -238,7 +242,7 @@ export function DeliveryManager() {
                     </label>
                   </fieldset>
                   <fieldset>
-                    <legend>Entrega expressa</legend>
+                    <legend>{t('Entrega expressa')}</legend>
                     <label className="suite-check">
                       <input
                         type="checkbox"
@@ -247,16 +251,16 @@ export function DeliveryManager() {
                           updateCity({ expressEnabled: e.target.checked })
                         }
                       />
-                      Oferecer esta opção
+                      {t(' Oferecer esta opção ')}
                     </label>
                     <label>
-                      Tarifa acordada (MT)
+                      {t(' Tarifa acordada (MT) ')}
                       <input
                         type="number"
                         min="0"
                         max="100000"
                         step="0.01"
-                        placeholder="Em branco: sob cotação"
+                        placeholder={t('Em branco: sob cotação')}
                         value={
                           city.expressFee === null ? '' : city.expressFee / 100
                         }
@@ -271,11 +275,12 @@ export function DeliveryManager() {
                       />
                     </label>
                     <small>
-                      Deixe em branco enquanto o parceiro não confirmar o preço.
-                      Não é uma cotação automática da Yango.
+                      {t(
+                        ' Deixe em branco enquanto o parceiro não confirmar o preço. Não é uma cotação automática da Yango. ',
+                      )}
                     </small>
                     <label>
-                      Condições e horário-limite
+                      {t(' Condições e horário-limite ')}
                       <input
                         required
                         maxLength={300}
@@ -288,12 +293,14 @@ export function DeliveryManager() {
                   </fieldset>
                 </div>
                 <h3>
-                  <MapPin size={20} aria-hidden="true" /> Pontos de levantamento
-                  · {city.name}
+                  <MapPin size={20} aria-hidden="true" />{' '}
+                  {t(' Pontos de levantamento · ')}
+                  {city.name}
                 </h3>
                 <p>
-                  O levantamento é gratuito. Desactive um ponto para o retirar
-                  das novas compras.
+                  {t(
+                    ' O levantamento é gratuito. Desactive um ponto para o retirar das novas compras. ',
+                  )}
                 </p>
                 {settings.points
                   .filter((p) => p.cityId === cityId)
@@ -301,7 +308,7 @@ export function DeliveryManager() {
                     <fieldset key={p.id}>
                       <legend>{p.name}</legend>
                       <label>
-                        Nome do ponto
+                        {t(' Nome do ponto ')}
                         <input
                           required
                           maxLength={100}
@@ -312,7 +319,7 @@ export function DeliveryManager() {
                         />
                       </label>
                       <label>
-                        Endereço e referência
+                        {t(' Endereço e referência ')}
                         <input
                           required
                           maxLength={500}
@@ -323,7 +330,7 @@ export function DeliveryManager() {
                         />
                       </label>
                       <label>
-                        Horário / instruções
+                        {t(' Horário / instruções ')}
                         <input
                           required
                           maxLength={200}
@@ -341,7 +348,7 @@ export function DeliveryManager() {
                             updatePoint(p.id, { active: e.target.checked })
                           }
                         />
-                        Ponto disponível para levantamento
+                        {t(' Ponto disponível para levantamento ')}
                       </label>
                     </fieldset>
                   ))}
@@ -364,15 +371,15 @@ export function DeliveryManager() {
                     })
                   }
                 >
-                  <Plus size={16} aria-hidden="true" /> Adicionar ponto nesta
-                  cidade
+                  <Plus size={16} aria-hidden="true" />{' '}
+                  {t(' Adicionar ponto nesta cidade ')}
                 </button>
               </>
             )}
           </fieldset>
           <button type="submit" disabled={busy}>
             <Save size={17} aria-hidden="true" />
-            {busy ? 'A guardar…' : 'Guardar levantamento e entregas'}
+            {t(busy ? 'A guardar…' : 'Guardar levantamento e entregas')}
           </button>
         </form>
       )}

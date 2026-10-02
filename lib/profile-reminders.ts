@@ -4,6 +4,7 @@ import {
   type ReminderSettings,
 } from './subscription-settings';
 import { profileAccess, expiryDate, type Membership } from './entitlement';
+import { renewalLink } from './manual-renewal';
 type ReminderEnv = {
   DB: D1Database;
   RESEND_API_KEY?: string;
@@ -27,6 +28,7 @@ export async function profileReminders(env: ReminderEnv, now = Date.now()) {
     message: string;
   }[] = [];
   for (const m of rows.results) {
+    if (m.next_starts_at) continue;
     const expiry = expiryDate(m);
     if (!expiry) continue;
     const remaining = Date.parse(expiry) - now,
@@ -52,6 +54,7 @@ export async function profileReminders(env: ReminderEnv, now = Date.now()) {
       phase === 'basic'
         ? 'Os seus dados continuam guardados. O perfil público mostra o nome, a fotografia e um contacto. Renove na sua conta para recuperar as funcionalidades.'
         : `O período termina em ${expiry.slice(0, 10)}. Não existe renovação automática. Depois tem 7 dias de tolerância; a seguir o perfil mostra apenas o contacto básico. Renove na sua conta Framy Connect.`;
+    message += ` Consulte os pacotes e renove: ${renewalLink(env.PUBLIC_SITE_URL)}`;
     if (phase === '7' || phase === '1') {
       let terms: { name?: string; billingCycle?: string } = {};
       try {
@@ -66,11 +69,7 @@ export async function profileReminders(env: ReminderEnv, now = Date.now()) {
         data_fim: new Date(expiry).toLocaleDateString('pt-MZ', {
           timeZone: 'Africa/Maputo',
         }),
-        link_renovacao:
-          (env.PUBLIC_SITE_URL ?? 'https://framyconnect.co.mz').replace(
-            /\/$/,
-            '',
-          ) + '/perfil?plans=1',
+        link_renovacao: renewalLink(env.PUBLIC_SITE_URL),
       };
       subject = renderReminder(settings.subject, values);
       message = renderReminder(settings.message, values);

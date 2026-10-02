@@ -1,4 +1,5 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 import Link from '@/components/hard-link';
 import { useEffect, useState } from 'react';
 import { checkoutURL } from '@/lib/paysuite';
@@ -28,6 +29,7 @@ const labels: Record<string, string> = {
   review: 'Pagamento em revisão pela equipa',
 };
 export function PaySuiteStatus() {
+  const { t } = useI18n();
   const [payment, setPayment] = useState<Payment | null>(null),
     [payments, setPayments] = useState<Payment[]>([]),
     [error, setError] = useState(''),
@@ -95,17 +97,17 @@ export function PaySuiteStatus() {
     <section
       className={`panel payment-result ${payment?.status === 'paid' ? 'is-paid' : ''}`}
     >
-      <h1>Estado do pagamento</h1>
+      <h1>{t('Estado do pagamento')}</h1>
       {signin ? (
         <Link href={'/entrar?return_to=' + encodeURIComponent(returnTo)}>
-          Entre para consultar os seus pagamentos
+          {t(' Entre para consultar os seus pagamentos ')}
         </Link>
       ) : (
         <>
-          {error && <p role="alert">{error}</p>}
-          {!loaded && <output>A consultar o estado…</output>}
+          {error && <p role="alert">{t(error)}</p>}
+          {!loaded && <output>{t('A consultar o estado…')}</output>}
           {loaded && !error && !payment && payments.length === 0 && (
-            <p>Ainda não tem pagamentos registados.</p>
+            <p>{t('Ainda não tem pagamentos registados.')}</p>
           )}
           {payment ? (
             <>
@@ -117,69 +119,82 @@ export function PaySuiteStatus() {
                 )}
               </div>
               <h2 aria-live="polite">
-                {labels[payment.status] ?? payment.status}
+                {t(labels[payment.status] ?? payment.status)}
               </h2>
               <p>
                 {(payment.amount / 100).toLocaleString('pt-MZ', {
                   minimumFractionDigits: 2,
                 })}{' '}
-                MT ·{' '}
-                {payment.kind === 'product'
-                  ? 'Produtos'
-                  : payment.cycle === 'annual'
-                    ? 'Perfil · um ano'
-                    : 'Perfil · um mês'}
+                {t(' MT ·')}{' '}
+                {t(
+                  payment.kind === 'product'
+                    ? 'Produtos'
+                    : payment.cycle === 'annual'
+                      ? 'Perfil · um ano'
+                      : 'Perfil · um mês',
+                )}
               </p>
               {payment.status === 'paid' && payment.kind === 'product' && (
                 <div className="payment-profile-next">
                   <span className="eyebrow">
-                    PRÓXIMO PASSO · PERFIL DIGITAL
+                    {t(' PRÓXIMO PASSO · PERFIL DIGITAL ')}
                   </span>
                   <h3>
-                    {payment.profileReady
-                      ? 'O seu perfil já está publicado'
-                      : 'Agora, prepare o seu perfil'}
+                    {t(
+                      payment.profileReady
+                        ? 'O seu perfil já está publicado'
+                        : 'Agora, prepare o seu perfil',
+                    )}
                   </h3>
                   <p>
-                    {payment.profileReady
-                      ? 'Pode rever os seus contactos e links. O produto fica associado ao perfil da sua conta.'
-                      : 'Adicione a sua fotografia, os contactos e os links que quer partilhar. Ao publicar, o perfil fica ligado à sua encomenda.'}
+                    {t(
+                      payment.profileReady
+                        ? 'Pode rever os seus contactos e links. O produto fica associado ao perfil da sua conta.'
+                        : 'Adicione a sua fotografia, os contactos e os links que quer partilhar. Ao publicar, o perfil fica ligado à sua encomenda.',
+                    )}
                   </p>
                   <Link
                     className="btn btn-primary"
                     href={'/perfil?pagamento=' + encodeURIComponent(payment.id)}
                   >
-                    {payment.profileReady
-                      ? 'Continuar a configurar o perfil'
-                      : 'Continuar: criar e configurar perfil'}{' '}
+                    {t(
+                      payment.profileReady
+                        ? 'Continuar a configurar o perfil'
+                        : 'Continuar: criar e configurar perfil',
+                    )}{' '}
                     <ArrowRight size={18} aria-hidden="true" />
                   </Link>
                   <p className="payment-next-note">
-                    Pode continuar mais tarde na sua conta. Não precisa de
-                    repetir o pagamento.
+                    {t(
+                      ' Pode continuar mais tarde na sua conta. Não precisa de repetir o pagamento. ',
+                    )}
                   </p>
                 </div>
               )}
               {url && payment.status === 'pending' && (
                 <a className="btn btn-primary" href={url}>
-                  Pagar na PaySuite
+                  {t(' Pagar na PaySuite ')}
                 </a>
               )}
               {payment.status === 'paid' && (
                 <p>
-                  {payment.kind === 'product'
-                    ? payment.orderStatus === 'fulfilled'
-                      ? 'Entrega confirmada pela equipa.'
-                      : 'A encomenda está paga. A equipa acompanhará a configuração do perfil, a produção e a entrega.'
-                    : 'O período pago foi registado no seu perfil.'}
+                  {t(
+                    payment.kind === 'product'
+                      ? payment.orderStatus === 'fulfilled'
+                        ? 'Entrega confirmada pela equipa.'
+                        : 'A encomenda está paga. A equipa acompanhará a configuração do perfil, a produção e a entrega.'
+                      : 'O período pago foi registado no seu perfil.',
+                  )}
                 </p>
               )}
               {payment.status === 'paid' && payment.fulfilment && (
                 <div className="pickup-location">
                   <h3>
-                    {payment.fulfilment.mode === 'pickup'
-                      ? 'O seu ponto de levantamento'
-                      : 'A sua entrega'}
+                    {t(
+                      payment.fulfilment.mode === 'pickup'
+                        ? 'O seu ponto de levantamento'
+                        : 'A sua entrega',
+                    )}
                   </h3>
                   {payment.fulfilment.point ? (
                     <>
@@ -190,9 +205,11 @@ export function PaySuiteStatus() {
                   ) : (
                     <p>
                       {payment.fulfilment.city} ·{' '}
-                      {payment.fulfilment.mode === 'express'
-                        ? 'Expresso'
-                        : 'Normal'}
+                      {t(
+                        payment.fulfilment.mode === 'express'
+                          ? 'Expresso'
+                          : 'Normal',
+                      )}
                     </p>
                   )}
                   <p>{payment.fulfilment.eta}</p>
@@ -200,25 +217,33 @@ export function PaySuiteStatus() {
               )}
               {payment.status === 'paid' && payment.receiptStatus && (
                 <p className="payment-next-note">
-                  {payment.receiptStatus === 'sent'
-                    ? 'O comprovativo foi enviado para o email da sua conta. Verifique também a pasta de spam.'
-                    : payment.receiptStatus === 'review'
-                      ? 'O pagamento está confirmado. Contacte a equipa se ainda não recebeu o comprovativo por email.'
-                      : 'O comprovativo de pagamento está a ser preparado para envio ao email da sua conta.'}
+                  {t(
+                    payment.receiptStatus === 'sent'
+                      ? 'O comprovativo foi enviado para o email da sua conta. Verifique também a pasta de spam.'
+                      : payment.receiptStatus === 'review'
+                        ? 'O pagamento está confirmado. Contacte a equipa se ainda não recebeu o comprovativo por email.'
+                        : 'O comprovativo de pagamento está a ser preparado para envio ao email da sua conta.',
+                  )}
                 </p>
               )}
               {payment.status === 'creating' && (
                 <p>
-                  Não crie outro pedido. A equipa verificará este pedido no
-                  prestador.
+                  {t(
+                    ' Não crie outro pedido. A equipa verificará este pedido no prestador. ',
+                  )}
                 </p>
               )}
               {payment.status === 'review' && (
                 <p>
-                  Não volte a pagar. Contacte a equipa com a referência abaixo.
+                  {t(
+                    ' Não volte a pagar. Contacte a equipa com a referência abaixo. ',
+                  )}
                 </p>
               )}
-              <p>Referência: {payment.id}</p>
+              <p>
+                {t('Referência: ')}
+                {payment.id}
+              </p>
             </>
           ) : (
             payments.map((p) => (
@@ -226,8 +251,9 @@ export function PaySuiteStatus() {
                 <a
                   href={'/checkout/retorno?payment=' + encodeURIComponent(p.id)}
                 >
-                  {(p.amount / 100).toFixed(2)} MT · {labels[p.status]} ·{' '}
-                  {p.orderStatus === 'fulfilled' ? 'Entregue · ' : ''}
+                  {(p.amount / 100).toFixed(2)} {t(' MT · ')}
+                  {t(labels[p.status])} ·{' '}
+                  {t(p.orderStatus === 'fulfilled' ? 'Entregue · ' : '')}
                   {p.id.slice(0, 8)}
                 </a>
               </p>
@@ -235,11 +261,11 @@ export function PaySuiteStatus() {
           )}
           <p>
             <button className="btn" onClick={() => location.reload()}>
-              Actualizar
+              {t(' Actualizar ')}
             </button>
           </p>
-          <Link href="/perfil">O meu perfil</Link> ·{' '}
-          <Link href="/contacto">Contactar a equipa</Link>
+          <Link href="/perfil">{t('O meu perfil')}</Link> ·{' '}
+          <Link href="/contacto">{t('Contactar a equipa')}</Link>
         </>
       )}
     </section>

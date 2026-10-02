@@ -52,6 +52,39 @@ const { ProfileHandoff } = (await module('components/profile-handoff.tsx'))
   .exports;
 const { translator, validLocale } = i18n.exports;
 const { LanguageProvider, LanguageSelector } = language.exports;
+const { localizedResponse } = (await module('lib/localized-response.ts', {
+  './i18n': i18n.url,
+})).exports;
+const { PasswordInput } = (await module('components/password-input.tsx', {
+  './language-provider': language.url,
+})).exports;
+
+test('password visibility is an accessible non-submit control and starts hidden in each locale', () => {
+  for (const locale of ['pt-MZ', 'en', 'zh-Hant']) {
+    const html = renderToStaticMarkup(React.createElement(LanguageProvider, { locale },
+      React.createElement(PasswordInput, { id: 'password', name: 'password', autoComplete: 'current-password' })));
+    assert.match(html, /type="password"/);
+    assert.match(html, /type="button"/);
+    assert.match(html, /aria-controls="password"/);
+    assert.match(html, /aria-pressed="false"/);
+    assert.ok(html.includes(translator(locale)('Mostrar palavra-passe')));
+  }
+});
+
+test('API errors follow the selected locale without changing protocol or customer data', async () => {
+  for (const locale of ['en', 'zh-Hant']) {
+    const request = new Request('https://example.com/api/example', { headers: { cookie: `framy-language=${locale}` } });
+    const response = await localizedResponse(request, Response.json({ error: 'Não foi possível enviar.', status: 'pending', name: 'Ana' }, { status: 400, headers: { 'Set-Cookie': 'example=1; HttpOnly' } }));
+    assert.equal(response.status, 400);
+    assert.equal(response.headers.get('Content-Language'), locale);
+    assert.equal(response.headers.get('Set-Cookie'), 'example=1; HttpOnly');
+    assert.deepEqual(await response.json(), { error: translator(locale)('Não foi possível enviar.'), status: 'pending', name: 'Ana' });
+    const successful = Response.json({ biography: 'Não foi possível enviar.' });
+    assert.equal(await localizedResponse(request, successful), successful);
+    const plain = new Response('Unavailable', { status: 503 });
+    assert.equal(await localizedResponse(request, plain), plain);
+  }
+});
 test('locale validation, system notices and parameter interpolation preserve data', () => {
   assert.equal(validLocale('zh-Hant'), 'zh-Hant');
   assert.equal(validLocale('<script>'), 'pt-MZ');

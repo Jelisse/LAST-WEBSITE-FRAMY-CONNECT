@@ -4620,5 +4620,2593 @@
   "Cartão NFC": [
     "NFC card",
     "NFC 卡片"
+  ],
+  "Não foi possível concluir.": [
+    "Unable to complete the request.",
+    "無法完成要求。"
+  ],
+  "Registo guardado. Este registo não executa transferências nem emite documentos fiscais.": [
+    "Record saved. This does not transfer funds or issue tax documents.",
+    "記錄已儲存。此操作不會轉帳或開立稅務文件。"
+  ],
+  "Gestão financeira": [
+    "Financial management",
+    "財務管理"
+  ],
+  "Resumo e gráficos": [
+    "Summary and charts",
+    "摘要與圖表"
+  ],
+  "Reconciliação e despesas": [
+    "Reconciliation and expenses",
+    "對帳與支出"
+  ],
+  "Diário e razão": [
+    "Journal and ledger",
+    "日記帳與分類帳"
+  ],
+  "Exportação": [
+    "Export",
+    "匯出"
+  ],
+  "Controlo de gestão em MZN · datas de Maputo · facturas emitidas num sistema externo. Sem cálculo automático de ISPC até validação do enquadramento fiscal.": [
+    "Management reporting in MZN · Maputo dates · invoices issued externally. ISPC is not calculated automatically until the applicable tax treatment is confirmed.",
+    "管理報表使用 MZN 及馬普托日期，發票由外部系統開立。確認適用稅制前不會自動計算 ISPC。"
+  ],
+  "A carregar movimentos…": [
+    "Loading transactions…",
+    "正在載入交易…"
+  ],
+  "Liquidações registadas": [
+    "Recorded settlements",
+    "已記錄的結算"
+  ],
+  "Recebimentos por actividade": [
+    "Receipts by activity",
+    "按業務分類的收款"
+  ],
+  "Produtos físicos": [
+    "Physical products",
+    "實體產品"
+  ],
+  "Subscrições digitais": [
+    "Digital subscriptions",
+    "數位訂閱"
+  ],
+  "Sem pagamentos confirmados neste período.": [
+    "No confirmed payments in this period.",
+    "此期間沒有已確認的付款。"
+  ],
+  "Recebimentos por mês": [
+    "Monthly receipts",
+    "每月收款"
+  ],
+  "Sem dados no período escolhido.": [
+    "No data for the selected period.",
+    "所選期間沒有資料。"
+  ],
+  "Como interpretar os valores": [
+    "Understanding the figures",
+    "如何解讀數據"
+  ],
+  "Recebimentos usam a data de confirmação do pagamento. Subscrições são reconhecidas proporcionalmente ao período de serviço; produtos, na entrega registada. A receita apresentada é bruta, antes de ajustar devoluções e impostos.": [
+    "Receipts use the payment confirmation date. Subscription revenue is recognized over the service period; product revenue on recorded delivery. Revenue is gross, before returns and tax adjustments.",
+    "收款按付款確認日期記錄。訂閱收入按服務期間分攤，產品收入按交付記錄確認。所示收入未扣除退貨及稅務調整。"
+  ],
+  "Taxas, liquidações, despesas e reembolsos manuais só entram após registo com comprovativo. Valores em falta não significam custo zero. Este painel não apresenta lucro líquido nem substitui as demonstrações do contabilista.": [
+    "Fees, settlements, expenses and manual refunds appear only after recording supporting evidence. Missing figures do not mean zero cost. This dashboard does not show net profit or replace your accountant's statements.",
+    "費用、結算、支出與手動退款須附憑證登錄。缺少數值不表示零成本。此面板不顯示淨利，也不能取代會計報表。"
+  ],
+  "Existem produtos pagos sem data de entrega registada: a respectiva receita ainda não foi reconhecida neste relatório.": [
+    "Some paid products have no recorded delivery date; their revenue has not yet been recognized here.",
+    "部分已付款產品尚無交付日期，相關收入尚未列入本報表。"
+  ],
+  "Vendas e documentos externos": [
+    "Sales and external documents",
+    "銷售與外部文件"
+  ],
+  "Cliente ou referência": [
+    "Customer or reference",
+    "客戶或參考編號"
+  ],
+  "Tipo de operação": [
+    "Transaction type",
+    "交易類型"
+  ],
+  "Todas as actividades": [
+    "All activities",
+    "所有業務"
+  ],
+  "Subscrições": [
+    "Subscriptions",
+    "訂閱"
+  ],
+  "Cliente / operação": [
+    "Customer / transaction",
+    "客戶／交易"
+  ],
+  "Recebido em": [
+    "Received on",
+    "收款日期"
+  ],
+  "Documento": [
+    "Document",
+    "文件"
+  ],
+  "Acção": [
+    "Action",
+    "操作"
+  ],
+  "Não confirmado": [
+    "Unconfirmed",
+    "尚未確認"
+  ],
+  "Associar factura": [
+    "Link invoice",
+    "連結發票"
+  ],
+  "Sem movimentos para estes filtros.": [
+    "No transactions match these filters.",
+    "沒有符合篩選條件的交易。"
+  ],
+  "Documento externo ·": [
+    "External document ·",
+    "外部文件 ·"
+  ],
+  "Factura": [
+    "Invoice",
+    "發票"
+  ],
+  "Factura-recibo": [
+    "Invoice and receipt",
+    "發票暨收據"
+  ],
+  "Nota de crédito": [
+    "Credit note",
+    "貸項通知單"
+  ],
+  "Referência emitida no sistema externo": [
+    "Reference issued by the external system",
+    "外部系統開立的參考編號"
+  ],
+  "Data de emissão": [
+    "Issue date",
+    "開立日期"
+  ],
+  "Notas": [
+    "Notes",
+    "備註"
+  ],
+  "Guardar referência": [
+    "Save reference",
+    "儲存參考編號"
+  ],
+  "Saldo por reconciliar no prestador": [
+    "Provider balance to reconcile",
+    "待與服務商核對的餘額"
+  ],
+  "Recebido": [
+    "Received",
+    "已收款"
+  ],
+  "Taxas / reembolsos / liquidações": [
+    "Fees / refunds / settlements",
+    "費用／退款／結算"
+  ],
+  "Saldo global desde o início. Um saldo negativo exige revisão, por exemplo após um reembolso posterior à liquidação.": [
+    "Overall balance since inception. A negative balance needs review, for example after a refund following settlement.",
+    "此為開始至今的總餘額。負數餘額需核查，例如結算後退款。"
+  ],
+  "Registar movimento comprovado": [
+    "Record a verified transaction",
+    "登錄已核實交易"
+  ],
+  "Registe aqui movimentos já realizados. Este formulário não executa reembolsos nem transferências.": [
+    "Record completed transactions here. This form does not execute refunds or transfers.",
+    "請在此登錄已完成的交易。此表格不會執行退款或轉帳。"
+  ],
+  "Pagamento associado": [
+    "Related payment",
+    "相關付款"
+  ],
+  "Seleccione": [
+    "Select",
+    "請選擇"
+  ],
+  "Registo a estornar": [
+    "Record to reverse",
+    "要沖銷的記錄"
+  ],
+  "Valor (MT)": [
+    "Amount (MT)",
+    "金額（MT）"
+  ],
+  "Data efectiva": [
+    "Effective date",
+    "生效日期"
+  ],
+  "Referência única do comprovativo": [
+    "Unique receipt reference",
+    "憑證唯一編號"
+  ],
+  "Descrição / motivo": [
+    "Description / reason",
+    "說明／原因"
+  ],
+  "Verifiquei o movimento e o comprovativo.": [
+    "I verified the transaction and supporting evidence.",
+    "我已核實交易及憑證。"
+  ],
+  "Movimentos registados": [
+    "Recorded transactions",
+    "已登錄交易"
+  ],
+  "Referência": [
+    "Reference",
+    "參考編號"
+  ],
+  "Diário de gestão e razão por conta": [
+    "Management journal and account ledger",
+    "管理日記帳與各科目分類帳"
+  ],
+  "Débitos e créditos de gestão. O contabilista classifica reembolsos, despesas e impostos no sistema externo; não são contas fiscais oficiais.": [
+    "Management debits and credits. Your accountant classifies refunds, expenses and taxes externally; these are not official tax accounts.",
+    "此為管理用途的借貸記錄。退款、支出與稅項由會計於外部系統分類，並非正式稅務帳目。"
+  ],
+  "Débitos": [
+    "Debits",
+    "借方"
+  ],
+  "Créditos": [
+    "Credits",
+    "貸方"
+  ],
+  "Saldo do período": [
+    "Period balance",
+    "本期餘額"
+  ],
+  "Débito": [
+    "Debit",
+    "借方"
+  ],
+  "Crédito": [
+    "Credit",
+    "貸方"
+  ],
+  "Exportação para o contabilista": [
+    "Export for your accountant",
+    "匯出給會計"
+  ],
+  "Ficheiros CSV compatíveis com Excel, valores em meticais e datas de Maputo. Período:": [
+    "Excel-compatible CSV files, amounts in meticais and Maputo dates. Period:",
+    "與 Excel 相容的 CSV，金額使用梅蒂卡爾及馬普托日期。期間："
+  ],
+  "Resumo do período": [
+    "Period summary",
+    "期間摘要"
+  ],
+  "Despesas e reconciliação": [
+    "Expenses and reconciliation",
+    "支出與對帳"
+  ],
+  "Diário de gestão": [
+    "Management journal",
+    "管理日記帳"
+  ],
+  "Fecho dos registos de gestão": [
+    "Close management records",
+    "管理記錄結帳"
+  ],
+  "Fechado até:": [
+    "Closed through:",
+    "已結帳至："
+  ],
+  "Nenhum período": [
+    "No period",
+    "尚無期間"
+  ],
+  ". Impede novos movimentos manuais e alterações a documentos nos períodos fechados. Correcções por estorno ficam no período aberto; o fecho não interrompe confirmações automáticas do prestador.": [
+    ". Closed periods prevent new manual transactions and document changes. Reversals are recorded in the open period; closing does not stop automatic provider confirmations.",
+    "。已結帳期間禁止新增手動交易或更改文件。沖銷記於開放期間；結帳不影響服務商的自動確認。"
+  ],
+  "Último dia do mês a fechar": [
+    "Last day of the month to close",
+    "要結帳月份的最後一天"
+  ],
+  "Revi e exportei os movimentos. Compreendo que este fecho não pode ser desfeito neste painel.": [
+    "I reviewed and exported the transactions. I understand this closing cannot be undone here.",
+    "我已核查並匯出交易，並了解無法在此面板撤銷結帳。"
+  ],
+  "Fechar período de gestão": [
+    "Close management period",
+    "結束管理期間"
+  ],
+  "Os ficheiros incluem dados de clientes: partilhe apenas com quem trata da contabilidade. Os valores não constituem uma declaração de ISPC nem um ficheiro fiscal certificado.": [
+    "Files contain customer data: share only with those handling accounting. These figures are not an ISPC return or a certified tax file.",
+    "檔案含客戶資料，僅供會計人員使用。數值並非 ISPC 申報或認證稅務檔案。"
+  ],
+  "Plano e renovação": [
+    "Plan and renewal",
+    "方案與續訂"
+  ],
+  "Caixa de entrada": [
+    "Inbox",
+    "收件匣"
+  ],
+  "Pedidos de informação": [
+    "Enquiries",
+    "詢問"
+  ],
+  "Mensagens dos visitantes do seu perfil, conservadas por 90 dias. Responda pelo seu email; a Framy não responde automaticamente. Não envie dados sensíveis.": [
+    "Messages from profile visitors are kept for 90 days. Reply using your email; Framy does not reply automatically. Do not send sensitive data.",
+    "訪客訊息保留 90 天。請使用電郵回覆，Framy 不會自動回覆。請勿傳送敏感資料。"
+  ],
+  "Ainda não recebeu mensagens. Active o formulário no editor e publique o perfil.": [
+    "No messages yet. Enable the form in the editor and publish your profile.",
+    "尚未收到訊息。請在編輯器啟用表格並發佈個人檔案。"
+  ],
+  "Concluída": [
+    "Completed",
+    "已完成"
+  ],
+  "Responder a": [
+    "Reply to",
+    "回覆"
+  ],
+  "Marcar como lida": [
+    "Mark as read",
+    "標示為已讀"
+  ],
+  "Concluir": [
+    "Complete",
+    "完成"
+  ],
+  "Eliminar": [
+    "Delete",
+    "刪除"
+  ],
+  "A mensagem será eliminada permanentemente.": [
+    "The message will be permanently deleted.",
+    "訊息將永久刪除。"
+  ],
+  "Confirmar eliminação": [
+    "Confirm deletion",
+    "確認刪除"
+  ],
+  "A sua equipa": [
+    "Your team",
+    "您的團隊"
+  ],
+  "membros ·": [
+    "members ·",
+    "位成員 ·"
+  ],
+  "convites pendentes ·": [
+    "pending invitations ·",
+    "個待處理邀請 ·"
+  ],
+  "lugares disponíveis de 25.": [
+    "available places out of 25.",
+    "個可用名額，共 25 個。"
+  ],
+  "A criação de equipas e convites requer um plano com gestão de equipa. Pode aceitar convites e gerir as suas participações.": [
+    "Creating teams and invitations requires a plan with team management. You can accept invitations and manage your memberships.",
+    "建立團隊及邀請需要含團隊管理的方案。您仍可接受邀請及管理團隊成員資格。"
+  ],
+  "Até 25 pessoas. Cada pessoa mantém a sua conta, plano e contactos privados. A equipa vê o nome, link e estado de publicação e pode aplicar uma cor de marca após aceitação.": [
+    "Up to 25 people. Each keeps their account, plan and private contacts. The team sees their name, link and publication status and can apply a brand colour after consent.",
+    "最多 25 人。每人保有自己的帳戶、方案及私人聯絡資料。團隊可查看姓名、連結與發佈狀態，並在同意後套用品牌色。"
+  ],
+  "Convite:": [
+    "Invitation:",
+    "邀請："
+  ],
+  "Autorizo esta equipa a ver o estado do meu perfil e a alterar a cor nos rascunhos e no perfil publicado.": [
+    "I allow this team to view my profile status and change the colour of drafts and my published profile.",
+    "我允許此團隊查看檔案狀態，並修改草稿及已發佈檔案的顏色。"
+  ],
+  "Aceitar convite": [
+    "Accept invitation",
+    "接受邀請"
+  ],
+  "Sair da equipa": [
+    "Leave team",
+    "退出團隊"
+  ],
+  "Nome da equipa": [
+    "Team name",
+    "團隊名稱"
+  ],
+  "Criar equipa": [
+    "Create team",
+    "建立團隊"
+  ],
+  "Email da pessoa": [
+    "Person's email",
+    "對方的電郵"
+  ],
+  "Criar convite": [
+    "Create invitation",
+    "建立邀請"
+  ],
+  "O convite aparece na conta com este email, em Ferramentas do perfil → A minha equipa. Expira em 7 dias. Não enviamos emails de convite automaticamente.": [
+    "The invitation appears in the account with this email under Profile tools → My team. It expires in 7 days. Invitation emails are not sent automatically.",
+    "邀請會出現在此電郵帳戶的「檔案工具 → 我的團隊」，7 天後到期。系統不會自動發送邀請電郵。"
+  ],
+  "· convite pendente": [
+    "· invitation pending",
+    "· 邀請待處理"
+  ],
+  "Revogar": [
+    "Revoke",
+    "撤銷"
+  ],
+  "Ver perfil ↗": [
+    "View profile ↗",
+    "查看檔案 ↗"
+  ],
+  "Perfil não publicado": [
+    "Profile not published",
+    "檔案尚未發佈"
+  ],
+  "Cor da marca": [
+    "Brand colour",
+    "品牌顏色"
+  ],
+  "Aplicar ao perfil": [
+    "Apply to profile",
+    "套用至檔案"
+  ],
+  "Remover da equipa": [
+    "Remove from team",
+    "移出團隊"
+  ],
+  "O seu domínio, o seu perfil": [
+    "Your domain, your profile",
+    "您的網域，您的檔案"
+  ],
+  "Ligue um subdomínio que já possui, por exemplo perfil.suaempresa.co.mz. Incluído no plano Profissional; o registo do domínio é pago ao seu fornecedor.": [
+    "Connect a subdomain you own, such as profile.yourcompany.co.mz. Included in Professional; domain registration is paid to your provider.",
+    "連結您擁有的子網域，例如 profile.yourcompany.co.mz。專業方案包含此功能，網域註冊費須支付給供應商。"
+  ],
+  "Pode registar o domínio e provar a propriedade. A publicação HTTPS aguarda a activação pela equipa Framy.": [
+    "You can register the domain and verify ownership. HTTPS publishing awaits activation by Framy.",
+    "您可登錄網域並驗證所有權。HTTPS 發佈需等待 Framy 團隊啟用。"
+  ],
+  "Domínio": [
+    "Domain",
+    "網域"
+  ],
+  "Adicionar domínio": [
+    "Add domain",
+    "新增網域"
+  ],
+  "Estado:": [
+    "Status:",
+    "狀態："
+  ],
+  "A aguardar prova de propriedade": [
+    "Awaiting ownership verification",
+    "等待所有權驗證"
+  ],
+  "Propriedade verificada · aguarda configuração": [
+    "Ownership verified · awaiting setup",
+    "已驗證所有權 · 等待設定"
+  ],
+  "Activo com HTTPS": [
+    "Active with HTTPS",
+    "已啟用 HTTPS"
+  ],
+  "No fornecedor DNS, adicione TXT": [
+    "At your DNS provider, add TXT",
+    "請向 DNS 供應商新增 TXT"
+  ],
+  "com valor": [
+    "with value",
+    "數值為"
+  ],
+  "Adicione CNAME": [
+    "Add CNAME",
+    "新增 CNAME"
+  ],
+  "Confirme os registos, aguarde a propagação e verifique novamente. Mantenha o TXT para a verificação periódica.": [
+    "Confirm the records, wait for propagation and check again. Keep the TXT record for periodic verification.",
+    "確認記錄並等待傳播後再驗證。請保留 TXT 記錄供定期驗證使用。"
+  ],
+  "Registos de validação do certificado": [
+    "Certificate validation records",
+    "憑證驗證記錄"
+  ],
+  "Valor:": [
+    "Value:",
+    "數值："
+  ],
+  "Adicione estes registos no seu fornecedor DNS e volte a verificar.": [
+    "Add these records at your DNS provider and check again.",
+    "請向 DNS 供應商新增這些記錄後再驗證。"
+  ],
+  "Desligar domínio": [
+    "Disconnect domain",
+    "中斷網域連結"
+  ],
+  "O domínio deixará de abrir o perfil. O endereço Framy continua disponível.": [
+    "The domain will no longer open the profile. Your Framy address remains available.",
+    "此網域將無法開啟檔案，Framy 網址仍可使用。"
+  ],
+  "Confirmar remoção": [
+    "Confirm removal",
+    "確認移除"
+  ],
+  "Mostrar palavra-passe": [
+    "Show password",
+    "顯示密碼"
+  ],
+  "Ocultar palavra-passe": [
+    "Hide password",
+    "隱藏密碼"
+  ],
+  "A entrar…": [
+    "Signing in…",
+    "正在登入…"
+  ],
+  "A criar conta…": [
+    "Creating account…",
+    "正在建立帳戶…"
+  ],
+  "Não foi possível ligar. Verifique a ligação e tente novamente.": [
+    "Unable to connect. Check your connection and try again.",
+    "無法連線。請檢查網路後再試。"
+  ],
+  "Experiência": [
+    "Trial",
+    "試用"
+  ],
+  "Lançamento": [
+    "Launch access",
+    "推出期間存取權"
+  ],
+  "Em tolerância": [
+    "Grace period",
+    "寬限期"
+  ],
+  "Contacto básico": [
+    "Basic contact",
+    "基本聯絡資訊"
+  ],
+  "Alterações guardadas. Os períodos já pagos mantêm as condições contratadas.": [
+    "Changes saved. Paid periods retain their agreed terms.",
+    "變更已儲存。已付款期間保留原約定條件。"
+  ],
+  "Configure os planos e acompanhe o ciclo de cada subscrição.": [
+    "Configure plans and track each subscription's lifecycle.",
+    "設定方案並追蹤每項訂閱的週期。"
+  ],
+  "Gestão de subscrições": [
+    "Subscription management",
+    "訂閱管理"
+  ],
+  "Mensagens de renovação": [
+    "Renewal messages",
+    "續訂訊息"
+  ],
+  "Histórico": [
+    "History",
+    "歷史記錄"
+  ],
+  "A carregar subscrições…": [
+    "Loading subscriptions…",
+    "正在載入訂閱…"
+  ],
+  "Períodos pagos activos": [
+    "Active paid periods",
+    "有效付費期間"
+  ],
+  "Experiências": [
+    "Trials",
+    "試用"
+  ],
+  "Indicadores referentes aos primeiros 500 clientes por validade. Refine a consulta através de uma exportação financeira.": [
+    "Figures cover the first 500 customers ordered by expiry. Use a financial export for further analysis.",
+    "數據涵蓋按到期日排序的前 500 位客戶。詳細分析請使用財務匯出。"
+  ],
+  "Preços e funcionalidades aplicam-se a novas compras e renovações. Arquivar impede novas adesões.": [
+    "Prices and features apply to new purchases and renewals. Archiving prevents new subscriptions.",
+    "價格及功能適用於新購買和續訂。封存後將無法新增訂閱。"
+  ],
+  "Criar plano": [
+    "Create plan",
+    "建立方案"
+  ],
+  "Configurar plano": [
+    "Configure plan",
+    "設定方案"
+  ],
+  "Nome do plano": [
+    "Plan name",
+    "方案名稱"
+  ],
+  "Mensal (MT)": [
+    "Monthly (MT)",
+    "每月（MT）"
+  ],
+  "Anual (MT)": [
+    "Annual (MT)",
+    "每年（MT）"
+  ],
+  "Máximo de links": [
+    "Maximum links",
+    "連結上限"
+  ],
+  "Ordem no catálogo": [
+    "Catalogue order",
+    "目錄排序"
+  ],
+  "Publicar plano": [
+    "Publish plan",
+    "發佈方案"
+  ],
+  "Funcionalidades com controlo de acesso": [
+    "Features with access control",
+    "具有存取控制的功能"
+  ],
+  "Outros benefícios comerciais (um por linha, até 12)": [
+    "Other commercial benefits (one per line, up to 12)",
+    "其他商業優惠（每行一項，最多 12 項）"
+  ],
+  "Estes textos descrevem serviços que a equipa oferece. Não criam novas funções no software.": [
+    "These descriptions explain services offered by the team. They do not create software features.",
+    "這些文字描述團隊提供的服務，不會新增軟體功能。"
+  ],
+  "Guardar plano": [
+    "Save plan",
+    "儲存方案"
+  ],
+  "Fechar editor": [
+    "Close editor",
+    "關閉編輯器"
+  ],
+  "Grátis": [
+    "Free",
+    "免費"
+  ],
+  "Mensal indisponível": [
+    "Monthly unavailable",
+    "暫無月繳"
+  ],
+  "Anual indisponível": [
+    "Annual unavailable",
+    "暫無年繳"
+  ],
+  "caracteres": [
+    "characters",
+    "字元"
+  ],
+  "Clientes e períodos contratados": [
+    "Customers and contracted periods",
+    "客戶及約定期間"
+  ],
+  "Nome, email ou plano": [
+    "Name, email or plan",
+    "姓名、電郵或方案"
+  ],
+  "Todas as periodicidades": [
+    "All billing cycles",
+    "所有計費週期"
+  ],
+  "Plano contratado": [
+    "Subscribed plan",
+    "訂閱方案"
+  ],
+  "Validade": [
+    "Expiry",
+    "到期日"
+  ],
+  "Próxima alteração": [
+    "Next change",
+    "下次變更"
+  ],
+  "Nenhum cliente corresponde aos filtros.": [
+    "No customers match these filters.",
+    "沒有符合篩選條件的客戶。"
+  ],
+  "As alterações de plano pagas começam no fim do período contratado. A activação depende de pagamento confirmado.": [
+    "Paid plan changes start when the current period ends. Activation requires confirmed payment.",
+    "已付款的方案變更於現有期間結束後生效。啟用需確認付款。"
+  ],
+  "Lembretes de renovação": [
+    "Renewal reminders",
+    "續訂提醒"
+  ],
+  "Envio antes da validade terminar. Os avisos de tolerância e contacto básico continuam a explicar as regras de acesso.": [
+    "Sent before expiry. Grace-period and basic-contact notices continue to explain access rules.",
+    "到期前發送提醒。寬限期及基本聯絡通知仍會說明存取規則。"
+  ],
+  "Enviar lembretes por email": [
+    "Send email reminders",
+    "發送電郵提醒"
+  ],
+  "Primeiro aviso: dias antes do fim": [
+    "First reminder: days before expiry",
+    "首次提醒：到期前幾天"
+  ],
+  "Também será enviado um aviso no último dia. Não há débitos automáticos.": [
+    "A reminder is also sent on the last day. There are no automatic charges.",
+    "最後一天也會發送提醒。不會自動扣款。"
+  ],
+  "Assunto": [
+    "Subject",
+    "主旨"
+  ],
+  "Mensagem": [
+    "Message",
+    "訊息"
+  ],
+  "Variáveis:": [
+    "Variables:",
+    "變數："
+  ],
+  "Pré-visualização · dados de exemplo": [
+    "Preview · sample data",
+    "預覽 · 範例資料"
+  ],
+  "Guardar mensagens": [
+    "Save messages",
+    "儲存訊息"
+  ],
+  "Últimos avisos": [
+    "Latest notices",
+    "最新通知"
+  ],
+  "Destinatário": [
+    "Recipient",
+    "收件人"
+  ],
+  "Estado do envio": [
+    "Sending status",
+    "發送狀態"
+  ],
+  "Aceite pelo serviço de email": [
+    "Accepted by email service",
+    "電郵服務已接受"
+  ],
+  "Aceitação pelo serviço não confirma entrega na caixa de entrada. Consulte o Resend para o resultado de entrega.": [
+    "Acceptance by the service does not confirm inbox delivery. Check Resend for delivery results.",
+    "服務接受訊息不代表已送達收件匣。請於 Resend 查看送達結果。"
+  ],
+  "Histórico de gestão": [
+    "Management history",
+    "管理歷史"
+  ],
+  "Sem alterações registadas.": [
+    "No changes recorded.",
+    "尚無變更記錄。"
+  ],
+  "Adesões pagas": [
+    "Paid subscriptions",
+    "付費訂閱"
+  ],
+  "Comunicação": [
+    "Communication",
+    "通訊"
+  ],
+  "Avisos disponíveis na conta": [
+    "Notices available in your account",
+    "帳戶內的通知"
+  ],
+  "Definições de pagamento": [
+    "Payment settings",
+    "付款設定"
+  ],
+  "Cada renovação exige autorização do cliente. Não existe débito automático; o produto físico é pago separadamente.": [
+    "Each renewal requires customer authorization. There is no automatic charge; physical products are paid separately.",
+    "每次續訂均需客戶授權。不會自動扣款，實體產品另行付款。"
+  ],
+  "Instruções para o cliente": [
+    "Customer instructions",
+    "客戶說明"
+  ],
+  "Permitir adesões pagas": [
+    "Enable paid subscriptions",
+    "啟用付費訂閱"
+  ],
+  "Disponibiliza a adesão aos planos digitais.": [
+    "Enables digital plan subscriptions.",
+    "開放數位方案訂閱。"
+  ],
+  "Ao abrir, as experiências já expiradas recebem pelo menos 7 dias de aviso, seguidos de 7 dias de tolerância. Verifique os dados de pagamento antes de activar.": [
+    "When enabled, expired trials receive at least 7 days' notice followed by a 7-day grace period. Check payment settings before activating.",
+    "啟用後，已到期試用至少會提前 7 天收到通知，之後有 7 天寬限期。請先核對付款設定。"
+  ],
+  "Alteração paga agendada para": [
+    "Paid change scheduled for",
+    "已付款變更預定於"
+  ],
+  ". Até lá mantém o plano actual.": [
+    ". Your current plan remains until then.",
+    "。屆時之前保留現有方案。"
+  ],
+  "Marcar como lido": [
+    "Mark as read",
+    "標示為已讀"
+  ],
+  "Adesões mensais ainda indisponíveis. O acesso de lançamento continua sem cobrança.": [
+    "Monthly subscriptions are not available yet. Launch access continues at no charge.",
+    "月繳訂閱尚未開放。推出期間仍可免費使用。"
+  ],
+  "Confirmo um mês, sem renovação automática.": [
+    "I confirm one month, with no automatic renewal.",
+    "我確認訂閱一個月，不自動續訂。"
+  ],
+  "Pedir pagamento deste plano": [
+    "Request payment for this plan",
+    "申請此方案付款"
+  ],
+  "Uma alteração de plano começa no fim do período já pago. Os dados que excedam o novo plano ficam guardados.": [
+    "A plan change starts after the paid period ends. Data exceeding the new plan's limits remains saved.",
+    "方案變更於已付款期間結束後生效。超出新方案限制的資料仍會保留。"
+  ],
+  "Ainda não existem pedidos de pagamento": [
+    "No payment requests yet",
+    "尚無付款申請"
+  ],
+  "Os pedidos dos planos digitais aparecerão aqui quando forem criados pelos clientes.": [
+    "Digital plan requests appear here when customers create them.",
+    "客戶建立數位方案申請後將顯示於此。"
+  ],
+  "Período:": [
+    "Period:",
+    "期間："
+  ],
+  "Consultar pagamento PaySuite": [
+    "View PaySuite payment",
+    "查看 PaySuite 付款"
+  ],
+  "Verificar pagamento": [
+    "Verify payment",
+    "核實付款"
+  ],
+  "Indique a referência acima ao pagar. A equipa activa o período após verificar o valor e a transacção. Pedido válido até": [
+    "Use the reference above when paying. The team activates access after verifying the amount and transaction. Request valid until",
+    "付款時請使用上述編號。團隊核實金額及交易後啟用存取權。申請有效至"
+  ],
+  "Cancelar pedido não pago": [
+    "Cancel unpaid request",
+    "取消未付款申請"
+  ],
+  "Verificar": [
+    "Verify",
+    "驗證"
+  ],
+  "Valor recebido em MT": [
+    "Amount received in MT",
+    "實收金額（MT）"
+  ],
+  "Verifiquei a transacção liquidada no prestador, destinatário, moeda MZN e valor exacto.": [
+    "I verified the settled transaction, recipient, MZN currency and exact amount with the provider.",
+    "我已向服務商核實已結算交易、收款人、MZN 幣別及確切金額。"
+  ],
+  "Registar pagamento confirmado": [
+    "Record confirmed payment",
+    "登錄已確認付款"
+  ],
+  "Personalize o porta-chaves de couro": [
+    "Personalize your leather keychain",
+    "自訂皮革鑰匙圈"
+  ],
+  "Escolha a cor, carregue o logótipo e ajuste o tamanho. A imagem e o resumo actualizam automaticamente.": [
+    "Choose a colour, upload your logo and adjust its size. The preview and summary update automatically.",
+    "選擇顏色、上傳標誌並調整大小。預覽及摘要會自動更新。"
+  ],
+  "Cor do couro": [
+    "Leather colour",
+    "皮革顏色"
+  ],
+  "Logótipo frontal": [
+    "Front logo",
+    "正面標誌"
+  ],
+  "Dimensões do produto": [
+    "Product dimensions",
+    "產品尺寸"
+  ],
+  "Couro · Argola metálica · Verso com símbolo NFC": [
+    "Leather · Metal ring · NFC symbol on the back",
+    "皮革 · 金屬環 · 背面 NFC 圖示"
+  ],
+  "PDF vectorial, PNG ou JPG · até 8 MB": [
+    "Vector PDF, PNG or JPG · up to 8 MB",
+    "向量 PDF、PNG 或 JPG · 最大 8 MB"
+  ],
+  "Ficheiro guardado para produção.": [
+    "File saved for production.",
+    "檔案已儲存供製作使用。"
+  ],
+  "Tamanho do logótipo ·": [
+    "Logo size ·",
+    "標誌大小 ·"
+  ],
+  "Ajustar posição": [
+    "Adjust position",
+    "調整位置"
+  ],
+  "Repor posição": [
+    "Reset position",
+    "重設位置"
+  ],
+  "Remover fundo do logótipo": [
+    "Remove logo background",
+    "移除標誌背景"
+  ],
+  "Para fundos de cor uniforme. Escolha a cor e ajuste a tolerância.": [
+    "For solid-colour backgrounds. Choose the colour and adjust tolerance.",
+    "適用於單色背景。請選擇顏色並調整容差。"
+  ],
+  "Cor do fundo": [
+    "Background colour",
+    "背景顏色"
+  ],
+  "Tolerância ·": [
+    "Tolerance ·",
+    "容差 ·"
+  ],
+  "Repor imagem original": [
+    "Restore original image",
+    "還原原始圖片"
+  ],
+  "Resultado em PNG transparente, até 2048 px. Pode repor o original durante esta edição. Confira os detalhes antes de continuar.": [
+    "Transparent PNG output, up to 2048 px. You can restore the original during this edit. Check details before continuing.",
+    "輸出透明 PNG，最大 2048 像素。此次編輯期間可還原原圖。繼續前請核對細節。"
+  ],
+  "A preparar o logótipo…": [
+    "Preparing your logo…",
+    "正在準備標誌…"
+  ],
+  "Vista interactiva": [
+    "Interactive view",
+    "互動檢視"
+  ],
+  "Ângulo": [
+    "Angle",
+    "角度"
+  ],
+  "Repor vista": [
+    "Reset view",
+    "重設檢視"
+  ],
+  "Fotografia de referência com símbolo F. Seleccionou o logótipo completo; a fotografia dessa versão ainda não está disponível.": [
+    "Reference photo with the F symbol. You selected the full logo; a photo of that version is not yet available.",
+    "參考照片顯示 F 圖示。您已選擇完整標誌，但該版本照片尚未提供。"
+  ],
+  "A equipa confirma a arte e o acabamento antes da produção.": [
+    "The team confirms the artwork and finish before production.",
+    "團隊會於製作前確認設計及表面處理。"
+  ],
+  "Os campos desactivados não estão incluídos no seu plano. Os dados guardados são preservados.": [
+    "Disabled fields are not included in your plan. Saved data is retained.",
+    "您的方案不包含停用欄位，已儲存資料仍會保留。"
+  ],
+  "Mais valor para o seu negócio": [
+    "More value for your business",
+    "為您的業務增添價值"
+  ],
+  "As ferramentas disponíveis dependem do seu plano. Os campos desactivados ficam guardados e não aparecem no perfil público.": [
+    "Available tools depend on your plan. Disabled fields remain saved and are hidden from the public profile.",
+    "可用工具依方案而定。停用欄位會保留，但不顯示於公開檔案。"
+  ],
+  "Produtos e serviços ·": [
+    "Products and services ·",
+    "產品與服務 ·"
+  ],
+  "Apresente o que oferece. O preço é informativo; o botão abre o endereço que escolher.": [
+    "Show what you offer. Prices are informational; the button opens your chosen address.",
+    "展示您的產品與服務。價格僅供參考，按鈕會開啟指定網址。"
+  ],
+  "Oferta": [
+    "Offering",
+    "項目"
+  ],
+  "Preço ou indicação": [
+    "Price or note",
+    "價格或備註"
+  ],
+  "Link HTTPS": [
+    "HTTPS link",
+    "HTTPS 連結"
+  ],
+  "Versão inglesa desta oferta": [
+    "English version of this offering",
+    "此項目的英文版本"
+  ],
+  "Remover oferta": [
+    "Remove offering",
+    "移除項目"
+  ],
+  "Adicionar produto ou serviço": [
+    "Add product or service",
+    "新增產品或服務"
+  ],
+  "Receber pedidos de informação no perfil": [
+    "Receive enquiries on your profile",
+    "在檔案接收詢問"
+  ],
+  "As mensagens ficam na sua caixa de entrada durante 90 dias. Não são enviadas automaticamente por email.": [
+    "Messages stay in your inbox for 90 days. They are not automatically emailed.",
+    "訊息會在收件匣保留 90 天，不會自動以電郵發送。"
+  ],
+  "Conteúdo em inglês": [
+    "English content",
+    "英文內容"
+  ],
+  "Escreva a sua própria versão. O visitante pode alternar entre Português e English. Campos vazios mantêm o texto original.": [
+    "Write your own version. Visitors can switch between Portuguese and English. Empty fields retain the original text.",
+    "請撰寫自己的版本。訪客可切換葡萄牙文與英文，空白欄位保留原文。"
+  ],
+  "Título em inglês": [
+    "Title in English",
+    "英文標題"
+  ],
+  "Biografia em inglês": [
+    "Biography in English",
+    "英文簡介"
+  ],
+  "Horário em inglês": [
+    "Opening hours in English",
+    "英文營業時間"
+  ],
+  "Links visíveis e contacto após o período pago": [
+    "Visible links and contact after the paid period",
+    "付費期間結束後的可見連結與聯絡資訊"
+  ],
+  "O plano actual apresenta até": [
+    "Your current plan displays up to",
+    "目前方案最多顯示"
+  ],
+  "links. Os restantes ficam guardados. Escolha os que pretende mostrar; a ordem segue a lista do editor.": [
+    "links. Others remain saved. Choose which to display; their order follows the editor list.",
+    "個連結，其餘仍會保留。請選擇要顯示的連結，順序依編輯器清單排列。"
+  ],
+  "Seleccionou mais de": [
+    "You selected more than",
+    "您已選擇超過"
+  ],
+  ". Apenas os primeiros": [
+    ". Only the first",
+    "。只有前"
+  ],
+  "serão mostrados neste plano.": [
+    "will be shown on this plan.",
+    "個會顯示於此方案。"
+  ],
+  "Usar os primeiros links automaticamente": [
+    "Use the first links automatically",
+    "自動使用前面的連結"
+  ],
+  "Contacto da página básica": [
+    "Basic page contact",
+    "基本頁面聯絡方式"
+  ],
+  "Primeiro contacto disponível": [
+    "First available contact",
+    "第一個可用聯絡方式"
+  ],
+  "Após a tolerância, ficam públicos apenas nome, fotografia e este contacto. Os restantes dados mantêm-se guardados.": [
+    "After the grace period, only your name, photo and this contact remain public. Other data stays saved.",
+    "寬限期後僅公開姓名、照片及此聯絡方式，其餘資料仍會保留。"
+  ],
+  "Levantamento e entregas": [
+    "Pickup and delivery",
+    "取貨與配送"
+  ],
+  "Defina cidades, pontos de levantamento e tarifas. Os valores são por encomenda, em MT.": [
+    "Set cities, pickup points and rates. Amounts are per order, in MT.",
+    "設定城市、取貨點及費率。每筆訂單以 MT 計價。"
+  ],
+  "Actualizar definições": [
+    "Refresh settings",
+    "更新設定"
+  ],
+  "Cidades de recepção": [
+    "Delivery cities",
+    "收貨城市"
+  ],
+  "Cidade a configurar": [
+    "City to configure",
+    "要設定的城市"
+  ],
+  "Adicionar cidade": [
+    "Add city",
+    "新增城市"
+  ],
+  "Nome da cidade": [
+    "City name",
+    "城市名稱"
+  ],
+  "Mostrar esta cidade no checkout": [
+    "Show this city at checkout",
+    "結帳時顯示此城市"
+  ],
+  "Entrega normal": [
+    "Standard delivery",
+    "標準配送"
+  ],
+  "Disponível nesta cidade": [
+    "Available in this city",
+    "此城市可使用"
+  ],
+  "Tarifa (MT)": [
+    "Rate (MT)",
+    "費率（MT）"
+  ],
+  "Zona abrangida / bairros": [
+    "Coverage area / neighbourhoods",
+    "服務區域／地區"
+  ],
+  "Prazo após preparação": [
+    "Time after preparation",
+    "備妥後所需時間"
+  ],
+  "Entrega expressa": [
+    "Express delivery",
+    "快速配送"
+  ],
+  "Oferecer esta opção": [
+    "Offer this option",
+    "提供此選項"
+  ],
+  "Tarifa acordada (MT)": [
+    "Agreed rate (MT)",
+    "約定費率（MT）"
+  ],
+  "Deixe em branco enquanto o parceiro não confirmar o preço. Não é uma cotação automática da Yango.": [
+    "Leave blank until the partner confirms the price. This is not an automatic Yango quote.",
+    "合作夥伴確認價格前請留空。此非 Yango 自動報價。"
+  ],
+  "Condições e horário-limite": [
+    "Conditions and cut-off time",
+    "條件與截止時間"
+  ],
+  "Pontos de levantamento ·": [
+    "Pickup points ·",
+    "取貨點 ·"
+  ],
+  "O levantamento é gratuito. Desactive um ponto para o retirar das novas compras.": [
+    "Pickup is free. Disable a point to remove it from new purchases.",
+    "取貨免費。停用取貨點後，新訂單將無法選取。"
+  ],
+  "Nome do ponto": [
+    "Pickup point name",
+    "取貨點名稱"
+  ],
+  "Endereço e referência": [
+    "Address and landmark",
+    "地址及地標"
+  ],
+  "Horário / instruções": [
+    "Hours / instructions",
+    "時間／說明"
+  ],
+  "Ponto disponível para levantamento": [
+    "Pickup point available",
+    "開放此取貨點"
+  ],
+  "Adicionar ponto nesta cidade": [
+    "Add a point in this city",
+    "在此城市新增取貨點"
+  ],
+  "Em que cidade pretende receber ou levantar o produto?": [
+    "In which city would you like delivery or pickup?",
+    "您希望在哪個城市收貨或取貨？"
+  ],
+  "Seleccionar cidade": [
+    "Select city",
+    "選擇城市"
+  ],
+  "Outra cidade / localidade": [
+    "Another city / locality",
+    "其他城市／地點"
+  ],
+  "As opções de recepção estão temporariamente indisponíveis.": [
+    "Delivery and pickup options are temporarily unavailable.",
+    "配送及取貨選項暫時無法使用。"
+  ],
+  "Como pretende receber?": [
+    "How would you like to receive it?",
+    "您希望如何收貨？"
+  ],
+  "Levantar num ponto": [
+    "Collect at a pickup point",
+    "至取貨點領取"
+  ],
+  "Sem ponto disponível nesta cidade": [
+    "No pickup point available in this city",
+    "此城市尚無取貨點"
+  ],
+  "Receber na minha morada": [
+    "Deliver to my address",
+    "配送至我的地址"
+  ],
+  "Sob cotação": [
+    "On quotation",
+    "需報價"
+  ],
+  "Ponto de levantamento": [
+    "Pickup point",
+    "取貨點"
+  ],
+  "Seleccionar ponto": [
+    "Select pickup point",
+    "選擇取貨點"
+  ],
+  "Ver endereço no mapa ↗": [
+    "View address on map ↗",
+    "在地圖查看地址 ↗"
+  ],
+  "Aguarde a confirmação de que o produto está pronto antes de se deslocar ao ponto.": [
+    "Wait for confirmation that your product is ready before visiting the pickup point.",
+    "請先等待產品備妥確認，再前往取貨點。"
+  ],
+  "Zona abrangida:": [
+    "Coverage area:",
+    "服務區域："
+  ],
+  "O prazo de entrega começa depois de o produto estar pronto.": [
+    "Delivery time starts once the product is ready.",
+    "配送時間自產品備妥後起算。"
+  ],
+  "O parceiro confirmará o preço e a disponibilidade. Este serviço ainda não pode ser pago no checkout.": [
+    "The partner will confirm pricing and availability. This service cannot yet be paid at checkout.",
+    "合作夥伴將確認價格及供應情況。目前無法在結帳時支付此服務。"
+  ],
+  "Solicitar cotação à equipa ↗": [
+    "Request a quote from the team ↗",
+    "向團隊索取報價 ↗"
+  ],
+  "O total será confirmado antes do pagamento. Pode escolher outra forma de recepção.": [
+    "The total will be confirmed before payment. You can choose another delivery method.",
+    "付款前會確認總額。您可選擇其他收貨方式。"
+  ],
+  "Checkout e pagamentos PaySuite": [
+    "PaySuite checkout and payments",
+    "PaySuite 結帳與付款"
+  ],
+  "Voltar ao gestor": [
+    "Back to management",
+    "返回管理面板"
+  ],
+  "Ligação configurada.": [
+    "Connection configured.",
+    "連線已設定。"
+  ],
+  "Ligação por configurar: segredos e activação no Cloudflare.": [
+    "Connection pending: credentials and activation in Cloudflare.",
+    "連線待設定：Cloudflare 憑證與啟用。"
+  ],
+  "Preços de configuração": [
+    "Configuration prices",
+    "設定價格"
+  ],
+  "Valores por encomenda, em MT. Design padrão incluído. Configure os pontos e as tarifas em Produtos → Levantamento e entregas.": [
+    "Prices per order in MT. Standard design included. Set pickup points and rates under Products → Pickup and delivery.",
+    "每筆訂單以 MT 計價，含標準設計。請至「產品 → 取貨與配送」設定取貨點及費率。"
+  ],
+  "Publicar estes preços e abrir pagamentos de produtos": [
+    "Publish these prices and enable product payments",
+    "發佈價格並開放產品付款"
+  ],
+  "Guardar preços": [
+    "Save prices",
+    "儲存價格"
+  ],
+  "Pedidos e pagamentos": [
+    "Orders and payments",
+    "訂單與付款"
+  ],
+  "Comprovativo por email:": [
+    "Email receipt:",
+    "電郵收據："
+  ],
+  "aceite pelo serviço de email": [
+    "accepted by email service",
+    "電郵服務已接受"
+  ],
+  "requer verificação no Resend antes de reenviar": [
+    "check in Resend before resending",
+    "重寄前請於 Resend 核查"
+  ],
+  "Modelo PVC + epóxi:": [
+    "PVC + epoxy model:",
+    "PVC + 環氧樹脂款式："
+  ],
+  "Porta-chaves de couro": [
+    "Leather keychain",
+    "皮革鑰匙圈"
+  ],
+  "Cor:": [
+    "Colour:",
+    "顏色："
+  ],
+  "· Frente:": [
+    "· Front:",
+    "· 正面："
+  ],
+  "Descarregar logótipo:": [
+    "Download logo:",
+    "下載標誌："
+  ],
+  "· Escala": [
+    "· Scale",
+    "· 比例"
+  ],
+  "Recepção:": [
+    "Delivery:",
+    "收貨："
+  ],
+  "Perfil:": [
+    "Profile:",
+    "檔案："
+  ],
+  "A aguardar configuração pelo cliente": [
+    "Awaiting customer setup",
+    "等待客戶設定"
+  ],
+  "Produtos:": [
+    "Products:",
+    "產品："
+  ],
+  "MT · Design:": [
+    "MT · Design:",
+    "MT · 設計："
+  ],
+  "MT · Entrega:": [
+    "MT · Delivery:",
+    "MT · 配送："
+  ],
+  "ID PaySuite para reconciliação": [
+    "PaySuite ID for reconciliation",
+    "對帳用 PaySuite ID"
+  ],
+  "Verificar no prestador": [
+    "Check with provider",
+    "向服務商核實"
+  ],
+  "Confirmar entrega ao cliente": [
+    "Confirm delivery to customer",
+    "確認已交付客戶"
+  ],
+  "A confirmar a ligação ao prestador": [
+    "Confirming provider connection",
+    "正在確認服務商連線"
+  ],
+  "Pagamento feito com sucesso": [
+    "Payment successful",
+    "付款成功"
+  ],
+  "Pagamento não concluído": [
+    "Payment incomplete",
+    "付款未完成"
+  ],
+  "Pagamento em revisão pela equipa": [
+    "Payment under team review",
+    "團隊正在核查付款"
+  ],
+  "Estado do pagamento": [
+    "Payment status",
+    "付款狀態"
+  ],
+  "Entre para consultar os seus pagamentos": [
+    "Sign in to view your payments",
+    "登入以查看付款"
+  ],
+  "A consultar o estado…": [
+    "Checking status…",
+    "正在查詢狀態…"
+  ],
+  "Ainda não tem pagamentos registados.": [
+    "You have no recorded payments yet.",
+    "您尚無付款記錄。"
+  ],
+  "Perfil · um mês": [
+    "Profile · one month",
+    "檔案 · 一個月"
+  ],
+  "PRÓXIMO PASSO · PERFIL DIGITAL": [
+    "NEXT STEP · DIGITAL PROFILE",
+    "下一步 · 數位檔案"
+  ],
+  "O seu perfil já está publicado": [
+    "Your profile is already published",
+    "您的檔案已發佈"
+  ],
+  "Adicione a sua fotografia, os contactos e os links que quer partilhar. Ao publicar, o perfil fica ligado à sua encomenda.": [
+    "Add your photo, contacts and links to share. Publishing connects your profile to your order.",
+    "新增照片、聯絡資訊及要分享的連結。發佈後檔案會與訂單連結。"
+  ],
+  "Pode continuar mais tarde na sua conta. Não precisa de repetir o pagamento.": [
+    "You can continue later in your account. You do not need to pay again.",
+    "可稍後在帳戶內繼續，無須再次付款。"
+  ],
+  "Pagar na PaySuite": [
+    "Pay with PaySuite",
+    "透過 PaySuite 付款"
+  ],
+  "A encomenda está paga. A equipa acompanhará a configuração do perfil, a produção e a entrega.": [
+    "Your order is paid. The team will follow up on profile setup, production and delivery.",
+    "訂單已付款。團隊將跟進檔案設定、製作及配送。"
+  ],
+  "O período pago foi registado no seu perfil.": [
+    "The paid period has been recorded on your profile.",
+    "已付款期間已登錄至您的檔案。"
+  ],
+  "O seu ponto de levantamento": [
+    "Your pickup point",
+    "您的取貨點"
+  ],
+  "O comprovativo foi enviado para o email da sua conta. Verifique também a pasta de spam.": [
+    "The receipt was sent to your account email. Check your spam folder too.",
+    "收據已寄至帳戶電郵，也請查看垃圾郵件匣。"
+  ],
+  "O pagamento está confirmado. Contacte a equipa se ainda não recebeu o comprovativo por email.": [
+    "Payment is confirmed. Contact the team if you have not received the email receipt.",
+    "付款已確認。如尚未收到電郵收據，請聯絡團隊。"
+  ],
+  "O comprovativo de pagamento está a ser preparado para envio ao email da sua conta.": [
+    "Your payment receipt is being prepared for your account email.",
+    "付款收據正在準備中，將寄至帳戶電郵。"
+  ],
+  "Não crie outro pedido. A equipa verificará este pedido no prestador.": [
+    "Do not create another request. The team will check this one with the provider.",
+    "請勿再次建立申請。團隊將向服務商核查此申請。"
+  ],
+  "Não volte a pagar. Contacte a equipa com a referência abaixo.": [
+    "Do not pay again. Contact the team with the reference below.",
+    "請勿再次付款。請提供下方編號聯絡團隊。"
+  ],
+  "O meu perfil": [
+    "My profile",
+    "我的檔案"
+  ],
+  "WhatsApp com indicativo internacional": [
+    "WhatsApp with country code",
+    "WhatsApp（含國碼）"
+  ],
+  "Número do WhatsApp publicado no perfil. Confirme o destinatário.": [
+    "WhatsApp number published on the profile. Confirm the recipient.",
+    "檔案上公開的 WhatsApp 號碼。請確認收件人。"
+  ],
+  "Indique o WhatsApp do cliente. Este número não será guardado no perfil.": [
+    "Enter the customer's WhatsApp number. It will not be saved to their profile.",
+    "輸入客戶 WhatsApp 號碼，此號碼不會儲存至檔案。"
+  ],
+  "Use o indicativo internacional, por exemplo +258840000000.": [
+    "Include the country code, for example +258840000000.",
+    "請加上國碼，例如 +258840000000。"
+  ],
+  "Pré-visualizar mensagem": [
+    "Preview message",
+    "預覽訊息"
+  ],
+  "Lembrar por WhatsApp ↗": [
+    "Remind via WhatsApp ↗",
+    "透過 WhatsApp 提醒 ↗"
+  ],
+  "Lembrar por WhatsApp": [
+    "Remind via WhatsApp",
+    "透過 WhatsApp 提醒"
+  ],
+  "Conversa aberta. Confirme o envio no WhatsApp; não foi registada uma mensagem enviada.": [
+    "Chat opened. Confirm sending in WhatsApp; no message has been recorded as sent.",
+    "對話已開啟。請於 WhatsApp 確認發送；系統未記錄為已發送。"
+  ],
+  "Lembretes por WhatsApp": [
+    "WhatsApp reminders",
+    "WhatsApp 提醒"
+  ],
+  "Pacotes que terminam nos próximos": [
+    "Plans expiring in the next",
+    "將於未來"
+  ],
+  "dias ou já venceram. A mensagem inclui o link dos pacotes. Clientes com o próximo período já pago não aparecem aqui.": [
+    "days or already expired. The message includes the plans link. Customers who have paid for the next period are excluded.",
+    "天內到期或已到期的方案。訊息包含方案連結，已支付下一期間費用的客戶不會列出。"
+  ],
+  "Reveja o destinatário e a mensagem. O botão abre o WhatsApp; é necessário confirmar o envio na aplicação.": [
+    "Review the recipient and message. The button opens WhatsApp; confirm sending in the app.",
+    "請核對收件人及訊息。按鈕會開啟 WhatsApp，須在應用程式內確認發送。"
+  ],
+  "Todos (": [
+    "All (",
+    "全部（"
+  ],
+  "A terminar": [
+    "Expiring soon",
+    "即將到期"
+  ],
+  "Vencidos": [
+    "Expired",
+    "已到期"
+  ],
+  "A consulta está limitada aos primeiros 500 clientes por validade; esta lista pode não incluir todos os lembretes.": [
+    "This view is limited to the first 500 customers by expiry; some reminders may not appear.",
+    "此清單限按到期日排序的前 500 位客戶，可能未涵蓋所有提醒。"
+  ],
+  "Nenhum pacote corresponde a estes filtros.": [
+    "No plans match these filters.",
+    "沒有符合篩選條件的方案。"
+  ],
+  "Não foi possível iniciar o pagamento.": [
+    "Unable to start payment.",
+    "無法開始付款。"
+  ],
+  "Ligação interrompida. Tente novamente para consultar o mesmo pedido.": [
+    "Connection interrupted. Try again to check the same request.",
+    "連線中斷。請重試以查詢同一申請。"
+  ],
+  "Método de pagamento": [
+    "Payment method",
+    "付款方式"
+  ],
+  "O pagamento é concluído na página segura da PaySuite. Não guardamos dados do cartão nem PINs.": [
+    "Payment is completed on PaySuite's secure page. We do not store card details or PINs.",
+    "付款於 PaySuite 安全頁面完成。我們不儲存卡片資料或 PIN 碼。"
+  ],
+  "Confirmo o total apresentado. Este pagamento não autoriza débitos automáticos.": [
+    "I confirm the total shown. This payment does not authorize automatic charges.",
+    "我確認所示總額。此次付款不授權自動扣款。"
+  ],
+  "Continuar para pagamento": [
+    "Continue to payment",
+    "繼續付款"
+  ],
+  "Consultar os meus pagamentos": [
+    "View my payments",
+    "查看我的付款"
+  ],
+  "Período de acesso": [
+    "Access period",
+    "使用期間"
+  ],
+  "Um mês": [
+    "One month",
+    "一個月"
+  ],
+  "Um ano": [
+    "One year",
+    "一年"
+  ],
+  "mês": [
+    "month",
+    "月"
+  ],
+  "O pagamento estará disponível após os 30 dias grátis.": [
+    "Payment will be available after the 30 free days.",
+    "免費 30 天結束後可付款。"
+  ],
+  "Imagem carregada. Guarde a opção para publicar a alteração.": [
+    "Image uploaded. Save the option to publish the change.",
+    "圖片已上傳。儲存選項以發佈變更。"
+  ],
+  "Imagem guardada. Já disponível na configuração do produto.": [
+    "Image saved. Now available in the product configurator.",
+    "圖片已儲存，可於產品設定中使用。"
+  ],
+  "Imagens das opções de design": [
+    "Design option images",
+    "設計選項圖片"
+  ],
+  "Uma imagem por opção, apresentada nos cartões, porta-chaves e kits. Use PNG, JPG ou WebP, até 8 MB. Formato horizontal recomendado: 3:2.": [
+    "One image per option, shown for cards, keychains and kits. Use PNG, JPG or WebP, up to 8 MB. Recommended landscape ratio: 3:2.",
+    "每個選項一張圖片，用於卡片、鑰匙圈及套組。支援 PNG、JPG 或 WebP，最大 8 MB。建議橫向比例 3:2。"
+  ],
+  "Actualizar imagens": [
+    "Refresh images",
+    "更新圖片"
+  ],
+  "Imagem da opção": [
+    "Option image",
+    "選項圖片"
+  ],
+  "Descrição da imagem": [
+    "Image description",
+    "圖片說明"
+  ],
+  "Restaurar ilustração": [
+    "Restore illustration",
+    "還原插圖"
+  ],
+  "Guardar imagem": [
+    "Save image",
+    "儲存圖片"
+  ],
+  "A página pública mostra apenas nome, fotografia e um contacto. Os restantes dados continuam guardados.": [
+    "The public page shows only your name, photo and one contact. Other data remains saved.",
+    "公開頁面僅顯示姓名、照片及一項聯絡方式，其餘資料仍會保留。"
+  ],
+  "Está nos 7 dias de tolerância. Renove para manter todas as funcionalidades.": [
+    "You are in the 7-day grace period. Renew to keep all features.",
+    "目前處於 7 天寬限期。請續訂以保留所有功能。"
+  ],
+  "Gerir plano e renovação →": [
+    "Manage plan and renewal →",
+    "管理方案與續訂 →"
+  ],
+  "Faltam": [
+    "Remaining:",
+    "剩餘"
+  ],
+  "dias.": [
+    "days.",
+    "天。"
+  ],
+  "Gerir renovação →": [
+    "Manage renewal →",
+    "管理續訂 →"
+  ],
+  "Tentativa sem confirmação": [
+    "Attempt unconfirmed",
+    "嘗試尚未確認"
+  ],
+  "Renovação:": [
+    "Renewal:",
+    "續訂："
+  ],
+  "Definições de comunicação": [
+    "Communication settings",
+    "通訊設定"
+  ],
+  "Não foi possível actualizar.": [
+    "Unable to update.",
+    "無法更新。"
+  ],
+  "Gestão das subscrições": [
+    "Subscription management",
+    "訂閱管理"
+  ],
+  "O seu plano digital": [
+    "Your digital plan",
+    "您的數位方案"
+  ],
+  "Controle as adesões, as instruções e os pedidos de pagamento dos planos digitais.": [
+    "Manage subscriptions, instructions and payment requests for digital plans.",
+    "管理數位方案訂閱、說明及付款申請。"
+  ],
+  "Escolha o período mensal ou anual. Sem débito nem renovação automática. O produto físico é pago separadamente.": [
+    "Choose monthly or annual billing. No automatic charges or renewal. Physical products are paid separately.",
+    "選擇月繳或年繳。不會自動扣款或續訂，實體產品另行付款。"
+  ],
+  "PaySuite indisponível": [
+    "PaySuite unavailable",
+    "PaySuite 暫不可用"
+  ],
+  "Guardar alterações": [
+    "Save changes",
+    "儲存變更"
+  ],
+  "Active o perfil para começar": [
+    "Activate your profile to get started",
+    "啟用檔案以開始使用"
+  ],
+  "Experiência gratuita": [
+    "Free trial",
+    "免費試用"
+  ],
+  "Período de tolerância de 7 dias": [
+    "7-day grace period",
+    "7 天寬限期"
+  ],
+  "Página de contacto básica": [
+    "Basic contact page",
+    "基本聯絡頁面"
+  ],
+  "Os seus pedidos de pagamento": [
+    "Your payment requests",
+    "您的付款申請"
+  ],
+  "A aguardar verificação": [
+    "Awaiting verification",
+    "等待核實"
+  ],
+  "Não foi possível ler a imagem.": [
+    "Unable to read the image.",
+    "無法讀取圖片。"
+  ],
+  "frente para personalizar": [
+    "front to personalize",
+    "可自訂的正面"
+  ],
+  "símbolo F": [
+    "F symbol",
+    "F 圖示"
+  ],
+  "O seu logótipo aplicado ao produto": [
+    "Your logo on the product",
+    "產品上的標誌"
+  ],
+  "Volte a carregar o logótipo.": [
+    "Upload your logo again.",
+    "請重新上傳標誌。"
+  ],
+  "Pré-visualização local. Inicie sessão e carregue o ficheiro para o guardar no pedido.": [
+    "Local preview. Sign in and upload the file to save it to your order.",
+    "本機預覽。請登入並上傳檔案以儲存至訂單。"
+  ],
+  "Símbolo F": [
+    "F symbol",
+    "F 圖示"
+  ],
+  "Substituir logótipo": [
+    "Replace logo",
+    "更換標誌"
+  ],
+  "Carregar logótipo": [
+    "Upload logo",
+    "上傳標誌"
+  ],
+  "Ajustar remoção": [
+    "Adjust removal",
+    "調整移除效果"
+  ],
+  "Ângulo de visualização": [
+    "Viewing angle",
+    "檢視角度"
+  ],
+  "Verso com símbolo NFC": [
+    "Back with NFC symbol",
+    "背面 NFC 圖示"
+  ],
+  "Pré-visualização da frente": [
+    "Front preview",
+    "正面預覽"
+  ],
+  "Pré-visualização do seu logótipo sobre a fotografia do produto.": [
+    "Preview of your logo on the product photo.",
+    "產品照片上的標誌預覽。"
+  ],
+  "Frente disponível para o design da equipa.": [
+    "Front available for the team's design.",
+    "正面可供團隊設計。"
+  ],
+  "A partir de 500 MT · sob consulta": [
+    "From 500 MT · on request",
+    "500 MT 起 · 需洽詢"
+  ],
+  "Nome em inglês": [
+    "Name in English",
+    "英文名稱"
+  ],
+  "Descrição em inglês": [
+    "Description in English",
+    "英文說明"
+  ],
+  "Preço em inglês": [
+    "Price in English",
+    "英文價格"
+  ],
+  "Opções guardadas. As encomendas anteriores mantêm as condições contratadas.": [
+    "Options saved. Previous orders retain their agreed terms.",
+    "選項已儲存，先前訂單保留原約定條件。"
+  ],
+  "Prazo a confirmar após preparação do produto": [
+    "Timing to be confirmed once the product is ready",
+    "產品備妥後確認時間"
+  ],
+  "Preço e disponibilidade a confirmar com o parceiro.": [
+    "Price and availability to be confirmed with the partner.",
+    "價格及供應情況需與合作夥伴確認。"
+  ],
+  "Em branco: sob cotação": [
+    "Blank: quotation required",
+    "留空：需報價"
+  ],
+  "Horário a confirmar": [
+    "Hours to be confirmed",
+    "時間待確認"
+  ],
+  "Guardar levantamento e entregas": [
+    "Save pickup and delivery",
+    "儲存取貨與配送"
+  ],
+  ", Moçambique": [
+    ", Mozambique",
+    "，莫三比克"
+  ],
+  "Termina": [
+    "Expires",
+    "到期於"
+  ],
+  "Venceu": [
+    "Expired",
+    "已到期於"
+  ],
+  "Pesquisar lembretes": [
+    "Search reminders",
+    "搜尋提醒"
+  ],
+  "Nome, email ou pacote": [
+    "Name, email or plan",
+    "姓名、電郵或方案"
+  ],
+  "Filtrar validade dos lembretes": [
+    "Filter reminders by expiry",
+    "依到期日篩選提醒"
+  ],
+  "Pesquisar movimento": [
+    "Search transactions",
+    "搜尋交易"
+  ],
+  "a": [
+    " to ",
+    " 至 "
+  ],
+  "Dimensões do porta-chaves de couro (mm)": [
+    "Leather keychain dimensions (mm)",
+    "皮革鑰匙圈尺寸（毫米）"
+  ],
+  "Ferramentas do perfil": [
+    "Profile tools",
+    "檔案工具"
+  ],
+  "O envio está desactivado na pré-visualização.": [
+    "Sending is disabled in preview.",
+    "預覽時停用發送功能。"
+  ],
+  "Explique ao cliente como efectuar e renovar o pagamento.": [
+    "Explain how the customer can pay and renew.",
+    "說明客戶如何付款及續訂。"
+  ],
+  "Instruções para o design": [
+    "Design instructions",
+    "設計說明"
+  ],
+  "A equipa revê as suas instruções e contacta-o para preparar o design. A produção começa após a sua aprovação.": [
+    "The team reviews your instructions and contacts you to prepare the design. Production starts after your approval.",
+    "團隊會審閱說明並聯絡您準備設計，經您批准後才開始製作。"
+  ],
+  "3. Como pretende receber?": [
+    "3. How would you like to receive it?",
+    "3. 您希望如何收貨？"
+  ],
+  "Bairro, morada e ponto de referência": [
+    "Neighbourhood, address and landmark",
+    "地區、地址及地標"
+  ],
+  "Design:": [
+    "Design:",
+    "設計："
+  ],
+  "Levantamento gratuito ·": [
+    "Free pickup ·",
+    "免費取貨 ·"
+  ],
+  "Valores propostos, sujeitos a publicação pelo gestor. Pagamentos ainda indisponíveis.": [
+    "Proposed prices, subject to publication by management. Payments are not yet available.",
+    "建議價格，須由管理員發佈。付款尚未開放。"
+  ],
+  "em": [
+    " on ",
+    " 於 "
+  ],
+  "Pesquisar cliente": [
+    "Search customers",
+    "搜尋客戶"
+  ],
+  "O endereço público de recuperação não está configurado correctamente.": [
+    "The public recovery address is not configured correctly.",
+    "公開復原網址設定不正確。"
+  ],
+  "Use o envio de recuperação por email para contas de clientes.": [
+    "Use email recovery for customer accounts.",
+    "客戶帳戶請使用電郵復原。"
+  ],
+  "O pedido mudou. Actualize antes de continuar.": [
+    "The request changed. Refresh before continuing.",
+    "申請已變更，請重新整理後繼續。"
+  ],
+  "A candidatura mudou. Actualize antes de decidir.": [
+    "The application changed. Refresh before deciding.",
+    "申請資料已變更，請重新整理後決定。"
+  ],
+  "A candidatura mudou. Actualize antes de carregar novamente.": [
+    "The application changed. Refresh before uploading again.",
+    "申請資料已變更，請重新整理後再次上傳。"
+  ],
+  "Campo inválido.": [
+    "Invalid field.",
+    "欄位無效。"
+  ],
+  "Limite de armazenamento atingido.": [
+    "Storage limit reached.",
+    "已達儲存上限。"
+  ],
+  "A reserva expirou. Confirme a disponibilidade e crie uma nova encomenda; reconcilie qualquer pagamento recebido.": [
+    "The reservation expired. Confirm availability and create a new order; reconcile any received payment.",
+    "預留已到期。請確認供應情況並建立新訂單，核對任何已收到的付款。"
+  ],
+  "O cliente deve indicar o local de entrega antes de atribuir um agente.": [
+    "The customer must provide a delivery location before an agent is assigned.",
+    "指派代理前，客戶須提供交付地點。"
+  ],
+  "Configuração indisponível.": [
+    "Configuration unavailable.",
+    "設定暫不可用。"
+  ],
+  "As opções de recepção estão indisponíveis. Verifique as migrações.": [
+    "Delivery options are unavailable. Check database migrations.",
+    "收貨選項無法使用，請檢查資料庫遷移。"
+  ],
+  "As definições mudaram. Actualize antes de guardar.": [
+    "Settings changed. Refresh before saving.",
+    "設定已變更，請重新整理後儲存。"
+  ],
+  "Imagens indisponíveis. Verifique as migrações.": [
+    "Images unavailable. Check database migrations.",
+    "圖片無法使用，請檢查資料庫遷移。"
+  ],
+  "Esta opção mudou. Actualize antes de guardar.": [
+    "This option changed. Refresh before saving.",
+    "此選項已變更，請重新整理後儲存。"
+  ],
+  "Não foi possível guardar a imagem.": [
+    "Unable to save the image.",
+    "無法儲存圖片。"
+  ],
+  "Período inválido. Use datas até hoje.": [
+    "Invalid period. Use dates no later than today.",
+    "期間無效，請使用不晚於今天的日期。"
+  ],
+  "Preencha os campos obrigatórios.": [
+    "Complete the required fields.",
+    "請填寫必填欄位。"
+  ],
+  "Confirme um período terminado.": [
+    "Confirm a completed period.",
+    "請確認已結束的期間。"
+  ],
+  "Seleccione o último dia do mês.": [
+    "Select the last day of the month.",
+    "請選擇該月最後一天。"
+  ],
+  "Operação inválida.": [
+    "Invalid operation.",
+    "操作無效。"
+  ],
+  "Período fechado. Registe uma correcção no período aberto.": [
+    "Period closed. Record a correction in the open period.",
+    "期間已結帳，請於開放期間登錄更正。"
+  ],
+  "Documento inválido.": [
+    "Invalid document.",
+    "文件無效。"
+  ],
+  "Confirme o movimento no documento ou prestador.": [
+    "Verify the transaction against the document or with the provider.",
+    "請根據文件或向服務商核實交易。"
+  ],
+  "Escolha uma operação paga.": [
+    "Choose a paid transaction.",
+    "請選擇已付款交易。"
+  ],
+  "Estorno inválido.": [
+    "Invalid reversal.",
+    "沖銷無效。"
+  ],
+  "O movimento não pode anteceder o pagamento.": [
+    "The transaction cannot precede the payment.",
+    "交易日期不得早於付款日期。"
+  ],
+  "Registo alterado ou valor superior ao saldo por reconciliar. Actualize.": [
+    "Record changed or amount exceeds the unreconciled balance. Refresh.",
+    "記錄已變更或金額超出待核對餘額，請重新整理。"
+  ],
+  "Não foi possível carregar as subscrições.": [
+    "Unable to load subscriptions.",
+    "無法載入訂閱。"
+  ],
+  "O stock mudou. Actualize antes de guardar.": [
+    "Stock changed. Refresh before saving.",
+    "庫存已變更，請重新整理後儲存。"
+  ],
+  "Domínios temporariamente indisponíveis.": [
+    "Domains are temporarily unavailable.",
+    "網域功能暫不可用。"
+  ],
+  "O domínio personalizado requer o plano Profissional ou uma experiência activa.": [
+    "Custom domains require Professional or an active trial.",
+    "自訂網域需要專業方案或有效試用。"
+  ],
+  "Aguarde antes de voltar a verificar.": [
+    "Wait before checking again.",
+    "請稍候再核查。"
+  ],
+  "Remova o domínio actual antes de adicionar outro.": [
+    "Remove the current domain before adding another.",
+    "新增網域前請先移除現有網域。"
+  ],
+  "Adicione primeiro um domínio.": [
+    "Add a domain first.",
+    "請先新增網域。"
+  ],
+  "Período inválido.": [
+    "Invalid period.",
+    "期間無效。"
+  ],
+  "As estatísticas estão incluídas no plano Profissional e na experiência gratuita.": [
+    "Statistics are included in Professional and the free trial.",
+    "專業方案及免費試用包含統計功能。"
+  ],
+  "Caixa de entrada indisponível.": [
+    "Inbox unavailable.",
+    "收件匣暫不可用。"
+  ],
+  "Autorize a partilha da mensagem e contacto com este negócio.": [
+    "Authorize sharing your message and contact details with this business.",
+    "請授權與此商家分享訊息及聯絡資料。"
+  ],
+  "Indique um email válido e uma mensagem com pelo menos 10 caracteres.": [
+    "Enter a valid email and a message of at least 10 characters.",
+    "請輸入有效電郵及至少 10 個字元的訊息。"
+  ],
+  "Enviou várias mensagens. Tente mais tarde.": [
+    "You sent several messages. Try again later.",
+    "您已發送多則訊息，請稍後再試。"
+  ],
+  "Este formulário está indisponível.": [
+    "This form is unavailable.",
+    "此表格暫不可用。"
+  ],
+  "Identificador inválido.": [
+    "Invalid identifier.",
+    "識別碼無效。"
+  ],
+  "Este negócio atingiu o limite diário de mensagens. Use outro contacto.": [
+    "This business has reached its daily message limit. Use another contact method.",
+    "此商家已達每日訊息上限，請使用其他聯絡方式。"
+  ],
+  "Subscrições temporariamente indisponíveis.": [
+    "Subscriptions are temporarily unavailable.",
+    "訂閱暫不可用。"
+  ],
+  "Sem permissão.": [
+    "Permission denied.",
+    "沒有權限。"
+  ],
+  "Definições inválidas.": [
+    "Invalid settings.",
+    "設定無效。"
+  ],
+  "Indique o destinatário e instruções de pagamento completos.": [
+    "Provide the recipient and complete payment instructions.",
+    "請提供收款人及完整付款說明。"
+  ],
+  "As definições mudaram. Actualize.": [
+    "Settings changed. Refresh.",
+    "設定已變更，請重新整理。"
+  ],
+  "Use uma conta de cliente.": [
+    "Use a customer account.",
+    "請使用客戶帳戶。"
+  ],
+  "Os pagamentos mensais ainda não estão disponíveis. O acesso de lançamento mantém-se.": [
+    "Monthly payments are not yet available. Launch access continues.",
+    "月繳付款尚未開放，推出期間存取權維持不變。"
+  ],
+  "Confirme o pagamento de um mês, sem renovação automática.": [
+    "Confirm payment for one month, without automatic renewal.",
+    "請確認支付一個月費用，不自動續訂。"
+  ],
+  "O plano mudou. Actualize antes de continuar.": [
+    "The plan changed. Refresh before continuing.",
+    "方案已變更，請重新整理後繼續。"
+  ],
+  "Active primeiro o perfil digital.": [
+    "Activate your digital profile first.",
+    "請先啟用數位檔案。"
+  ],
+  "Já tem uma alteração paga agendada. Aguarde a activação antes de pedir outro pagamento.": [
+    "You already have a paid change scheduled. Wait for activation before requesting another payment.",
+    "已有已付款變更排程，請等待生效後再申請付款。"
+  ],
+  "Preço indisponível.": [
+    "Price unavailable.",
+    "價格暫不可用。"
+  ],
+  "Consulte o estado do pagamento PaySuite antes de alterar este pedido.": [
+    "Check the PaySuite payment status before changing this request.",
+    "更改申請前請先核查 PaySuite 付款狀態。"
+  ],
+  "Use a reconciliação PaySuite para confirmar este pagamento.": [
+    "Use PaySuite reconciliation to confirm this payment.",
+    "請使用 PaySuite 對帳確認此付款。"
+  ],
+  "Pedido cancelado ou expirado. Não confirme; contacte o cliente para resolver o pagamento.": [
+    "Request cancelled or expired. Do not confirm; contact the customer to resolve the payment.",
+    "申請已取消或到期。請勿確認，應聯絡客戶處理付款。"
+  ],
+  "Esta transacção já foi usada num produto.": [
+    "This transaction was already used for a product.",
+    "此交易已用於產品付款。"
+  ],
+  "Perfil não activado.": [
+    "Profile not activated.",
+    "檔案尚未啟用。"
+  ],
+  "Já existe uma alteração paga agendada. Aguarde a sua activação.": [
+    "A paid change is already scheduled. Wait for activation.",
+    "已有已付款變更排程，請等待生效。"
+  ],
+  "O pedido ou plano mudou. Actualize antes de confirmar.": [
+    "The request or plan changed. Refresh before confirming.",
+    "申請或方案已變更，請重新整理後確認。"
+  ],
+  "Esta transacção já está registada. Actualize antes de tentar novamente.": [
+    "This transaction is already recorded. Refresh before retrying.",
+    "此交易已記錄，請重新整理後再試。"
+  ],
+  "Equipas temporariamente indisponíveis.": [
+    "Teams are temporarily unavailable.",
+    "團隊功能暫不可用。"
+  ],
+  "Confirme que autoriza a equipa a aplicar a cor da marca ao seu perfil.": [
+    "Confirm that you allow the team to apply its brand colour to your profile.",
+    "請確認允許團隊將品牌色套用至您的檔案。"
+  ],
+  "Convite indisponível, expirado ou equipa completa.": [
+    "Invitation unavailable, expired or team full.",
+    "邀請無效、已到期或團隊已滿。"
+  ],
+  "Equipa não encontrada.": [
+    "Team not found.",
+    "找不到團隊。"
+  ],
+  "A gestão de equipa requer o plano Profissional ou uma experiência activa.": [
+    "Team management requires Professional or an active trial.",
+    "團隊管理需要專業方案或有效試用。"
+  ],
+  "Já tem uma equipa.": [
+    "You already have a team.",
+    "您已有團隊。"
+  ],
+  "Crie primeiro a equipa.": [
+    "Create the team first.",
+    "請先建立團隊。"
+  ],
+  "Email inválido.": [
+    "Invalid email.",
+    "電郵無效。"
+  ],
+  "Limite de 25 membros e convites.": [
+    "Limit of 25 members and invitations.",
+    "成員及邀請合計上限為 25。"
+  ],
+  "Cor inválida.": [
+    "Invalid colour.",
+    "顏色無效。"
+  ],
+  "O perfil mudou ou a pessoa saiu da equipa. Actualize.": [
+    "The profile changed or the person left the team. Refresh.",
+    "檔案已變更或該成員已離隊，請重新整理。"
+  ],
+  "Evento inválido.": [
+    "Invalid event.",
+    "事件無效。"
+  ],
+  "Etapa inválida.": [
+    "Invalid step.",
+    "步驟無效。"
+  ],
+  "O pedido mudou. Actualize antes de guardar.": [
+    "The request changed. Refresh before saving.",
+    "申請已變更，請重新整理後儲存。"
+  ],
+  "O plano ou perfil mudou. Actualize antes de continuar.": [
+    "The plan or profile changed. Refresh before continuing.",
+    "方案或檔案已變更，請重新整理後繼續。"
+  ],
+  "Pagamento não encontrado.": [
+    "Payment not found.",
+    "找不到付款。"
+  ],
+  "Pagamentos temporariamente indisponíveis.": [
+    "Payments are temporarily unavailable.",
+    "付款暫不可用。"
+  ],
+  "Aguarde antes de tentar novamente.": [
+    "Wait before trying again.",
+    "請稍候再試。"
+  ],
+  "Confirme o valor e as condições de pagamento.": [
+    "Confirm the amount and payment terms.",
+    "請確認金額及付款條件。"
+  ],
+  "Compras de produtos ainda indisponíveis.": [
+    "Product purchases are not available yet.",
+    "產品購買尚未開放。"
+  ],
+  "O preço mudou. Actualize a configuração.": [
+    "The price changed. Refresh the configuration.",
+    "價格已變更，請更新設定。"
+  ],
+  "Preencha o contacto e a morada de entrega.": [
+    "Complete the contact details and delivery address.",
+    "請填寫聯絡資料及配送地址。"
+  ],
+  "O logótipo não está disponível para esta conta. Volte a carregá-lo.": [
+    "The logo is unavailable for this account. Upload it again.",
+    "此帳戶無法使用該標誌，請重新上傳。"
+  ],
+  "Descreva o design que pretende para a equipa.": [
+    "Describe the design you would like the team to create.",
+    "請說明希望團隊製作的設計。"
+  ],
+  "Subscrições indisponíveis.": [
+    "Subscriptions unavailable.",
+    "訂閱暫不可用。"
+  ],
+  "O pagamento do perfil estará disponível após os 30 dias grátis.": [
+    "Profile payment will be available after the 30 free days.",
+    "免費 30 天結束後可支付檔案方案費用。"
+  ],
+  "Já tem uma alteração de plano agendada.": [
+    "You already have a plan change scheduled.",
+    "您已有方案變更排程。"
+  ],
+  "O preço mudou. Actualize antes de continuar.": [
+    "The price changed. Refresh before continuing.",
+    "價格已變更，請重新整理後繼續。"
+  ],
+  "Pedido registado. Estamos a confirmar a ligação ao prestador; não repita o pagamento.": [
+    "Request recorded. We are confirming the provider connection; do not pay again.",
+    "申請已記錄，正在確認服務商連線，請勿重複付款。"
+  ],
+  "Aplique a migração de pagamentos antes de configurar.": [
+    "Apply the payments migration before configuring.",
+    "設定前請先套用付款資料庫遷移。"
+  ],
+  "Valor inválido.": [
+    "Invalid amount.",
+    "金額無效。"
+  ],
+  "Configuração inválida.": [
+    "Invalid configuration.",
+    "設定無效。"
+  ],
+  "Configure primeiro os segredos e a activação PaySuite no Cloudflare.": [
+    "First configure PaySuite credentials and activation in Cloudflare.",
+    "請先於 Cloudflare 設定 PaySuite 憑證及啟用。"
+  ],
+  "Preços alterados por outro gestor. Actualize.": [
+    "Another manager changed the prices. Refresh.",
+    "其他管理員已更改價格，請重新整理。"
+  ],
+  "Indique o ID PaySuite obtido no painel do prestador.": [
+    "Enter the PaySuite ID from the provider dashboard.",
+    "請輸入服務商面板上的 PaySuite ID。"
+  ],
+  "Confirme que a encomenda está paga, tem perfil associado e ainda não foi entregue. Actualize a lista.": [
+    "Confirm the order is paid, has a linked profile and has not been delivered. Refresh the list.",
+    "請確認訂單已付款、已連結檔案且尚未交付，並重新整理清單。"
+  ],
+  "Não foi possível actualizar. Confirme os valores, as credenciais e o estado do pedido.": [
+    "Unable to update. Check amounts, credentials and request status.",
+    "無法更新，請核對金額、憑證及申請狀態。"
+  ],
+  "Design inválido.": [
+    "Invalid design.",
+    "設計無效。"
+  ],
+  "Material indisponível.": [
+    "Material unavailable.",
+    "材質暫不可用。"
+  ],
+  "Preço por confirmar.": [
+    "Price to be confirmed.",
+    "價格待確認。"
+  ],
+  "Preço inválido.": [
+    "Invalid price.",
+    "價格無效。"
+  ],
+  "Opção ou versão inválida.": [
+    "Invalid option or version.",
+    "選項或版本無效。"
+  ],
+  "Carregue uma imagem através do gestor.": [
+    "Upload an image through the manager.",
+    "請透過管理面板上傳圖片。"
+  ],
+  "Indique uma descrição de até 180 caracteres.": [
+    "Enter a description up to 180 characters.",
+    "請輸入最多 180 個字元的說明。"
+  ],
+  "Perfil indisponível.": [
+    "Profile unavailable.",
+    "檔案暫不可用。"
+  ],
+  "Defina entre 1 e 100 cidades e até 100 pontos.": [
+    "Set 1 to 100 cities and up to 100 pickup points.",
+    "請設定 1 至 100 個城市，最多 100 個取貨點。"
+  ],
+  "Verifique os campos de texto.": [
+    "Check the text fields.",
+    "請檢查文字欄位。"
+  ],
+  "Tarifa inválida.": [
+    "Invalid rate.",
+    "費率無效。"
+  ],
+  "Cidades repetidas.": [
+    "Duplicate cities.",
+    "城市重複。"
+  ],
+  "Verifique as cidades e os pontos repetidos.": [
+    "Check for duplicate cities and pickup points.",
+    "請檢查重複城市及取貨點。"
+  ],
+  "Seleccione uma cidade disponível.": [
+    "Select an available city.",
+    "請選擇可用城市。"
+  ],
+  "Seleccione um ponto de levantamento disponível.": [
+    "Select an available pickup point.",
+    "請選擇可用取貨點。"
+  ],
+  "Serviço sob consulta ou indisponível. Solicite uma proposta antes de pagar.": [
+    "Service requires a quote or is unavailable. Request a proposal before paying.",
+    "服務需洽詢或暫不可用，付款前請先索取報價。"
+  ],
+  "Configure o porta-chaves de couro.": [
+    "Configure the leather keychain.",
+    "請設定皮革鑰匙圈。"
+  ],
+  "Cor ou logótipo inválido.": [
+    "Invalid colour or logo.",
+    "顏色或標誌無效。"
+  ],
+  "Ajuste a posição do logótipo.": [
+    "Adjust the logo position.",
+    "請調整標誌位置。"
+  ],
+  "Carregue o logótipo antes de pagar.": [
+    "Upload the logo before paying.",
+    "付款前請先上傳標誌。"
+  ],
+  "Imagem ou tolerância inválida.": [
+    "Invalid image or tolerance.",
+    "圖片或容差無效。"
+  ],
+  "Escolha a cor do fundo.": [
+    "Choose the background colour.",
+    "請選擇背景顏色。"
+  ],
+  "Não foi possível preparar a imagem.": [
+    "Unable to prepare the image.",
+    "無法準備圖片。"
+  ],
+  "Não foi encontrado fundo dessa cor nas margens. Ajuste a cor ou a tolerância.": [
+    "No background of that colour was found at the edges. Adjust the colour or tolerance.",
+    "邊緣未找到該顏色的背景，請調整顏色或容差。"
+  ],
+  "A remoção apagaria toda a imagem. Reduza a tolerância ou escolha outra cor.": [
+    "Removal would erase the entire image. Reduce tolerance or choose another colour.",
+    "此移除操作會清除整張圖片，請降低容差或選擇其他顏色。"
+  ],
+  "Método de pagamento inválido.": [
+    "Invalid payment method.",
+    "付款方式無效。"
+  ],
+  "Resposta de pagamento inválida.": [
+    "Invalid payment response.",
+    "付款回應無效。"
+  ],
+  "Endereço de pagamento não autorizado.": [
+    "Payment address not authorized.",
+    "付款網址未獲授權。"
+  ],
+  "Pagamentos indisponíveis.": [
+    "Payments unavailable.",
+    "付款暫不可用。"
+  ],
+  "Não foi possível confirmar o pedido no prestador.": [
+    "Unable to confirm the request with the provider.",
+    "無法向服務商確認申請。"
+  ],
+  "Data inválida.": [
+    "Invalid date.",
+    "日期無效。"
+  ],
+  "Funcionalidades inválidas.": [
+    "Invalid features.",
+    "功能無效。"
+  ],
+  "Seleccione as funcionalidades do plano.": [
+    "Select the plan features.",
+    "請選擇方案功能。"
+  ],
+  "Periodicidade inválida.": [
+    "Invalid billing cycle.",
+    "計費週期無效。"
+  ],
+  "Active pelo menos uma periodicidade.": [
+    "Enable at least one billing cycle.",
+    "請至少啟用一種計費週期。"
+  ],
+  "Ordem inválida.": [
+    "Invalid order.",
+    "排序無效。"
+  ],
+  "Benefícios inválidos (máximo 12).": [
+    "Invalid benefits (maximum 12).",
+    "優惠無效（最多 12 項）。"
+  ],
+  "Pedido vazio.": [
+    "Empty request.",
+    "申請為空。"
+  ],
+  "Não foi possível consultar o DNS.": [
+    "Unable to query DNS.",
+    "無法查詢 DNS。"
+  ],
+  "O serviço de domínios ainda não está configurado.": [
+    "The domain service is not configured yet.",
+    "網域服務尚未設定。"
+  ],
+  "O prestador não conseguiu actualizar o domínio. Confirme a configuração Cloudflare for SaaS.": [
+    "The provider could not update the domain. Check Cloudflare for SaaS configuration.",
+    "服務商無法更新網域，請檢查 Cloudflare for SaaS 設定。"
+  ],
+  "Texto inválido ou demasiado longo.": [
+    "Invalid or overly long text.",
+    "文字無效或過長。"
+  ],
+  "Use um endereço HTTPS sem credenciais.": [
+    "Use an HTTPS address without credentials.",
+    "請使用不含憑證的 HTTPS 網址。"
+  ],
+  "Conteúdo adicional inválido.": [
+    "Invalid additional content.",
+    "額外內容無效。"
+  ],
+  "Pode apresentar até 6 produtos ou serviços.": [
+    "You can display up to 6 products or services.",
+    "最多可展示 6 項產品或服務。"
+  ],
+  "Selecção de links inválida.": [
+    "Invalid link selection.",
+    "連結選擇無效。"
+  ],
+  "Preferência de contacto inválida.": [
+    "Invalid contact preference.",
+    "聯絡偏好無效。"
+  ],
+  "Indique um domínio público seu, sem https:// ou caminhos.": [
+    "Enter a public domain you own, without https:// or paths.",
+    "請輸入您擁有的公開網域，不含 https:// 或路徑。"
+  ],
+  "Escolha um modelo válido de PVC + epóxi.": [
+    "Choose a valid PVC + epoxy model.",
+    "請選擇有效的 PVC + 環氧樹脂款式。"
+  ],
+  "O volume excede o limite desta consulta. Solicite uma exportação assistida.": [
+    "Volume exceeds this query's limit. Request an assisted export.",
+    "資料量超過查詢上限，請申請協助匯出。"
+  ],
+  "Demasiados movimentos para esta consulta.": [
+    "Too many transactions for this query.",
+    "此查詢的交易數量過多。"
+  ],
+  "Referência de pagamento inválida.": [
+    "Invalid payment reference.",
+    "付款編號無效。"
+  ],
+  "Pagamento não corresponde ao pedido.": [
+    "Payment does not match the request.",
+    "付款與申請不符。"
+  ],
+  "Pedido de subscrição inválido.": [
+    "Invalid subscription request.",
+    "訂閱申請無效。"
+  ],
+  "A subscrição necessita de revisão.": [
+    "The subscription needs review.",
+    "訂閱需要核查。"
+  ],
+  "Tente novamente a confirmação.": [
+    "Try confirming again.",
+    "請再次嘗試確認。"
+  ],
+  "Escolha até 90 dias de histórico.": [
+    "Select up to 90 days of history.",
+    "最多可選擇 90 天歷史記錄。"
+  ],
+  "Antecedência inválida (2 a 30 dias).": [
+    "Invalid lead time (2 to 30 days).",
+    "提前天數無效（2 至 30 天）。"
+  ],
+  "Mensagem inválida.": [
+    "Invalid message.",
+    "訊息無效。"
+  ],
+  "Assunto inválido.": [
+    "Invalid subject.",
+    "主旨無效。"
+  ],
+  "Variável desconhecida na mensagem.": [
+    "Unknown variable in the message.",
+    "訊息含未知變數。"
+  ],
+  "Inclua {link_renovacao} na mensagem.": [
+    "Include {link_renovacao} in the message.",
+    "請在訊息中加入 {link_renovacao}。"
+  ],
+  "· CSV": [
+    "· CSV",
+    "· CSV"
+  ],
+  "M-Pesa": [
+    "M-Pesa",
+    "M-Pesa"
+  ],
+  "e-Mola": [
+    "e-Mola",
+    "e-Mola"
+  ],
+  "Visa / Mastercard": [
+    "Visa / Mastercard",
+    "Visa / Mastercard"
+  ],
+  "MT": [
+    "MT",
+    "MT"
+  ],
+  "· Y": [
+    "· Y",
+    "· Y"
+  ],
+  "MT ·": [
+    "MT ·",
+    "MT ·"
+  ],
+  "perfil.suaempresa.co.mz": [
+    "perfil.suaempresa.co.mz",
+    "perfil.suaempresa.co.mz"
+  ],
+  "_framy.": [
+    "_framy.",
+    "_framy."
+  ],
+  "Website": [
+    "Website",
+    "Website"
+  ],
+  "+258 84 000 0000": [
+    "+258 84 000 0000",
+    "+258 84 000 0000"
+  ],
+  "Descreva o logótipo, os textos e o estilo que pretende.": [
+    "Describe the logo, text and style you would like.",
+    "請描述您想要的標誌、文字及風格。"
+  ],
+  "Produtos e serviços": [
+    "Products and services",
+    "產品與服務"
+  ],
+  "Saber mais": [
+    "Find out more",
+    "了解更多"
+  ],
+  "Pedir informações": [
+    "Ask for information",
+    "索取資訊"
+  ],
+  "A sua mensagem está na caixa de entrada do negócio. Poderão responder para o seu email.": [
+    "Your message is in the business inbox. They can reply to your email.",
+    "您的訊息已傳送至商家的收件匣。商家可透過電子郵件回覆您。"
+  ],
+  "Enviar o meu nome, email e mensagem a este negócio. Conservados por até 90 dias.": [
+    "Send my name, email and message to this business. Stored for up to 90 days.",
+    "將我的姓名、電子郵件及訊息傳送給此商家。資料最多保留 90 天。"
+  ],
+  "Enviar pedido": [
+    "Send enquiry",
+    "傳送查詢"
   ]
 }

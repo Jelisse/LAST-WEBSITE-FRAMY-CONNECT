@@ -1,5 +1,9 @@
 'use client';
-import { featureCatalog, type PlanFeatures, type FeatureKey } from '@/lib/plan-features';
+import {
+  featureCatalog,
+  type PlanFeatures,
+  type FeatureKey,
+} from '@/lib/plan-features';
 import { PlanFeatureIcon } from './plan-feature-icon';
 import { useI18n } from './language-provider';
 import { profileColors } from '@/lib/profile-business';
@@ -36,7 +40,12 @@ type DomainData = {
     checks_json: string;
   } | null;
 };
-export function ProfileGrowthHub({ features, onEdit, onAnalytics, initialTab = 'overview' }: {
+export function ProfileGrowthHub({
+  features,
+  onEdit,
+  onAnalytics,
+  initialTab = 'overview',
+}: {
   features: PlanFeatures;
   initialTab?: 'overview' | 'billing';
   onEdit: (section: 'business' | 'extras') => void;
@@ -46,19 +55,46 @@ export function ProfileGrowthHub({ features, onEdit, onAnalytics, initialTab = '
   const [tab, setTab] = useState(initialTab as string);
   return (
     <div className="profile-growth">
-      <section className="professional-tool-links" aria-label={t('Ferramentas profissionais')}>
+      <section
+        className="professional-tool-links"
+        aria-label={t('Ferramentas profissionais')}
+      >
         <h2>{t('Ferramentas profissionais')}</h2>
         <div>
-          {(['whatsapp', 'location', 'showcase', 'english', 'enquiries', 'analytics', 'teams'] as FeatureKey[]).filter(key => features[key]).map(key => (
-            <button type="button" key={key} onClick={() => {
-              if (key === 'analytics') onAnalytics();
-              else if (key === 'teams' || key === 'enquiries') setTab(key);
-              else onEdit(key === 'whatsapp' || key === 'location' ? 'business' : 'extras');
-            }}><PlanFeatureIcon feature={key} /><span>{t(featureCatalog[key])}</span></button>
-          ))}
+          {(
+            [
+              'whatsapp',
+              'location',
+              'showcase',
+              'english',
+              'enquiries',
+              'analytics',
+              'teams',
+            ] as FeatureKey[]
+          )
+            .filter((key) => features[key])
+            .map((key) => (
+              <button
+                type="button"
+                key={key}
+                onClick={() => {
+                  if (key === 'analytics') onAnalytics();
+                  else if (key === 'teams' || key === 'enquiries') setTab(key);
+                  else
+                    onEdit(
+                      key === 'whatsapp' || key === 'location'
+                        ? 'business'
+                        : 'extras',
+                    );
+                }}
+              >
+                <PlanFeatureIcon feature={key} />
+                <span>{t(featureCatalog[key])}</span>
+              </button>
+            ))}
         </div>
       </section>
-      <nav aria-label="Ferramentas do perfil" className="growth-tabs">
+      <nav aria-label={t('Ferramentas do perfil')} className="growth-tabs">
         {[
           ['overview', 'Ferramentas profissionais'],
           ['billing', 'Plano e renovação'],
@@ -78,7 +114,14 @@ export function ProfileGrowthHub({ features, onEdit, onAnalytics, initialTab = '
     </div>
   );
 }
-function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: boolean }) {
+function GrowthTool({
+  tool,
+  canManageTeam,
+}: {
+  tool: string;
+  canManageTeam: boolean;
+}) {
+  const { t } = useI18n();
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]),
     [teams, setTeams] = useState<TeamData | null>(null),
     [domains, setDomains] = useState<DomainData | null>(null),
@@ -137,21 +180,22 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
   }
   return (
     <section className="profile-growth-panel">
-      {error && <p role="alert">{error}</p>}
-      {notice && <output>{notice}</output>}
-      {!loaded && !error && <p>A carregar…</p>}
+      {error && <p role="alert">{t(error)}</p>}
+      {notice && <output>{t(notice)}</output>}
+      {!loaded && !error && <p>{t('A carregar…')}</p>}
       {tool === 'enquiries' && (
         <>
-          <h2>Pedidos de informação</h2>
+          <h2>{t('Pedidos de informação')}</h2>
           <p>
-            Mensagens dos visitantes do seu perfil, conservadas por 90 dias.
-            Responda pelo seu email; a Framy não responde automaticamente. Não
-            envie dados sensíveis.
+            {t(
+              ' Mensagens dos visitantes do seu perfil, conservadas por 90 dias. Responda pelo seu email; a Framy não responde automaticamente. Não envie dados sensíveis. ',
+            )}
           </p>
           {loaded && !enquiries.length && (
             <p>
-              Ainda não recebeu mensagens. Active o formulário no editor e
-              publique o perfil.
+              {t(
+                ' Ainda não recebeu mensagens. Active o formulário no editor e publique o perfil. ',
+              )}
             </p>
           )}
           {enquiries.map((e) => (
@@ -174,7 +218,8 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
               </p>
               <p className="growth-preserve">{e.message}</p>
               <a href={'mailto:' + encodeURIComponent(e.email)}>
-                Responder a {e.email} ↗
+                {t(' Responder a ')}
+                {e.email} ↗
               </a>
               <div className="growth-actions">
                 <button
@@ -183,7 +228,7 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
                     void act({ action: 'status', id: e.id, status: 'read' })
                   }
                 >
-                  Marcar como lida
+                  {t(' Marcar como lida ')}
                 </button>
                 <button
                   disabled={busy}
@@ -191,16 +236,16 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
                     void act({ action: 'status', id: e.id, status: 'closed' })
                   }
                 >
-                  Concluir
+                  {t(' Concluir ')}
                 </button>
                 <details>
-                  <summary>Eliminar</summary>
-                  <p>A mensagem será eliminada permanentemente.</p>
+                  <summary>{t('Eliminar')}</summary>
+                  <p>{t('A mensagem será eliminada permanentemente.')}</p>
                   <button
                     disabled={busy}
                     onClick={() => void act({ action: 'delete', id: e.id })}
                   >
-                    Confirmar eliminação
+                    {t(' Confirmar eliminação ')}
                   </button>
                 </details>
               </div>
@@ -210,13 +255,24 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
       )}
       {teams && (
         <>
-          <h2>A sua equipa</h2>
-          <output>{teams.members.length} membros · {teams.pending.length} convites pendentes · {Math.max(0, 25 - teams.members.length - teams.pending.length)} lugares disponíveis de 25.</output>
-          {!canManageTeam && <p>A criação de equipas e convites requer um plano com gestão de equipa. Pode aceitar convites e gerir as suas participações.</p>}
+          <h2>{t('A sua equipa')}</h2>
+          <output>
+            {teams.members.length} {t(' membros · ')}
+            {teams.pending.length} {t(' convites pendentes · ')}
+            {Math.max(0, 25 - teams.members.length - teams.pending.length)}{' '}
+            {t(' lugares disponíveis de 25.')}
+          </output>
+          {!canManageTeam && (
+            <p>
+              {t(
+                'A criação de equipas e convites requer um plano com gestão de equipa. Pode aceitar convites e gerir as suas participações.',
+              )}
+            </p>
+          )}
           <p>
-            Até 25 pessoas. Cada pessoa mantém a sua conta, plano e contactos
-            privados. A equipa vê o nome, link e estado de publicação e pode
-            aplicar uma cor de marca após aceitação.
+            {t(
+              ' Até 25 pessoas. Cada pessoa mantém a sua conta, plano e contactos privados. A equipa vê o nome, link e estado de publicação e pode aplicar uma cor de marca após aceitação. ',
+            )}
           </p>
           {teams.invitations.map((i) => (
             <form
@@ -227,13 +283,17 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
                 void act({ action: 'accept', id: i.id, consent: true });
               }}
             >
-              <h3>Convite: {i.name}</h3>
+              <h3>
+                {t('Convite: ')}
+                {i.name}
+              </h3>
               <label className="growth-check">
                 <input type="checkbox" required />
-                Autorizo esta equipa a ver o estado do meu perfil e a alterar a
-                cor nos rascunhos e no perfil publicado.
+                {t(
+                  ' Autorizo esta equipa a ver o estado do meu perfil e a alterar a cor nos rascunhos e no perfil publicado. ',
+                )}
               </label>
-              <button disabled={busy}>Aceitar convite</button>
+              <button disabled={busy}>{t('Aceitar convite')}</button>
             </form>
           ))}
           {teams.memberships.map((m) => (
@@ -243,7 +303,7 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
                 disabled={busy}
                 onClick={() => void act({ action: 'leave', id: m.id })}
               >
-                Sair da equipa
+                {t(' Sair da equipa ')}
               </button>
             </article>
           ))}
@@ -258,10 +318,12 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
               }}
             >
               <label>
-                Nome da equipa
+                {t(' Nome da equipa ')}
                 <input name="name" maxLength={90} required />
               </label>
-              <button disabled={busy || !canManageTeam}>Criar equipa</button>
+              <button disabled={busy || !canManageTeam}>
+                {t('Criar equipa')}
+              </button>
             </form>
           ) : (
             <>
@@ -276,24 +338,32 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
                 }}
               >
                 <label>
-                  Email da pessoa
+                  {t(' Email da pessoa ')}
                   <input type="email" name="email" required maxLength={160} />
                 </label>
-                <button disabled={busy || !canManageTeam || teams.members.length + teams.pending.length >= 25}>Criar convite</button>
+                <button
+                  disabled={
+                    busy ||
+                    !canManageTeam ||
+                    teams.members.length + teams.pending.length >= 25
+                  }
+                >
+                  {t('Criar convite')}
+                </button>
                 <p>
-                  O convite aparece na conta com este email, em Ferramentas do
-                  perfil → A minha equipa. Expira em 7 dias. Não enviamos emails
-                  de convite automaticamente.
+                  {t(
+                    ' O convite aparece na conta com este email, em Ferramentas do perfil → A minha equipa. Expira em 7 dias. Não enviamos emails de convite automaticamente. ',
+                  )}
                 </p>
               </form>
               {teams.pending.map((i) => (
                 <p key={i.id}>
-                  {i.email} · convite pendente{' '}
+                  {i.email} {t(' · convite pendente')}{' '}
                   <button
                     disabled={busy}
                     onClick={() => void act({ action: 'revoke', id: i.id })}
                   >
-                    Revogar
+                    {t(' Revogar ')}
                   </button>
                 </p>
               ))}
@@ -306,10 +376,10 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Ver perfil ↗
+                      {t(' Ver perfil ↗ ')}
                     </a>
                   ) : (
-                    <p>Perfil não publicado</p>
+                    <p>{t('Perfil não publicado')}</p>
                   )}
                   <form
                     onSubmit={(ev) => {
@@ -323,7 +393,7 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
                     }}
                   >
                     <label>
-                      Cor da marca
+                      {t(' Cor da marca ')}
                       <select name="accent">
                         {profileColors.map((color) => (
                           <option key={color.value} value={color.value}>
@@ -333,14 +403,14 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
                       </select>
                     </label>
                     <button disabled={busy || !canManageTeam || !m.username}>
-                      Aplicar ao perfil
+                      {t(' Aplicar ao perfil ')}
                     </button>
                   </form>
                   <button
                     disabled={busy}
                     onClick={() => void act({ action: 'remove', id: m.id })}
                   >
-                    Remover da equipa
+                    {t(' Remover da equipa ')}
                   </button>
                 </article>
               ))}
@@ -350,16 +420,17 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
       )}
       {domains && (
         <>
-          <h2>O seu domínio, o seu perfil</h2>
+          <h2>{t('O seu domínio, o seu perfil')}</h2>
           <p>
-            Ligue um subdomínio que já possui, por exemplo
-            perfil.suaempresa.co.mz. Incluído no plano Profissional; o registo
-            do domínio é pago ao seu fornecedor.
+            {t(
+              ' Ligue um subdomínio que já possui, por exemplo perfil.suaempresa.co.mz. Incluído no plano Profissional; o registo do domínio é pago ao seu fornecedor. ',
+            )}
           </p>
           {!domains.configured && (
             <p className="growth-notice">
-              Pode registar o domínio e provar a propriedade. A publicação HTTPS
-              aguarda a activação pela equipa Framy.
+              {t(
+                ' Pode registar o domínio e provar a propriedade. A publicação HTTPS aguarda a activação pela equipa Framy. ',
+              )}
             </p>
           )}
           {!domains.domain ? (
@@ -373,21 +444,21 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
               }}
             >
               <label>
-                Domínio
+                {t(' Domínio ')}
                 <input
                   name="hostname"
-                  placeholder="perfil.suaempresa.co.mz"
+                  placeholder={t('perfil.suaempresa.co.mz')}
                   required
                   maxLength={253}
                 />
               </label>
-              <button disabled={busy}>Adicionar domínio</button>
+              <button disabled={busy}>{t('Adicionar domínio')}</button>
             </form>
           ) : (
             <>
               <h3>{domains.domain.hostname}</h3>
               <p>
-                Estado:{' '}
+                {t(' Estado:')}{' '}
                 {(
                   {
                     pending: 'A aguardar prova de propriedade',
@@ -399,36 +470,43 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
               </p>
               <ol>
                 <li>
-                  No fornecedor DNS, adicione TXT{' '}
-                  <code>_framy.{domains.domain.hostname}</code> com valor{' '}
-                  <code>{domains.domain.token}</code>.
+                  {t(' No fornecedor DNS, adicione TXT')}{' '}
+                  <code>
+                    {t('_framy.')}
+                    {domains.domain.hostname}
+                  </code>{' '}
+                  {t(' com valor')} <code>{domains.domain.token}</code>.
                 </li>
                 {domains.cname && (
                   <li>
-                    Adicione CNAME <code>{domains.domain.hostname}</code> →{' '}
+                    {t(' Adicione CNAME ')}
+                    <code>{domains.domain.hostname}</code> →{' '}
                     <code>{domains.cname}</code>.
                   </li>
                 )}
                 <li>
-                  Confirme os registos, aguarde a propagação e verifique
-                  novamente. Mantenha o TXT para a verificação periódica.
+                  {t(
+                    ' Confirme os registos, aguarde a propagação e verifique novamente. Mantenha o TXT para a verificação periódica. ',
+                  )}
                 </li>
               </ol>
               {domains.domain.checks_json !== '[]' && (
                 <details>
-                  <summary>Registos de validação do certificado</summary>
+                  <summary>{t('Registos de validação do certificado')}</summary>
                   {domainRecords(domains.domain.checks_json).map(
                     (record, i) => (
                       <p key={i}>
                         {record.type}: <code>{record.name}</code>
                         <br />
-                        Valor: <code>{record.value}</code>
+                        {t(' Valor: ')}
+                        <code>{record.value}</code>
                       </p>
                     ),
                   )}
                   <p>
-                    Adicione estes registos no seu fornecedor DNS e volte a
-                    verificar.
+                    {t(
+                      ' Adicione estes registos no seu fornecedor DNS e volte a verificar. ',
+                    )}
                   </p>
                 </details>
               )}
@@ -436,19 +514,20 @@ function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: bool
                 disabled={busy}
                 onClick={() => void act({ action: 'verify' })}
               >
-                {busy ? 'A verificar…' : 'Verificar DNS e HTTPS'}
+                {t(busy ? 'A verificar…' : 'Verificar DNS e HTTPS')}
               </button>
               <details>
-                <summary>Desligar domínio</summary>
+                <summary>{t('Desligar domínio')}</summary>
                 <p>
-                  O domínio deixará de abrir o perfil. O endereço Framy continua
-                  disponível.
+                  {t(
+                    ' O domínio deixará de abrir o perfil. O endereço Framy continua disponível. ',
+                  )}
                 </p>
                 <button
                   disabled={busy}
                   onClick={() => void act({ action: 'remove' })}
                 >
-                  Confirmar remoção
+                  {t(' Confirmar remoção ')}
                 </button>
               </details>
             </>

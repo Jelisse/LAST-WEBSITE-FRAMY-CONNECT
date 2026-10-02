@@ -1,6 +1,6 @@
 /* Shared Framy UI palette, based on the supplied orange product reference. */
-:root { --framy-orange:#ee590d; --framy-orange-hover:#ff742b; --framy-ink:#28170e; }
-body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page) { --action-orange:var(--framy-orange); --action-orange-hover:var(--framy-orange-hover); --action-orange-pressed:#de4c04; }
+:root { --framy-orange:#ee590d; --framy-orange-hover:#dc4f08; --framy-orange-text:#ae3b08; --framy-ink:#28170e; --primary:var(--framy-orange); --strong:var(--framy-orange-text); --customer-orange:var(--framy-orange-text); --action-orange:var(--framy-orange); --action-orange-hover:var(--framy-orange-hover); --action-orange-pressed:#c84608; }
+body:has(.brand-topbar,.framy-home,.workspace-header,.manager-top,.agent-header,.staff-page) { --action-orange:var(--framy-orange); --action-orange-hover:var(--framy-orange-hover); --action-orange-pressed:#c84608; }
 body :is(.site-header.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) { position:sticky; top:0; z-index:50; background:var(--framy-orange); color:#fff; border-bottom:1px solid #c9470c; box-shadow:0 3px 16px #47241018; backdrop-filter:none; }
 body :is(.workspace-header,.manager-top,.agent-header,.staff-page > header) { min-height:72px; height:auto; padding-block:12px; }
 body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) :is(.account-menu-trigger,.breadcrumb,.agent-eyebrow,.header-contact-link,.header-agent-link,[data-slot="sidebar-trigger"]) { color:#fff; }
@@ -42,6 +42,9 @@ body :is(.agent-header,.staff-page > header) { padding-inline:20px; border-top:0
 body :is(.agent-header,.staff-page > header) p { color:#fff; }
 
 body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) .account-menu-label { color:#fff; }
+body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) { isolation:isolate; }
+body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header)::before { content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; background:url('/media-optimized/brand-profile-mountains-1440-629d89b12d66.webp') right 60% / cover no-repeat; filter:invert(1); mix-blend-mode:screen; opacity:.075; }
+.auth-card :is(.auth-switch,.auth-return,.auth-forgot) { color:var(--framy-orange-text); }
 body:has(.brand-topbar) .auth-card > .language-selector { display:none; }
 
 /* Keep explicit heading and staff-label colors aligned with the orange header. */

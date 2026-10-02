@@ -17,17 +17,39 @@ export async function HomePurchaseOffers({
 }) {
   const t = await getTranslations();
   const prices = hardwarePrices(products);
-  const published = (id: string) => products.some((product) => product.id === id && product.published !== false);
+  const published = (id: string) =>
+    products.some(
+      (product) => product.id === id && product.published !== false,
+    );
   // Homepage photography is independent of the customer's configurator selection.
   const cards: ProductPhoto[] = [
-    { id: 'card-orange-packaging', material: 'Cartão NFC', src: '/home/card-packaging-orange.jpg', detail: 'Laranja' },
-    { id: 'card-black-packaging', material: 'Cartão NFC', src: '/home/card-packaging-black.jpg', detail: 'Preto' },
+    {
+      id: 'card-orange-packaging',
+      material: 'Cartão NFC',
+      src: '/home/card-packaging-orange-cutout.webp',
+      detail: 'Laranja',
+    },
+    {
+      id: 'card-black-packaging',
+      material: 'Cartão NFC',
+      src: '/home/card-packaging-black-cutout.webp',
+      detail: 'Preto',
+    },
   ];
   const kit: ProductPhoto[] = [
-    { id: 'kit-gift-box', material: 'Kit: cartão + porta-chaves', src: '/home/kit-gift-box.png' },
+    {
+      id: 'kit-gift-box',
+      material: 'Kit: cartão + porta-chaves',
+      src: '/home/kit-gift-box-cutout.webp',
+    },
   ];
   const keychains: ProductPhoto[] = published('keychain')
-    ? pvcModels.map((model) => ({ id: model.id, material: 'PVC + epóxi', src: pvcPhoto(model.id), detail: model.name }))
+    ? pvcModels.map((model) => ({
+        id: model.id,
+        material: 'PVC + epóxi',
+        src: pvcPhoto(model.id),
+        detail: model.name,
+      }))
     : [];
   const offers: {
     id: PurchaseFormat;
@@ -93,7 +115,13 @@ export async function HomePurchaseOffers({
               </div>
               <ProductMaterialGallery
                 name={t(offer.name)}
-                caption={offer.id === 'card' ? t('Embalagens do cartão · imagens ilustrativas') : offer.id === 'kit' ? '' : undefined}
+                caption={
+                  offer.id === 'card'
+                    ? t('Embalagens do cartão · imagens ilustrativas')
+                    : offer.id === 'kit'
+                      ? ''
+                      : undefined
+                }
                 frames={
                   offer.id === 'card'
                     ? cards.map((photo) => [photo])

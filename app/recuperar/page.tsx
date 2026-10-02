@@ -1,4 +1,5 @@
 'use client';
+import { PasswordInput } from '@/components/password-input';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
 
 import { useState, useEffect } from 'react';
@@ -134,9 +135,9 @@ export default function Page() {
             </p>
             <label>
               {t('Nova palavra-passe')}
-              <input
+              <PasswordInput
                 name="password"
-                type="password"
+
                 required
                 minLength={12}
                 maxLength={72}
@@ -145,9 +146,9 @@ export default function Page() {
             </label>
             <label>
               {t('Repetir palavra-passe')}
-              <input
+              <PasswordInput
                 name="confirm"
-                type="password"
+
                 required
                 minLength={12}
                 maxLength={72}

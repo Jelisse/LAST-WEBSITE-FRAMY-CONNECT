@@ -1,4 +1,5 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 import { useCallback, useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import type { ManagedPlan } from '@/lib/domain';
@@ -18,7 +19,8 @@ import {
   type ReminderSettings,
 } from '@/lib/subscription-settings';
 import { ProfileSubscriptions } from './profile-subscriptions';
-type Member = {
+import { RenewalWhatsApp, type RenewalContact } from './renewal-whatsapp';
+type Member = RenewalContact & {
   owner_id: string;
   name: string;
   email: string;
@@ -63,6 +65,7 @@ const when = (s?: string) =>
     ? new Date(s).toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo' })
     : '—';
 export function SubscriptionManager() {
+  const { t } = useI18n();
   const [data, setData] = useState<Data | null>(null),
     [tab, setTab] = useState('plans'),
     [error, setError] = useState(''),
@@ -141,7 +144,9 @@ export function SubscriptionManager() {
   return (
     <section className="subscription-manager management-suite" aria-busy={busy}>
       <div className="suite-toolbar">
-        <p>Configure os planos e acompanhe o ciclo de cada subscrição.</p>
+        <p>
+          {t('Configure os planos e acompanhe o ciclo de cada subscrição.')}
+        </p>
         <button
           type="button"
           disabled={busy}
@@ -152,10 +157,10 @@ export function SubscriptionManager() {
               .finally(() => setBusy(false));
           }}
         >
-          Actualizar dados
+          {t(' Actualizar dados ')}
         </button>
       </div>
-      <nav className="suite-tabs" aria-label="Gestão de subscrições">
+      <nav className="suite-tabs" aria-label={t('Gestão de subscrições')}>
         {[
           ['plans', 'Planos e funcionalidades'],
           ['members', 'Clientes e validade'],
@@ -164,18 +169,18 @@ export function SubscriptionManager() {
           ['audit', 'Histórico'],
         ].map(([id, label]) => (
           <button key={id} aria-pressed={tab === id} onClick={() => setTab(id)}>
-            {label}
+            {t(label)}
           </button>
         ))}
       </nav>
       {error && (
         <p role="alert" className="manager-error">
-          {error}
+          {t(error)}
         </p>
       )}
-      {notice && <output className="manager-notice">{notice}</output>}
+      {notice && <output className="manager-notice">{t(notice)}</output>}
       {!data ? (
-        <p>A carregar subscrições…</p>
+        <p>{t('A carregar subscrições…')}</p>
       ) : (
         <>
           <div className="suite-stats">
@@ -198,23 +203,25 @@ export function SubscriptionManager() {
               ],
             ].map(([label, value]) => (
               <article key={label}>
-                <span>{label}</span>
+                <span>{t(label)}</span>
                 <strong>{value}</strong>
               </article>
             ))}
           </div>
           {data.truncated && (
             <p>
-              Indicadores referentes aos primeiros 500 clientes por validade.
-              Refine a consulta através de uma exportação financeira.
+              {t(
+                ' Indicadores referentes aos primeiros 500 clientes por validade. Refine a consulta através de uma exportação financeira. ',
+              )}
             </p>
           )}
           {tab === 'plans' && (
             <>
               <div className="suite-toolbar">
                 <p>
-                  Preços e funcionalidades aplicam-se a novas compras e
-                  renovações. Arquivar impede novas adesões.
+                  {t(
+                    ' Preços e funcionalidades aplicam-se a novas compras e renovações. Arquivar impede novas adesões. ',
+                  )}
                 </p>
                 <button
                   className="manager-primary"
@@ -238,7 +245,7 @@ export function SubscriptionManager() {
                     })
                   }
                 >
-                  Criar plano
+                  {t(' Criar plano ')}
                 </button>
               </div>
               {editing ? (
@@ -260,7 +267,7 @@ export function SubscriptionManager() {
                   }}
                 >
                   <h2>
-                    {editing.version ? 'Editar plano' : 'Configurar plano'}
+                    {t(editing.version ? 'Editar plano' : 'Configurar plano')}
                   </h2>
                   <div className="suite-grid">
                     {(['name', 'audience'] as const).map((key, i) => (
@@ -277,7 +284,7 @@ export function SubscriptionManager() {
                       </label>
                     ))}
                     <label>
-                      Mensal (MT)
+                      {t(' Mensal (MT) ')}
                       <input
                         required
                         type="number"
@@ -294,7 +301,7 @@ export function SubscriptionManager() {
                       />
                     </label>
                     <label>
-                      Anual (MT)
+                      {t(' Anual (MT) ')}
                       <input
                         required
                         type="number"
@@ -311,7 +318,7 @@ export function SubscriptionManager() {
                       />
                     </label>
                     <label>
-                      Máximo de links
+                      {t(' Máximo de links ')}
                       <input
                         required
                         type="number"
@@ -327,7 +334,7 @@ export function SubscriptionManager() {
                       />
                     </label>
                     <label>
-                      Caracteres da biografia
+                      {t(' Caracteres da biografia ')}
                       <input
                         required
                         type="number"
@@ -343,7 +350,7 @@ export function SubscriptionManager() {
                       />
                     </label>
                     <label>
-                      Ordem no catálogo
+                      {t(' Ordem no catálogo ')}
                       <input
                         required
                         type="number"
@@ -360,7 +367,7 @@ export function SubscriptionManager() {
                     </label>
                   </div>
                   <label>
-                    Descrição
+                    {t(' Descrição ')}
                     <textarea
                       required
                       maxLength={2000}
@@ -393,7 +400,9 @@ export function SubscriptionManager() {
                     ))}
                   </div>
                   <fieldset>
-                    <legend>Funcionalidades com controlo de acesso</legend>
+                    <legend>
+                      {t('Funcionalidades com controlo de acesso')}
+                    </legend>
                     <div className="suite-checks">
                       {(Object.keys(featureCatalog) as FeatureKey[]).map(
                         (key) => (
@@ -411,14 +420,14 @@ export function SubscriptionManager() {
                                 })
                               }
                             />
-                            {featureCatalog[key]}
+                            {t(featureCatalog[key])}
                           </label>
                         ),
                       )}
                     </div>
                   </fieldset>
                   <label>
-                    Outros benefícios comerciais (um por linha, até 12)
+                    {t(' Outros benefícios comerciais (um por linha, até 12) ')}
                     <textarea
                       maxLength={1900}
                       value={(editing.benefits ?? []).join('\n')}
@@ -431,19 +440,20 @@ export function SubscriptionManager() {
                     />
                   </label>
                   <p>
-                    Estes textos descrevem serviços que a equipa oferece. Não
-                    criam novas funções no software.
+                    {t(
+                      ' Estes textos descrevem serviços que a equipa oferece. Não criam novas funções no software. ',
+                    )}
                   </p>
                   <div className="suite-toolbar">
                     <button disabled={busy} className="manager-primary">
-                      Guardar plano
+                      {t(' Guardar plano ')}
                     </button>
                     <button
                       type="button"
                       disabled={busy}
                       onClick={() => setEditing(null)}
                     >
-                      Fechar editor
+                      {t(' Fechar editor ')}
                     </button>
                   </div>
                 </form>
@@ -452,26 +462,31 @@ export function SubscriptionManager() {
                 {data.plans.map((p) => (
                   <article className="manager-card" key={p.id}>
                     <span className="manager-eyebrow">
-                      {p.active ? 'PUBLICADO' : 'ARQUIVADO'}
+                      {t(p.active ? 'PUBLICADO' : 'ARQUIVADO')}
                     </span>
                     <h2>{p.name}</h2>
                     <p>{p.description}</p>
                     <strong>
-                      {p.id === 'free-30'
-                        ? 'Grátis'
-                        : `${p.monthlyEnabled ? 'Mensal: ' + planPrice(p) : 'Mensal indisponível'} · ${p.annualEnabled ? 'Anual: ' + planPrice({ meticais: planAnnualMeticais(p) }) : 'Anual indisponível'}`}
+                      {t(
+                        p.id === 'free-30'
+                          ? 'Grátis'
+                          : `${p.monthlyEnabled ? 'Mensal: ' + planPrice(p) : 'Mensal indisponível'} · ${p.annualEnabled ? 'Anual: ' + planPrice({ meticais: planAnnualMeticais(p) }) : 'Anual indisponível'}`,
+                      )}
                     </strong>
                     <p>
-                      {p.links} links · {p.bio} caracteres
+                      {p.links} {t(' links · ')}
+                      {p.bio} {t(' caracteres ')}
                     </p>
                     <ul>
                       {(Object.keys(featureCatalog) as FeatureKey[])
                         .filter((k) => planFeatures(p)[k])
                         .map((k) => (
-                          <li key={k}>{featureCatalog[k]}</li>
+                          <li key={k}>{t(featureCatalog[k])}</li>
                         ))}
                     </ul>
-                    <button onClick={() => setEditing(p)}>Editar plano</button>
+                    <button onClick={() => setEditing(p)}>
+                      {t('Editar plano')}
+                    </button>
                   </article>
                 ))}
               </div>
@@ -479,48 +494,48 @@ export function SubscriptionManager() {
           )}
           {tab === 'members' && (
             <section className="manager-card">
-              <h2>Clientes e períodos contratados</h2>
+              <h2>{t('Clientes e períodos contratados')}</h2>
               <div className="suite-toolbar">
                 <div className="suite-search-field">
                   <input
-                    aria-label="Pesquisar cliente"
-                    placeholder="Nome, email ou plano"
+                    aria-label={t('Pesquisar cliente')}
+                    placeholder={t('Nome, email ou plano')}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
                   <Search size={20} aria-hidden="true" />
                 </div>
                 <select
-                  aria-label="Estado"
+                  aria-label={t('Estado')}
                   value={state}
                   onChange={(e) => setState(e.target.value)}
                 >
-                  <option value="all">Todos os estados</option>
+                  <option value="all">{t('Todos os estados')}</option>
                   {Object.entries(states).map(([id, label]) => (
                     <option key={id} value={id}>
-                      {label}
+                      {t(label)}
                     </option>
                   ))}
                 </select>
                 <select
-                  aria-label="Periodicidade"
+                  aria-label={t('Periodicidade')}
                   value={cycle}
                   onChange={(e) => setCycle(e.target.value)}
                 >
-                  <option value="all">Todas as periodicidades</option>
-                  <option value="monthly">Mensal</option>
-                  <option value="annual">Anual</option>
+                  <option value="all">{t('Todas as periodicidades')}</option>
+                  <option value="monthly">{t('Mensal')}</option>
+                  <option value="annual">{t('Anual')}</option>
                 </select>
               </div>
               <div className="suite-table">
                 <table>
                   <thead>
                     <tr>
-                      <th>Cliente</th>
-                      <th>Plano contratado</th>
-                      <th>Estado</th>
-                      <th>Validade</th>
-                      <th>Próxima alteração</th>
+                      <th>{t('Cliente')}</th>
+                      <th>{t('Plano contratado')}</th>
+                      <th>{t('Estado')}</th>
+                      <th>{t('Validade')}</th>
+                      <th>{t('Próxima alteração')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -539,12 +554,14 @@ export function SubscriptionManager() {
                             }
                           })()}
                         </td>
-                        <td>{states[m.state]}</td>
+                        <td>{t(states[m.state])}</td>
                         <td>{when(m.paid_expires_at ?? m.trial_expires_at)}</td>
                         <td>
-                          {m.next_starts_at
-                            ? `${m.next_plan_id} · ${when(m.next_starts_at)}`
-                            : '—'}
+                          {t(
+                            m.next_starts_at
+                              ? `${m.next_plan_id} · ${when(m.next_starts_at)}`
+                              : '—',
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -552,17 +569,23 @@ export function SubscriptionManager() {
                 </table>
               </div>
               {!filtered.length && (
-                <p>Nenhum cliente corresponde aos filtros.</p>
+                <p>{t('Nenhum cliente corresponde aos filtros.')}</p>
               )}
               <p>
-                As alterações de plano pagas começam no fim do período
-                contratado. A activação depende de pagamento confirmado.
+                {t(
+                  ' As alterações de plano pagas começam no fim do período contratado. A activação depende de pagamento confirmado. ',
+                )}
               </p>
             </section>
           )}
           {tab === 'payments' && <ProfileSubscriptions manager />}
           {tab === 'messages' && reminders && (
             <>
+              <RenewalWhatsApp
+                members={data.members}
+                daysBefore={data.reminders.daysBefore}
+                truncated={data.truncated}
+              />
               <form
                 className="manager-card suite-form"
                 onSubmit={(e) => {
@@ -573,10 +596,11 @@ export function SubscriptionManager() {
                   });
                 }}
               >
-                <h2>Lembretes de renovação</h2>
+                <h2>{t('Lembretes de renovação')}</h2>
                 <p>
-                  Envio antes da validade terminar. Os avisos de tolerância e
-                  contacto básico continuam a explicar as regras de acesso.
+                  {t(
+                    ' Envio antes da validade terminar. Os avisos de tolerância e contacto básico continuam a explicar as regras de acesso. ',
+                  )}
                 </p>
                 <label className="suite-check">
                   <input
@@ -586,10 +610,10 @@ export function SubscriptionManager() {
                       setReminders({ ...reminders, enabled: e.target.checked })
                     }
                   />
-                  Enviar lembretes por email
+                  {t(' Enviar lembretes por email ')}
                 </label>
                 <label>
-                  Primeiro aviso: dias antes do fim
+                  {t(' Primeiro aviso: dias antes do fim ')}
                   <input
                     type="number"
                     min={2}
@@ -605,11 +629,12 @@ export function SubscriptionManager() {
                   />
                 </label>
                 <p>
-                  Também será enviado um aviso no último dia. Não há débitos
-                  automáticos.
+                  {t(
+                    ' Também será enviado um aviso no último dia. Não há débitos automáticos. ',
+                  )}
                 </p>
                 <label>
-                  Assunto
+                  {t(' Assunto ')}
                   <input
                     required
                     maxLength={160}
@@ -620,7 +645,7 @@ export function SubscriptionManager() {
                   />
                 </label>
                 <label>
-                  Mensagem
+                  {t(' Mensagem ')}
                   <textarea
                     rows={6}
                     required
@@ -632,11 +657,11 @@ export function SubscriptionManager() {
                   />
                 </label>
                 <p>
-                  Variáveis:{' '}
+                  {t(' Variáveis:')}{' '}
                   {reminderVariables.map((v) => '{' + v + '}').join(' · ')}
                 </p>
                 <aside className="suite-preview">
-                  <h3>Pré-visualização · dados de exemplo</h3>
+                  <h3>{t('Pré-visualização · dados de exemplo')}</h3>
                   {[reminders.subject, reminders.message].map((template, i) => (
                     <p key={i}>
                       {renderReminder(template, {
@@ -651,18 +676,18 @@ export function SubscriptionManager() {
                   ))}
                 </aside>
                 <button className="manager-primary" disabled={busy}>
-                  Guardar mensagens
+                  {t(' Guardar mensagens ')}
                 </button>
               </form>
               <section className="manager-card">
-                <h2>Últimos avisos</h2>
+                <h2>{t('Últimos avisos')}</h2>
                 <div className="suite-table">
                   <table>
                     <thead>
                       <tr>
-                        <th>Destinatário</th>
-                        <th>Assunto</th>
-                        <th>Estado do envio</th>
+                        <th>{t('Destinatário')}</th>
+                        <th>{t('Assunto')}</th>
+                        <th>{t('Estado do envio')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -671,11 +696,13 @@ export function SubscriptionManager() {
                           <td>{n.email}</td>
                           <td>{n.subject}</td>
                           <td>
-                            {n.sent_at
-                              ? 'Aceite pelo serviço de email'
-                              : n.attempted_at
-                                ? 'Tentativa sem confirmação'
-                                : 'Aviso na conta / por enviar'}
+                            {t(
+                              n.sent_at
+                                ? 'Aceite pelo serviço de email'
+                                : n.attempted_at
+                                  ? 'Tentativa sem confirmação'
+                                  : 'Aviso na conta / por enviar',
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -683,26 +710,29 @@ export function SubscriptionManager() {
                   </table>
                 </div>
                 <p>
-                  Aceitação pelo serviço não confirma entrega na caixa de
-                  entrada. Consulte o Resend para o resultado de entrega.
+                  {t(
+                    ' Aceitação pelo serviço não confirma entrega na caixa de entrada. Consulte o Resend para o resultado de entrega. ',
+                  )}
                 </p>
               </section>
             </>
           )}
           {tab === 'audit' && (
             <section className="manager-card">
-              <h2>Histórico de gestão</h2>
+              <h2>{t('Histórico de gestão')}</h2>
               {data.audit.length ? (
                 data.audit.map((a, i) => (
                   <p key={i}>
                     {when(a.created_at)} · {a.actor} · {a.action} ·{' '}
-                    {a.action.startsWith('Renovação:')
-                      ? 'Definições de comunicação'
-                      : a.subject}
+                    {t(
+                      a.action.startsWith('Renovação:')
+                        ? 'Definições de comunicação'
+                        : a.subject,
+                    )}
                   </p>
                 ))
               ) : (
-                <p>Sem alterações registadas.</p>
+                <p>{t('Sem alterações registadas.')}</p>
               )}
             </section>
           )}

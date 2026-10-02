@@ -73,7 +73,7 @@
   line-height: 1.03;
   letter-spacing: -0.055em;
   font-weight: 700;
-  color: #ec4f09;
+  color: var(--framy-orange-text);
   margin: 0 0 25px;
 }
 .home-hero h2 {
@@ -108,11 +108,11 @@
   font-weight: 600;
 }
 .home-primary {
-  background: #ed4c00;
+  background: var(--framy-orange);
   color: #fff;
 }
 .home-primary:hover {
-  background: #c83e00;
+  background: var(--framy-orange);
 }
 .home-secondary {
   color: #39342f;
@@ -133,7 +133,7 @@
 .home-hero-benefits svg {
   width: 25px;
   min-width: 25px;
-  color: #f35a19;
+  color: var(--framy-orange-text);
   stroke-width: 1.5;
 }
 .home-hero-scene {
@@ -219,7 +219,7 @@
   inset: 4.2% 12.1% 4.1% 9.3%;
   border-radius: 15% / 7%;
   overflow: hidden;
-  background: #c95000;
+  background: var(--framy-orange);
 }
 .home-card-print {
   position: absolute;
@@ -331,7 +331,7 @@
   line-height: 1.7;
 }
 .home-products {
-  background: #eb4c00;
+  background: var(--framy-orange);
   padding: 70px 5% 90px;
 }
 .home-products > h2 {
@@ -389,7 +389,7 @@
   position: absolute;
   right: 12px;
   top: 18px;
-  color: #d8460a;
+  color: var(--framy-orange-text);
 }
 .home-product:hover {
   box-shadow: 0 10px 24px #8c230040;
@@ -435,7 +435,7 @@
   max-width: 150px;
 }
 .home-audience-card > span {
-  background: #ec4b00;
+  background: var(--framy-orange);
   border-radius: 13px;
   color: white;
   display: grid;
@@ -454,7 +454,7 @@
 }
 .home-how {
   padding: 65px max(5%, calc((100% - 1260px) / 2)) 85px;
-  background: #eb4c00;
+  background: var(--framy-orange);
   color: #2c180e;
 }
 .home-how > h2 {
@@ -888,7 +888,7 @@
   inset: 4.2% 12.1% 4.1% 9.3%;
   border-radius: 15% / 7%;
   overflow: hidden;
-  background: #c95000;
+  background: var(--framy-orange);
 }
 .sharing-tap .sharing-screen {
   left: 12.1%;
@@ -1384,7 +1384,7 @@
   margin: 0;
   border-radius: 14px;
   background: #ffddd0;
-  color: #bd3b0a;
+  color: var(--framy-orange-text);
 }
 .home-purpose-icon svg {
   width: 24px;
@@ -1685,7 +1685,7 @@
 }
 .home-how {
   padding: 64px max(5%, calc((100% - 1296px) /2));
-  background: #b83b09;
+  background: var(--framy-orange);
 }
 .home-how > h2,
 .home-how > p {
@@ -2083,7 +2083,7 @@
 .sharing-black-back img { border-radius: 7% / 4.5%; }
 .sharing-product-demo > .sharing-phone { left: 48%; top: 4%; width: 41%; transform: rotate(2deg); }
 .sharing-product-demo .sharing-screen > img { object-fit: cover; }
-.sharing-nfc-pulse { position: absolute; left: 35%; top: 24%; width: 16%; height: auto; z-index: 4; overflow: visible; color: #f4510b; pointer-events: none; }
+.sharing-nfc-pulse { position: absolute; left: 35%; top: 24%; width: 16%; height: auto; z-index: 4; overflow: visible; color: var(--framy-orange-text); pointer-events: none; }
 .sharing-nfc-pulse path { stroke: currentColor; stroke-width: 4; stroke-linecap: round; opacity: .35; animation: sharing-nfc-wave 2.1s ease-in-out infinite; }
 .sharing-nfc-pulse path:nth-child(2) { animation-delay: .22s; }
 .sharing-nfc-pulse path:nth-child(3) { animation-delay: .44s; }

@@ -3,6 +3,7 @@ import { useI18n, LanguageSelector } from '@/components/language-provider';
 
 import { useEffect, useRef, useState } from 'react';
 import Link from '@/components/hard-link';
+import { PasswordInput } from './password-input';
 export function LoginForm({
   initialRegister = false,
   purchaseReturn,
@@ -46,8 +47,10 @@ export function LoginForm({
               : t('Entre para abrir o seu painel.')}
         </p>
         <form
+          aria-busy={busy}
           onSubmit={async (e) => {
             e.preventDefault();
+            if (busy) return;
             setBusy(true);
             setError('');
             const data = new FormData(e.currentTarget);
@@ -64,12 +67,18 @@ export function LoginForm({
                     'return_to',
                   ),
                 }),
+                signal: AbortSignal.timeout(15000),
               });
               const b = (await r.json()) as { error: string; next: string };
               if (!r.ok) throw Error(b.error);
               location.assign(b.next);
             } catch (e) {
-              setError(e instanceof Error ? e.message : 'Tente novamente.');
+              setError(
+                e instanceof Error &&
+                  !['TimeoutError', 'TypeError', 'AbortError'].includes(e.name)
+                  ? e.message
+                  : 'Não foi possível ligar. Verifique a ligação e tente novamente.',
+              );
               setBusy(false);
             }
           }}
@@ -99,30 +108,30 @@ export function LoginForm({
           </label>
           <label>
             {t('Palavra-passe')}
-            <input
+            <PasswordInput
+              key={register ? 'register-password' : 'login-password'}
               name="password"
-              type="password"
               required
               minLength={12}
               maxLength={72}
               autoComplete={register ? 'new-password' : 'current-password'}
             />
           </label>
+          {!register && (
+            <Link className="auth-forgot" href="/recuperar">
+              {t('Esqueci-me da palavra-passe')}
+            </Link>
+          )}
           {register && <small>{t('Use pelo menos 12 caracteres.')}</small>}
           {error && <p role="alert">{t(error)}</p>}
           <button disabled={busy} type="submit">
             {busy
-              ? t('Aguarde…')
+              ? t(register ? 'A criar conta…' : 'A entrar…')
               : register
                 ? t('Criar conta e continuar')
                 : t('Entrar')}
           </button>
         </form>
-        {!register && (
-          <p>
-            <Link href="/recuperar">{t('Esqueci-me da palavra-passe')}</Link>
-          </p>
-        )}
         <button
           className="auth-switch"
           disabled={busy}

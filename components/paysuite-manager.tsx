@@ -1,4 +1,5 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 import Link from '@/components/hard-link';
 import { useEffect, useState } from 'react';
 import type { CheckoutPricing } from '@/lib/checkout-pricing';
@@ -14,6 +15,7 @@ type Payment = {
   order_status: string | null;
 };
 export function PaySuiteManager() {
+  const { t } = useI18n();
   const [data, setData] = useState<{
       ready: boolean;
       pricing: CheckoutPricing;
@@ -57,15 +59,17 @@ export function PaySuiteManager() {
   }
   return (
     <section className="panel">
-      <h1>Checkout e pagamentos PaySuite</h1>
-      <Link href="/manager">Voltar ao gestor</Link>
-      {error && <p role="alert">{error}</p>}
+      <h1>{t('Checkout e pagamentos PaySuite')}</h1>
+      <Link href="/manager">{t('Voltar ao gestor')}</Link>
+      {error && <p role="alert">{t(error)}</p>}
       {data && (
         <>
           <p>
-            {data.ready
-              ? 'Ligação configurada.'
-              : 'Ligação por configurar: segredos e activação no Cloudflare.'}
+            {t(
+              data.ready
+                ? 'Ligação configurada.'
+                : 'Ligação por configurar: segredos e activação no Cloudflare.',
+            )}
           </p>
           <form
             onSubmit={(e) => {
@@ -85,10 +89,11 @@ export function PaySuiteManager() {
               });
             }}
           >
-            <h2>Preços de configuração</h2>
+            <h2>{t('Preços de configuração')}</h2>
             <p>
-              Valores por encomenda, em MT. Design padrão incluído. Configure os
-              pontos e as tarifas em Produtos → Levantamento e entregas.
+              {t(
+                ' Valores por encomenda, em MT. Design padrão incluído. Configure os pontos e as tarifas em Produtos → Levantamento e entregas. ',
+              )}
             </p>
             {(
               [
@@ -99,7 +104,7 @@ export function PaySuiteManager() {
 
               .map(([key, label]) => (
                 <label key={key}>
-                  {label}
+                  {t(label)}
                   <input
                     key={`${key}-${data.pricing.version}`}
 
@@ -125,11 +130,11 @@ export function PaySuiteManager() {
                 name="enabled"
                 defaultChecked={!!data.pricing.enabled}
               />
-              Publicar estes preços e abrir pagamentos de produtos
+              {t(' Publicar estes preços e abrir pagamentos de produtos ')}
             </label>
-            <button disabled={busy}>Guardar preços</button>
+            <button disabled={busy}>{t('Guardar preços')}</button>
           </form>
-          <h2>Pedidos e pagamentos</h2>
+          <h2>{t('Pedidos e pagamentos')}</h2>
           {data.payments.map((p) => {
             const c = p.configuration_json
               ? JSON.parse(p.configuration_json)
@@ -137,19 +142,21 @@ export function PaySuiteManager() {
             return (
               <article key={p.id} className="growth-invoice">
                 <h3>
-                  {p.name} · {(p.amount / 100).toFixed(2)} MT
+                  {p.name} · {(p.amount / 100).toFixed(2)} {t(' MT ')}
                 </h3>
                 <p>
                   {p.email} · {p.status} · {p.id}
                 </p>
                 {p.receipt_status && (
                   <p>
-                    Comprovativo por email:{' '}
-                    {p.receipt_status === 'sent'
-                      ? 'aceite pelo serviço de email'
-                      : p.receipt_status === 'review'
-                        ? 'requer verificação no Resend antes de reenviar'
-                        : 'a aguardar envio'}
+                    {t(' Comprovativo por email:')}{' '}
+                    {t(
+                      p.receipt_status === 'sent'
+                        ? 'aceite pelo serviço de email'
+                        : p.receipt_status === 'review'
+                          ? 'requer verificação no Resend antes de reenviar'
+                          : 'a aguardar envio',
+                    )}
                   </p>
                 )}
                 {c && (
@@ -161,31 +168,45 @@ export function PaySuiteManager() {
                       {c.city} · {c.address} · {c.contact}
                     </p>
                     <p>{c.designInstructions}</p>
-                    {c.pvcModel && <p>Modelo PVC + epóxi: {c.pvcModel.name}</p>}
+                    {c.pvcModel && (
+                      <p>
+                        {t('Modelo PVC + epóxi: ')}
+                        {c.pvcModel.name}
+                      </p>
+                    )}
                     {c.leather && (
                       <div>
-                        <strong>Porta-chaves de couro</strong>
+                        <strong>{t('Porta-chaves de couro')}</strong>
                         <p>
-                          Cor:{' '}
-                          {c.leather.color === 'brown' ? 'Castanho' : 'Preto'} ·
-                          Frente:{' '}
-                          {c.design === 'standard'
-                            ? c.leather.logo === 'full'
-                              ? 'Logo completo'
-                              : 'Símbolo F'
-                            : c.design === 'customer'
-                              ? 'Logo do cliente'
-                              : 'Design pela equipa'}
+                          {t(' Cor:')}{' '}
+                          {t(
+                            c.leather.color === 'brown' ? 'Castanho' : 'Preto',
+                          )}{' '}
+                          {t(' · Frente:')}{' '}
+                          {t(
+                            c.design === 'standard'
+                              ? c.leather.logo === 'full'
+                                ? 'Logo completo'
+                                : 'Símbolo F'
+                              : c.design === 'customer'
+                                ? 'Logo do cliente'
+                                : 'Design pela equipa',
+                          )}
                         </p>
                         <p>{c.leatherDimensions}</p>
                         {c.leather.assetId && (
                           <>
                             <a href={'/api/design-assets/' + c.leather.assetId}>
-                              Descarregar logótipo: {c.leather.fileName}
+                              {t(' Descarregar logótipo: ')}
+                              {c.leather.fileName}
                             </a>
                             <p>
-                              Página {c.leather.page} · Escala {c.leather.scale}
-                              % · X {c.leather.x} · Y {c.leather.y}
+                              {t(' Página ')}
+                              {c.leather.page} {t(' · Escala ')}
+                              {c.leather.scale}
+                              {t(' % · X ')}
+                              {c.leather.x} {t(' · Y ')}
+                              {c.leather.y}
                             </p>
                           </>
                         )}
@@ -193,26 +214,29 @@ export function PaySuiteManager() {
                     )}
                     {c.fulfilment && (
                       <p>
-                        Recepção:{' '}
-                        {c.fulfilment.mode === 'pickup'
-                          ? 'Levantamento · ' +
-                            c.fulfilment.point?.name +
-                            ' · ' +
-                            c.fulfilment.point?.hours
-                          : c.fulfilment.mode === 'express'
-                            ? 'Entrega expressa'
-                            : 'Entrega normal'}
+                        {t(' Recepção:')}{' '}
+                        {t(
+                          c.fulfilment.mode === 'pickup'
+                            ? 'Levantamento · ' +
+                                c.fulfilment.point?.name +
+                                ' · ' +
+                                c.fulfilment.point?.hours
+                            : c.fulfilment.mode === 'express'
+                              ? 'Entrega expressa'
+                              : 'Entrega normal',
+                        )}
                       </p>
                     )}
                     <p>
-                      Perfil:{' '}
+                      {t(' Perfil:')}{' '}
                       {c.profileUsername ||
                         'A aguardar configuração pelo cliente'}
                     </p>
                     <p>
-                      Produtos: {c.hardware / 100} MT · Design:{' '}
-                      {c.customization / 100} MT · Entrega: {c.delivery / 100}{' '}
-                      MT
+                      {t(' Produtos: ')}
+                      {c.hardware / 100} {t(' MT · Design:')}{' '}
+                      {c.customization / 100} {t(' MT · Entrega: ')}
+                      {c.delivery / 100} {t(' MT ')}
                     </p>
                   </>
                 )}
@@ -231,11 +255,13 @@ export function PaySuiteManager() {
                   >
                     {!p.provider_id && (
                       <label>
-                        ID PaySuite para reconciliação
+                        {t(' ID PaySuite para reconciliação ')}
                         <input name="providerId" required />
                       </label>
                     )}
-                    <button disabled={busy}>Verificar no prestador</button>
+                    <button disabled={busy}>
+                      {t('Verificar no prestador')}
+                    </button>
                   </form>
                 )}
                 {p.order_status === 'paid' && (
@@ -243,7 +269,7 @@ export function PaySuiteManager() {
                     disabled={busy || !c?.profileUsername}
                     onClick={() => void act({ action: 'fulfilled', id: p.id })}
                   >
-                    Confirmar entrega ao cliente
+                    {t(' Confirmar entrega ao cliente ')}
                   </button>
                 )}
               </article>

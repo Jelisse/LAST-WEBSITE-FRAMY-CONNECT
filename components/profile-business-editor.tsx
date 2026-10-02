@@ -12,7 +12,7 @@ export function ProfileBusinessEditor({
   features,
 }: {
   profile: Profile;
-  features?: {whatsapp:boolean; location:boolean};
+  features?: { whatsapp: boolean; location: boolean };
   onChange: (profile: Profile) => void;
 }) {
   const { t } = useI18n();
@@ -27,7 +27,13 @@ export function ProfileBusinessEditor({
           'Estes campos são opcionais e aparecem no perfil publicado. Não ocupam os seus links.',
         )}
       </p>
-      {(features?.whatsapp === false || features?.location === false) && <p>Os campos desactivados não estão incluídos no seu plano. Os dados guardados são preservados.</p>}
+      {(features?.whatsapp === false || features?.location === false) && (
+        <p>
+          {t(
+            'Os campos desactivados não estão incluídos no seu plano. Os dados guardados são preservados.',
+          )}
+        </p>
+      )}
       <div className="profile-business-fields">
         <label>
           {t('WhatsApp público')}

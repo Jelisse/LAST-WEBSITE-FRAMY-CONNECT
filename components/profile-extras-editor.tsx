@@ -1,4 +1,5 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 import type { PlanFeatures } from '@/lib/plan-features';
 import type { Profile } from '@/lib/domain';
 import { defaultExtras } from '@/lib/profile-growth';
@@ -13,6 +14,7 @@ export function ProfileExtrasEditor({
   limit: number;
   features?: PlanFeatures;
 }) {
+  const { t } = useI18n();
   const e = {
     ...defaultExtras,
     ...profile.extras,
@@ -41,23 +43,31 @@ export function ProfileExtrasEditor({
   ];
   return (
     <section className="profile-business-editor">
-      <h3>Mais valor para o seu negócio</h3>
+      <h3>{t('Mais valor para o seu negócio')}</h3>
       <p>
-        As ferramentas disponíveis dependem do seu plano. Os campos desactivados
-        ficam guardados e não aparecem no perfil público.
+        {t(
+          ' As ferramentas disponíveis dependem do seu plano. Os campos desactivados ficam guardados e não aparecem no perfil público. ',
+        )}
       </p>
       <fieldset disabled={features?.showcase === false}>
         <details>
-          <summary>Produtos e serviços · {e.services.length}/6</summary>
+          <summary>
+            {t('Produtos e serviços · ')}
+            {e.services.length}/6
+          </summary>
           <p>
-            Apresente o que oferece. O preço é informativo; o botão abre o
-            endereço que escolher.
+            {t(
+              ' Apresente o que oferece. O preço é informativo; o botão abre o endereço que escolher. ',
+            )}
           </p>
           {e.services.map((s, i) => (
             <fieldset key={i}>
-              <legend>Oferta {i + 1}</legend>
+              <legend>
+                {t('Oferta ')}
+                {i + 1}
+              </legend>
               <label>
-                Nome
+                {t(' Nome ')}
                 <input
                   maxLength={80}
                   value={s.title}
@@ -71,7 +81,7 @@ export function ProfileExtrasEditor({
                 />
               </label>
               <label>
-                Descrição
+                {t(' Descrição ')}
                 <textarea
                   maxLength={300}
                   value={s.description}
@@ -85,9 +95,9 @@ export function ProfileExtrasEditor({
                 />
               </label>
               <label>
-                Preço ou indicação
+                {t(' Preço ou indicação ')}
                 <input
-                  placeholder="A partir de 500 MT · sob consulta"
+                  placeholder={t('A partir de 500 MT · sob consulta')}
                   maxLength={60}
                   value={s.price}
                   onChange={(ev) =>
@@ -100,7 +110,7 @@ export function ProfileExtrasEditor({
                 />
               </label>
               <label>
-                Link HTTPS
+                {t(' Link HTTPS ')}
                 <input
                   type="url"
                   maxLength={300}
@@ -115,7 +125,7 @@ export function ProfileExtrasEditor({
                 />
               </label>
               <details>
-                <summary>Versão inglesa desta oferta</summary>
+                <summary>{t('Versão inglesa desta oferta')}</summary>
                 {(
                   [
                     ['englishTitle', 'Nome em inglês', 80],
@@ -124,7 +134,7 @@ export function ProfileExtrasEditor({
                   ] as const
                 ).map(([key, label, max]) => (
                   <label key={key}>
-                    {label}
+                    {t(label)}
                     <input
                       disabled={features?.english === false}
                       maxLength={max}
@@ -146,7 +156,7 @@ export function ProfileExtrasEditor({
                   set({ services: e.services.filter((_, j) => j !== i) })
                 }
               >
-                Remover oferta
+                {t(' Remover oferta ')}
               </button>
             </fieldset>
           ))}
@@ -162,7 +172,7 @@ export function ProfileExtrasEditor({
               })
             }
           >
-            Adicionar produto ou serviço
+            {t(' Adicionar produto ou serviço ')}
           </button>
         </details>
       </fieldset>
@@ -173,21 +183,23 @@ export function ProfileExtrasEditor({
           checked={e.enquiries}
           onChange={(ev) => set({ enquiries: ev.target.checked })}
         />
-        Receber pedidos de informação no perfil
+        {t(' Receber pedidos de informação no perfil ')}
       </label>
       <p>
-        As mensagens ficam na sua caixa de entrada durante 90 dias. Não são
-        enviadas automaticamente por email.
+        {t(
+          ' As mensagens ficam na sua caixa de entrada durante 90 dias. Não são enviadas automaticamente por email. ',
+        )}
       </p>
       <fieldset disabled={features?.english === false}>
         <details>
-          <summary>Conteúdo em inglês</summary>
+          <summary>{t('Conteúdo em inglês')}</summary>
           <p>
-            Escreva a sua própria versão. O visitante pode alternar entre
-            Português e English. Campos vazios mantêm o texto original.
+            {t(
+              ' Escreva a sua própria versão. O visitante pode alternar entre Português e English. Campos vazios mantêm o texto original. ',
+            )}
           </p>
           <label>
-            Título em inglês
+            {t(' Título em inglês ')}
             <input
               value={e.english.title}
               maxLength={120}
@@ -197,7 +209,7 @@ export function ProfileExtrasEditor({
             />
           </label>
           <label>
-            Biografia em inglês
+            {t(' Biografia em inglês ')}
             <textarea
               value={e.english.bio}
               maxLength={600}
@@ -207,7 +219,7 @@ export function ProfileExtrasEditor({
             />
           </label>
           <label>
-            Horário em inglês
+            {t(' Horário em inglês ')}
             <textarea
               disabled={features?.location === false}
               value={e.english.hours}
@@ -220,11 +232,13 @@ export function ProfileExtrasEditor({
         </details>
       </fieldset>
       <details>
-        <summary>Links visíveis e contacto após o período pago</summary>
+        <summary>{t('Links visíveis e contacto após o período pago')}</summary>
         <p>
-          O plano actual apresenta até {limit} links. Os restantes ficam
-          guardados. Escolha os que pretende mostrar; a ordem segue a lista do
-          editor.
+          {t(' O plano actual apresenta até ')}
+          {limit}{' '}
+          {t(
+            ' links. Os restantes ficam guardados. Escolha os que pretende mostrar; a ordem segue a lista do editor. ',
+          )}
         </p>
         {(profile.links ?? []).map((l, i) => (
           <label className="growth-check" key={l.url + i}>
@@ -251,20 +265,22 @@ export function ProfileExtrasEditor({
         ))}
         {e.visibleLinks && e.visibleLinks.length > limit && (
           <p role="alert">
-            Seleccionou mais de {limit}. Apenas os primeiros {limit} serão
-            mostrados neste plano.
+            {t(' Seleccionou mais de ')}
+            {limit}
+            {t('. Apenas os primeiros ')}
+            {limit} {t(' serão mostrados neste plano. ')}
           </p>
         )}
         <button type="button" onClick={() => set({ visibleLinks: null })}>
-          Usar os primeiros links automaticamente
+          {t(' Usar os primeiros links automaticamente ')}
         </button>
         <label>
-          Contacto da página básica
+          {t(' Contacto da página básica ')}
           <select
             value={e.primaryContact}
             onChange={(ev) => set({ primaryContact: ev.target.value })}
           >
-            <option value="">Primeiro contacto disponível</option>
+            <option value="">{t('Primeiro contacto disponível')}</option>
             {contacts.map((c, i) => (
               <option key={c.url + i} value={c.url}>
                 {c.label}
@@ -273,8 +289,9 @@ export function ProfileExtrasEditor({
           </select>
         </label>
         <p>
-          Após a tolerância, ficam públicos apenas nome, fotografia e este
-          contacto. Os restantes dados mantêm-se guardados.
+          {t(
+            ' Após a tolerância, ficam públicos apenas nome, fotografia e este contacto. Os restantes dados mantêm-se guardados. ',
+          )}
         </p>
       </details>
     </section>

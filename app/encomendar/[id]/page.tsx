@@ -22,9 +22,12 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  if (!productCheckoutEnabled()) redirect(`/comprar?formato=${encodeURIComponent(id)}`);
+  if (!productCheckoutEnabled())
+    redirect(`/comprar?formato=${encodeURIComponent(id)}`);
   const [user, products, plans] = await Promise.all([
-    getChatGPTUser(), getProducts(), getManagedPlans(),
+    getChatGPTUser(),
+    getProducts(),
+    getManagedPlans(),
   ]);
   const product = products.find(
     (p) => p.id === id && p.available && p.published !== false,
@@ -40,7 +43,7 @@ export default async function Page({
           account={user ? { id: user.userId, name: user.displayName } : null}
         />
       </main>
-      <SiteFooter />
+      <SiteFooter compact />
     </>
   );
 }

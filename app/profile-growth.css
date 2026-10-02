@@ -44,9 +44,9 @@
 }
 .growth-tabs button[aria-pressed='true'],
 .profile-growth-panel form > button {
-  background: #b83c0a;
+  background: var(--framy-orange);
   color: #fff;
-  border-color: #b83c0a;
+  border-color: var(--framy-orange);
 }
 .profile-growth button:disabled,
 .profile-growth-panel button:disabled {

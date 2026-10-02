@@ -8,7 +8,9 @@ import { ArrowUpRight, Mail, MessageCircle, ShieldCheck } from 'lucide-react';
 export async function SiteHeader({ focused = false }: { focused?: boolean }) {
   const t = await getTranslations();
   return (
-    <header className={`site-header brand-topbar${focused ? ' site-header-focused' : ''}`}>
+    <header
+      className={`site-header brand-topbar${focused ? ' site-header-focused' : ''}`}
+    >
       <Link href="/" className="brand">
         <Image
           width={220}
@@ -44,8 +46,23 @@ export async function SiteHeader({ focused = false }: { focused?: boolean }) {
     </header>
   );
 }
-export async function SiteFooter() {
+export async function SiteFooter({
+  compact = false,
+}: { compact?: boolean } = {}) {
   const t = await getTranslations();
+  if (compact)
+    return (
+      <footer className="brand-footer brand-footer-compact">
+        <div className="brand-footer-inner">
+          <span>© {new Date().getFullYear()} Framy Connect</span>
+          <nav aria-label={t('Conta e apoio')}>
+            <Link href="/ajuda">{t('Centro de ajuda')}</Link>
+            <Link href="/privacidade">{t('Privacidade')}</Link>
+            <Link href="/termos">{t('Termos de utilização')}</Link>
+          </nav>
+        </div>
+      </footer>
+    );
   return (
     <footer className="brand-footer">
       <div className="brand-footer-inner">
@@ -86,7 +103,11 @@ export async function SiteFooter() {
                 {t('info@framyconnect.co.mz')}
               </span>
             </a>
-            <a href="https://wa.me/258846847629" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://wa.me/258846847629"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <MessageCircle size={16} aria-hidden="true" />
               <span>
                 <small>{t('WhatsApp')}</small>

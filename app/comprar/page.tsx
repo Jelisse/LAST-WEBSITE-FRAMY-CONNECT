@@ -75,7 +75,7 @@ export default async function Page({
           signedIn={!!user}
         />
       </main>
-      <SiteFooter />
+      <SiteFooter compact />
     </>
   );
 }

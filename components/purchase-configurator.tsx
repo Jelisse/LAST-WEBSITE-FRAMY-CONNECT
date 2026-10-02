@@ -547,17 +547,20 @@ export function PurchaseConfigurator({
               )}
               {(design === 'team' || (!isLeather && design === 'customer')) && (
                 <label className="purchase-method">
-                  Instruções para o design
+                  {t('Instruções para o design')}
                   <textarea
                     value={designInstructions}
                     onChange={(e) => setDesignInstructions(e.target.value)}
                     maxLength={2000}
 
-                    placeholder="Descreva o logótipo, os textos e o estilo que pretende."
+                    placeholder={t(
+                      'Descreva o logótipo, os textos e o estilo que pretende.',
+                    )}
                   />
                   <small>
-                    A equipa revê as suas instruções e contacta-o para preparar
-                    o design. A produção começa após a sua aprovação.
+                    {t(
+                      'A equipa revê as suas instruções e contacta-o para preparar o design. A produção começa após a sua aprovação.',
+                    )}
                   </small>
                 </label>
               )}
@@ -578,7 +581,7 @@ export function PurchaseConfigurator({
           >
             <h2 className="configuration-panel-heading">
               <Truck className="purchase-icon" size={20} aria-hidden="true" />
-              3. Como pretende receber?
+              {t('3. Como pretende receber?')}
             </h2>
             <DeliverySelector
               settings={fulfilmentSettings}
@@ -613,7 +616,7 @@ export function PurchaseConfigurator({
             )}
             {city && delivery !== 'pickup' && (
               <label>
-                Bairro, morada e ponto de referência
+                {t('Bairro, morada e ponto de referência')}
                 <textarea
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
@@ -728,21 +731,21 @@ export function PurchaseConfigurator({
             </p>
           )}
           <p>
-            Design:{' '}
+            {t('Design:')}{' '}
             {designAmount === null
-              ? 'Sob consulta'
+              ? t('Sob consulta')
               : money(designAmount, t.locale)}
           </p>
           {delivery === 'pickup' && fulfilment && (
             <p>
               <MapPin className="purchase-icon" size={16} aria-hidden="true" />
-              Levantamento gratuito · {fulfilment.point?.name}
+              {t('Levantamento gratuito ·')} {fulfilment.point?.name}
             </p>
           )}
           {delivery !== 'pickup' && city && (
             <p>
-              Entrega{delivery === 'express' ? ' expressa' : ''}:{' '}
-              {fulfilment ? money(fulfilment.fee, t.locale) : 'Sob cotação'}
+              {t(delivery === 'express' ? 'Entrega expressa' : 'Entrega')}:{' '}
+              {fulfilment ? money(fulfilment.fee, t.locale) : t('Sob cotação')}
             </p>
           )}
           <div className="purchase-total" aria-live="polite">
@@ -779,8 +782,9 @@ export function PurchaseConfigurator({
           </div>
           {!paymentAvailable && (
             <p>
-              Valores propostos, sujeitos a publicação pelo gestor. Pagamentos
-              ainda indisponíveis.
+              {t(
+                'Valores propostos, sujeitos a publicação pelo gestor. Pagamentos ainda indisponíveis.',
+              )}
             </p>
           )}
           {!signedIn && (

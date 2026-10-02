@@ -1,4 +1,5 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 import { useCallback, useEffect, useState } from 'react';
 import {
   financeSummary,
@@ -37,6 +38,7 @@ const money = (v: number) =>
     maximumFractionDigits: 2,
   }).format(v / 100) + ' MT';
 export function FinanceManager() {
+  const { t } = useI18n();
   const today = maputoDay(new Date().toISOString());
   const [from, setFrom] = useState(today.slice(0, 7) + '-01'),
     [to, setTo] = useState(today),
@@ -121,9 +123,9 @@ export function FinanceManager() {
     <section className="management-suite" aria-busy={busy}>
       <div className="suite-toolbar">
         <label>
-          De
+          {t(' De ')}
           <input
-            aria-label="Data inicial"
+            aria-label={t('Data inicial')}
             type="date"
             value={from}
             max={to}
@@ -131,9 +133,9 @@ export function FinanceManager() {
           />
         </label>
         <label>
-          Até
+          {t(' Até ')}
           <input
-            aria-label="Data final"
+            aria-label={t('Data final')}
             type="date"
             value={to}
             min={from}
@@ -150,10 +152,10 @@ export function FinanceManager() {
               .finally(() => setBusy(false));
           }}
         >
-          Actualizar
+          {t(' Actualizar ')}
         </button>
       </div>
-      <nav className="suite-tabs" aria-label="Gestão financeira">
+      <nav className="suite-tabs" aria-label={t('Gestão financeira')}>
         {[
           ['overview', 'Resumo e gráficos'],
           ['operations', 'Vendas e documentos'],
@@ -162,23 +164,23 @@ export function FinanceManager() {
           ['exports', 'Exportação'],
         ].map(([id, label]) => (
           <button key={id} aria-pressed={tab === id} onClick={() => setTab(id)}>
-            {label}
+            {t(label)}
           </button>
         ))}
       </nav>
       {error && (
         <p role="alert" className="manager-error">
-          {error}
+          {t(error)}
         </p>
       )}
-      {notice && <output className="manager-notice">{notice}</output>}
+      {notice && <output className="manager-notice">{t(notice)}</output>}
       <p className="suite-note">
-        Controlo de gestão em MZN · datas de Maputo · facturas emitidas num
-        sistema externo. Sem cálculo automático de ISPC até validação do
-        enquadramento fiscal.
+        {t(
+          ' Controlo de gestão em MZN · datas de Maputo · facturas emitidas num sistema externo. Sem cálculo automático de ISPC até validação do enquadramento fiscal. ',
+        )}
       </p>
       {!data ? (
-        <p>A carregar movimentos…</p>
+        <p>{t('A carregar movimentos…')}</p>
       ) : (
         <>
           {tab === 'overview' && totals && (
@@ -193,21 +195,21 @@ export function FinanceManager() {
                   ['Despesas registadas', totals.expenses],
                 ].map(([label, value]) => (
                   <article key={label}>
-                    <span>{label}</span>
+                    <span>{t(label)}</span>
                     <strong>{money(Number(value))}</strong>
                   </article>
                 ))}
               </div>
               <div className="suite-grid">
                 <article className="manager-card">
-                  <h2>Recebimentos por actividade</h2>
+                  <h2>{t('Recebimentos por actividade')}</h2>
                   {[
                     ['Produtos físicos', totals.productReceived],
                     ['Subscrições digitais', totals.subscriptionReceived],
                   ].map(([label, value]) => (
                     <div className="suite-bar" key={label}>
                       <span>
-                        {label} · {money(Number(value))}
+                        {t(label)} · {money(Number(value))}
                       </span>
                       <meter
                         min={0}
@@ -218,11 +220,11 @@ export function FinanceManager() {
                     </div>
                   ))}
                   {!totals.received && (
-                    <p>Sem pagamentos confirmados neste período.</p>
+                    <p>{t('Sem pagamentos confirmados neste período.')}</p>
                   )}
                 </article>
                 <article className="manager-card">
-                  <h2>Recebimentos por mês</h2>
+                  <h2>{t('Recebimentos por mês')}</h2>
                   {(() => {
                     const monthly = new Map<string, number>();
                     data.operations
@@ -254,32 +256,30 @@ export function FinanceManager() {
                           </div>
                         ))
                     ) : (
-                      <p>Sem dados no período escolhido.</p>
+                      <p>{t('Sem dados no período escolhido.')}</p>
                     );
                   })()}
                 </article>
               </div>
               <section className="manager-card">
-                <h2>Como interpretar os valores</h2>
+                <h2>{t('Como interpretar os valores')}</h2>
                 <p>
-                  Recebimentos usam a data de confirmação do pagamento.
-                  Subscrições são reconhecidas proporcionalmente ao período de
-                  serviço; produtos, na entrega registada. A receita apresentada
-                  é bruta, antes de ajustar devoluções e impostos.
+                  {t(
+                    ' Recebimentos usam a data de confirmação do pagamento. Subscrições são reconhecidas proporcionalmente ao período de serviço; produtos, na entrega registada. A receita apresentada é bruta, antes de ajustar devoluções e impostos. ',
+                  )}
                 </p>
                 <p>
-                  Taxas, liquidações, despesas e reembolsos manuais só entram
-                  após registo com comprovativo. Valores em falta não significam
-                  custo zero. Este painel não apresenta lucro líquido nem
-                  substitui as demonstrações do contabilista.
+                  {t(
+                    ' Taxas, liquidações, despesas e reembolsos manuais só entram após registo com comprovativo. Valores em falta não significam custo zero. Este painel não apresenta lucro líquido nem substitui as demonstrações do contabilista. ',
+                  )}
                 </p>
                 {data.operations.some(
                   (o) => o.kind === 'product' && o.paidAt && !o.fulfilledAt,
                 ) && (
                   <p>
-                    Existem produtos pagos sem data de entrega registada: a
-                    respectiva receita ainda não foi reconhecida neste
-                    relatório.
+                    {t(
+                      ' Existem produtos pagos sem data de entrega registada: a respectiva receita ainda não foi reconhecida neste relatório. ',
+                    )}
                   </p>
                 )}
               </section>
@@ -287,34 +287,34 @@ export function FinanceManager() {
           )}
           {tab === 'operations' && (
             <section className="manager-card">
-              <h2>Vendas e documentos externos</h2>
+              <h2>{t('Vendas e documentos externos')}</h2>
               <div className="suite-toolbar">
                 <input
-                  placeholder="Cliente ou referência"
-                  aria-label="Pesquisar movimento"
+                  placeholder={t('Cliente ou referência')}
+                  aria-label={t('Pesquisar movimento')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
                 <select
                   value={kind}
-                  aria-label="Tipo de operação"
+                  aria-label={t('Tipo de operação')}
                   onChange={(e) => setKind(e.target.value)}
                 >
-                  <option value="all">Todas as actividades</option>
-                  <option value="product">Produtos</option>
-                  <option value="subscription">Subscrições</option>
+                  <option value="all">{t('Todas as actividades')}</option>
+                  <option value="product">{t('Produtos')}</option>
+                  <option value="subscription">{t('Subscrições')}</option>
                 </select>
               </div>
               <div className="suite-table">
                 <table>
                   <thead>
                     <tr>
-                      <th>Cliente / operação</th>
-                      <th>Tipo</th>
-                      <th>Recebido em</th>
-                      <th>Valor</th>
-                      <th>Documento</th>
-                      <th>Acção</th>
+                      <th>{t('Cliente / operação')}</th>
+                      <th>{t('Tipo')}</th>
+                      <th>{t('Recebido em')}</th>
+                      <th>{t('Valor')}</th>
+                      <th>{t('Documento')}</th>
+                      <th>{t('Acção')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -327,14 +327,16 @@ export function FinanceManager() {
                           </small>
                         </td>
                         <td>
-                          {o.kind === 'product'
-                            ? 'Produto'
-                            : o.cycle === 'annual'
-                              ? 'Plano anual'
-                              : 'Plano mensal'}
+                          {t(
+                            o.kind === 'product'
+                              ? 'Produto'
+                              : o.cycle === 'annual'
+                                ? 'Plano anual'
+                                : 'Plano mensal',
+                          )}
                         </td>
                         <td>
-                          {o.paidAt ? maputoDay(o.paidAt) : 'Não confirmado'}
+                          {t(o.paidAt ? maputoDay(o.paidAt) : 'Não confirmado')}
                         </td>
                         <td>{money(o.amount)}</td>
                         <td>
@@ -343,7 +345,7 @@ export function FinanceManager() {
                         </td>
                         <td>
                           <button onClick={() => setSelected(o)}>
-                            Associar factura
+                            {t(' Associar factura ')}
                           </button>
                         </td>
                       </tr>
@@ -351,7 +353,9 @@ export function FinanceManager() {
                   </tbody>
                 </table>
               </div>
-              {!operations.length && <p>Sem movimentos para estes filtros.</p>}
+              {!operations.length && (
+                <p>{t('Sem movimentos para estes filtros.')}</p>
+              )}
               {selected && (
                 <form
                   key={selected.id}
@@ -370,20 +374,23 @@ export function FinanceManager() {
                     });
                   }}
                 >
-                  <h3>Documento externo · {selected.customer}</h3>
+                  <h3>
+                    {t('Documento externo · ')}
+                    {selected.customer}
+                  </h3>
                   <label>
-                    Tipo
+                    {t(' Tipo ')}
                     <select
                       name="type"
                       defaultValue={document?.document_type ?? 'Factura'}
                     >
-                      <option>Factura</option>
-                      <option>Factura-recibo</option>
-                      <option>Nota de crédito</option>
+                      <option>{t('Factura')}</option>
+                      <option>{t('Factura-recibo')}</option>
+                      <option>{t('Nota de crédito')}</option>
                     </select>
                   </label>
                   <label>
-                    Referência emitida no sistema externo
+                    {t(' Referência emitida no sistema externo ')}
                     <input
                       name="reference"
                       required
@@ -392,7 +399,7 @@ export function FinanceManager() {
                     />
                   </label>
                   <label>
-                    Data de emissão
+                    {t(' Data de emissão ')}
                     <input
                       name="date"
                       required
@@ -402,16 +409,16 @@ export function FinanceManager() {
                     />
                   </label>
                   <label>
-                    Notas
+                    {t(' Notas ')}
                     <textarea
                       name="notes"
                       maxLength={500}
                       defaultValue={document?.notes}
                     />
                   </label>
-                  <button disabled={busy}>Guardar referência</button>
+                  <button disabled={busy}>{t('Guardar referência')}</button>
                   <button type="button" onClick={() => setSelected(null)}>
-                    Fechar
+                    {t(' Fechar ')}
                   </button>
                 </form>
               )}
@@ -420,15 +427,15 @@ export function FinanceManager() {
           {tab === 'entries' && (
             <>
               <section className="manager-card">
-                <h2>Saldo por reconciliar no prestador</h2>
+                <h2>{t('Saldo por reconciliar no prestador')}</h2>
                 <div className="suite-table">
                   <table>
                     <thead>
                       <tr>
-                        <th>Pagamento</th>
-                        <th>Recebido</th>
-                        <th>Taxas / reembolsos / liquidações</th>
-                        <th>Saldo</th>
+                        <th>{t('Pagamento')}</th>
+                        <th>{t('Recebido')}</th>
+                        <th>{t('Taxas / reembolsos / liquidações')}</th>
+                        <th>{t('Saldo')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -454,8 +461,9 @@ export function FinanceManager() {
                   </table>
                 </div>
                 <p>
-                  Saldo global desde o início. Um saldo negativo exige revisão,
-                  por exemplo após um reembolso posterior à liquidação.
+                  {t(
+                    ' Saldo global desde o início. Um saldo negativo exige revisão, por exemplo após um reembolso posterior à liquidação. ',
+                  )}
                 </p>
               </section>
               <form
@@ -476,33 +484,34 @@ export function FinanceManager() {
                   });
                 }}
               >
-                <h2>Registar movimento comprovado</h2>
+                <h2>{t('Registar movimento comprovado')}</h2>
                 <p>
-                  Registe aqui movimentos já realizados. Este formulário não
-                  executa reembolsos nem transferências.
+                  {t(
+                    ' Registe aqui movimentos já realizados. Este formulário não executa reembolsos nem transferências. ',
+                  )}
                 </p>
                 <div className="suite-grid">
                   <label>
-                    Tipo
+                    {t(' Tipo ')}
                     <select
                       value={entryKind}
                       onChange={(e) => setEntryKind(e.target.value)}
                     >
                       {Object.entries(entryLabels).map(([id, label]) => (
                         <option key={id} value={id}>
-                          {label}
+                          {t(label)}
                         </option>
                       ))}
                     </select>
                   </label>
                   <label>
-                    Pagamento associado
+                    {t(' Pagamento associado ')}
                     <select
                       name="operation"
                       required={!['expense', 'reversal'].includes(entryKind)}
                       disabled={['expense', 'reversal'].includes(entryKind)}
                     >
-                      <option value="">Seleccione</option>
+                      <option value="">{t('Seleccione')}</option>
                       {data.operations
                         .filter((o) => o.paidAt)
                         .map((o) => (
@@ -514,9 +523,9 @@ export function FinanceManager() {
                   </label>
                   {entryKind === 'reversal' && (
                     <label>
-                      Registo a estornar
+                      {t(' Registo a estornar ')}
                       <select name="reversal" required>
-                        <option value="">Seleccione</option>
+                        <option value="">{t('Seleccione')}</option>
                         {activeEntries
                           .filter((e) => !e.id.startsWith('legacy-'))
                           .map((e) => (
@@ -528,7 +537,7 @@ export function FinanceManager() {
                     </label>
                   )}
                   <label>
-                    Valor (MT)
+                    {t(' Valor (MT) ')}
                     <input
                       name="amount"
                       required
@@ -539,7 +548,7 @@ export function FinanceManager() {
                     />
                   </label>
                   <label>
-                    Data efectiva
+                    {t(' Data efectiva ')}
                     <input
                       required
                       name="date"
@@ -550,32 +559,32 @@ export function FinanceManager() {
                   </label>
                 </div>
                 <label>
-                  Referência única do comprovativo
+                  {t(' Referência única do comprovativo ')}
                   <input name="reference" required maxLength={120} />
                 </label>
                 <label>
-                  Descrição / motivo
+                  {t(' Descrição / motivo ')}
                   <textarea name="notes" required maxLength={500} />
                 </label>
                 <label className="suite-check">
                   <input name="verified" type="checkbox" required />
-                  Verifiquei o movimento e o comprovativo.
+                  {t(' Verifiquei o movimento e o comprovativo. ')}
                 </label>
                 <button className="manager-primary" disabled={busy}>
-                  Registar movimento
+                  {t(' Registar movimento ')}
                 </button>
               </form>
               <section className="manager-card">
-                <h2>Movimentos registados</h2>
+                <h2>{t('Movimentos registados')}</h2>
                 <div className="suite-table">
                   <table>
                     <thead>
                       <tr>
-                        <th>Data</th>
-                        <th>Tipo</th>
-                        <th>Referência</th>
-                        <th>Valor</th>
-                        <th>Descrição</th>
+                        <th>{t('Data')}</th>
+                        <th>{t('Tipo')}</th>
+                        <th>{t('Referência')}</th>
+                        <th>{t('Valor')}</th>
+                        <th>{t('Descrição')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -600,20 +609,20 @@ export function FinanceManager() {
           )}
           {tab === 'journal' && (
             <section className="manager-card">
-              <h2>Diário de gestão e razão por conta</h2>
+              <h2>{t('Diário de gestão e razão por conta')}</h2>
               <p>
-                Débitos e créditos de gestão. O contabilista classifica
-                reembolsos, despesas e impostos no sistema externo; não são
-                contas fiscais oficiais.
+                {t(
+                  ' Débitos e créditos de gestão. O contabilista classifica reembolsos, despesas e impostos no sistema externo; não são contas fiscais oficiais. ',
+                )}
               </p>
               <div className="suite-table">
                 <table>
                   <thead>
                     <tr>
-                      <th>Conta</th>
-                      <th>Débitos</th>
-                      <th>Créditos</th>
-                      <th>Saldo do período</th>
+                      <th>{t('Conta')}</th>
+                      <th>{t('Débitos')}</th>
+                      <th>{t('Créditos')}</th>
+                      <th>{t('Saldo do período')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -639,11 +648,11 @@ export function FinanceManager() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Data</th>
-                      <th>Referência</th>
-                      <th>Conta</th>
-                      <th>Débito</th>
-                      <th>Crédito</th>
+                      <th>{t('Data')}</th>
+                      <th>{t('Referência')}</th>
+                      <th>{t('Conta')}</th>
+                      <th>{t('Débito')}</th>
+                      <th>{t('Crédito')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -663,10 +672,13 @@ export function FinanceManager() {
           )}
           {tab === 'exports' && (
             <section className="manager-card">
-              <h2>Exportação para o contabilista</h2>
+              <h2>{t('Exportação para o contabilista')}</h2>
               <p>
-                Ficheiros CSV compatíveis com Excel, valores em meticais e datas
-                de Maputo. Período: {from} a {to}.
+                {t(
+                  ' Ficheiros CSV compatíveis com Excel, valores em meticais e datas de Maputo. Período: ',
+                )}
+                {from} {t(' a ')}
+                {to}.
               </p>
               <div className="suite-toolbar">
                 {[
@@ -680,7 +692,7 @@ export function FinanceManager() {
                     key={id}
                     href={'/api/manager-finance?' + query + '&export=' + id}
                   >
-                    {label} · CSV
+                    {t(label)} {t(' · CSV ')}
                   </a>
                 ))}
               </div>
@@ -696,29 +708,30 @@ export function FinanceManager() {
                   });
                 }}
               >
-                <h3>Fecho dos registos de gestão</h3>
+                <h3>{t('Fecho dos registos de gestão')}</h3>
                 <p>
-                  Fechado até: {data.closedThrough ?? 'Nenhum período'}. Impede
-                  novos movimentos manuais e alterações a documentos nos
-                  períodos fechados. Correcções por estorno ficam no período
-                  aberto; o fecho não interrompe confirmações automáticas do
-                  prestador.
+                  {t(' Fechado até: ')}
+                  {data.closedThrough ?? 'Nenhum período'}
+                  {t(
+                    '. Impede novos movimentos manuais e alterações a documentos nos períodos fechados. Correcções por estorno ficam no período aberto; o fecho não interrompe confirmações automáticas do prestador. ',
+                  )}
                 </p>
                 <label>
-                  Último dia do mês a fechar
+                  {t(' Último dia do mês a fechar ')}
                   <input name="date" type="date" required max={today} />
                 </label>
                 <label className="suite-check">
                   <input type="checkbox" name="verified" required />
-                  Revi e exportei os movimentos. Compreendo que este fecho não
-                  pode ser desfeito neste painel.
+                  {t(
+                    ' Revi e exportei os movimentos. Compreendo que este fecho não pode ser desfeito neste painel. ',
+                  )}
                 </label>
-                <button disabled={busy}>Fechar período de gestão</button>
+                <button disabled={busy}>{t('Fechar período de gestão')}</button>
               </form>
               <p>
-                Os ficheiros incluem dados de clientes: partilhe apenas com quem
-                trata da contabilidade. Os valores não constituem uma declaração
-                de ISPC nem um ficheiro fiscal certificado.
+                {t(
+                  ' Os ficheiros incluem dados de clientes: partilhe apenas com quem trata da contabilidade. Os valores não constituem uma declaração de ISPC nem um ficheiro fiscal certificado. ',
+                )}
               </p>
             </section>
           )}

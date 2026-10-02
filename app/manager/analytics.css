@@ -305,7 +305,7 @@
 }
 .website-analytics .wa-presets button[aria-pressed='true'] {
   background: #fff;
-  color: #b83b09;
+  color: var(--framy-orange-text);
   border-color: #e9d4c6;
   box-shadow: 0 1px 3px #4226120c;
 }
@@ -331,7 +331,7 @@
 .website-analytics .wa-toolbar input:focus-visible,
 .website-analytics summary:focus-visible,
 .website-analytics .wa-heat td:focus-visible {
-  outline: 2px solid #b83b09;
+  outline: 2px solid var(--framy-orange);
   outline-offset: 3px;
 }
 .website-analytics .wa-toolbar button.wa-refresh {
@@ -755,7 +755,7 @@
   box-shadow: 0 1px 3px #4226120c;
 }
 .website-analytics .wa-view-switch button:focus-visible {
-  outline: 2px solid #b83b09;
+  outline: 2px solid var(--framy-orange);
   outline-offset: 2px;
 }
 .website-analytics .wa-traffic .wa-daily {

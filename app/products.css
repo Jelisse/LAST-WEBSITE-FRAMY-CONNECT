@@ -153,7 +153,7 @@
   min-height: 42px;
 }
 .product-availability input {
-  accent-color: #f4511e;
+  accent-color: var(--framy-orange);
   width: 18px;
   height: 18px;
 }

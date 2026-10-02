@@ -1,4 +1,5 @@
 import { MapPin, Truck, Zap } from 'lucide-react';
+import { useI18n } from '@/components/language-provider';
 import type { FulfilmentSettings } from '@/lib/fulfilment';
 import Link from '@/components/hard-link';
 export function DeliverySelector({
@@ -18,6 +19,7 @@ export function DeliverySelector({
   onMode: (mode: string) => void;
   onPoint: (id: string) => void;
 }) {
+  const { t } = useI18n();
   const selected = settings?.cities.find((c) => c.id === city && c.active);
   const points =
     settings?.points.filter((p) => p.cityId === city && p.active) ?? [];
@@ -30,9 +32,9 @@ export function DeliverySelector({
   return (
     <>
       <label>
-        Em que cidade pretende receber ou levantar o produto?
+        {t(' Em que cidade pretende receber ou levantar o produto? ')}
         <select value={city} onChange={(e) => onCity(e.target.value)}>
-          <option value="">Seleccionar cidade</option>
+          <option value="">{t('Seleccionar cidade')}</option>
           {settings?.cities
             .filter((c) => c.active)
             .map((c) => (
@@ -40,18 +42,18 @@ export function DeliverySelector({
                 {c.name}
               </option>
             ))}
-          <option value="other">Outra cidade / localidade</option>
+          <option value="other">{t('Outra cidade / localidade')}</option>
         </select>
       </label>
       {!settings && (
         <p role="alert">
-          As opções de recepção estão temporariamente indisponíveis.
+          {t(' As opções de recepção estão temporariamente indisponíveis. ')}
         </p>
       )}
       {city && (
         <>
           <fieldset className="delivery-methods">
-            <legend>Como pretende receber?</legend>
+            <legend>{t('Como pretende receber?')}</legend>
             <div className="delivery-options">
               <label className={mode === 'pickup' ? 'is-selected' : ''}>
                 <input
@@ -61,11 +63,13 @@ export function DeliverySelector({
                   onChange={() => onMode('pickup')}
                 />
                 <MapPin size={22} aria-hidden="true" />
-                <strong>Levantar num ponto</strong>
+                <strong>{t('Levantar num ponto')}</strong>
                 <small>
-                  {points.length
-                    ? 'Gratuito'
-                    : 'Sem ponto disponível nesta cidade'}
+                  {t(
+                    points.length
+                      ? 'Gratuito'
+                      : 'Sem ponto disponível nesta cidade',
+                  )}
                 </small>
               </label>
               <label className={mode === 'standard' ? 'is-selected' : ''}>
@@ -76,11 +80,13 @@ export function DeliverySelector({
                   onChange={() => onMode('standard')}
                 />
                 <Truck size={22} aria-hidden="true" />
-                <strong>Receber na minha morada</strong>
+                <strong>{t('Receber na minha morada')}</strong>
                 <small>
-                  {selected?.standardEnabled
-                    ? amount(selected.standardFee)
-                    : 'Sob consulta'}
+                  {t(
+                    selected?.standardEnabled
+                      ? amount(selected.standardFee)
+                      : 'Sob consulta',
+                  )}
                 </small>
               </label>
               <label className={mode === 'express' ? 'is-selected' : ''}>
@@ -91,11 +97,13 @@ export function DeliverySelector({
                   onChange={() => onMode('express')}
                 />
                 <Zap size={22} aria-hidden="true" />
-                <strong>Entrega expressa</strong>
+                <strong>{t('Entrega expressa')}</strong>
                 <small>
-                  {selected?.expressEnabled && selected.expressFee !== null
-                    ? amount(selected.expressFee)
-                    : 'Sob cotação'}
+                  {t(
+                    selected?.expressEnabled && selected.expressFee !== null
+                      ? amount(selected.expressFee)
+                      : 'Sob cotação',
+                  )}
                 </small>
               </label>
             </div>
@@ -103,9 +111,9 @@ export function DeliverySelector({
           {mode === 'pickup' && points.length > 0 && (
             <>
               <label>
-                Ponto de levantamento
+                {t(' Ponto de levantamento ')}
                 <select value={point} onChange={(e) => onPoint(e.target.value)}>
-                  <option value="">Seleccionar ponto</option>
+                  <option value="">{t('Seleccionar ponto')}</option>
                   {points.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -131,11 +139,12 @@ export function DeliverySelector({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Ver endereço no mapa ↗
+                    {t(' Ver endereço no mapa ↗ ')}
                   </a>
                   <p>
-                    Aguarde a confirmação de que o produto está pronto antes de
-                    se deslocar ao ponto.
+                    {t(
+                      ' Aguarde a confirmação de que o produto está pronto antes de se deslocar ao ponto. ',
+                    )}
                   </p>
                 </div>
               )}
@@ -143,10 +152,15 @@ export function DeliverySelector({
           )}
           {mode === 'standard' && selected?.standardEnabled && (
             <div className="pickup-location">
-              <strong>Zona abrangida: {selected.area}</strong>
+              <strong>
+                {t('Zona abrangida: ')}
+                {selected.area}
+              </strong>
               <p>{selected.eta}</p>
               <small>
-                O prazo de entrega começa depois de o produto estar pronto.
+                {t(
+                  ' O prazo de entrega começa depois de o produto estar pronto. ',
+                )}
               </small>
             </div>
           )}
@@ -155,8 +169,9 @@ export function DeliverySelector({
               <p>{selected.expressNote}</p>
               {selected.expressFee === null && (
                 <p>
-                  O parceiro confirmará o preço e a disponibilidade. Este
-                  serviço ainda não pode ser pago no checkout.
+                  {t(
+                    ' O parceiro confirmará o preço e a disponibilidade. Este serviço ainda não pode ser pago no checkout. ',
+                  )}
                 </p>
               )}
             </div>
@@ -167,12 +182,13 @@ export function DeliverySelector({
               (!selected?.expressEnabled || selected.expressFee === null))) && (
             <p>
               <Link className="home-text-link" href="/contacto">
-                Solicitar cotação à equipa ↗
+                {t(' Solicitar cotação à equipa ↗ ')}
               </Link>
               <br />
               <small>
-                O total será confirmado antes do pagamento. Pode escolher outra
-                forma de recepção.
+                {t(
+                  ' O total será confirmado antes do pagamento. Pode escolher outra forma de recepção. ',
+                )}
               </small>
             </p>
           )}

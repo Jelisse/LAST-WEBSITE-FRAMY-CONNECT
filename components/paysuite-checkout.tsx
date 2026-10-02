@@ -1,4 +1,5 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 import Link from '@/components/hard-link';
 import { useRef, useState } from 'react';
 
@@ -9,6 +10,7 @@ export function PaySuiteCheckout({
   payload: Record<string, unknown>;
   disabled?: boolean;
 }) {
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   const [method, setMethod] = useState('mpesa');
@@ -66,20 +68,21 @@ export function PaySuiteCheckout({
   return (
     <form onSubmit={pay} className="paysuite-checkout">
       <label>
-        Método de pagamento
+        {t(' Método de pagamento ')}
         <select
           value={method}
           onChange={(e) => setMethod(e.target.value)}
           disabled={busy || disabled}
         >
-          <option value="mpesa">M-Pesa</option>
-          <option value="emola">e-Mola</option>
-          <option value="credit_card">Visa / Mastercard</option>
+          <option value="mpesa">{t('M-Pesa')}</option>
+          <option value="emola">{t('e-Mola')}</option>
+          <option value="credit_card">{t('Visa / Mastercard')}</option>
         </select>
       </label>
       <p>
-        O pagamento é concluído na página segura da PaySuite. Não guardamos
-        dados do cartão nem PINs.
+        {t(
+          ' O pagamento é concluído na página segura da PaySuite. Não guardamos dados do cartão nem PINs. ',
+        )}
       </p>
       <label className="growth-check">
         <input
@@ -89,18 +92,21 @@ export function PaySuiteCheckout({
           required
           disabled={busy || disabled}
         />
-        Confirmo o total apresentado. Este pagamento não autoriza débitos
-        automáticos.
+        {t(
+          ' Confirmo o total apresentado. Este pagamento não autoriza débitos automáticos. ',
+        )}
       </label>
-      {error && <p role="alert">{error}</p>}
+      {error && <p role="alert">{t(error)}</p>}
       <button
         className="btn btn-primary"
         disabled={busy || disabled || !accepted}
       >
-        {busy ? 'A preparar pagamento…' : 'Continuar para pagamento'}
+        {t(busy ? 'A preparar pagamento…' : 'Continuar para pagamento')}
       </button>
       <p>
-        <Link href="/checkout/retorno">Consultar os meus pagamentos</Link>
+        <Link href="/checkout/retorno">
+          {t('Consultar os meus pagamentos')}
+        </Link>
       </p>
     </form>
   );

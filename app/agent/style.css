@@ -9,7 +9,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 24px;
-  border-top: 4px solid #f05a29;
+  border-top: 4px solid var(--framy-orange);
   padding: 28px 0;
 }
 .agent-header > a {
@@ -322,7 +322,7 @@
 .agent-header { flex-direction:column; gap:18px; }
 .agent-toolbar nav button,.agent-toolbar > button { display:flex; align-items:center; justify-content:center; gap:8px; min-height:44px; }
 @media(max-width:700px) {
- .agent-header { padding:0 0 20px; border:0; }
+ .agent-header { padding:0 0 20px; border: 0; }
  .agent-eyebrow { margin:0 0 8px; font-size:12px; }
  .agent-header h1 { margin:0; font-size:27px; }
  .agent-header p:last-child:not(.agent-eyebrow) { display:none; }

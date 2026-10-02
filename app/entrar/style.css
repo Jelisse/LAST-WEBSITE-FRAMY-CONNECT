@@ -1,10 +1,10 @@
 .auth-page {
   position: relative;
   isolation: isolate;
-  min-height: 100svh;
+  min-height: calc(100svh - 164px);
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: clamp(20px, 4vh, 48px) 20px;
   background: var(--action-orange);
 }
 .auth-page::before {
@@ -16,7 +16,7 @@
   background: url('/media-optimized/brand-profile-mountains-1440-629d89b12d66.webp') center bottom / cover no-repeat;
   filter: invert(1);
   mix-blend-mode: screen;
-  opacity: 0.18;
+  opacity: 0.12;
   mask-image: linear-gradient(to bottom, transparent, #000 70%);
 }
 .auth-card {
@@ -29,7 +29,7 @@
 }
 .auth-card h1 {
   font-size: 28px;
-  margin: 24px 0 12px;
+  margin: 18px 0 10px;
 }
 .auth-card p {
   color: #655b54;
@@ -41,7 +41,7 @@
   gap: 10px;
 }
 .auth-card form {
-  gap: 20px;
+  gap: 16px;
 }
 .auth-card input {
   border: 1px solid #d8cfc8;
@@ -76,12 +76,19 @@
 }
 .auth-card .auth-switch {
   background: transparent;
-  color: var(--action-orange);
+  color: var(--framy-orange-text);
   width: 100%;
-  margin-top: 16px;
+  margin-top: 10px;
 }
+.auth-forgot { justify-self:end; font-size:14px; padding:6px 0; margin-top:-8px; text-decoration:underline; text-underline-offset:3px; }
+.auth-card .password-field { position:relative; display:block; }
+.auth-card .password-field input { padding-right:54px; }
+.auth-card .password-toggle { position:absolute; right:3px; top:0; bottom:0; height:44px; margin-block:auto; display:grid; place-items:center; width:44px; min-height:44px; padding:8px; background: transparent; color: #51453e; border: 0; border-radius:8px; }
+.auth-card .password-toggle:hover:not(:disabled) { background: #fff0e5; }
+.auth-card .password-toggle:focus-visible { outline-offset:-3px; }
+@media(max-width:480px) { .auth-card { padding:26px 20px; border-radius:18px; } .auth-card h1 { font-size:25px; } .auth-page { min-height:calc(100svh - 200px); } }
 .auth-card .auth-switch:hover:not(:disabled) { background: #fff0e5; color: var(--action-orange-hover); }
-.auth-return { display: inline-block; margin-top: 20px; font-size: 14px; color: var(--action-orange); text-decoration: underline; text-underline-offset: 4px; }
+.auth-return { display: inline-block; margin-top: 20px; font-size: 14px; color: var(--framy-orange-text); text-decoration: underline; text-underline-offset: 4px; }
 @media (prefers-reduced-motion: reduce) { .auth-card button { transition: none; transform: none !important; } }
 .auth-card [role='alert'] {
   color: #ad2014;
@@ -106,7 +113,7 @@
 .security-sessions p { font-size: 14px; line-height: 1.6; }
 .security-card .security-signout { background: #fff; color: #963d2c; border-color: #decac3; font-size: 14px; }
 .security-card .security-signout:hover:not(:disabled) { background: #fff4f0; border-color: #b76a54; }
-.security-card button:focus-visible { outline: 3px solid #c34008; outline-offset: 3px; }
+.security-card button:focus-visible { outline: 3px solid var(--framy-orange); outline-offset: 3px; }
 .security-card button:disabled { cursor: wait; }
 @media (max-width: 480px) {
   .auth-page:has(.security-card) { padding: 16px; }
@@ -136,7 +143,7 @@
 .staff-page h2 {
   font-size: 20px;
 }
-.staff-section { margin:18px 0; border:1px solid #e5dfd8; padding:18px; border-radius:14px; background:#fff; }
+.staff-section { margin:18px 0; border: 1px solid #e5dfd8; padding:18px; border-radius:14px; background: #fff; }
 .staff-section > summary { cursor:pointer; font-size:18px; font-weight:600; padding:6px 0; }
 .staff-section[open] > summary { margin-bottom:18px; }
 .staff-page > header { flex-wrap:wrap; }

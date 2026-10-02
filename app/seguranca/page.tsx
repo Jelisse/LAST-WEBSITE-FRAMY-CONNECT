@@ -1,4 +1,5 @@
 'use client';
+import { PasswordInput } from '@/components/password-input';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
 
 import { useState } from 'react';
@@ -60,8 +61,7 @@ export default function Page() {
         >
           <label>
             {t('Palavra-passe actual')}
-            <input
-              type="password"
+            <PasswordInput
               name="current"
               required
               maxLength={72}
@@ -70,8 +70,7 @@ export default function Page() {
           </label>
           <label>
             {t('Nova palavra-passe')}
-            <input
-              type="password"
+            <PasswordInput
               name="password"
               required
               minLength={12}
@@ -81,8 +80,7 @@ export default function Page() {
           </label>
           <label>
             {t('Repetir nova palavra-passe')}
-            <input
-              type="password"
+            <PasswordInput
               name="confirm"
               required
               minLength={12}
@@ -90,20 +88,34 @@ export default function Page() {
               autoComplete="new-password"
             />
           </label>
-          <button className="security-save" type="submit" disabled={busy}><LockKeyhole size={18} aria-hidden="true" /><span>{t('Alterar palavra-passe')}</span></button>
+          <button className="security-save" type="submit" disabled={busy}>
+            <LockKeyhole size={18} aria-hidden="true" />
+            <span>{t('Alterar palavra-passe')}</span>
+          </button>
         </form>
         {error && <p role="alert">{t(error)}</p>}
-        <section className="security-sessions" aria-labelledby="sessions-heading">
-        <h2 id="sessions-heading"><MonitorSmartphone size={20} aria-hidden="true" />{t('Dispositivos e sessões')}</h2>
-        <p>{t('Termine o acesso em todos os dispositivos, incluindo este. Terá de iniciar sessão novamente.')}</p>
-        <button
-          className="security-signout"
-          type="button"
-          disabled={busy}
-          onClick={() => void post({ action: 'logout-all' })}
+        <section
+          className="security-sessions"
+          aria-labelledby="sessions-heading"
         >
-          <LogOut size={18} aria-hidden="true" /><span>{t('Terminar sessão em todos os dispositivos')}</span>
-        </button>
+          <h2 id="sessions-heading">
+            <MonitorSmartphone size={20} aria-hidden="true" />
+            {t('Dispositivos e sessões')}
+          </h2>
+          <p>
+            {t(
+              'Termine o acesso em todos os dispositivos, incluindo este. Terá de iniciar sessão novamente.',
+            )}
+          </p>
+          <button
+            className="security-signout"
+            type="button"
+            disabled={busy}
+            onClick={() => void post({ action: 'logout-all' })}
+          >
+            <LogOut size={18} aria-hidden="true" />
+            <span>{t('Terminar sessão em todos os dispositivos')}</span>
+          </button>
         </section>
       </section>
     </main>

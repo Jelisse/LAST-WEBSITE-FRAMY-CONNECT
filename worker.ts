@@ -4,6 +4,7 @@ import { refreshProfileDomains } from './lib/profile-domains';
 import { customDomainRequest } from './lib/custom-domain-request';
 import handler from 'vinext/server/fetch-handler';
 import { securityHeaders } from './lib/security-headers';
+import { localizedResponse } from './lib/localized-response';
 import { cleanupReservations } from './lib/reservation-cleanup';
 import { reconcilePayment, type GatewayPayment } from './lib/server-paysuite';
 const worker = {
@@ -86,7 +87,8 @@ const worker = {
         : await handler.fetch(routed, env, ctx);
     // Preserve development websocket upgrades and streams.
     if (response.status === 101) return response;
-    const next = new Response(response.body, response);
+    const localized = await localizedResponse(request, response);
+    const next = new Response(localized.body, localized);
     if (routed instanceof Response)
       next.headers.set('Cache-Control', 'private, no-store');
     if (routed instanceof Request && routed.url !== request.url) {

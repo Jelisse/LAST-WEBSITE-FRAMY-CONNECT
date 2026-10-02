@@ -7,6 +7,7 @@ import {
   validateReminderSettings,
 } from '@/lib/subscription-settings';
 import { profileAccess } from '@/lib/entitlement';
+import { manualRenewal } from '@/lib/manual-renewal';
 export const dynamic = 'force-dynamic';
 export async function GET() {
   const user = await getChatGPTUser();
@@ -23,7 +24,11 @@ export async function GET() {
         .first<{ data_json: string; version: number }>(),
       db
         .prepare(
-          'SELECT m.*,a.name,a.email FROM profile_membership_view m JOIN auth_accounts a ON a.id=m.owner_id WHERE a.active=1 ORDER BY COALESCE(m.paid_expires_at,m.trial_expires_at) LIMIT 501',
+          `SELECT m.*,a.name,a.email,
+            CASE WHEN json_valid(p.published_json) THEN json_extract(p.published_json,'$.business.whatsapp') END AS whatsapp
+            FROM profile_membership_view m JOIN auth_accounts a ON a.id=m.owner_id
+            LEFT JOIN profiles p ON p.owner_id=m.owner_id
+            WHERE a.active=1 ORDER BY COALESCE(m.paid_expires_at,m.trial_expires_at) LIMIT 501`,
         )
         .all(),
       db
@@ -37,13 +42,20 @@ export async function GET() {
         )
         .all(),
     ]);
+    const reminders = settings
+      ? JSON.parse(settings.data_json)
+      : reminderDefaults;
     return json({
       plans,
-      reminders: settings ? JSON.parse(settings.data_json) : reminderDefaults,
+      reminders,
       reminderVersion: settings?.version ?? 0,
       members: members.results
         .slice(0, 500)
-        .map((m) => ({ ...m, state: profileAccess(m as never) })),
+        .map((m) => ({
+          ...m,
+          state: profileAccess(m as never),
+          renewal: manualRenewal(m as never, reminders.daysBefore),
+        })),
       truncated: members.results.length > 500,
       audit: audit.results,
       deliveries: deliveries.results,

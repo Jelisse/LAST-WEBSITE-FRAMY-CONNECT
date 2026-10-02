@@ -26,16 +26,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations();
   return {
     icons: {
-  icon: [
-    {
-      url: '/favicon.png',
-      type: 'image/png',
-      sizes: '96x96',
+      icon: [
+        {
+          url: '/favicon.png',
+          type: 'image/png',
+          sizes: '96x96',
+        },
+      ],
+      shortcut: '/favicon.png',
+      apple: '/favicon.png',
     },
-  ],
-  shortcut: '/favicon.png',
-  apple: '/favicon.png',
-},
     title: {
       default: t('Framy Connect — O Seu Mundo, Num Toque.'),
       template: '%s | Framy Connect',
@@ -61,7 +61,12 @@ export default async function RootLayout({
           {t('Saltar para o conteúdo')}
         </a>
         <LanguageProvider locale={locale}>
-          <InternalPageChrome header={<SiteHeader focused />} footer={<SiteFooter />}>{children}</InternalPageChrome>
+          <InternalPageChrome
+            header={<SiteHeader focused />}
+            footer={<SiteFooter compact />}
+          >
+            {children}
+          </InternalPageChrome>
           <SiteAnalyticsTracker />
         </LanguageProvider>
       </body>

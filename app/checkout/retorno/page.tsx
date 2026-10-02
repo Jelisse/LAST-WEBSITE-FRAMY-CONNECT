@@ -11,7 +11,7 @@ export default function Page() {
       <main id="main" className="section-wrap">
         <PaySuiteStatus />
       </main>
-      <SiteFooter />
+      <SiteFooter compact />
     </>
   );
 }

@@ -61,6 +61,7 @@ export function LeatherPreview({
   preview?: string;
   back?: boolean;
 }) {
+  const { t } = useI18n();
   const logo = value.color === 'black' ? 'symbol' : value.logo;
   const custom = design !== 'standard';
   const photo = `/products/leather/${value.color}-${back ? 'back' : custom ? 'blank' : logo}.png`;
@@ -77,7 +78,7 @@ export function LeatherPreview({
         <div className="leather-photo-artwork">
           <SourceImage
             src={preview}
-            alt="O seu logótipo aplicado ao produto"
+            alt={t('O seu logótipo aplicado ao produto')}
             style={{
               width: `${value.scale}%`,
               height: `${value.scale}%`,
@@ -252,13 +253,14 @@ export function LeatherConfigurator({
   return (
     <section className="leather-config">
       <div className="leather-controls">
-        <h3>Personalize o porta-chaves de couro</h3>
+        <h3>{t('Personalize o porta-chaves de couro')}</h3>
         <p className="leather-live-note">
-          Escolha a cor, carregue o logótipo e ajuste o tamanho. A imagem e o
-          resumo actualizam automaticamente.
+          {t(
+            ' Escolha a cor, carregue o logótipo e ajuste o tamanho. A imagem e o resumo actualizam automaticamente. ',
+          )}
         </p>
         <fieldset disabled={busy}>
-          <legend>Cor do couro</legend>
+          <legend>{t('Cor do couro')}</legend>
           <div className="leather-swatches">
             {(['brown', 'black'] as const).map((color) => (
               <button
@@ -288,7 +290,7 @@ export function LeatherConfigurator({
         {design === 'standard' && (
           <>
             <fieldset>
-              <legend>Logótipo frontal</legend>
+              <legend>{t('Logótipo frontal')}</legend>
               <div className="leather-logos">
                 {(['full', 'symbol'] as const).map((logo) => (
                   <button
@@ -297,7 +299,7 @@ export function LeatherConfigurator({
                     aria-pressed={value.logo === logo}
                     onClick={() => update({ logo })}
                   >
-                    {logo === 'full' ? 'FramyConnect completo' : 'Símbolo F'}
+                    {t(logo === 'full' ? 'FramyConnect completo' : 'Símbolo F')}
                   </button>
                 ))}
               </div>
@@ -305,9 +307,11 @@ export function LeatherConfigurator({
             <div className="leather-specs">
               <Ruler size={18} aria-hidden="true" />
               <div>
-                <strong>Dimensões do produto</strong>
+                <strong>{t('Dimensões do produto')}</strong>
                 <p>{dimensions || 'Medidas a confirmar pela equipa.'}</p>
-                <small>Couro · Argola metálica · Verso com símbolo NFC</small>
+                <small>
+                  {t('Couro · Argola metálica · Verso com símbolo NFC')}
+                </small>
               </div>
             </div>
           </>
@@ -317,9 +321,9 @@ export function LeatherConfigurator({
             <label className="leather-upload">
               <span className="leather-upload-action">
                 <Upload size={20} aria-hidden="true" />
-                {preview ? 'Substituir logótipo' : 'Carregar logótipo'}
+                {t(preview ? 'Substituir logótipo' : 'Carregar logótipo')}
               </span>
-              <span>PDF vectorial, PNG ou JPG · até 8 MB</span>
+              <span>{t('PDF vectorial, PNG ou JPG · até 8 MB')}</span>
               <input
                 type="file"
                 accept="application/pdf,image/png,image/jpeg"
@@ -331,11 +335,12 @@ export function LeatherConfigurator({
               />
             </label>
             {value.fileName && <p className="leather-file">{value.fileName}</p>}
-            {value.assetId && <p>Ficheiro guardado para produção.</p>}
+            {value.assetId && <p>{t('Ficheiro guardado para produção.')}</p>}
             {preview && (
               <>
                 <label>
-                  Tamanho do logótipo · {value.scale}%
+                  {t(' Tamanho do logótipo · ')}
+                  {value.scale}%
                   <input
                     type="range"
                     min="25"
@@ -345,9 +350,9 @@ export function LeatherConfigurator({
                   />
                 </label>
                 <details className="leather-optional">
-                  <summary>Ajustar posição</summary>
+                  <summary>{t('Ajustar posição')}</summary>
                   <label>
-                    Posição horizontal
+                    {t(' Posição horizontal ')}
                     <input
                       type="range"
                       min="-20"
@@ -357,7 +362,7 @@ export function LeatherConfigurator({
                     />
                   </label>
                   <label>
-                    Posição vertical
+                    {t(' Posição vertical ')}
                     <input
                       type="range"
                       min="-20"
@@ -370,12 +375,13 @@ export function LeatherConfigurator({
                     type="button"
                     onClick={() => update({ scale: 70, x: 0, y: 0 })}
                   >
-                    <RotateCcw size={15} aria-hidden="true" /> Repor posição
+                    <RotateCcw size={15} aria-hidden="true" />{' '}
+                    {t(' Repor posição ')}
                   </button>
                 </details>
                 {isPdf && (
                   <label>
-                    Página do PDF
+                    {t(' Página do PDF ')}
                     <input
                       type="number"
                       min="1"
@@ -401,18 +407,21 @@ export function LeatherConfigurator({
             )}
             {preview && !isPdf && (
               <details className="leather-optional">
-                <summary>Remover fundo</summary>
+                <summary>{t('Remover fundo')}</summary>
                 <fieldset
                   className="leather-background-controls"
                   disabled={busy}
                 >
-                  <legend className="sr-only">Remover fundo do logótipo</legend>
+                  <legend className="sr-only">
+                    {t('Remover fundo do logótipo')}
+                  </legend>
                   <p>
-                    Para fundos de cor uniforme. Escolha a cor e ajuste a
-                    tolerância.
+                    {t(
+                      ' Para fundos de cor uniforme. Escolha a cor e ajuste a tolerância. ',
+                    )}
                   </p>
                   <label>
-                    Cor do fundo{' '}
+                    {t(' Cor do fundo')}{' '}
                     <input
                       type="color"
                       value={backgroundColor}
@@ -420,7 +429,8 @@ export function LeatherConfigurator({
                     />
                   </label>
                   <label>
-                    Tolerância · {tolerance}
+                    {t(' Tolerância · ')}
+                    {tolerance}
                     <input
                       type="range"
                       min="0"
@@ -431,7 +441,7 @@ export function LeatherConfigurator({
                   </label>
                   <button type="button" onClick={() => void removeBackground()}>
                     <Eraser size={16} aria-hidden="true" />
-                    {backgroundRemoved ? 'Ajustar remoção' : 'Remover fundo'}
+                    {t(backgroundRemoved ? 'Ajustar remoção' : 'Remover fundo')}
                   </button>
                   {backgroundRemoved && (
                     <button
@@ -439,21 +449,21 @@ export function LeatherConfigurator({
                       onClick={() => void restoreOriginal()}
                     >
                       <RotateCcw size={16} aria-hidden="true" />
-                      Repor imagem original
+                      {t(' Repor imagem original ')}
                     </button>
                   )}
                   <small>
-                    Resultado em PNG transparente, até 2048 px. Pode repor o
-                    original durante esta edição. Confira os detalhes antes de
-                    continuar.
+                    {t(
+                      ' Resultado em PNG transparente, até 2048 px. Pode repor o original durante esta edição. Confira os detalhes antes de continuar. ',
+                    )}
                   </small>
                 </fieldset>
               </details>
             )}
           </>
         )}
-        {busy && <output>A preparar o logótipo…</output>}
-        {error && <p role="alert">{error}</p>}
+        {busy && <output>{t('A preparar o logótipo…')}</output>}
+        {error && <p role="alert">{t(error)}</p>}
       </div>
       <figure className="leather-preview">
         <div className="leather-face-tabs">
@@ -462,21 +472,21 @@ export function LeatherConfigurator({
             aria-pressed={!back}
             onClick={() => setBack(false)}
           >
-            Frente
+            {t(' Frente ')}
           </button>
           <button
             type="button"
             aria-pressed={back}
             onClick={() => setBack(true)}
           >
-            Verso
+            {t(' Verso ')}
           </button>
         </div>
         <div
           className={`leather-studio ${value.color === 'black' ? 'is-black' : ''}`}
         >
           <div className="leather-studio-label">
-            <Move3D size={15} aria-hidden="true" /> Vista interactiva
+            <Move3D size={15} aria-hidden="true" /> {t(' Vista interactiva ')}
           </div>
           <div
             className="leather-studio-stage"
@@ -520,10 +530,10 @@ export function LeatherConfigurator({
         </div>
         <div className="leather-studio-controls">
           <label>
-            <Move3D size={15} aria-hidden="true" /> Ângulo
+            <Move3D size={15} aria-hidden="true" /> {t(' Ângulo ')}
             <input
               type="range"
-              aria-label="Ângulo de visualização"
+              aria-label={t('Ângulo de visualização')}
               min="-22"
               max="22"
               value={tilt.y}
@@ -537,26 +547,31 @@ export function LeatherConfigurator({
               setBack(false);
             }}
           >
-            <RotateCcw size={15} aria-hidden="true" /> Repor vista
+            <RotateCcw size={15} aria-hidden="true" /> {t(' Repor vista ')}
           </button>
         </div>
         <figcaption>
-          {back ? 'Verso com símbolo NFC' : 'Pré-visualização da frente'}
+          {t(back ? 'Verso com símbolo NFC' : 'Pré-visualização da frente')}
           {!back &&
             design === 'standard' &&
             value.color === 'black' &&
             value.logo === 'full' && (
               <small>
-                Fotografia de referência com símbolo F. Seleccionou o logótipo
-                completo; a fotografia dessa versão ainda não está disponível.
+                {t(
+                  ' Fotografia de referência com símbolo F. Seleccionou o logótipo completo; a fotografia dessa versão ainda não está disponível. ',
+                )}
               </small>
             )}
           {!back && design !== 'standard' && (
             <small>
-              {design === 'customer'
-                ? 'Pré-visualização do seu logótipo sobre a fotografia do produto. '
-                : 'Frente disponível para o design da equipa. '}
-              A equipa confirma a arte e o acabamento antes da produção.
+              {t(
+                design === 'customer'
+                  ? 'Pré-visualização do seu logótipo sobre a fotografia do produto. '
+                  : 'Frente disponível para o design da equipa. ',
+              )}
+              {t(
+                ' A equipa confirma a arte e o acabamento antes da produção. ',
+              )}
             </small>
           )}
         </figcaption>

@@ -67,7 +67,7 @@
 }
 .media-upload-actions button:focus-visible,
 .compact-mobile-menu summary:focus-visible {
-  outline: 2px solid #b63a0a;
+  outline: 2px solid var(--framy-orange);
   outline-offset: 3px;
 }
 .media-upload-progress {
@@ -354,7 +354,7 @@
   display: inline-block;
   vertical-align: middle;
   margin-right: 10px;
-  color: #b63a0a;
+  color: var(--framy-orange-text);
 }
 .staff-section > .account-management > h2,
 .staff-section > .application-manager > h2 {

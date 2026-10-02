@@ -1,9 +1,11 @@
 'use client';
+import { useI18n } from '@/components/language-provider';
 import { useEffect, useState } from 'react';
 import { designImageDefaults, type DesignImage } from '@/lib/design-images';
 import { designServices } from '@/lib/purchase-structure';
 import { MediaUploadBox } from './media-upload-box';
 export function DesignImageManager() {
+  const { t } = useI18n();
   const [rows, setRows] = useState<DesignImage[]>([]);
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState('');
@@ -19,7 +21,9 @@ export function DesignImageManager() {
     setRows(d.images);
   }
   useEffect(() => {
-    void Promise.resolve().then(load).catch((e) => setMessage(e.message));
+    void Promise.resolve()
+      .then(load)
+      .catch((e) => setMessage(e.message));
   }, []);
   function edit(id: string, patch: Partial<DesignImage>) {
     setRows((old) =>
@@ -80,10 +84,11 @@ export function DesignImageManager() {
   }
   return (
     <section className="panel design-image-manager">
-      <h2>Imagens das opções de design</h2>
+      <h2>{t('Imagens das opções de design')}</h2>
       <p>
-        Uma imagem por opção, apresentada nos cartões, porta-chaves e kits. Use
-        PNG, JPG ou WebP, até 8 MB. Formato horizontal recomendado: 3:2.
+        {t(
+          ' Uma imagem por opção, apresentada nos cartões, porta-chaves e kits. Use PNG, JPG ou WebP, até 8 MB. Formato horizontal recomendado: 3:2. ',
+        )}
       </p>
       <button
         type="button"
@@ -91,7 +96,7 @@ export function DesignImageManager() {
         disabled={busy}
         onClick={() => void load().catch((e) => setMessage(e.message))}
       >
-        Actualizar imagens
+        {t(' Actualizar imagens ')}
       </button>
       <div className="design-image-grid">
         {designServices.map((service) => {
@@ -101,14 +106,14 @@ export function DesignImageManager() {
               <fieldset key={row.id} disabled={busy}>
                 <legend>{service.name}</legend>
                 <MediaUploadBox
-                  title="Imagem da opção"
+                  title={t('Imagem da opção')}
                   src={row.image}
                   accept="image/png,image/jpeg,image/webp"
                   disabled={busy}
                   onFiles={(files) => upload(row.id, files)}
                 />
                 <label>
-                  Descrição da imagem
+                  {t(' Descrição da imagem ')}
                   <input
                     value={row.alt}
                     maxLength={180}
@@ -125,14 +130,14 @@ export function DesignImageManager() {
                     })
                   }
                 >
-                  Restaurar ilustração
+                  {t(' Restaurar ilustração ')}
                 </button>
                 <button
                   type="button"
                   className="btn primary"
                   onClick={() => void save(row)}
                 >
-                  Guardar imagem
+                  {t(' Guardar imagem ')}
                 </button>
               </fieldset>
             )
