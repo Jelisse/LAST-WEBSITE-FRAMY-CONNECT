@@ -226,6 +226,8 @@ export default async function Home() {
             <ArrowUpRight size={18} />
           </Link>
         </section>
+      </main>
+      <div className="home-brand-finale">
         <section className="home-how" id="primeiros-passos">
           <h2>{t('Veja as opções para o seu cartão ou porta-chaves')}</h2>
           <p>
@@ -238,8 +240,8 @@ export default async function Home() {
             <ArrowUpRight size={18} />
           </Link>
         </section>
-      </main>
       <SiteFooter />
+      </div>
     </div>
   );
 }

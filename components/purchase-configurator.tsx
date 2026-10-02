@@ -568,13 +568,60 @@ export function PurchaseConfigurator({
                     </strong>
                     <p>
                       {isLeather && item.id === 'customer'
-                        ? 'Carregue o seu logo em PDF, PNG ou JPG e veja a simulação.'
+                        ? t(
+                            'Carregue o seu logo em PDF, PNG ou JPG e veja a simulação.',
+                          )
                         : t(item.description)}
                     </p>
                   </label>
                 ))}
               </div>
             </div>
+            {format !== 'keychain' && design === 'standard' && (
+              <fieldset className="card-design-selection">
+                <legend>{t('Design do cartão')}</legend>
+                <p>
+                  {t(
+                    'Escolha o cartão. O material e o preço da configuração acompanham a sua selecção.',
+                  )}
+                </p>
+                <div className="card-view-controls">
+                  {[false, true].map((back) => (
+                    <button
+                      type="button"
+                      key={String(back)}
+                      aria-pressed={cardBack === back}
+                      onClick={() => {
+                        setCardBack(back);
+                        setCardPaused(true);
+                      }}
+                    >
+                      {t(back ? 'Verso' : 'Frente')}
+                    </button>
+                  ))}
+                </div>
+                <div className="material-options">
+                  {cardMaterials.map((material) => (
+                    <label
+                      key={material}
+                      className={card === material ? 'is-selected' : ''}
+                    >
+                      <CardMaterialImage material={material} back={cardBack} />
+                      <span>
+                        <input
+                          type="radio"
+                          name="card-design-material"
+                          checked={card === material}
+                          onChange={() => setCard(material)}
+                        />
+                        {t(material)}
+                        {material !== 'Madeira' && <> · {t(material === 'PVC' ? 'Laranja' : 'Preto')}</>}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
             <div className="purchase-active-design" hidden={designOptionsOpen}>
               {isPvcStandard && (
                 <PvcConfigurator

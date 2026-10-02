@@ -359,6 +359,11 @@
 
 .product-gallery-dots { border: 0; margin:0; min-width:0; }
 
+/* Use the same front/back artwork and working demo QR as the configurator. */
+.home-solution-photo .card-material-art { height:100%; width:100%; padding:4px; }
+.home-solution-photo .card-material-surface { flex:none; }
+.framy-home .home-solution-photo .card-material-surface img { scale:none; }
+
 @media(min-width:701px) {
   .home-plan-comparison[data-cycle=monthly] .home-profile-plan .home-solution-price { min-height:96px; }
   .home-solutions .home-solution-copy h3 { min-height:2.4em; }

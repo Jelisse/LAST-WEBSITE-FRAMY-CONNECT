@@ -1,0 +1,73 @@
+/* Original mountain geometry. Always scale uniformly; crop, never stretch.
+   Quiet crops in working UI; one continuous landscape across the home finale. */
+:root { --framy-mountain: url('/brand/mountain-identity-2400.webp'); }
+body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header)::before {
+  inset: 0;
+  background-image: var(--framy-mountain);
+  background-size: 920px auto;
+  background-position: left -120px top -145px;
+  background-repeat: no-repeat;
+  filter: invert(1);
+  opacity: .22;
+  mask-image: linear-gradient(90deg,#000 0%,#0009 22%,transparent 52%);
+}
+/* This wrapper gives the call to action and footer a single, unbroken horizon. */
+body .framy-home .home-brand-finale {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(180deg,var(--framy-orange) 0%,#99401f 32%,#30231e 75%);
+}
+body .framy-home .home-brand-finale::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--framy-mountain) no-repeat 60% 12% / max(1300px,115%) auto;
+  filter: invert(1);
+  mix-blend-mode: screen;
+  opacity: .30;
+  /* Keep copy quiet on the left while revealing the ridge on the right. */
+  mask-image: linear-gradient(110deg,#0002 8%,#0006 38%,#000 72%);
+}
+body .framy-home .home-brand-finale :is(.home-how,.brand-footer) {
+  background: transparent;
+}
+body .framy-home .home-brand-finale :is(.home-how,.brand-footer)::before { display:none; }
+body .framy-home .home-brand-finale .home-how { padding-block:72px 88px; }
+body .framy-home .home-brand-finale .home-how > h2 { max-width:780px; }
+body .framy-home .home-brand-finale .home-how > p { max-width:430px; }
+/* Other footers carry a restrained crop of the same original artwork. */
+body .brand-footer::before {
+  background: var(--framy-mountain) no-repeat 58% 36% / max(1200px,110%) auto;
+  opacity:.20;
+  mask-image:linear-gradient(180deg,#0002,#000 90%);
+}
+body .brand-footer.brand-footer-compact::before {
+  background-size:1100px auto;
+  background-position:left -80px top -150px;
+  opacity:.14;
+  mask-image:linear-gradient(90deg,#000,transparent 70%);
+}
+@media(max-width:700px) {
+  body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header)::before {
+    background-size:650px auto;
+    background-position:left -100px top -105px;
+    opacity:.18;
+    mask-image:linear-gradient(90deg,#000,transparent 65%);
+  }
+  body .framy-home .home-brand-finale::before {
+    background-size:1100px auto;
+    background-position:48% top;
+    opacity:.22;
+    mask-image:linear-gradient(180deg,#0009, #0004 50%,transparent 88%);
+  }
+  body .framy-home .home-brand-finale .home-how { padding-block:48px 56px; }
+  body .brand-footer::before { background-size:1000px auto; opacity:.14; }
+}
+@media(forced-colors:active), print {
+  body .framy-home .home-brand-finale::before,
+  body .brand-footer::before,
+  body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header)::before { display:none; }
+}

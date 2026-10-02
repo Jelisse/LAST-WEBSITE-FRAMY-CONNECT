@@ -1,5 +1,4 @@
 'use client';
-import { PanelBrand } from '@/components/panel-brand';
 
 import { useI18n } from '@/components/language-provider';
 
@@ -115,19 +114,16 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
   return (
     <main id="main" className="agent-workspace">
       <header className="agent-header">
-          <PanelBrand />
         <DashboardTools />
-        <div>
-          <p className="agent-eyebrow">{t('Operações · Agente de execução')}</p>
-          <h1>
-            {t('Olá, ')}
-            {displayName}
-          </h1>
-          <p>
-            {t('Os seus pedidos, produção, entregas e stock num só lugar.')}
-          </p>
-        </div>
       </header>
+      <div className="agent-intro">
+        <p className="agent-eyebrow">{t('Operações · Agente de execução')}</p>
+        <h1>
+          {t('Olá, ')}
+          {displayName}
+        </h1>
+        <p>{t('Os seus pedidos, produção, entregas e stock num só lugar.')}</p>
+      </div>
       <section className="agent-metrics" aria-label={t('Resumo de trabalho')}>
         {[
           ['Por produzir', orders.filter((o) => o.status === 'QUEUED').length],

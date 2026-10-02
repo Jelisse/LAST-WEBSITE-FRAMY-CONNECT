@@ -37,7 +37,6 @@ export function LoginForm({
     <main id="main" className="auth-page">
       <section className="auth-card">
         <LanguageSelector />
-        <Link href="/">{t('Framy Connect')}</Link>
         <h1>{register ? t('Criar a minha conta') : t('Bem-vindo à Framy')}</h1>
         <p>
           {purchaseReturn

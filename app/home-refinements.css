@@ -18,3 +18,10 @@
 }
 .framy-home .home-solution-eyebrow, .framy-home .home-hero .hero-nfc-mark { color:var(--framy-orange); }
 .sharing-example-profile .mobile-profile-footer small { font-size:2.3cqw; }
+
+.framy-home { --home-header-height:56px; }
+.framy-home .home-nav { min-height:56px; padding-block:6px; }
+.framy-home .home-nav .home-brand { width:112px; height:32px; }
+@media(min-width:701px) and (max-width:1120px) {
+  .framy-home { --home-header-height:96px; }
+}

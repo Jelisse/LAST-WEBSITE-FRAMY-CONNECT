@@ -53,13 +53,30 @@ export function ProfileGrowthHub({
 }) {
   const { t } = useI18n();
   const [tab, setTab] = useState(initialTab as string);
+  const benefits: Partial<Record<FeatureKey, string>> = {
+    whatsapp:
+      'Facilite o primeiro contacto com uma mensagem pronta para enviar.',
+    location:
+      'Ajude os clientes a encontrar o seu negócio e a planear a visita.',
+    showcase: 'Apresente os serviços e produtos que quer destacar.',
+    english: 'Torne o seu perfil acessível a clientes que falam inglês.',
+    enquiries: 'Receba pedidos do perfil e acompanhe cada resposta.',
+    analytics: 'Saiba quais as ligações que despertam mais interesse.',
+    teams: 'Organize os membros, convites e identidade visual da equipa.',
+  };
   return (
     <div className="profile-growth">
       <section
         className="professional-tool-links"
+        hidden={tab !== 'overview'}
         aria-label={t('Ferramentas profissionais')}
       >
         <h2>{t('Ferramentas profissionais')}</h2>
+        <p>
+          {t(
+            'Escolha uma ferramenta, configure os dados e publique o perfil para mostrar as alterações aos visitantes.',
+          )}
+        </p>
         <div>
           {(
             [
@@ -89,7 +106,11 @@ export function ProfileGrowthHub({
                 }}
               >
                 <PlanFeatureIcon feature={key} />
-                <span>{t(featureCatalog[key])}</span>
+                <span>
+                  <strong>{t(featureCatalog[key])}</strong>
+                  <small>{t(benefits[key] ?? '')}</small>
+                  <em>{t('Abrir ferramenta')} →</em>
+                </span>
               </button>
             ))}
         </div>
@@ -122,6 +143,8 @@ function GrowthTool({
   canManageTeam: boolean;
 }) {
   const { t } = useI18n();
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]),
     [teams, setTeams] = useState<TeamData | null>(null),
     [domains, setDomains] = useState<DomainData | null>(null),
@@ -180,7 +203,27 @@ function GrowthTool({
   }
   return (
     <section className="profile-growth-panel">
-      {error && <p role="alert">{t(error)}</p>}
+      {error && (
+        <div role="alert">
+          <p>{t(error)}</p>
+          <button
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              setError('');
+              try {
+                await load();
+              } catch (e) {
+                setError(e instanceof Error ? e.message : 'Tente novamente.');
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            {t('Tentar novamente')}
+          </button>
+        </div>
+      )}
       {notice && <output>{t(notice)}</output>}
       {!loaded && !error && <p>{t('A carregar…')}</p>}
       {tool === 'enquiries' && (
@@ -198,70 +241,123 @@ function GrowthTool({
               )}
             </p>
           )}
-          {enquiries.map((e) => (
-            <article className="growth-invoice" key={e.id}>
-              <h3>{e.name}</h3>
-              <p>
-                {new Date(e.created_at).toLocaleString('pt-MZ', {
-                  timeZone: 'Africa/Maputo',
-                })}{' '}
-                ·{' '}
-                {
-                  (
-                    {
-                      new: 'Nova',
-                      read: 'Lida',
-                      closed: 'Concluída',
-                    } as Record<string, string>
-                  )[e.status]
-                }
-              </p>
-              <p className="growth-preserve">{e.message}</p>
-              <a href={'mailto:' + encodeURIComponent(e.email)}>
-                {t(' Responder a ')}
-                {e.email} ↗
-              </a>
-              <div className="growth-actions">
-                <button
-                  disabled={busy}
-                  onClick={() =>
-                    void act({ action: 'status', id: e.id, status: 'read' })
-                  }
-                >
-                  {t(' Marcar como lida ')}
-                </button>
-                <button
-                  disabled={busy}
-                  onClick={() =>
-                    void act({ action: 'status', id: e.id, status: 'closed' })
-                  }
-                >
-                  {t(' Concluir ')}
-                </button>
-                <details>
-                  <summary>{t('Eliminar')}</summary>
-                  <p>{t('A mensagem será eliminada permanentemente.')}</p>
+          {loaded && enquiries.length > 0 && (
+            <label>
+              {t('Estado')}
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                {[
+                  ['all', 'Todos'],
+                  ['new', 'Nova'],
+                  ['read', 'Lida'],
+                  ['closed', 'Concluída'],
+                ].map(([v, label]) => (
+                  <option key={v} value={v}>
+                    {t(label)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {loaded &&
+            enquiries.length > 0 &&
+            !enquiries.some(
+              (e) => statusFilter === 'all' || e.status === statusFilter,
+            ) && <p>{t('Nenhum resultado encontrado.')}</p>}
+          {enquiries
+            .filter((e) => statusFilter === 'all' || e.status === statusFilter)
+            .map((e) => (
+              <article className="growth-invoice" key={e.id}>
+                <h3>{e.name}</h3>
+                <p>
+                  {new Date(e.created_at).toLocaleString(t.locale, {
+                    timeZone: 'Africa/Maputo',
+                  })}{' '}
+                  ·{' '}
+                  {t(
+                    (
+                      {
+                        new: 'Nova',
+                        read: 'Lida',
+                        closed: 'Concluída',
+                      } as Record<string, string>
+                    )[e.status],
+                  )}
+                </p>
+                <p className="growth-preserve">{e.message}</p>
+                <a href={'mailto:' + encodeURIComponent(e.email)}>
+                  {t(' Responder a ')}
+                  {e.email} ↗
+                </a>
+                <div className="growth-actions">
                   <button
                     disabled={busy}
-                    onClick={() => void act({ action: 'delete', id: e.id })}
+                    onClick={() =>
+                      void act({ action: 'status', id: e.id, status: 'read' })
+                    }
                   >
-                    {t(' Confirmar eliminação ')}
+                    {t(' Marcar como lida ')}
                   </button>
-                </details>
-              </div>
-            </article>
-          ))}
+                  <button
+                    disabled={busy}
+                    onClick={() =>
+                      void act({ action: 'status', id: e.id, status: 'closed' })
+                    }
+                  >
+                    {t(' Concluir ')}
+                  </button>
+                  <details>
+                    <summary>{t('Eliminar')}</summary>
+                    <p>{t('A mensagem será eliminada permanentemente.')}</p>
+                    <button
+                      disabled={busy}
+                      onClick={() => void act({ action: 'delete', id: e.id })}
+                    >
+                      {t(' Confirmar eliminação ')}
+                    </button>
+                  </details>
+                </div>
+              </article>
+            ))}
         </>
       )}
       {teams && (
         <>
           <h2>{t('A sua equipa')}</h2>
-          <output>
-            {teams.members.length} {t(' membros · ')}
-            {teams.pending.length} {t(' convites pendentes · ')}
-            {Math.max(0, 25 - teams.members.length - teams.pending.length)}{' '}
-            {t(' lugares disponíveis de 25.')}
-          </output>
+          <div className="team-metrics">
+            <article>
+              <strong>{teams.members.length}</strong>
+              <span>{t('Membros')}</span>
+            </article>
+            <article>
+              <strong>{teams.pending.length}</strong>
+              <span>{t('Convites pendentes')}</span>
+            </article>
+            <article>
+              <strong>
+                {Math.max(0, 25 - teams.members.length - teams.pending.length)}
+              </strong>
+              <span>{t('Lugares disponíveis')}</span>
+            </article>
+          </div>
+          <div className="team-guide">
+            <h3>{t('Como funciona a equipa')}</h3>
+            <ol>
+              <li>
+                {t(
+                  'Crie a equipa e convide as pessoas pelo email da conta Framy.',
+                )}
+              </li>
+              <li>{t('Cada pessoa aceita o convite na sua própria conta.')}</li>
+              <li>
+                {t(
+                  'Acompanhe os perfis publicados e aplique a cor da equipa quando necessário.',
+                )}
+              </li>
+            </ol>
+          </div>
           {!canManageTeam && (
             <p>
               {t(
@@ -356,64 +452,99 @@ function GrowthTool({
                   )}
                 </p>
               </form>
-              {teams.pending.map((i) => (
-                <p key={i.id}>
-                  {i.email} {t(' · convite pendente')}{' '}
-                  <button
-                    disabled={busy}
-                    onClick={() => void act({ action: 'revoke', id: i.id })}
-                  >
-                    {t(' Revogar ')}
-                  </button>
-                </p>
-              ))}
-              {teams.members.map((m) => (
-                <article className="growth-invoice" key={m.id}>
-                  <h3>{m.name}</h3>
-                  {m.username && m.published ? (
-                    <a
-                      href={'/' + m.username}
-                      target="_blank"
-                      rel="noopener noreferrer"
+              <label>
+                {t('Pesquisar membros e convites')}
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </label>
+              {search &&
+                ![
+                  ...teams.pending.map((i) => i.email),
+                  ...teams.members.map(
+                    (m) => m.name + ' ' + (m.username ?? ''),
+                  ),
+                ].some((v) =>
+                  v.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
+                ) && <p role="status">{t('Nenhum resultado encontrado.')}</p>}
+              {teams.pending
+                .filter((i) =>
+                  i.email
+                    .toLocaleLowerCase()
+                    .includes(search.toLocaleLowerCase()),
+                )
+                .map((i) => (
+                  <div className="team-pending" key={i.id}>
+                    {i.email} {t(' · convite pendente')}{' '}
+                    <small>
+                      {t('Expira em')}:{' '}
+                      {new Date(i.expires_at).toLocaleDateString(t.locale, {
+                        timeZone: 'Africa/Maputo',
+                      })}
+                    </small>
+                    <button
+                      disabled={busy}
+                      onClick={() => void act({ action: 'revoke', id: i.id })}
                     >
-                      {t(' Ver perfil ↗ ')}
-                    </a>
-                  ) : (
-                    <p>{t('Perfil não publicado')}</p>
-                  )}
-                  <form
-                    onSubmit={(ev) => {
-                      ev.preventDefault();
-                      void act({
-                        action: 'brand',
-                        id: m.id,
-                        version: m.version,
-                        accent: new FormData(ev.currentTarget).get('accent'),
-                      });
-                    }}
-                  >
-                    <label>
-                      {t(' Cor da marca ')}
-                      <select name="accent">
-                        {profileColors.map((color) => (
-                          <option key={color.value} value={color.value}>
-                            {color.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <button disabled={busy || !canManageTeam || !m.username}>
-                      {t(' Aplicar ao perfil ')}
+                      {t(' Revogar ')}
                     </button>
-                  </form>
-                  <button
-                    disabled={busy}
-                    onClick={() => void act({ action: 'remove', id: m.id })}
-                  >
-                    {t(' Remover da equipa ')}
-                  </button>
-                </article>
-              ))}
+                  </div>
+                ))}
+              {teams.members
+                .filter((m) =>
+                  (m.name + ' ' + (m.username ?? ''))
+                    .toLocaleLowerCase()
+                    .includes(search.toLocaleLowerCase()),
+                )
+                .map((m) => (
+                  <article className="growth-invoice" key={m.id}>
+                    <h3>{m.name}</h3>
+                    {m.username && m.published ? (
+                      <a
+                        href={'/' + m.username}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {t(' Ver perfil ↗ ')}
+                      </a>
+                    ) : (
+                      <p>{t('Perfil não publicado')}</p>
+                    )}
+                    <form
+                      onSubmit={(ev) => {
+                        ev.preventDefault();
+                        void act({
+                          action: 'brand',
+                          id: m.id,
+                          version: m.version,
+                          accent: new FormData(ev.currentTarget).get('accent'),
+                        });
+                      }}
+                    >
+                      <label>
+                        {t(' Cor da marca ')}
+                        <select name="accent">
+                          {profileColors.map((color) => (
+                            <option key={color.value} value={color.value}>
+                              {t(color.label)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <button disabled={busy || !canManageTeam || !m.username}>
+                        {t(' Aplicar ao perfil ')}
+                      </button>
+                    </form>
+                    <button
+                      disabled={busy}
+                      onClick={() => void act({ action: 'remove', id: m.id })}
+                    >
+                      {t(' Remover da equipa ')}
+                    </button>
+                  </article>
+                ))}
             </>
           )}
         </>

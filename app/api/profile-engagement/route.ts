@@ -114,7 +114,8 @@ export async function GET(request: Request) {
         403,
       );
     const db = database(),
-      since = Date.now() - days * 86400000;
+      generatedAt = Date.now(),
+      since = generatedAt - days * 86400000;
     const [summary, actions, daily] = await Promise.all([
       db
         .prepare(
@@ -135,7 +136,12 @@ export async function GET(request: Request) {
         .bind(user.userId, since)
         .all(),
     ]);
-    return json({ summary, actions: actions.results, daily: daily.results });
+    return json({
+      summary,
+      actions: actions.results,
+      daily: daily.results,
+      generatedAt,
+    });
   } catch {
     return json({ error: 'Estatísticas temporariamente indisponíveis.' }, 503);
   }

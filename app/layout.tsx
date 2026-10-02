@@ -13,6 +13,8 @@ import './mobile-dashboard.css';
 import './analytics-consent.css';
 import './profile-business.css';
 import './brand-interface.css';
+import './customer-tools.css';
+import './mountain-identity.css';
 import { InternalPageChrome } from '@/components/internal-page-chrome';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { SiteAnalyticsTracker } from '@/components/site-analytics-tracker';

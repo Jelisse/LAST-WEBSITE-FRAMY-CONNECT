@@ -130,7 +130,6 @@ export function PlanPicker({
           </>
         ) : (
           <>
-            <span className="plans-kicker">{t('FRAMY CONNECT')}</span>
             <DialogTitle className="plans-title">
               {t('Um plano para cada conexão.')}
             </DialogTitle>

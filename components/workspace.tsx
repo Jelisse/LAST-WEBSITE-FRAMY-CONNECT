@@ -128,7 +128,9 @@ function initials(name: string) {
 }
 export function Workspace({ displayName }: { displayName: string }) {
   const { t } = useI18n();
-  const [growthInitialTab, setGrowthInitialTab] = useState<'overview' | 'billing'>('overview');
+  const [growthInitialTab, setGrowthInitialTab] = useState<
+    'overview' | 'billing'
+  >('overview');
   const toolSection = useRef<'business' | 'extras' | null>(null);
   const [tab, setTab] = useState('overview'),
     [data, setData] = useState<WorkspaceData | null>(null),
@@ -148,9 +150,13 @@ export function Workspace({ displayName }: { displayName: string }) {
     [uploadingPhoto, setUploadingPhoto] = useState(false);
   useEffect(() => {
     if (tab !== 'profile' || !toolSection.current) return;
-    const section = document.getElementById(`professional-${toolSection.current}`);
+    const section = document.getElementById(
+      `professional-${toolSection.current}`,
+    );
     if (section) {
-      section.querySelectorAll('details').forEach(detail => { detail.open = true; });
+      section.querySelectorAll('details').forEach((detail) => {
+        detail.open = true;
+      });
       section.scrollIntoView({ block: 'start' });
       section.focus({ preventScroll: true });
       toolSection.current = null;
@@ -648,18 +654,16 @@ export function Workspace({ displayName }: { displayName: string }) {
           </div>
           <div className="workspace-title">
             <div>
-              <span className="eyebrow">
-                {t('FRAMY CONNECT /')}{' '}
-                {tab === 'profile' ? t('IDENTIDADE') : t('MINHA CONTA')}
-              </span>
               <h1>
                 {tab === 'overview'
                   ? t('Olá, {0}.', [
                       displayName.trim().split(/\s+/)[0] || t('bem-vindo'),
                     ])
-                  : menu
-                      .find((m) => m.id === tab)
-                      ?.label.replace(' · teste', '')}
+                  : t(
+                      menu
+                        .find((m) => m.id === tab)
+                        ?.label.replace(' · teste', '') ?? '',
+                    )}
               </h1>
             </div>
             <Button
@@ -854,25 +858,51 @@ export function Workspace({ displayName }: { displayName: string }) {
                             />
                           </label>
                         </div>
-                        <button type="button" className="btn btn-outline" onClick={() => { setGrowthInitialTab('overview'); setTab('growth'); }}><BriefcaseBusiness size={18} />{t('Ferramentas profissionais')}</button>
-                        <div id="professional-business" tabIndex={-1} style={{scrollMarginTop:110}}><ProfileBusinessEditor
-                          features={membershipFeatures({plan_id:data.membership.planId, terms_json:JSON.stringify(data.membership.terms)})}
-                          profile={profile}
-                          onChange={(next) => {
-                            setProfile(next);
-                            setDirty(true);
+                        <button
+                          type="button"
+                          className="btn btn-outline"
+                          onClick={() => {
+                            setGrowthInitialTab('overview');
+                            setTab('growth');
                           }}
-                        />
+                        >
+                          <BriefcaseBusiness size={18} />
+                          {t('Ferramentas profissionais')}
+                        </button>
+                        <div
+                          id="professional-business"
+                          tabIndex={-1}
+                          style={{ scrollMarginTop: 110 }}
+                        >
+                          <ProfileBusinessEditor
+                            features={membershipFeatures({
+                              plan_id: data.membership.planId,
+                              terms_json: JSON.stringify(data.membership.terms),
+                            })}
+                            profile={profile}
+                            onChange={(next) => {
+                              setProfile(next);
+                              setDirty(true);
+                            }}
+                          />
                         </div>
-                        <div id="professional-extras" tabIndex={-1} style={{scrollMarginTop:110}}><ProfileExtrasEditor
-                          features={membershipFeatures({plan_id:data.membership.planId, terms_json:JSON.stringify(data.membership.terms)})}
-                          profile={profile}
-                          limit={data.membership.terms.links}
-                          onChange={(p) => {
-                            setProfile(p);
-                            setDirty(true);
-                          }}
-                        />
+                        <div
+                          id="professional-extras"
+                          tabIndex={-1}
+                          style={{ scrollMarginTop: 110 }}
+                        >
+                          <ProfileExtrasEditor
+                            features={membershipFeatures({
+                              plan_id: data.membership.planId,
+                              terms_json: JSON.stringify(data.membership.terms),
+                            })}
+                            profile={profile}
+                            limit={data.membership.terms.links}
+                            onChange={(p) => {
+                              setProfile(p);
+                              setDirty(true);
+                            }}
+                          />
                         </div>
                         <ProfileLinksEditor
                           profile={profile}
@@ -959,13 +989,26 @@ export function Workspace({ displayName }: { displayName: string }) {
                   </aside>
                 </div>
               )}
-              {tab === 'analytics' && <ProfileEngagementPanel />}
-              {tab === 'growth' && <ProfileGrowthHub
-                initialTab={growthInitialTab}
-                features={membershipFeatures({plan_id:data.membership.planId, terms_json:JSON.stringify(data.membership.terms)})}
-                onEdit={(section) => { toolSection.current = section; setTab('profile'); }}
-                onAnalytics={() => setTab('analytics')}
-              />}
+              {tab === 'analytics' && (
+                <ProfileEngagementPanel
+                  onEdit={() => setTab('profile')}
+                  onTools={() => setTab('growth')}
+                />
+              )}
+              {tab === 'growth' && (
+                <ProfileGrowthHub
+                  initialTab={growthInitialTab}
+                  features={membershipFeatures({
+                    plan_id: data.membership.planId,
+                    terms_json: JSON.stringify(data.membership.terms),
+                  })}
+                  onEdit={(section) => {
+                    toolSection.current = section;
+                    setTab('profile');
+                  }}
+                  onAnalytics={() => setTab('analytics')}
+                />
+              )}
               {tab === 'operations' && data.canManageProducts && (
                 <ProductManager
                   onSaved={() => {

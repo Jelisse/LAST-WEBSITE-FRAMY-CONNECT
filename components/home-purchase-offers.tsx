@@ -1,6 +1,7 @@
 import Link from '@/components/hard-link';
 import { ProductMaterialGallery } from './product-material-gallery';
 import type { ProductPhoto } from '@/lib/product-gallery';
+import { cardArtwork } from '@/lib/card-artwork';
 import { pvcModels, pvcPhoto } from '@/lib/pvc-models';
 import { ArrowUpRight } from 'lucide-react';
 import { getTranslations } from '@/lib/server-i18n';
@@ -23,17 +24,26 @@ export async function HomePurchaseOffers({
     );
   // Homepage photography is independent of the customer's configurator selection.
   const cards: ProductPhoto[] = [
+    ...['PVC', 'Madeira', 'Metal'].flatMap((material) =>
+      (['front', 'back'] as const).map((cardSide, side) => ({
+        id: `card-${material}-${cardSide}`,
+        material,
+        src: cardArtwork[material][side],
+        cardSide,
+        detail: `${t(material)} · ${t(side ? 'Verso' : 'Frente')}`,
+      })),
+    ),
     {
       id: 'card-orange-packaging',
       material: 'Cartão NFC',
       src: '/home/card-packaging-orange-cutout.webp',
-      detail: 'Laranja',
+      detail: `${t('Embalagens do cartão · imagens ilustrativas')} · ${t('Laranja')}`,
     },
     {
       id: 'card-black-packaging',
       material: 'Cartão NFC',
       src: '/home/card-packaging-black-cutout.webp',
-      detail: 'Preto',
+      detail: `${t('Embalagens do cartão · imagens ilustrativas')} · ${t('Preto')}`,
     },
   ];
   const kit: ProductPhoto[] = [
@@ -41,15 +51,24 @@ export async function HomePurchaseOffers({
       id: 'kit-gift-box',
       material: 'Kit: cartão + porta-chaves',
       src: '/home/kit-gift-box-cutout.webp',
+      detail: t('Preto'),
+    },
+    {
+      id: 'kit-white-orange',
+      material: 'Kit: cartão + porta-chaves',
+      src: '/home/kit-white-orange-cutout.webp',
+      detail: `${t('Branco')} · ${t('Laranja')} · ${t('Simulação ilustrativa')}`,
     },
   ];
   const keychains: ProductPhoto[] = published('keychain')
-    ? pvcModels.map((model) => ({
-        id: model.id,
-        material: 'PVC + epóxi',
-        src: pvcPhoto(model.id),
-        detail: model.name,
-      }))
+    ? pvcModels.flatMap((model) =>
+        [false, true].map((back) => ({
+          id: `${model.id}-${back ? 'back' : 'front'}`,
+          material: 'PVC + epóxi',
+          src: pvcPhoto(model.id, back),
+          detail: `${t(model.name)} · ${t(back ? 'Verso' : 'Frente')}`,
+        })),
+      )
     : [];
   const offers: {
     id: PurchaseFormat;
@@ -115,19 +134,12 @@ export async function HomePurchaseOffers({
               </div>
               <ProductMaterialGallery
                 name={t(offer.name)}
-                caption={
-                  offer.id === 'card'
-                    ? t('Embalagens do cartão · imagens ilustrativas')
-                    : offer.id === 'kit'
-                      ? ''
-                      : undefined
-                }
                 frames={
                   offer.id === 'card'
                     ? cards.map((photo) => [photo])
                     : offer.id === 'keychain'
                       ? keychains.map((photo) => [photo])
-                      : [kit]
+                      : kit.map((photo) => [photo])
                 }
               />
               <div className="home-solution-copy">

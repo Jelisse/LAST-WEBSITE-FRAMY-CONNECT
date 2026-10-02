@@ -7,7 +7,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react';
-import { Upload, RotateCcw, Ruler, Check, Move3D, Eraser } from 'lucide-react';
+import { Upload, RotateCcw, Ruler, Check, Eraser } from 'lucide-react';
 import { SourceImage } from './source-image';
 import { useI18n } from './language-provider';
 import { removeLogoBackground } from '@/lib/logo-background';
@@ -130,7 +130,6 @@ export function LeatherConfigurator({
   const [tolerance, setTolerance] = useState(30);
   const [backgroundRemoved, setBackgroundRemoved] = useState(false);
   const originalRef = useRef<{ blob: Blob; name: string } | null>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const fileRef = useRef<Blob | null>(null),
     sequence = useRef(0);
   const update = (patch: Partial<LeatherDesign>) =>
@@ -485,25 +484,11 @@ export function LeatherConfigurator({
         <div
           className={`leather-studio ${value.color === 'black' ? 'is-black' : ''}`}
         >
-          <div className="leather-studio-label">
-            <Move3D size={15} aria-hidden="true" /> {t(' Vista interactiva ')}
-          </div>
-          <div
-            className="leather-studio-stage"
-            onPointerMove={(e) => {
-              if (e.pointerType !== 'mouse') return;
-              const r = e.currentTarget.getBoundingClientRect();
-              setTilt({
-                x: (0.5 - (e.clientY - r.top) / r.height) * 14,
-                y: ((e.clientX - r.left) / r.width - 0.5) * 24,
-              });
-            }}
-            onPointerLeave={() => setTilt({ x: 0, y: 0 })}
-          >
+          <div className="leather-studio-stage">
             <div
               className="leather-studio-object"
               style={{
-                transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y + (back ? 180 : 0)}deg)`,
+                transform: `rotateY(${back ? 180 : 0}deg)`,
               }}
             >
               <div className="leather-studio-face" aria-hidden={back}>
@@ -525,30 +510,7 @@ export function LeatherConfigurator({
             <span key={`${value.color}-${t.locale}`} aria-live="polite">
               {colorCaption}
             </span>
-            <small>{t('Mova o cursor para inclinar')}</small>
           </div>
-        </div>
-        <div className="leather-studio-controls">
-          <label>
-            <Move3D size={15} aria-hidden="true" /> {t(' Ângulo ')}
-            <input
-              type="range"
-              aria-label={t('Ângulo de visualização')}
-              min="-22"
-              max="22"
-              value={tilt.y}
-              onChange={(e) => setTilt({ x: 0, y: Number(e.target.value) })}
-            />
-          </label>
-          <button
-            type="button"
-            onClick={() => {
-              setTilt({ x: 0, y: 0 });
-              setBack(false);
-            }}
-          >
-            <RotateCcw size={15} aria-hidden="true" /> {t(' Repor vista ')}
-          </button>
         </div>
         <figcaption>
           {t(back ? 'Verso com símbolo NFC' : 'Pré-visualização da frente')}

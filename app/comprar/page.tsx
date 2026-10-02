@@ -6,7 +6,6 @@ import { PurchaseConfigurator } from '@/components/purchase-configurator';
 import { getTranslations } from '@/lib/server-i18n';
 import { getProducts } from '@/lib/server-catalog';
 import { hardwarePrices } from '@/lib/hardware-pricing';
-import Link from '@/components/hard-link';
 import { purchaseSelection } from '@/lib/purchase-structure';
 import { productPhotos } from '@/lib/product-gallery';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
@@ -47,7 +46,6 @@ export default async function Page({
     <>
       <SiteHeader focused />
       <main id="main" className="section-wrap purchase-page">
-        <span className="eyebrow">FRAMY CONNECT</span>
         <h1>{t(title)}</h1>
         <p className="page-intro">
           {t(
@@ -58,9 +56,6 @@ export default async function Page({
                 : 'Escolha o material e o design do seu cartão.',
           )}
         </p>
-        <Link className="home-text-link" href="/produtos">
-          {t('Escolher outro produto')}
-        </Link>
         <PurchaseConfigurator
           key={query.formato ?? 'kit'}
           initial={query.formato}

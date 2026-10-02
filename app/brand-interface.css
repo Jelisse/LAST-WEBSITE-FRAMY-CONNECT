@@ -49,3 +49,29 @@ body:has(.brand-topbar) .auth-card > .language-selector { display:none; }
 
 /* Keep explicit heading and staff-label colors aligned with the orange header. */
 body :is(.agent-header,.staff-page > header) h1,body .manager-top > span:not(.desktop-language) span { color:#fff; }
+
+/* Compact shared chrome; controls retain a 44px touch target. */
+:root { --framy-header-height:56px; }
+body :is(.site-header.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) { min-height:var(--framy-header-height); height:auto; padding-block:6px; gap:12px; box-sizing:border-box; }
+body .site-header.brand-topbar > .brand img,body .panel-brand img { width:104px; height:32px; object-fit:contain; }
+body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header) :is(.language-selector select,.account-menu-trigger,.compact-mobile-menu > summary) { min-height:44px; height:44px; padding-block:8px; box-sizing:border-box; }
+body .site-header.brand-topbar .header-actions { gap:12px; }
+body .agent-header { flex-direction:row; flex-wrap:wrap; justify-content:space-between; }
+body .agent-header .dashboard-tools > a img { width:104px; height:32px; filter:brightness(0) invert(1); }
+.agent-intro { padding:20px 0; }
+.agent-intro h1 { margin:4px 0; }
+.agent-intro p { margin:0; }
+body .staff-page > header h1 { font-size:20px; margin:0; }
+@media(max-width:760px) {
+  body .workspace-header { padding-block:6px !important; }
+  body .site-header.brand-topbar { grid-template-columns:auto minmax(0,1fr); padding-inline:4%; gap:8px; }
+  body .site-header.brand-topbar > .brand { justify-self:start; }
+  body .site-header.brand-topbar .header-actions { grid-column:2; grid-row:1; justify-content:flex-end; flex-wrap:nowrap; gap:6px; }
+  body .site-header.brand-topbar .header-contact-link { display:none; }
+  body .site-header.brand-topbar .language-selector select { max-width:112px; }
+  body .site-header.brand-topbar > .brand img,body .panel-brand img { width:88px; height:30px; }
+}
+@media(max-width:380px) {
+  body .site-header.brand-topbar .header-actions > .language-selector { display:none; }
+  /* The mobile navigation also exposes the language selector. */
+}
