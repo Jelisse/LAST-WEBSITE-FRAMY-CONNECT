@@ -1,7 +1,15 @@
 'use client';
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import {
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import { Upload, RotateCcw, Ruler, Check, Move3D, Eraser } from 'lucide-react';
 import { SourceImage } from './source-image';
+import { useI18n } from './language-provider';
 import { removeLogoBackground } from '@/lib/logo-background';
 import type { LeatherDesign } from '@/lib/leather-design';
 async function previewFile(blob: Blob, page: number) {
@@ -91,23 +99,26 @@ export function LeatherConfigurator({
   onBusy,
   dimensions,
   onPreviewChange,
+  preview,
 }: {
   value: LeatherDesign;
-  onChange: (value: LeatherDesign) => void;
+  onChange: Dispatch<SetStateAction<LeatherDesign>>;
   design: string;
   signedIn: boolean;
   onBusy: (busy: boolean) => void;
   dimensions?: string;
-  onPreviewChange?: (preview: string) => void;
+  onPreviewChange: (preview: string) => void;
+  preview: string;
 }) {
-  const [preview, setPreview] = useState(''),
-    [error, setError] = useState(''),
+  const { t } = useI18n();
+  const colorCaption = t(
+    value.color === 'brown' ? 'Couro · Castanho' : 'Couro · Preto',
+  );
+  const setPreview = onPreviewChange;
+  const [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
     [back, setBack] = useState(false),
     [isPdf, setIsPdf] = useState(false);
-  useEffect(() => {
-    onPreviewChange?.(preview);
-  }, [preview, onPreviewChange]);
   useEffect(
     () => () => {
       onPreviewChange?.('');
@@ -122,17 +133,19 @@ export function LeatherConfigurator({
   const fileRef = useRef<Blob | null>(null),
     sequence = useRef(0);
   const update = (patch: Partial<LeatherDesign>) =>
-    onChange({ ...value, ...patch });
+    onChange((current) => ({ ...current, ...patch }));
   const originalName = useEffectEvent(() => value.fileName || 'logotipo');
   const invalidate = useEffectEvent(() => update({ assetId: undefined }));
   useEffect(() => {
     if (!value.assetId) return;
     let alive = true;
+    const seq = sequence.current;
     onBusy(true);
     void fetch('/api/design-assets/' + value.assetId)
       .then(async (r) => {
         if (!r.ok) throw Error('Volte a carregar o logótipo.');
         const blob = await r.blob();
+        if (!alive || seq !== sequence.current) return '';
         fileRef.current = blob;
         if (!originalRef.current)
           originalRef.current = { blob, name: originalName() };
@@ -140,22 +153,22 @@ export function LeatherConfigurator({
         return previewFile(blob, value.page);
       })
       .then((src) => {
-        if (alive) setPreview(src);
+        if (alive && seq === sequence.current) setPreview(src);
       })
       .catch((e) => {
-        if (alive) {
+        if (alive && seq === sequence.current) {
           setError(e.message);
           invalidate();
         }
       })
       .finally(() => {
-        if (alive) onBusy(false);
+        if (alive && seq === sequence.current) onBusy(false);
       });
     return () => {
       alive = false;
       onBusy(false);
     };
-  }, [value.assetId, value.page, onBusy]);
+  }, [value.assetId, value.page, onBusy, setPreview]);
   async function upload(file?: File, preserveOriginal = false) {
     if (!file) return;
     const seq = ++sequence.current;
@@ -240,6 +253,10 @@ export function LeatherConfigurator({
     <section className="leather-config">
       <div className="leather-controls">
         <h3>Personalize o porta-chaves de couro</h3>
+        <p className="leather-live-note">
+          Escolha a cor, carregue o logótipo e ajuste o tamanho. A imagem e o
+          resumo actualizam automaticamente.
+        </p>
         <fieldset disabled={busy}>
           <legend>Cor do couro</legend>
           <div className="leather-swatches">
@@ -260,7 +277,7 @@ export function LeatherConfigurator({
                 <span
                   style={{ background: color === 'brown' ? '#975121' : '#222' }}
                 />
-                {color === 'brown' ? 'Castanho' : 'Preto'}
+                {t(color === 'brown' ? 'Castanho' : 'Preto')}
                 {value.color === color && (
                   <Check size={15} aria-hidden="true" />
                 )}
@@ -298,8 +315,10 @@ export function LeatherConfigurator({
         {design === 'customer' && (
           <>
             <label className="leather-upload">
-              <Upload size={20} aria-hidden="true" />
-              <strong>Carregar o seu logótipo</strong>
+              <span className="leather-upload-action">
+                <Upload size={20} aria-hidden="true" />
+                {preview ? 'Substituir logótipo' : 'Carregar logótipo'}
+              </span>
               <span>PDF vectorial, PNG ou JPG · até 8 MB</span>
               <input
                 type="file"
@@ -312,65 +331,6 @@ export function LeatherConfigurator({
               />
             </label>
             {value.fileName && <p className="leather-file">{value.fileName}</p>}
-            {preview && (
-              <div className="leather-logo-source">
-                <div className="leather-artwork-area">
-                  <SourceImage
-                    src={preview}
-                    alt="Composição do logótipo carregado"
-                    style={{
-                      width: `${value.scale}%`,
-                      height: `${value.scale}%`,
-                      left: `${50 + value.x}%`,
-                      top: `${50 + value.y}%`,
-                    }}
-                  />
-                </div>
-                <span>Composição do seu logótipo · área de gravação</span>
-              </div>
-            )}
-            {preview && !isPdf && (
-              <fieldset className="leather-background-controls" disabled={busy}>
-                <legend>Remover fundo do logótipo</legend>
-                <p>
-                  Para fundos de cor uniforme. Escolha a cor e ajuste a
-                  tolerância.
-                </p>
-                <label>
-                  Cor do fundo{' '}
-                  <input
-                    type="color"
-                    value={backgroundColor}
-                    onChange={(e) => setBackgroundColor(e.target.value)}
-                  />
-                </label>
-                <label>
-                  Tolerância · {tolerance}
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={tolerance}
-                    onChange={(e) => setTolerance(Number(e.target.value))}
-                  />
-                </label>
-                <button type="button" onClick={() => void removeBackground()}>
-                  <Eraser size={16} aria-hidden="true" />
-                  {backgroundRemoved ? 'Ajustar remoção' : 'Remover fundo'}
-                </button>
-                {backgroundRemoved && (
-                  <button type="button" onClick={() => void restoreOriginal()}>
-                    <RotateCcw size={16} aria-hidden="true" />
-                    Repor imagem original
-                  </button>
-                )}
-                <small>
-                  Resultado em PNG transparente, até 2048 px. Pode repor o
-                  original durante esta edição. Confira os detalhes antes de
-                  continuar.
-                </small>
-              </fieldset>
-            )}
             {value.assetId && <p>Ficheiro guardado para produção.</p>}
             {preview && (
               <>
@@ -384,32 +344,35 @@ export function LeatherConfigurator({
                     onChange={(e) => update({ scale: Number(e.target.value) })}
                   />
                 </label>
-                <label>
-                  Posição horizontal
-                  <input
-                    type="range"
-                    min="-20"
-                    max="20"
-                    value={value.x}
-                    onChange={(e) => update({ x: Number(e.target.value) })}
-                  />
-                </label>
-                <label>
-                  Posição vertical
-                  <input
-                    type="range"
-                    min="-20"
-                    max="20"
-                    value={value.y}
-                    onChange={(e) => update({ y: Number(e.target.value) })}
-                  />
-                </label>
-                <button
-                  type="button"
-                  onClick={() => update({ scale: 70, x: 0, y: 0 })}
-                >
-                  <RotateCcw size={15} aria-hidden="true" /> Repor posição
-                </button>
+                <details className="leather-optional">
+                  <summary>Ajustar posição</summary>
+                  <label>
+                    Posição horizontal
+                    <input
+                      type="range"
+                      min="-20"
+                      max="20"
+                      value={value.x}
+                      onChange={(e) => update({ x: Number(e.target.value) })}
+                    />
+                  </label>
+                  <label>
+                    Posição vertical
+                    <input
+                      type="range"
+                      min="-20"
+                      max="20"
+                      value={value.y}
+                      onChange={(e) => update({ y: Number(e.target.value) })}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => update({ scale: 70, x: 0, y: 0 })}
+                  >
+                    <RotateCcw size={15} aria-hidden="true" /> Repor posição
+                  </button>
+                </details>
                 {isPdf && (
                   <label>
                     Página do PDF
@@ -435,6 +398,57 @@ export function LeatherConfigurator({
                   </label>
                 )}
               </>
+            )}
+            {preview && !isPdf && (
+              <details className="leather-optional">
+                <summary>Remover fundo</summary>
+                <fieldset
+                  className="leather-background-controls"
+                  disabled={busy}
+                >
+                  <legend className="sr-only">Remover fundo do logótipo</legend>
+                  <p>
+                    Para fundos de cor uniforme. Escolha a cor e ajuste a
+                    tolerância.
+                  </p>
+                  <label>
+                    Cor do fundo{' '}
+                    <input
+                      type="color"
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Tolerância · {tolerance}
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={tolerance}
+                      onChange={(e) => setTolerance(Number(e.target.value))}
+                    />
+                  </label>
+                  <button type="button" onClick={() => void removeBackground()}>
+                    <Eraser size={16} aria-hidden="true" />
+                    {backgroundRemoved ? 'Ajustar remoção' : 'Remover fundo'}
+                  </button>
+                  {backgroundRemoved && (
+                    <button
+                      type="button"
+                      onClick={() => void restoreOriginal()}
+                    >
+                      <RotateCcw size={16} aria-hidden="true" />
+                      Repor imagem original
+                    </button>
+                  )}
+                  <small>
+                    Resultado em PNG transparente, até 2048 px. Pode repor o
+                    original durante esta edição. Confira os detalhes antes de
+                    continuar.
+                  </small>
+                </fieldset>
+              </details>
             )}
           </>
         )}
@@ -498,10 +512,10 @@ export function LeatherConfigurator({
             </div>
           </div>
           <div className="leather-studio-caption">
-            <span>
-              COURO · {value.color === 'brown' ? 'CASTANHO' : 'PRETO'}
+            <span key={`${value.color}-${t.locale}`} aria-live="polite">
+              {colorCaption}
             </span>
-            <small>Mova o cursor para inclinar</small>
+            <small>{t('Mova o cursor para inclinar')}</small>
           </div>
         </div>
         <div className="leather-studio-controls">

@@ -161,6 +161,7 @@ export function PaySuiteManager() {
                       {c.city} · {c.address} · {c.contact}
                     </p>
                     <p>{c.designInstructions}</p>
+                    {c.pvcModel && <p>Modelo PVC + epóxi: {c.pvcModel.name}</p>}
                     {c.leather && (
                       <div>
                         <strong>Porta-chaves de couro</strong>

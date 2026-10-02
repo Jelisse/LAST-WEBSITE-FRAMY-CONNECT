@@ -1,3 +1,4 @@
+import { pvcModel } from '@/lib/pvc-models';
 import { validateLeather } from '@/lib/leather-design';
 
 import { env } from 'cloudflare:workers';
@@ -189,7 +190,14 @@ export async function POST(request: Request) {
       )
         throw Error('Descreva o design que pretende para a equipa.');
 
+      const selectedPvc =
+        quote.format !== 'card' &&
+        quote.keychain === 'PVC + epóxi' &&
+        quote.design === 'standard'
+          ? pvcModel(b.pvcModel)
+          : null;
       const configuration = {
+        ...(selectedPvc ? { pvcModel: selectedPvc } : {}),
         ...(leather
           ? {
               leather,

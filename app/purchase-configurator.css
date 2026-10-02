@@ -43,7 +43,7 @@
   margin: 0;
   text-align: center;
 }
-.configuration-photos img {
+.configuration-photos figure > img {
   width: 100%;
   height: 140px;
   object-fit: contain;
@@ -510,3 +510,31 @@ fieldset.purchase-section {
 .leather-background-controls label { display:grid; gap:4px; font-size:13px; }
 .leather-background-controls input[type=color] { width:100%; padding:4px; background:#fff; }
 .leather-artwork-area { background-color:#fff; background-image:conic-gradient(#eee 25%,#fff 0 50%,#eee 0 75%,#fff 0); background-size:16px 16px; }
+
+/* Logo overlays must never inherit a product thumbnail background. */
+.leather-photo-artwork img { background:transparent; border:0; border-radius:0; box-shadow:none; padding:0; }
+.leather-controls .leather-upload { position:relative; display:grid; gap:10px; cursor:pointer; }
+.purchase-configurator .leather-upload input[type=file] { position:absolute; inset:0; width:100%; max-width:100%; height:100%; min-height:0; opacity:0; padding:0; margin:0; cursor:pointer; }
+.leather-upload:focus-within { outline:2px solid #b83c0a; outline-offset:3px; }
+.leather-upload-action { display:inline-flex; align-items:center; gap:8px; font-weight:600; color:#a84119; }
+.leather-optional { border:1px solid #e4d5c9; border-radius:12px; padding:12px; margin:14px 0; }
+.leather-optional > summary { margin:0; font-size:14px; font-weight:600; cursor:pointer; }
+.leather-optional[open] > summary { margin-bottom:14px; }
+.leather-controls .leather-background-controls { border:0; margin:0; padding:0; }
+.leather-preview { position:sticky; top:112px; }
+.leather-live-note { margin:8px 0 16px; font-size:12px; color:#71655c; line-height:1.5; }
+@media(max-width:700px) { .leather-preview { position:static; grid-row:1; } }
+
+.pvc-config { margin-top:24px; padding-top:24px; border-top:1px solid #ecdfd4; }
+.pvc-config fieldset { border:0; padding:0; margin:0; min-width:0; }
+.pvc-config legend { font-size:17px; margin-bottom:16px; }
+.pvc-model-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.pvc-model-options label { display:grid; gap:10px; border:1px solid #dfd5cb; border-radius:14px; padding:12px; cursor:pointer; background:#fff; }
+.pvc-model-options label.is-selected { border-color:#bc430f; box-shadow:inset 0 0 0 1px #bc430f; }
+.pvc-model-options label:focus-within { outline:2px solid #bc430f; outline-offset:3px; }
+.pvc-model-options img { display:block; width:100%; aspect-ratio:1; object-fit:contain; }
+.pvc-model-options span { font-size:13px; font-weight:600; }
+.pvc-model-preview { max-width:360px; margin:24px auto 0; text-align:center; }
+.pvc-product-photo,.configuration-photos figure > .pvc-product-photo { display:block; width:100%; height:auto; aspect-ratio:1; object-fit:contain; background:#fff; }
+.pvc-model-preview figcaption,.pvc-selection { font-size:13px; margin-top:12px; }
+@media(max-width:480px) { .pvc-model-options { gap:6px; } .pvc-model-options label { padding:8px; } }

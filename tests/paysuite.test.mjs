@@ -651,3 +651,15 @@ test('leather checkout preserves choices and validates ownership of uploaded log
  const saved=JSON.parse(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders WHERE id=?').get(body.requestId).configuration_json);
  assert.equal(saved.leather.assetId,assetId);assert.equal(saved.leather.color,'black');assert.equal(saved.leather.scale,60);assert.equal(saved.leather.x,10);assert.match(saved.leatherDimensions,/25 mm/);
 });
+
+test('PVC model selection is validated and snapshotted for fulfilment', async t => {
+ const f=fixture(t), checkout=await api('app/api/paysuite/checkout/route.ts');
+ assert.equal((await checkout.POST(request(product({pvcModel:'unlisted'})))).status,422);
+ for (const id of ['tiktok','pattern','instagram']) {
+   const body=product({pvcModel:id});
+   assert.equal((await checkout.POST(request(body))).status,200);
+   const saved=JSON.parse(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders WHERE id=?').get(body.requestId).configuration_json);
+   assert.equal(saved.pvcModel.id,id);
+   assert.ok(saved.pvcModel.name);
+ }
+});

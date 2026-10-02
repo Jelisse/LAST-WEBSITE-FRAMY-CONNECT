@@ -15,6 +15,8 @@ import {
   BadgeCheck,
 } from 'lucide-react';
 
+import { PvcConfigurator, PvcPreview } from './pvc-configurator';
+import { pvcModel, pvcPhoto, type PvcModel } from '@/lib/pvc-models';
 import { LeatherConfigurator, LeatherPreview } from './leather-configurator';
 
 import { defaultLeather, type LeatherDesign } from '@/lib/leather-design';
@@ -70,6 +72,10 @@ export function PurchaseConfigurator({
   const [keychain, setKeychain] = useState<string>(selection.keychain);
   const [design, setDesign] = useState('standard');
 
+  const [pvc, setPvc] = useState<PvcModel>('tiktok');
+  const [pvcBack, setPvcBack] = useState(false);
+  const isPvcStandard =
+    format !== 'card' && keychain === 'PVC + epóxi' && design === 'standard';
   const [leatherPreview, setLeatherPreview] = useState('');
   const [leather, setLeather] = useState<LeatherDesign>(defaultLeather);
 
@@ -102,6 +108,7 @@ export function PurchaseConfigurator({
         setDesign(draft.design);
 
         setLeather(draft.leather ?? defaultLeather);
+        setPvc(draft.pvcModel ?? 'tiktok');
 
         setDelivery(draft.delivery);
         setCity(draft.city);
@@ -120,6 +127,7 @@ export function PurchaseConfigurator({
         'framy-checkout:configuration:' + initial,
         JSON.stringify({
           version: 2,
+          pvcModel: pvc,
 
           leather,
 
@@ -140,6 +148,7 @@ export function PurchaseConfigurator({
     }
   }, [
     draftReady,
+    pvc,
 
     leather,
 
@@ -281,24 +290,32 @@ export function PurchaseConfigurator({
                   <SourceImage
                     className={`purchase-design-image ${isLeather ? 'is-leather-photo' : ''}`}
                     src={
-                      isLeather
-                        ? `/products/leather/${leather.color}-${item.id !== 'standard' ? 'blank' : leather.color === 'black' ? 'symbol' : leather.logo}.png`
-                        : (
-                            designImages.find((row) => row.id === item.id) ??
-                            designImageDefaults.find(
-                              (row) => row.id === item.id,
-                            )!
-                          ).image
+                      format !== 'card' &&
+                      keychain === 'PVC + epóxi' &&
+                      item.id === 'standard'
+                        ? pvcPhoto(pvc)
+                        : isLeather
+                          ? `/products/leather/${leather.color}-${item.id !== 'standard' ? 'blank' : leather.color === 'black' ? 'symbol' : leather.logo}.png`
+                          : (
+                              designImages.find((row) => row.id === item.id) ??
+                              designImageDefaults.find(
+                                (row) => row.id === item.id,
+                              )!
+                            ).image
                     }
                     alt={
-                      isLeather
-                        ? `Fotografia de referência · couro ${leather.color === 'black' ? 'preto' : 'castanho'}`
-                        : (
-                            designImages.find((row) => row.id === item.id) ??
-                            designImageDefaults.find(
-                              (row) => row.id === item.id,
-                            )!
-                          ).alt
+                      format !== 'card' &&
+                      keychain === 'PVC + epóxi' &&
+                      item.id === 'standard'
+                        ? t(pvcModel(pvc).name)
+                        : isLeather
+                          ? `Fotografia de referência · couro ${leather.color === 'black' ? 'preto' : 'castanho'}`
+                          : (
+                              designImages.find((row) => row.id === item.id) ??
+                              designImageDefaults.find(
+                                (row) => row.id === item.id,
+                              )!
+                            ).alt
                     }
                     width={600}
                     height={400}
@@ -339,11 +356,20 @@ export function PurchaseConfigurator({
                 </label>
               ))}
             </div>
+            {isPvcStandard && (
+              <PvcConfigurator
+                model={pvc}
+                onChange={setPvc}
+                back={pvcBack}
+                onFaceChange={setPvcBack}
+              />
+            )}
             {isLeather && (
               <LeatherConfigurator
                 value={leather}
                 onChange={setLeather}
                 onPreviewChange={setLeatherPreview}
+                preview={leatherPreview}
                 design={design}
                 signedIn={signedIn}
                 onBusy={setLeatherBusy}
@@ -430,7 +456,14 @@ export function PurchaseConfigurator({
           </h2>
           {isLeather && (
             <p className="leather-summary">
-              Couro {leather.color === 'brown' ? 'castanho' : 'preto'} ·{' '}
+              <span key={`${leather.color}-${t.locale}`}>
+                {t(
+                  leather.color === 'brown'
+                    ? 'Couro · Castanho'
+                    : 'Couro · Preto',
+                )}
+              </span>{' '}
+              ·{' '}
               {design === 'standard'
                 ? leather.logo === 'full'
                   ? 'Logo completo'
@@ -438,6 +471,11 @@ export function PurchaseConfigurator({
                 : design === 'customer'
                   ? 'O seu logótipo'
                   : 'Design pela equipa'}
+            </p>
+          )}
+          {isPvcStandard && (
+            <p className="pvc-selection" aria-live="polite">
+              {t('Modelo')}: {t(pvcModel(pvc).name)}
             </p>
           )}
           <div className="configuration-photos">
@@ -451,6 +489,8 @@ export function PurchaseConfigurator({
                       design={design}
                       preview={leatherPreview}
                     />
+                  ) : isPvcStandard && material === 'PVC + epóxi' ? (
+                    <PvcPreview model={pvc} back={pvcBack} />
                   ) : photo ? (
                     <SourceImage
                       src={photo.src}
@@ -466,7 +506,10 @@ export function PurchaseConfigurator({
               );
             })}
           </div>
-          <div aria-live="polite">
+          <div
+            aria-live="polite"
+            key={`${format}-${card}-${keychain}-${design}-${t.locale}`}
+          >
             <h3>{t(selected.name)}</h3>
             {format !== 'keychain' && (
               <p>
@@ -497,7 +540,10 @@ export function PurchaseConfigurator({
           <p>
             <strong>{t('Produtos · pagamento único')}</strong>
             <br />
-            <span aria-live="polite">
+            <span
+              aria-live="polite"
+              key={`${card}-${keychain}-${estimate?.amount}-${t.locale}`}
+            >
               {estimate
                 ? money(estimate.amount, t.locale)
                 : t('Preço a confirmar')}
@@ -590,7 +636,7 @@ export function PurchaseConfigurator({
             </p>
           )}
           <PaySuiteCheckout
-            key={`${format}-${card}-${keychain}-${design}-${city}-${delivery}-${pickupPoint}-${total}-${isLeather ? JSON.stringify(leather) : ''}-${designInstructions}`}
+            key={`${format}-${card}-${keychain}-${design}-${city}-${delivery}-${pickupPoint}-${total}-${isLeather ? JSON.stringify(leather) : ''}-${designInstructions}-${isPvcStandard ? pvc : ''}`}
 
             disabled={
               (isLeather &&
@@ -616,6 +662,7 @@ export function PurchaseConfigurator({
               address,
               designInstructions,
 
+              ...(isPvcStandard ? { pvcModel: pvc } : {}),
               ...(isLeather ? { leather } : {}),
 
               expectedAmount: total,

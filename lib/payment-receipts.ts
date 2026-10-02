@@ -17,6 +17,7 @@ type Receipt = {
   periodEnd?: string;
   terms?: { name?: string };
   configuration?: {
+    pvcModel?: { id: string; name: string };
     leather?: { color: string; logo: string; fileName?: string };
     leatherDimensions?: string;
     fulfilment?: {
@@ -60,6 +61,7 @@ export function receiptMessage(r: Receipt) {
     );
     if (c.format !== 'keychain') lines.push(`Cartão: ${c.card}`);
     if (c.format !== 'card') lines.push(`Porta-chaves: ${c.keychain}`);
+    if (c.pvcModel) lines.push(`Modelo PVC + epóxi: ${c.pvcModel.name}`);
     if (c.leather) {
       lines.push(
         `Couro: ${c.leather.color === 'brown' ? 'Castanho' : 'Preto'}`,
