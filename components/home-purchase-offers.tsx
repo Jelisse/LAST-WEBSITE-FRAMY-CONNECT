@@ -93,7 +93,7 @@ export async function HomePurchaseOffers({
               </div>
               <ProductMaterialGallery
                 name={t(offer.name)}
-                caption={offer.id === 'keychain' ? undefined : t(offer.name)}
+                caption={offer.id === 'card' ? t('Embalagens do cartão · imagens ilustrativas') : offer.id === 'kit' ? '' : undefined}
                 frames={
                   offer.id === 'card'
                     ? cards.map((photo) => [photo])

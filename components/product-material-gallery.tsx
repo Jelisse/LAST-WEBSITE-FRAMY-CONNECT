@@ -48,14 +48,17 @@ export function ProductMaterialGallery({ frames, name, caption }: {
       <div className={`home-solution-photo${frame.length > 1 ? ' is-pair' : ''}`}>
         {frame.length ? frame.map((photo) => (
           <div className={`product-gallery-image${photo.src === heroDefaults.card ? ' is-demo-card' : ''}`} key={photo.id}>
-            <SourceImage src={photo.src} alt={`${name} · ${t(photo.material)}${photo.detail ? ` · ${t(photo.detail)}` : ''}`}
+            <SourceImage src={photo.src} alt={`${name}${t(photo.material) !== name ? ` · ${t(photo.material)}` : ''}${photo.detail ? ` · ${t(photo.detail)}` : ''}`}
               width={600} height={600} sizes="(max-width: 700px) 90vw, 400px" />
             <DemoCardQr source={photo.src} />
           </div>
         )) : <div className="home-photo-placeholder">{t('Fotografia do produto em preparação')}</div>}
       </div>
+      {frames.length > 1 && <fieldset className="product-gallery-dots" aria-label={t('Fotografias do produto')}>
+        {frames.map((photos, i) => <button type="button" key={photos.map(p => p.id).join('-')} aria-label={`${t('Fotografia')} ${i + 1}`} aria-pressed={index % frames.length === i} onClick={() => { setIndex(i); setPaused(true); }} />)}
+      </fieldset>}
       <div className="product-gallery-caption">
-        <span>{caption ?? t('Materiais disponíveis')}{!caption && frame.length > 0 && <> · {frame.map((photo) => `${t(photo.material)}${photo.detail ? ` · ${t(photo.detail)}` : ''}`).join(' / ')}</>}</span>
+        <span>{caption}{caption === undefined && frame.length > 0 && <>{frame.map((photo) => photo.detail ? t(photo.detail) : t(photo.material)).join(' / ')}</>}</span>
         {frames.length > 1 && <div className="product-gallery-controls">
           <button type="button" onClick={() => move(-1)} aria-label={t('Material anterior')}><ChevronLeft size={16} /></button>
           {!reducedMotion && <button type="button" onClick={() => setPaused(!paused)} aria-label={t(paused ? 'Retomar fotografias' : 'Pausar fotografias')}>

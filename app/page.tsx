@@ -173,10 +173,10 @@ export default async function Home() {
               <strong>{t('30 dias grátis')}</strong>
               <span>
                 {t(
-                  'Adicione links como Instagram, WhatsApp e website. Nome, email e telefone não contam para o limite de links.',
+                  'Experimente o seu perfil digital durante 30 dias, sem renovação automática.',
                 )}
               </span>
-              <Link className="home-text-link" href="/perfil?plans=1">
+              <Link className="home-primary" href="/perfil?plans=1">
                 {t('Começar 30 dias grátis')} <ArrowUpRight size={18} />
               </Link>
             </div>

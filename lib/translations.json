@@ -4564,5 +4564,61 @@
     "Choose your PVC + epoxy design",
     "選擇 PVC 加環氧樹脂款式"
   ],
-  "Verso FramyConnect": ["FramyConnect back", "FramyConnect 背面"]
+  "Verso FramyConnect": ["FramyConnect back", "FramyConnect 背面"],
+  "Periodicidade": [
+    "Billing period",
+    "付款週期"
+  ],
+  "Mensal": [
+    "Monthly",
+    "每月"
+  ],
+  "Anual": [
+    "Annual",
+    "每年"
+  ],
+  "Total cobrado anualmente": [
+    "Total billed annually",
+    "每年收取的總額"
+  ],
+  "Poupe {0} por ano": [
+    "Save {0} per year",
+    "每年節省 {0}"
+  ],
+  "Equivalente a 2 meses": [
+    "Equivalent to 2 months",
+    "相當於兩個月"
+  ],
+  "Escolher Profissional": [
+    "Choose Professional",
+    "選擇專業方案"
+  ],
+  "Escolher Individual": [
+    "Choose Individual",
+    "選擇個人方案"
+  ],
+  "Ver todas as funcionalidades": [
+    "View all features",
+    "查看所有功能"
+  ],
+  "Perfis e ferramentas à medida da sua organização.": [
+    "Profiles and tools tailored to your organisation.",
+    "為您的組織量身打造的個人檔案與工具。"
+  ],
+  "Pedir proposta": [
+    "Request a quote",
+    "索取報價"
+  ],
+  "Experimente o seu perfil digital durante 30 dias, sem renovação automática.": [
+    "Try your digital profile for 30 days. No automatic renewal.",
+    "試用數位個人檔案 30 天。不自動續訂。"
+  ],
+  "Embalagens do cartão · imagens ilustrativas": [
+    "Card packaging · illustrative images",
+    "卡片包裝 · 示意圖片"
+  ],
+  "Cartão NFC": [
+    "NFC card",
+    "NFC 卡片"
+  ]
 }
