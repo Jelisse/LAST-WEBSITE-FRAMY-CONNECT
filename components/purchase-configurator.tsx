@@ -309,36 +309,63 @@ export function PurchaseConfigurator({
             </legend>
             <div className="purchase-materials">
               {format !== 'keychain' && (
-                <label>
-                  {t('Cartão')}
-                  <select
-                    value={card}
-                    onChange={(e) => setCard(e.target.value)}
-                  >
+                <fieldset className="material-option-group">
+                  <legend>{t('Cartão')}</legend>
+                  <div className="material-options">
                     {cardMaterials.map((item) => (
-                      <option key={item} value={item}>
-                        {t(item)}
-                      </option>
+                      <label
+                        key={item}
+                        className={card === item ? 'is-selected' : ''}
+                      >
+                        <input
+                          type="radio"
+                          name="card-material"
+                          value={item}
+                          checked={card === item}
+                          onChange={() => setCard(item)}
+                        />
+                        <CreditCard size={20} aria-hidden="true" />
+                        <span>{t(item)}</span>
+                      </label>
                     ))}
-                  </select>
-                </label>
+                  </div>
+                </fieldset>
               )}
               {format !== 'card' && (
-                <label>
-                  {t('Porta-chaves')}
-                  <select
-                    value={keychain}
-                    onChange={(e) => setKeychain(e.target.value)}
-                  >
+                <fieldset className="material-option-group">
+                  <legend>{t('Porta-chaves')}</legend>
+                  <div className="material-options">
                     {keychainMaterials.map((item) => (
-                      <option key={item} value={item}>
-                        {t(item)}
-                      </option>
+                      <label
+                        key={item}
+                        className={keychain === item ? 'is-selected' : ''}
+                      >
+                        <input
+                          type="radio"
+                          name="keychain-material"
+                          value={item}
+                          checked={keychain === item}
+                          onChange={() => setKeychain(item)}
+                        />
+                        <KeyRound size={20} aria-hidden="true" />
+                        <span>{t(item)}</span>
+                      </label>
                     ))}
-                  </select>
-                </label>
+                  </div>
+                </fieldset>
               )}
             </div>
+            <button
+              type="button"
+              className="btn btn-primary material-continue"
+              onClick={() => {
+                setActiveConfiguration('design');
+                setDesignOptionsOpen(true);
+                designControl.current?.focus();
+              }}
+            >
+              {t('Continuar para o design')} →
+            </button>
           </fieldset>
           <fieldset
             id="design-panel"
