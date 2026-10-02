@@ -70,6 +70,7 @@ export function PurchaseConfigurator({
   const [keychain, setKeychain] = useState<string>(selection.keychain);
   const [design, setDesign] = useState('standard');
 
+  const [leatherPreview, setLeatherPreview] = useState('');
   const [leather, setLeather] = useState<LeatherDesign>(defaultLeather);
 
   const [leatherBusy, setLeatherBusy] = useState(false);
@@ -281,7 +282,7 @@ export function PurchaseConfigurator({
                     className={`purchase-design-image ${isLeather ? 'is-leather-photo' : ''}`}
                     src={
                       isLeather
-                        ? `/products/leather/${leather.color}-${leather.color === 'black' || item.id !== 'standard' ? 'symbol' : leather.logo}.png`
+                        ? `/products/leather/${leather.color}-${item.id !== 'standard' ? 'blank' : leather.color === 'black' ? 'symbol' : leather.logo}.png`
                         : (
                             designImages.find((row) => row.id === item.id) ??
                             designImageDefaults.find(
@@ -342,6 +343,7 @@ export function PurchaseConfigurator({
               <LeatherConfigurator
                 value={leather}
                 onChange={setLeather}
+                onPreviewChange={setLeatherPreview}
                 design={design}
                 signedIn={signedIn}
                 onBusy={setLeatherBusy}
@@ -444,7 +446,11 @@ export function PurchaseConfigurator({
               return (
                 <figure key={material}>
                   {isLeather && material === 'Couro' ? (
-                    <LeatherPreview value={leather} design={design} />
+                    <LeatherPreview
+                      value={leather}
+                      design={design}
+                      preview={leatherPreview}
+                    />
                   ) : photo ? (
                     <SourceImage
                       src={photo.src}

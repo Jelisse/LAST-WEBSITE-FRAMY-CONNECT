@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { Upload, RotateCcw, Ruler, Check, Move3D } from 'lucide-react';
+import { Upload, RotateCcw, Ruler, Check, Move3D, Eraser } from 'lucide-react';
 import { SourceImage } from './source-image';
+import { removeLogoBackground } from '@/lib/logo-background';
 import type { LeatherDesign } from '@/lib/leather-design';
 async function previewFile(blob: Blob, page: number) {
   if (blob.type === 'application/pdf') {
@@ -44,23 +45,41 @@ async function previewFile(blob: Blob, page: number) {
 export function LeatherPreview({
   value,
   design,
+  preview,
   back = false,
 }: {
   value: LeatherDesign;
   design: string;
+  preview?: string;
   back?: boolean;
 }) {
-  const logo =
-    value.color === 'black' || design !== 'standard' ? 'symbol' : value.logo;
-  const photo = `/products/leather/${value.color}-${back ? 'back' : logo}.png`;
+  const logo = value.color === 'black' ? 'symbol' : value.logo;
+  const custom = design !== 'standard';
+  const photo = `/products/leather/${value.color}-${back ? 'back' : custom ? 'blank' : logo}.png`;
   return (
-    <SourceImage
-      className="leather-photo"
-      src={photo}
-      alt={`Porta-chaves de couro ${value.color === 'brown' ? 'castanho' : 'preto'} · ${back ? 'verso NFC' : logo === 'full' ? 'logo completo' : 'símbolo F'}`}
-      width={600}
-      height={620}
-    />
+    <div className="leather-photo-composite">
+      <SourceImage
+        className="leather-photo"
+        src={photo}
+        alt={`Porta-chaves de couro ${value.color === 'brown' ? 'castanho' : 'preto'} · ${back ? 'verso NFC' : custom ? 'frente para personalizar' : logo === 'full' ? 'logo completo' : 'símbolo F'}`}
+        width={985}
+        height={1024}
+      />
+      {!back && design === 'customer' && preview && (
+        <div className="leather-photo-artwork">
+          <SourceImage
+            src={preview}
+            alt="O seu logótipo aplicado ao produto"
+            style={{
+              width: `${value.scale}%`,
+              height: `${value.scale}%`,
+              left: `${50 + value.x}%`,
+              top: `${50 + value.y}%`,
+            }}
+          />
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -71,6 +90,7 @@ export function LeatherConfigurator({
   signedIn,
   onBusy,
   dimensions,
+  onPreviewChange,
 }: {
   value: LeatherDesign;
   onChange: (value: LeatherDesign) => void;
@@ -78,17 +98,32 @@ export function LeatherConfigurator({
   signedIn: boolean;
   onBusy: (busy: boolean) => void;
   dimensions?: string;
+  onPreviewChange?: (preview: string) => void;
 }) {
   const [preview, setPreview] = useState(''),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
     [back, setBack] = useState(false),
     [isPdf, setIsPdf] = useState(false);
+  useEffect(() => {
+    onPreviewChange?.(preview);
+  }, [preview, onPreviewChange]);
+  useEffect(
+    () => () => {
+      onPreviewChange?.('');
+    },
+    [onPreviewChange],
+  );
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff');
+  const [tolerance, setTolerance] = useState(30);
+  const [backgroundRemoved, setBackgroundRemoved] = useState(false);
+  const originalRef = useRef<{ blob: Blob; name: string } | null>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const fileRef = useRef<Blob | null>(null),
     sequence = useRef(0);
   const update = (patch: Partial<LeatherDesign>) =>
     onChange({ ...value, ...patch });
+  const originalName = useEffectEvent(() => value.fileName || 'logotipo');
   const invalidate = useEffectEvent(() => update({ assetId: undefined }));
   useEffect(() => {
     if (!value.assetId) return;
@@ -99,6 +134,8 @@ export function LeatherConfigurator({
         if (!r.ok) throw Error('Volte a carregar o logótipo.');
         const blob = await r.blob();
         fileRef.current = blob;
+        if (!originalRef.current)
+          originalRef.current = { blob, name: originalName() };
         if (alive) setIsPdf(blob.type === 'application/pdf');
         return previewFile(blob, value.page);
       })
@@ -119,7 +156,7 @@ export function LeatherConfigurator({
       onBusy(false);
     };
   }, [value.assetId, value.page, onBusy]);
-  async function upload(file?: File) {
+  async function upload(file?: File, preserveOriginal = false) {
     if (!file) return;
     const seq = ++sequence.current;
     setBusy(true);
@@ -132,6 +169,10 @@ export function LeatherConfigurator({
       const src = await previewFile(file, 1);
       if (seq !== sequence.current) return;
       setPreview(src);
+      if (!preserveOriginal) {
+        originalRef.current = { blob: file, name: file.name };
+        setBackgroundRemoved(false);
+      }
       fileRef.current = file;
       setIsPdf(file.type === 'application/pdf');
       setBack(false);
@@ -157,6 +198,43 @@ export function LeatherConfigurator({
       setBusy(false);
       onBusy(false);
     }
+  }
+  async function removeBackground() {
+    const original = originalRef.current;
+    if (!original || busy) return;
+    setBusy(true);
+    onBusy(true);
+    setError('');
+    try {
+      const png = await removeLogoBackground(
+        original.blob,
+        backgroundColor,
+        tolerance,
+      );
+      await upload(
+        new File(
+          [png],
+          original.name.replace(/\.[^.]+$/, '') + '-sem-fundo.png',
+          { type: 'image/png' },
+        ),
+        true,
+      );
+      setBackgroundRemoved(true);
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : 'Não foi possível remover o fundo.',
+      );
+    } finally {
+      setBusy(false);
+      onBusy(false);
+    }
+  }
+  async function restoreOriginal() {
+    const original = originalRef.current;
+    if (!original || busy) return;
+    await upload(
+      new File([original.blob], original.name, { type: original.blob.type }),
+    );
   }
   return (
     <section className="leather-config">
@@ -251,11 +329,53 @@ export function LeatherConfigurator({
                 <span>Composição do seu logótipo · área de gravação</span>
               </div>
             )}
+            {preview && !isPdf && (
+              <fieldset className="leather-background-controls" disabled={busy}>
+                <legend>Remover fundo do logótipo</legend>
+                <p>
+                  Para fundos de cor uniforme. Escolha a cor e ajuste a
+                  tolerância.
+                </p>
+                <label>
+                  Cor do fundo{' '}
+                  <input
+                    type="color"
+                    value={backgroundColor}
+                    onChange={(e) => setBackgroundColor(e.target.value)}
+                  />
+                </label>
+                <label>
+                  Tolerância · {tolerance}
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={tolerance}
+                    onChange={(e) => setTolerance(Number(e.target.value))}
+                  />
+                </label>
+                <button type="button" onClick={() => void removeBackground()}>
+                  <Eraser size={16} aria-hidden="true" />
+                  {backgroundRemoved ? 'Ajustar remoção' : 'Remover fundo'}
+                </button>
+                {backgroundRemoved && (
+                  <button type="button" onClick={() => void restoreOriginal()}>
+                    <RotateCcw size={16} aria-hidden="true" />
+                    Repor imagem original
+                  </button>
+                )}
+                <small>
+                  Resultado em PNG transparente, até 2048 px. Pode repor o
+                  original durante esta edição. Confira os detalhes antes de
+                  continuar.
+                </small>
+              </fieldset>
+            )}
             {value.assetId && <p>Ficheiro guardado para produção.</p>}
             {preview && (
               <>
                 <label>
-                  Tamanho do logótipo
+                  Tamanho do logótipo · {value.scale}%
                   <input
                     type="range"
                     min="25"
@@ -363,7 +483,11 @@ export function LeatherConfigurator({
               }}
             >
               <div className="leather-studio-face" aria-hidden={back}>
-                <LeatherPreview value={value} design={design} />
+                <LeatherPreview
+                  value={value}
+                  design={design}
+                  preview={preview}
+                />
               </div>
               <div
                 className="leather-studio-face leather-studio-reverse"
@@ -413,10 +537,12 @@ export function LeatherConfigurator({
                 completo; a fotografia dessa versão ainda não está disponível.
               </small>
             )}
-          {design !== 'standard' && (
+          {!back && design !== 'standard' && (
             <small>
-              Fotografia de referência do produto. O seu design substituirá o
-              logótipo frontal; a equipa confirma a arte antes da produção.
+              {design === 'customer'
+                ? 'Pré-visualização do seu logótipo sobre a fotografia do produto. '
+                : 'Frente disponível para o design da equipa. '}
+              A equipa confirma a arte e o acabamento antes da produção.
             </small>
           )}
         </figcaption>

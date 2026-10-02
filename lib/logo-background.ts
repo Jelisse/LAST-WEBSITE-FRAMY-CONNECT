@@ -31,3 +31,107 @@ export function clearLogoBackground(data: Uint8ClampedArray, width: number, heig
   }
   return removed;
 }
+
+/** Remove only matching background connected to the image edges. */
+export function clearLogoBackgroundColor(
+  data: Uint8ClampedArray,
+  width: number,
+  height: number,
+  color: readonly number[],
+  tolerance: number,
+) {
+  if (
+    !Number.isInteger(width) ||
+    !Number.isInteger(height) ||
+    width < 1 ||
+    height < 1 ||
+    width * height > 2048 * 2048 ||
+    data.length !== width * height * 4 ||
+    color.length !== 3 ||
+    !color.every((v) => Number.isFinite(v) && v >= 0 && v <= 255) ||
+    !Number.isFinite(tolerance) ||
+    tolerance < 0 ||
+    tolerance > 100
+  )
+    throw Error('Imagem ou tolerância inválida.');
+  const seen = new Uint8Array(width * height),
+    queue = new Uint32Array(width * height);
+  let start = 0,
+    end = 0,
+    removed = 0;
+  const visit = (pixel: number) => {
+    if (seen[pixel]) return;
+    seen[pixel] = 1;
+    const i = pixel * 4;
+    const distance = Math.max(
+      Math.abs(data[i] - color[0]),
+      Math.abs(data[i + 1] - color[1]),
+      Math.abs(data[i + 2] - color[2]),
+    );
+    if (data[i + 3] === 0 || distance <= tolerance) queue[end++] = pixel;
+  };
+  for (let x = 0; x < width; x++) {
+    visit(x);
+    visit((height - 1) * width + x);
+  }
+  for (let y = 0; y < height; y++) {
+    visit(y * width);
+    visit(y * width + width - 1);
+  }
+  while (start < end) {
+    const pixel = queue[start++];
+    if (data[pixel * 4 + 3]) removed++;
+    data[pixel * 4 + 3] = 0;
+    if (pixel % width) visit(pixel - 1);
+    if (pixel % width < width - 1) visit(pixel + 1);
+    if (pixel >= width) visit(pixel - width);
+    if (pixel < width * (height - 1)) visit(pixel + width);
+  }
+  return removed;
+}
+
+export async function removeLogoBackground(
+  blob: Blob,
+  hex: string,
+  tolerance: number,
+): Promise<Blob> {
+  if (!/^#[0-9a-f]{6}$/i.test(hex)) throw Error('Escolha a cor do fundo.');
+  const image = await createImageBitmap(blob);
+  try {
+    const ratio = Math.min(1, 2048 / Math.max(image.width, image.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(image.width * ratio));
+    canvas.height = Math.max(1, Math.round(image.height * ratio));
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw Error('Não foi possível preparar a imagem.');
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const removed = clearLogoBackgroundColor(
+      pixels.data,
+      canvas.width,
+      canvas.height,
+      [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)),
+      tolerance,
+    );
+    if (!removed)
+      throw Error(
+        'Não foi encontrado fundo dessa cor nas margens. Ajuste a cor ou a tolerância.',
+      );
+    if (!pixels.data.some((v, i) => i % 4 === 3 && v > 0))
+      throw Error(
+        'A remoção apagaria toda a imagem. Reduza a tolerância ou escolha outra cor.',
+      );
+    ctx.putImageData(pixels, 0, 0);
+    return await new Promise<Blob>((resolve, reject) =>
+      canvas.toBlob(
+        (result) =>
+          result
+            ? resolve(result)
+            : reject(Error('Não foi possível criar o PNG.')),
+        'image/png',
+      ),
+    );
+  } finally {
+    image.close();
+  }
+}
