@@ -128,6 +128,8 @@ function initials(name: string) {
 }
 export function Workspace({ displayName }: { displayName: string }) {
   const { t } = useI18n();
+  const [growthInitialTab, setGrowthInitialTab] = useState<'overview' | 'billing'>('overview');
+  const toolSection = useRef<'business' | 'extras' | null>(null);
   const [tab, setTab] = useState('overview'),
     [data, setData] = useState<WorkspaceData | null>(null),
     [profile, setProfile] = useState<Profile>(blankProfile),
@@ -144,6 +146,16 @@ export function Workspace({ displayName }: { displayName: string }) {
     [testToolsOpen, setTestToolsOpen] = useState(false),
     [plansOpen, setPlansOpen] = useState(false),
     [uploadingPhoto, setUploadingPhoto] = useState(false);
+  useEffect(() => {
+    if (tab !== 'profile' || !toolSection.current) return;
+    const section = document.getElementById(`professional-${toolSection.current}`);
+    if (section) {
+      section.querySelectorAll('details').forEach(detail => { detail.open = true; });
+      section.scrollIntoView({ block: 'start' });
+      section.focus({ preventScroll: true });
+      toolSection.current = null;
+    }
+  }, [tab]);
   const products = useMemo(() => data?.products ?? [], [data?.products]);
   const pendingCreate = useRef<string | null>(null);
   const load = useCallback(async (resetProfile = false) => {
@@ -371,6 +383,7 @@ export function Workspace({ displayName }: { displayName: string }) {
     if (!data) return;
     if (planId !== 'free-30') {
       setPlansOpen(false);
+      setGrowthInitialTab('billing');
       setTab('growth');
       return;
     }
@@ -841,7 +854,8 @@ export function Workspace({ displayName }: { displayName: string }) {
                             />
                           </label>
                         </div>
-                        <ProfileBusinessEditor
+                        <button type="button" className="btn btn-outline" onClick={() => { setGrowthInitialTab('overview'); setTab('growth'); }}><BriefcaseBusiness size={18} />{t('Ferramentas profissionais')}</button>
+                        <div id="professional-business" tabIndex={-1} style={{scrollMarginTop:110}}><ProfileBusinessEditor
                           features={membershipFeatures({plan_id:data.membership.planId, terms_json:JSON.stringify(data.membership.terms)})}
                           profile={profile}
                           onChange={(next) => {
@@ -849,7 +863,8 @@ export function Workspace({ displayName }: { displayName: string }) {
                             setDirty(true);
                           }}
                         />
-                        <ProfileExtrasEditor
+                        </div>
+                        <div id="professional-extras" tabIndex={-1} style={{scrollMarginTop:110}}><ProfileExtrasEditor
                           features={membershipFeatures({plan_id:data.membership.planId, terms_json:JSON.stringify(data.membership.terms)})}
                           profile={profile}
                           limit={data.membership.terms.links}
@@ -858,6 +873,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                             setDirty(true);
                           }}
                         />
+                        </div>
                         <ProfileLinksEditor
                           profile={profile}
                           planId={data.membership.planId}
@@ -944,7 +960,12 @@ export function Workspace({ displayName }: { displayName: string }) {
                 </div>
               )}
               {tab === 'analytics' && <ProfileEngagementPanel />}
-              {tab === 'growth' && <ProfileGrowthHub />}
+              {tab === 'growth' && <ProfileGrowthHub
+                initialTab={growthInitialTab}
+                features={membershipFeatures({plan_id:data.membership.planId, terms_json:JSON.stringify(data.membership.terms)})}
+                onEdit={(section) => { toolSection.current = section; setTab('profile'); }}
+                onAnalytics={() => setTab('analytics')}
+              />}
               {tab === 'operations' && data.canManageProducts && (
                 <ProductManager
                   onSaved={() => {

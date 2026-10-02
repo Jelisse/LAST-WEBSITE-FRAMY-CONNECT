@@ -1,3 +1,4 @@
+import { PlanFeatureIcon, BasePlanIcon } from './plan-feature-icon';
 import {
   planFeatures,
   featureCatalog,
@@ -9,8 +10,6 @@ import {
   UserRound,
   BriefcaseBusiness,
   Building2,
-  Check,
-  Minus,
 } from 'lucide-react';
 import { getTranslations } from '@/lib/server-i18n';
 import { planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
@@ -43,8 +42,6 @@ export async function HomeProfilePlans({
           ...[
             'Fotografia, nome e título no perfil',
             'Email e telefone com controlo de visibilidade',
-            ...(enabledFeatures.whatsapp ? [featureCatalog.whatsapp] : []),
-            ...(enabledFeatures.location ? [featureCatalog.location] : []),
             'Cores personalizadas e dois estilos de perfil',
             'Links para redes sociais, website e portefólio',
             'Partilha por link, NFC e código QR',
@@ -55,7 +52,7 @@ export async function HomeProfilePlans({
           ...(plan.benefits ?? []),
         ];
         const advanced = (Object.keys(featureCatalog) as FeatureKey[]).filter(
-          (k) => !['whatsapp', 'location'].includes(k),
+          (k) => k !== 'domain',
         );
         return (
           <article
@@ -104,13 +101,14 @@ export async function HomeProfilePlans({
                 </span>
               </div>
               <ul className="home-plan-inclusions">
-                {features.map((feature) => (
+                {features.map((feature, index) => (
                   <li key={feature}>
-                    <Check size={16} aria-hidden="true" />
+                    <BasePlanIcon index={index} />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
+              {plan.id !== 'personal' && <>
               <p className="home-plan-feature-heading">
                 {t('Ferramentas profissionais')}
               </p>
@@ -120,11 +118,7 @@ export async function HomeProfilePlans({
                     key={feature}
                     className={enabledFeatures[feature] ? '' : 'is-unavailable'}
                   >
-                    {enabledFeatures[feature] ? (
-                      <Check size={16} aria-hidden="true" />
-                    ) : (
-                      <Minus size={16} aria-hidden="true" />
-                    )}
+                    <PlanFeatureIcon feature={feature} />
                     <span>
                       {t(featureCatalog[feature])}
                       {!enabledFeatures[feature] && (
@@ -134,13 +128,7 @@ export async function HomeProfilePlans({
                   </li>
                 ))}
               </ul>
-              {recommended && (
-                <p className="home-plan-conditions">
-                  {t(
-                    'Equipa: subscrição por perfil. Domínio adquirido separadamente e sujeito a activação técnica.',
-                  )}
-                </p>
-              )}
+              </>}
               <Link
                 className={recommended ? 'home-primary' : 'home-secondary'}
                 href="/perfil?plans=1"
@@ -179,9 +167,9 @@ export async function HomeProfilePlans({
               'Cartões, porta-chaves e materiais a escolher',
               'Design e apoio à configuração a combinar',
               'Preço e condições de renovação sob consulta',
-            ].map((feature) => (
+            ].map((feature, index) => (
               <li key={feature}>
-                <Check size={16} aria-hidden="true" />
+                <BasePlanIcon index={index} corporate />
                 <span>{t(feature)}</span>
               </li>
             ))}

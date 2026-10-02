@@ -8,9 +8,10 @@ import { SourceImage } from './source-image';
 import { useI18n } from './language-provider';
 import type { ProductPhoto } from '@/lib/product-gallery';
 
-export function ProductMaterialGallery({ frames, name }: {
+export function ProductMaterialGallery({ frames, name, caption }: {
   frames: ProductPhoto[][];
   name: string;
+  caption?: string;
 }) {
   const { t } = useI18n();
   const [index, setIndex] = useState(0);
@@ -54,7 +55,7 @@ export function ProductMaterialGallery({ frames, name }: {
         )) : <div className="home-photo-placeholder">{t('Fotografia do produto em preparação')}</div>}
       </div>
       <div className="product-gallery-caption">
-        <span>{t('Materiais disponíveis')}{frame.length > 0 && <> · {frame.map((photo) => `${t(photo.material)}${photo.detail ? ` · ${t(photo.detail)}` : ''}`).join(' / ')}</>}</span>
+        <span>{caption ?? t('Materiais disponíveis')}{!caption && frame.length > 0 && <> · {frame.map((photo) => `${t(photo.material)}${photo.detail ? ` · ${t(photo.detail)}` : ''}`).join(' / ')}</>}</span>
         {frames.length > 1 && <div className="product-gallery-controls">
           <button type="button" onClick={() => move(-1)} aria-label={t('Material anterior')}><ChevronLeft size={16} /></button>
           {!reducedMotion && <button type="button" onClick={() => setPaused(!paused)} aria-label={t(paused ? 'Retomar fotografias' : 'Pausar fotografias')}>

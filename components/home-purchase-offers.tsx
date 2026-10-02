@@ -2,7 +2,6 @@ import Link from '@/components/hard-link';
 import { ProductMaterialGallery } from './product-material-gallery';
 import type { ProductPhoto } from '@/lib/product-gallery';
 import { pvcModels, pvcPhoto } from '@/lib/pvc-models';
-import { heroDefaults } from '@/lib/hero-media';
 import { ArrowUpRight } from 'lucide-react';
 import { getTranslations } from '@/lib/server-i18n';
 import { type Product } from '@/lib/catalog';
@@ -19,19 +18,17 @@ export async function HomePurchaseOffers({
   const t = await getTranslations();
   const prices = hardwarePrices(products);
   const published = (id: string) => products.some((product) => product.id === id && product.published !== false);
-  // Marketing previews reuse the designs available in the configurator.
-  const cards: ProductPhoto[] = published('pvc')
-    ? [{ id: 'pvc', material: 'PVC', src: heroDefaults.card, detail: 'Angela Khossa' }]
-    : [];
+  // Homepage photography is independent of the customer's configurator selection.
+  const cards: ProductPhoto[] = [
+    { id: 'card-orange-packaging', material: 'Cartão NFC', src: '/home/card-packaging-orange.jpg', detail: 'Laranja' },
+    { id: 'card-black-packaging', material: 'Cartão NFC', src: '/home/card-packaging-black.jpg', detail: 'Preto' },
+  ];
+  const kit: ProductPhoto[] = [
+    { id: 'kit-gift-box', material: 'Kit: cartão + porta-chaves', src: '/home/kit-gift-box.png' },
+  ];
   const keychains: ProductPhoto[] = published('keychain')
     ? pvcModels.map((model) => ({ id: model.id, material: 'PVC + epóxi', src: pvcPhoto(model.id), detail: model.name }))
     : [];
-  // Requested kit previews are independent of the legacy standalone leather listing.
-  const leather: ProductPhoto[] = [
-        { id: 'leather-brown', material: 'Couro', src: '/products/leather/brown-full.png', detail: 'Castanho' },
-        { id: 'leather-black', material: 'Couro', src: '/products/leather/black-symbol.png', detail: 'Preto' },
-      ];
-  const kitKeychains = [...leather, ...keychains];
   const offers: {
     id: PurchaseFormat;
     name: string;
@@ -96,14 +93,13 @@ export async function HomePurchaseOffers({
               </div>
               <ProductMaterialGallery
                 name={t(offer.name)}
+                caption={offer.id === 'keychain' ? undefined : t(offer.name)}
                 frames={
                   offer.id === 'card'
                     ? cards.map((photo) => [photo])
                     : offer.id === 'keychain'
                       ? keychains.map((photo) => [photo])
-                      : cards.flatMap((card) =>
-                          kitKeychains.map((keychain) => [card, keychain]),
-                        )
+                      : [kit]
                 }
               />
               <div className="home-solution-copy">

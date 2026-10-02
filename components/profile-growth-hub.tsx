@@ -1,4 +1,7 @@
 'use client';
+import { featureCatalog, type PlanFeatures, type FeatureKey } from '@/lib/plan-features';
+import { PlanFeatureIcon } from './plan-feature-icon';
+import { useI18n } from './language-provider';
 import { profileColors } from '@/lib/profile-business';
 import { useCallback, useEffect, useState } from 'react';
 import { ProfileSubscriptions } from './profile-subscriptions';
@@ -33,31 +36,49 @@ type DomainData = {
     checks_json: string;
   } | null;
 };
-export function ProfileGrowthHub() {
-  const [tab, setTab] = useState('billing');
+export function ProfileGrowthHub({ features, onEdit, onAnalytics, initialTab = 'overview' }: {
+  features: PlanFeatures;
+  initialTab?: 'overview' | 'billing';
+  onEdit: (section: 'business' | 'extras') => void;
+  onAnalytics: () => void;
+}) {
+  const { t } = useI18n();
+  const [tab, setTab] = useState(initialTab as string);
   return (
     <div className="profile-growth">
+      <section className="professional-tool-links" aria-label={t('Ferramentas profissionais')}>
+        <h2>{t('Ferramentas profissionais')}</h2>
+        <div>
+          {(['whatsapp', 'location', 'showcase', 'english', 'enquiries', 'analytics', 'teams'] as FeatureKey[]).filter(key => features[key]).map(key => (
+            <button type="button" key={key} onClick={() => {
+              if (key === 'analytics') onAnalytics();
+              else if (key === 'teams' || key === 'enquiries') setTab(key);
+              else onEdit(key === 'whatsapp' || key === 'location' ? 'business' : 'extras');
+            }}><PlanFeatureIcon feature={key} /><span>{t(featureCatalog[key])}</span></button>
+          ))}
+        </div>
+      </section>
       <nav aria-label="Ferramentas do perfil" className="growth-tabs">
         {[
+          ['overview', 'Ferramentas profissionais'],
           ['billing', 'Plano e renovação'],
           ['enquiries', 'Caixa de entrada'],
           ['teams', 'A minha equipa'],
-          ['domains', 'Domínio próprio'],
         ].map(([id, label]) => (
           <button key={id} aria-pressed={tab === id} onClick={() => setTab(id)}>
-            {label}
+            {t(label)}
           </button>
         ))}
       </nav>
       {tab === 'billing' ? (
         <ProfileSubscriptions />
-      ) : (
-        <GrowthTool key={tab} tool={tab} />
-      )}
+      ) : tab !== 'overview' ? (
+        <GrowthTool key={tab} tool={tab} canManageTeam={features.teams} />
+      ) : null}
     </div>
   );
 }
-function GrowthTool({ tool }: { tool: string }) {
+function GrowthTool({ tool, canManageTeam }: { tool: string; canManageTeam: boolean }) {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]),
     [teams, setTeams] = useState<TeamData | null>(null),
     [domains, setDomains] = useState<DomainData | null>(null),
@@ -190,6 +211,8 @@ function GrowthTool({ tool }: { tool: string }) {
       {teams && (
         <>
           <h2>A sua equipa</h2>
+          <output>{teams.members.length} membros · {teams.pending.length} convites pendentes · {Math.max(0, 25 - teams.members.length - teams.pending.length)} lugares disponíveis de 25.</output>
+          {!canManageTeam && <p>A criação de equipas e convites requer um plano com gestão de equipa. Pode aceitar convites e gerir as suas participações.</p>}
           <p>
             Até 25 pessoas. Cada pessoa mantém a sua conta, plano e contactos
             privados. A equipa vê o nome, link e estado de publicação e pode
@@ -238,7 +261,7 @@ function GrowthTool({ tool }: { tool: string }) {
                 Nome da equipa
                 <input name="name" maxLength={90} required />
               </label>
-              <button disabled={busy}>Criar equipa</button>
+              <button disabled={busy || !canManageTeam}>Criar equipa</button>
             </form>
           ) : (
             <>
@@ -256,7 +279,7 @@ function GrowthTool({ tool }: { tool: string }) {
                   Email da pessoa
                   <input type="email" name="email" required maxLength={160} />
                 </label>
-                <button disabled={busy}>Criar convite</button>
+                <button disabled={busy || !canManageTeam || teams.members.length + teams.pending.length >= 25}>Criar convite</button>
                 <p>
                   O convite aparece na conta com este email, em Ferramentas do
                   perfil → A minha equipa. Expira em 7 dias. Não enviamos emails
@@ -309,7 +332,7 @@ function GrowthTool({ tool }: { tool: string }) {
                         ))}
                       </select>
                     </label>
-                    <button disabled={busy || !m.username}>
+                    <button disabled={busy || !canManageTeam || !m.username}>
                       Aplicar ao perfil
                     </button>
                   </form>

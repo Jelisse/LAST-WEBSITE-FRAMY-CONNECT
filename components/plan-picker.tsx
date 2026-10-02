@@ -1,4 +1,5 @@
 'use client';
+import { PlanFeatureIcon, BasePlanIcon } from './plan-feature-icon';
 import { planFeatures, featureCatalog, type FeatureKey } from '@/lib/plan-features';
 import { useI18n } from '@/components/language-provider';
 
@@ -85,26 +86,26 @@ export function PlanPicker({
             </div>
             <ul className="plan-inclusions">
               <li>
-                <Check />
+                <BasePlanIcon index={0} />
                 {choice.links}
                 {t(' links com títulos personalizados')}
               </li>
               <li>
-                <Check />
+                <BasePlanIcon index={1} />
                 {choice.bio
                   ? t('Biografia até {0} caracteres', [choice.bio])
                   : t('Nome e título de apresentação')}
               </li>
               <li>
-                <Check />
+                <BasePlanIcon index={3} />
                 {t('Email, telefone e website com controlo de privacidade')}
               </li>
               <li>
-                <Check />
+                <BasePlanIcon index={0} />
                 {t('Editar, ordenar e publicar os seus links')}
               </li>
               <li>
-                <Check />
+                <BasePlanIcon index={6} />
                 {t('Partilha do perfil e guardar o contacto')}
               </li>
             </ul>
@@ -214,7 +215,7 @@ export function PlanPicker({
                       <Check />
                       {t('Partilha de perfil')}
                     </li>
-                    {(Object.keys(featureCatalog) as FeatureKey[]).filter(k=>planFeatures(plan)[k]).map(k=><li key={k}><Check/>{t(featureCatalog[k])}</li>)}
+                    {(Object.keys(featureCatalog) as FeatureKey[]).filter(k=>k !== 'domain' && planFeatures(plan)[k]).map(k=><li key={k}><PlanFeatureIcon feature={k}/>{t(featureCatalog[k])}</li>)}
                     {(plan.benefits??[]).map(b=><li key={b}><Check/>{b}</li>)}
                   </ul>
                 </article>

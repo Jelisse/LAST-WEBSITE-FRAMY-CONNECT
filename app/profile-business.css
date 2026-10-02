@@ -397,3 +397,10 @@
 .mobile-profile-frame[data-tone='dark'] .mobile-profile-footer small {
   color: #fff;
 }
+
+.professional-tool-links { margin-bottom:24px; }
+.professional-tool-links > div { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:12px; }
+.professional-tool-links button { display:flex; align-items:center; gap:12px; padding:16px; text-align:left; border:1px solid #e4d6cb; border-radius:12px; background:white; color:#332820; cursor:pointer; }
+.professional-tool-links button svg { flex-shrink:0; color:#c3410b; }
+.professional-tool-links button:hover { background:#fff4e9; }
+.professional-tool-links button:focus-visible { outline:3px solid #c3410b; outline-offset:3px; }
