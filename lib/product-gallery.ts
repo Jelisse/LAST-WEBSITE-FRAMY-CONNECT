@@ -1,6 +1,6 @@
 import type { Product } from './catalog';
 
-export type ProductPhoto = { id: string; material: string; src: string };
+export type ProductPhoto = { id: string; material: string; src: string; detail?: string };
 const materials: Record<string, string> = {
   pvc: 'PVC', wood: 'Madeira', metal: 'Metal',
   keychain: 'PVC + epóxi', 'keychain-leather': 'Couro',

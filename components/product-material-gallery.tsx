@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { heroDefaults } from '@/lib/hero-media';
+import { DemoCardQr } from './demo-card-qr';
 import { SourceImage } from './source-image';
 import { useI18n } from './language-provider';
 import type { ProductPhoto } from '@/lib/product-gallery';
@@ -44,12 +46,15 @@ export function ProductMaterialGallery({ frames, name }: {
       onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
       <div className={`home-solution-photo${frame.length > 1 ? ' is-pair' : ''}`}>
         {frame.length ? frame.map((photo) => (
-          <SourceImage key={photo.id} src={photo.src} alt={`${name} · ${t(photo.material)}`}
-            width={600} height={600} sizes="(max-width: 700px) 90vw, 400px" />
+          <div className={`product-gallery-image${photo.src === heroDefaults.card ? ' is-demo-card' : ''}`} key={photo.id}>
+            <SourceImage src={photo.src} alt={`${name} · ${t(photo.material)}${photo.detail ? ` · ${t(photo.detail)}` : ''}`}
+              width={600} height={600} sizes="(max-width: 700px) 90vw, 400px" />
+            <DemoCardQr source={photo.src} />
+          </div>
         )) : <div className="home-photo-placeholder">{t('Fotografia do produto em preparação')}</div>}
       </div>
       <div className="product-gallery-caption">
-        <span>{t('Materiais disponíveis')}{frame.length > 0 && <> · {frame.map((photo) => t(photo.material)).join(' / ')}</>}</span>
+        <span>{t('Materiais disponíveis')}{frame.length > 0 && <> · {frame.map((photo) => `${t(photo.material)}${photo.detail ? ` · ${t(photo.detail)}` : ''}`).join(' / ')}</>}</span>
         {frames.length > 1 && <div className="product-gallery-controls">
           <button type="button" onClick={() => move(-1)} aria-label={t('Material anterior')}><ChevronLeft size={16} /></button>
           {!reducedMotion && <button type="button" onClick={() => setPaused(!paused)} aria-label={t(paused ? 'Retomar fotografias' : 'Pausar fotografias')}>

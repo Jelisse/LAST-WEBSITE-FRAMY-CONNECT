@@ -111,7 +111,7 @@ export function HomeSharingScene({ media }: { media: HeroMedia }) {
               <path d="M39 25 Q61 50 39 75" />
               <path d="M60 12 Q94 50 60 88" />
             </svg>
-            <DemoPhone image={media.tapProfile} label="" alt="Ana Matavele" />
+            <DemoPhone image={media.tapProfile} label="" alt="Angela Khossa" />
           </div>
           <p>{t('Aproxime o cartão de um telemóvel compatível com NFC.')}</p>
         </article>

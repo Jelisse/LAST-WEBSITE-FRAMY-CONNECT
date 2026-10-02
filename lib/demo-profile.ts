@@ -2,7 +2,7 @@ import { blankProfile } from './domain';
 
 // Fictional identity shared by the home preview and the full example profile.
 export const demoIdentity = {
-  name: 'Ana Matavele',
+  name: 'Angela Khossa',
   title: 'Criadora de conteúdos',
   photo: '/home/ana-matavele.webp',
 };

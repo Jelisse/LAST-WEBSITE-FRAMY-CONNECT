@@ -1,12 +1,12 @@
 export const heroDefaults = {
   video1: '/home/card-promo.mp4',
   video2: '/home/keychain-promo.mp4',
-  card: '/home/ana-card.webp',
+  card: '/home/angela-card.webp',
   cardFront: '/home/solange-card-front.png',
   keychain: '/home/framy-keychain.png',
   tapCard: '/home/orange-card-front.png',
   tapProfile: '/home/ana-matavele.webp',
-  scanCard: '/home/ana-card.webp',
+  scanCard: '/home/angela-card.webp',
 };
 export type HeroSlot = keyof typeof heroDefaults;
 export type HeroMedia = Record<HeroSlot, string>;

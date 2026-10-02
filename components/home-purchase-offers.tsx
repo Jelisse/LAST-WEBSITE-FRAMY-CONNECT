@@ -1,6 +1,8 @@
 import Link from '@/components/hard-link';
 import { ProductMaterialGallery } from './product-material-gallery';
-import { productPhotos } from '@/lib/product-gallery';
+import type { ProductPhoto } from '@/lib/product-gallery';
+import { pvcModels, pvcPhoto } from '@/lib/pvc-models';
+import { heroDefaults } from '@/lib/hero-media';
 import { ArrowUpRight } from 'lucide-react';
 import { getTranslations } from '@/lib/server-i18n';
 import { type Product } from '@/lib/catalog';
@@ -16,13 +18,21 @@ export async function HomePurchaseOffers({
 }) {
   const t = await getTranslations();
   const prices = hardwarePrices(products);
-  const photos = productPhotos(products);
-  const cards = photos.filter((photo) =>
-    ['pvc', 'wood', 'metal'].includes(photo.id),
-  );
-  const keychains = photos.filter((photo) =>
-    ['keychain', 'keychain-leather'].includes(photo.id),
-  );
+  const published = (id: string) => products.some((product) => product.id === id && product.published !== false);
+  // Marketing previews reuse the designs available in the configurator.
+  const cards: ProductPhoto[] = published('pvc')
+    ? [{ id: 'pvc', material: 'PVC', src: heroDefaults.card, detail: 'Angela Khossa' }]
+    : [];
+  const keychains: ProductPhoto[] = published('keychain')
+    ? pvcModels.map((model) => ({ id: model.id, material: 'PVC + epóxi', src: pvcPhoto(model.id), detail: model.name }))
+    : [];
+  const leather: ProductPhoto[] = published('keychain-leather')
+    ? [
+        { id: 'leather-brown', material: 'Couro', src: '/products/leather/brown-full.png', detail: 'Castanho' },
+        { id: 'leather-black', material: 'Couro', src: '/products/leather/black-symbol.png', detail: 'Preto' },
+      ]
+    : [];
+  const kitKeychains = [...leather, ...keychains];
   const offers: {
     id: PurchaseFormat;
     name: string;
@@ -93,7 +103,7 @@ export async function HomePurchaseOffers({
                     : offer.id === 'keychain'
                       ? keychains.map((photo) => [photo])
                       : cards.flatMap((card) =>
-                          keychains.map((keychain) => [card, keychain]),
+                          kitKeychains.map((keychain) => [card, keychain]),
                         )
                 }
               />
