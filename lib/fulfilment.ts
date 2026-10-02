@@ -289,7 +289,7 @@ export const fulfilmentDefaults: FulfilmentSettings = {
     {
       id: 'mahota',
       cityId: 'maputo',
-      name: 'Ponto Agente Mahotas',
+      name: 'Agente FramyConnect — Mahotas',
       address:
         'Bairro Mahota, Av. Dom Alexandre, próximo do cruzamento com a Rua Mário Coluna, em frente às Bombas Puma.',
       hours: 'Segunda a sexta: 09:00–17:00. Sábado: 08:00–13:00.',
