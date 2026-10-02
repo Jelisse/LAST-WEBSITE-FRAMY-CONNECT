@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Package,
   CreditCard,
@@ -71,6 +71,8 @@ export function PurchaseConfigurator({
   const [card, setCard] = useState<string>(selection.card);
   const [keychain, setKeychain] = useState<string>(selection.keychain);
   const [design, setDesign] = useState('standard');
+  const [designOptionsOpen, setDesignOptionsOpen] = useState(false);
+  const designControl = useRef<HTMLButtonElement>(null);
   const [activeConfiguration, setActiveConfiguration] = useState<
     'materials' | 'design'
   >('design');
@@ -272,9 +274,15 @@ export function PurchaseConfigurator({
             <button
               type="button"
               id="design-control"
+              ref={designControl}
               aria-expanded={activeConfiguration === 'design'}
               aria-controls="design-panel"
-              onClick={() => setActiveConfiguration('design')}
+              onClick={() => {
+                setDesignOptionsOpen(
+                  activeConfiguration !== 'design' || !designOptionsOpen,
+                );
+                setActiveConfiguration('design');
+              }}
             >
               <strong>
                 <Palette
@@ -284,7 +292,10 @@ export function PurchaseConfigurator({
                 />
                 {t('2. Design')}
               </strong>
-              <span>{t(selectedDesign.name)}</span>
+              <span>
+                {t(selectedDesign.name)}{' '}
+                <span className="purchase-change-label">{t('Alterar')}</span>
+              </span>
             </button>
           </div>
           <fieldset
@@ -338,18 +349,10 @@ export function PurchaseConfigurator({
               <Palette className="purchase-icon" size={20} aria-hidden="true" />
               {t('2. Design')}
             </legend>
-            <details className="purchase-design-options">
-              <summary>
-                <span>
-                  <Palette
-                    className="purchase-icon"
-                    size={18}
-                    aria-hidden="true"
-                  />
-                  {t(selectedDesign.name)}
-                </span>
-                <span className="purchase-change-label">{t('Alterar')}</span>
-              </summary>
+            <div
+              className="purchase-design-options"
+              hidden={!designOptionsOpen}
+            >
               <div className="purchase-choices">
                 {designServices.map((item) => (
                   <label
@@ -398,12 +401,9 @@ export function PurchaseConfigurator({
                       name="design"
                       checked={design === item.id}
                       onChange={() => setDesign(item.id)}
-                      onClick={(event) => {
-                        const choices = event.currentTarget.closest('details');
-                        if (choices) {
-                          choices.open = false;
-                          choices.querySelector('summary')?.focus();
-                        }
+                      onClick={() => {
+                        setDesignOptionsOpen(false);
+                        designControl.current?.focus();
                       }}
                     />
                     <strong>
@@ -436,43 +436,45 @@ export function PurchaseConfigurator({
                   </label>
                 ))}
               </div>
-            </details>
-            {isPvcStandard && (
-              <PvcConfigurator
-                model={pvc}
-                onChange={setPvc}
-                back={pvcBack}
-                onFaceChange={setPvcBack}
-              />
-            )}
-            {isLeather && (
-              <LeatherConfigurator
-                value={leather}
-                onChange={setLeather}
-                onPreviewChange={setLeatherPreview}
-                preview={leatherPreview}
-                design={design}
-                signedIn={signedIn}
-                onBusy={setLeatherBusy}
-                dimensions={leatherDimensions}
-              />
-            )}
-            {(design === 'team' || (!isLeather && design === 'customer')) && (
-              <label className="purchase-method">
-                Instruções para o design
-                <textarea
-                  value={designInstructions}
-                  onChange={(e) => setDesignInstructions(e.target.value)}
-                  maxLength={2000}
-
-                  placeholder="Descreva o logótipo, os textos e o estilo que pretende."
+            </div>
+            <div className="purchase-active-design" hidden={designOptionsOpen}>
+              {isPvcStandard && (
+                <PvcConfigurator
+                  model={pvc}
+                  onChange={setPvc}
+                  back={pvcBack}
+                  onFaceChange={setPvcBack}
                 />
-                <small>
-                  A equipa revê as suas instruções e contacta-o para preparar o
-                  design. A produção começa após a sua aprovação.
-                </small>
-              </label>
-            )}
+              )}
+              {isLeather && (
+                <LeatherConfigurator
+                  value={leather}
+                  onChange={setLeather}
+                  onPreviewChange={setLeatherPreview}
+                  preview={leatherPreview}
+                  design={design}
+                  signedIn={signedIn}
+                  onBusy={setLeatherBusy}
+                  dimensions={leatherDimensions}
+                />
+              )}
+              {(design === 'team' || (!isLeather && design === 'customer')) && (
+                <label className="purchase-method">
+                  Instruções para o design
+                  <textarea
+                    value={designInstructions}
+                    onChange={(e) => setDesignInstructions(e.target.value)}
+                    maxLength={2000}
+
+                    placeholder="Descreva o logótipo, os textos e o estilo que pretende."
+                  />
+                  <small>
+                    A equipa revê as suas instruções e contacta-o para preparar
+                    o design. A produção começa após a sua aprovação.
+                  </small>
+                </label>
+              )}
+            </div>
           </fieldset>
           <section className="purchase-section">
             <h2>

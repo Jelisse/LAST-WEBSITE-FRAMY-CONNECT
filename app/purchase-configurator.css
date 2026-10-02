@@ -592,3 +592,7 @@ fieldset.purchase-section {
   .configuration-switcher button > span { font-size:12px; }
   .configuration-switcher .purchase-icon { width:17px; margin-right:6px; }
 }
+
+.purchase-design-options[hidden], .purchase-active-design[hidden] { display:none; }
+.configuration-switcher .purchase-change-label { display:inline-block; margin-left:8px; font-size:12px; }
+.purchase-active-design > .pvc-config, .purchase-active-design > .leather-config { margin-top:0; padding-top:0; border-top:0; }
