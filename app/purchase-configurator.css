@@ -576,3 +576,19 @@ fieldset.purchase-section {
 }
 
 .purchase-design-options > summary { scroll-margin-top:160px; }
+
+/* One full-width editor beneath two compact configuration controls. */
+.configuration-switcher { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:24px; }
+.configuration-switcher button { display:flex; flex-direction:column; align-items:flex-start; gap:8px; min-width:0; padding:16px 18px; border:1px solid #dfd5cb; border-radius:14px; background:#fff; color:inherit; font:inherit; text-align:left; cursor:pointer; }
+.configuration-switcher button[aria-expanded=true] { border-color:#bc430f; background:#fff3e9; box-shadow:inset 0 0 0 1px #bc430f; }
+.configuration-switcher button:focus-visible { outline:2px solid #bc430f; outline-offset:3px; }
+.configuration-switcher strong { display:flex; align-items:center; font-size:17px; }
+.configuration-switcher button > span { font-size:14px; line-height:1.5; color:#746456; overflow-wrap:anywhere; }
+.configuration-panel[hidden] { display:none; }
+@media(max-width:600px) {
+  .configuration-switcher { gap:8px; margin-bottom:20px; }
+  .configuration-switcher button { padding:12px 10px; }
+  .configuration-switcher strong { font-size:14px; }
+  .configuration-switcher button > span { font-size:12px; }
+  .configuration-switcher .purchase-icon { width:17px; margin-right:6px; }
+}

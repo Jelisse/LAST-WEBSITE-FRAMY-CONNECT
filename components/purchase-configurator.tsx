@@ -71,6 +71,9 @@ export function PurchaseConfigurator({
   const [card, setCard] = useState<string>(selection.card);
   const [keychain, setKeychain] = useState<string>(selection.keychain);
   const [design, setDesign] = useState('standard');
+  const [activeConfiguration, setActiveConfiguration] = useState<
+    'materials' | 'design'
+  >('design');
 
   const [pvc, setPvc] = useState<PvcModel>('tiktok');
   const [pvcBack, setPvcBack] = useState(false);
@@ -241,7 +244,54 @@ export function PurchaseConfigurator({
       </a>
       <div className="purchase-layout">
         <div>
-          <fieldset className="purchase-section">
+          <div className="configuration-switcher">
+            <button
+              type="button"
+              id="materials-control"
+              aria-expanded={activeConfiguration === 'materials'}
+              aria-controls="materials-panel"
+              onClick={() => setActiveConfiguration('materials')}
+            >
+              <strong>
+                <Layers
+                  className="purchase-icon"
+                  size={20}
+                  aria-hidden="true"
+                />
+                {t('1. Materiais')}
+              </strong>
+              <span>
+                {[
+                  format !== 'keychain' ? t(card) : '',
+                  format !== 'card' ? t(keychain) : '',
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </span>
+            </button>
+            <button
+              type="button"
+              id="design-control"
+              aria-expanded={activeConfiguration === 'design'}
+              aria-controls="design-panel"
+              onClick={() => setActiveConfiguration('design')}
+            >
+              <strong>
+                <Palette
+                  className="purchase-icon"
+                  size={20}
+                  aria-hidden="true"
+                />
+                {t('2. Design')}
+              </strong>
+              <span>{t(selectedDesign.name)}</span>
+            </button>
+          </div>
+          <fieldset
+            id="materials-panel"
+            className="purchase-section configuration-panel"
+            hidden={activeConfiguration !== 'materials'}
+          >
             <legend>
               <Layers className="purchase-icon" size={20} aria-hidden="true" />
               {t('1. Materiais')}
@@ -279,7 +329,11 @@ export function PurchaseConfigurator({
               )}
             </div>
           </fieldset>
-          <fieldset className="purchase-section">
+          <fieldset
+            id="design-panel"
+            className="purchase-section configuration-panel"
+            hidden={activeConfiguration !== 'design'}
+          >
             <legend>
               <Palette className="purchase-icon" size={20} aria-hidden="true" />
               {t('2. Design')}
