@@ -17,6 +17,8 @@ type Receipt = {
   periodEnd?: string;
   terms?: { name?: string };
   configuration?: {
+    leather?: { color: string; logo: string; fileName?: string };
+    leatherDimensions?: string;
     fulfilment?: {
       mode: string;
       city: string;
@@ -58,6 +60,16 @@ export function receiptMessage(r: Receipt) {
     );
     if (c.format !== 'keychain') lines.push(`Cartão: ${c.card}`);
     if (c.format !== 'card') lines.push(`Porta-chaves: ${c.keychain}`);
+    if (c.leather) {
+      lines.push(
+        `Couro: ${c.leather.color === 'brown' ? 'Castanho' : 'Preto'}`,
+      );
+      if (c.design === 'standard')
+        lines.push(
+          `Logótipo: ${c.leather.logo === 'full' ? 'FramyConnect completo' : 'Símbolo F'}`,
+        );
+      if (c.leatherDimensions) lines.push(c.leatherDimensions);
+    }
     lines.push(
       `Design: ${{ standard: 'FramyConnect', customer: 'O seu design', team: 'Criado pela equipa' }[c.design] ?? c.design}`,
       `Produtos: ${money(c.hardware)}`,

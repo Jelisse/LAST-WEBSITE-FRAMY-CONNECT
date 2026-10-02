@@ -95,21 +95,30 @@ export function PaySuiteManager() {
                 ['customer_design', 'Design do cliente'],
                 ['team_design', 'Design pela equipa'],
               ] as const
-            ).map(([key, label]) => (
-              <label key={key}>
-                {label}
-                <input
-                  key={`${key}-${data.pricing.version}`}
-                  type="number"
-                  min="0"
-                  max="100000"
-                  step="0.01"
-                  required
-                  name={key}
-                  defaultValue={data.pricing[key] / 100}
-                />
-              </label>
-            ))}
+            )
+
+              .map(([key, label]) => (
+                <label key={key}>
+                  {label}
+                  <input
+                    key={`${key}-${data.pricing.version}`}
+
+                    type="number"
+
+                    min="0"
+
+                    max="100000"
+
+                    step="0.01"
+
+                    required
+
+                    name={key}
+
+                    defaultValue={data.pricing[key] / 100}
+                  />
+                </label>
+              ))}
             <label>
               <input
                 type="checkbox"
@@ -152,6 +161,35 @@ export function PaySuiteManager() {
                       {c.city} · {c.address} · {c.contact}
                     </p>
                     <p>{c.designInstructions}</p>
+                    {c.leather && (
+                      <div>
+                        <strong>Porta-chaves de couro</strong>
+                        <p>
+                          Cor:{' '}
+                          {c.leather.color === 'brown' ? 'Castanho' : 'Preto'} ·
+                          Frente:{' '}
+                          {c.design === 'standard'
+                            ? c.leather.logo === 'full'
+                              ? 'Logo completo'
+                              : 'Símbolo F'
+                            : c.design === 'customer'
+                              ? 'Logo do cliente'
+                              : 'Design pela equipa'}
+                        </p>
+                        <p>{c.leatherDimensions}</p>
+                        {c.leather.assetId && (
+                          <>
+                            <a href={'/api/design-assets/' + c.leather.assetId}>
+                              Descarregar logótipo: {c.leather.fileName}
+                            </a>
+                            <p>
+                              Página {c.leather.page} · Escala {c.leather.scale}
+                              % · X {c.leather.x} · Y {c.leather.y}
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    )}
                     {c.fulfilment && (
                       <p>
                         Recepção:{' '}

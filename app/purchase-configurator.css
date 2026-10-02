@@ -446,3 +446,54 @@ fieldset.purchase-section {
 .purchase-icon { display:inline-block; flex-shrink:0; vertical-align:-.2em; margin-right:8px; color:#aa3c12; }
 .checkout-journey strong .purchase-icon { color:inherit; }
 @media(max-width:600px) { .checkout-journey strong .purchase-icon { display:block; margin:0 auto 6px; } }
+.leather-config { display:grid; grid-template-columns:minmax(0,1fr) minmax(200px,.9fr); gap:24px; margin-top:26px; padding-top:24px; border-top:1px solid #ecdfd4; }
+.leather-controls { min-width:0; }
+.leather-controls h3 { font-size:18px; margin:0 0 20px; }
+.leather-controls fieldset { border:0; padding:0; margin:0 0 20px; min-width:0; }
+.leather-controls fieldset legend { font-size:14px; margin-bottom:10px; padding:0; }
+.leather-controls button,.leather-face-tabs button { border:1px solid #d9cabe; padding:10px 12px; border-radius:10px; background:white; cursor:pointer; font:inherit; font-size:13px; display:inline-flex; gap:7px; align-items:center; }
+.leather-controls button[aria-pressed=true],.leather-face-tabs button[aria-pressed=true] { border-color:#b83c0a; background:#fff0e4; box-shadow:inset 0 0 0 1px #b83c0a; }
+.leather-controls button:focus-visible,.leather-face-tabs button:focus-visible { outline:2px solid #b83c0a; outline-offset:3px; }
+.leather-swatches,.leather-logos,.leather-face-tabs { display:flex; gap:8px; flex-wrap:wrap; }
+.leather-swatches button>span { width:22px; height:22px; border:2px solid #fff; outline:1px solid #d0b8a5; border-radius:50%; }
+.leather-specs { padding:15px; display:flex; gap:10px; background:#faf5ef; border-radius:12px; font-size:13px; line-height:1.6; }
+.leather-specs svg { flex-shrink:0; color:#a84119; }
+.leather-specs p { white-space:pre-line; }
+.leather-preview { min-width:0; margin:0; align-self:start; text-align:center; }
+.leather-photo { display:block; width:100%; height:auto; aspect-ratio:1/1.06; object-fit:contain; background:#f4f1eb; border-radius:16px; }
+.leather-face-tabs { justify-content:center; margin-bottom:12px; }
+.leather-preview figcaption { font-size:13px; margin-top:10px; }
+.leather-preview small { display:block; margin-top:8px; font-size:11px; line-height:1.6; color:#77665b; }
+.leather-upload { display:grid; gap:8px; padding:16px; border:1px dashed #b98058; border-radius:12px; background:#fff9f3; font-size:13px; }
+.leather-upload input[type=file] { max-width:100%; padding:4px; border:0; font-size:12px; }
+.leather-logo-source { padding:12px; margin:12px 0; border:1px solid #e4d5c9; border-radius:12px; background:#fff; display:grid; gap:8px; text-align:center; font-size:12px; }
+.leather-logo-source img { max-width:100%; width:100%; height:90px; object-fit:contain; }
+.leather-file { overflow-wrap:anywhere; font-size:12px; }
+.leather-controls input[type=range] { padding:0; min-height:28px; accent-color:#b83c0a; }
+.leather-controls>label { display:grid; font-size:13px; }
+.leather-summary { padding:10px; background:#fff4e8; border-radius:8px; font-size:13px; }
+@media(max-width:700px) { .leather-config { grid-template-columns:1fr; } .leather-preview { max-width:360px; width:100%; justify-self:center; } }
+
+/* Studio lighting and perspective; originals remain unchanged. */
+.leather-studio { position:relative; isolation:isolate; overflow:hidden; border:1px solid #e4d5c2; border-radius:24px; background:radial-gradient(ellipse at 50% 35%,#fffdf8 0%,#f2eadc 62%,#d8c7ae 100%); box-shadow:0 18px 40px -24px #54331c66,inset 0 1px 0 #fff; }
+.leather-studio.is-black { border-color:#d0ceca; background:radial-gradient(ellipse at 50% 35%,#faf9f5 0%,#e6e3dc 65%,#bfc0bf 100%); }
+.leather-studio-label { display:flex; align-items:center; justify-content:center; gap:7px; padding:16px 12px 0; font-size:11px; letter-spacing:.06em; color:#786449; }
+.leather-studio-stage { position:relative; perspective:950px; padding:6px 12px 16px; }
+.leather-studio-halo { pointer-events:none; position:absolute; inset:8% 4% 18%; background:radial-gradient(ellipse,#ffedbd 0%,transparent 65%); filter:blur(18px); }
+.is-black .leather-studio-halo { background:radial-gradient(ellipse,#fff2d9 0%,transparent 65%); }
+.leather-studio-shadow { pointer-events:none; position:absolute; width:45%; height:5%; left:27.5%; bottom:5%; border-radius:50%; background:#523c2a; filter:blur(12px); opacity:.24; transition:transform .18s ease; }
+.leather-studio-object { position:relative; width:100%; aspect-ratio:1/1.06; transform-style:preserve-3d; transition:transform .4s cubic-bezier(.2,.75,.25,1); }
+.leather-studio-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:translateZ(2px); }
+.leather-studio-reverse { transform:rotateY(180deg) translateZ(2px); }
+.leather-studio-face .leather-photo { background:transparent; mix-blend-mode:multiply; mask-image:radial-gradient(ellipse at center,#000 58%,transparent 77%); }
+.leather-studio-sheen { position:absolute; pointer-events:none; inset:15% 20% 10%; border-radius:45%; background:linear-gradient(115deg,transparent 25%,#fff4db 46%,transparent 61%); mix-blend-mode:soft-light; }
+.leather-studio-caption { display:grid; gap:5px; padding:6px 16px 20px; color:#655640; }
+.leather-studio-caption span { font-size:10px; letter-spacing:.18em; font-weight:600; }
+.leather-studio-caption small { font-size:11px; }
+.leather-studio-controls { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; margin:16px 0; padding:14px; background:#faf7f2; border:1px solid #eee3d8; border-radius:14px; }
+.leather-studio-controls label { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:6px; font-size:12px; color:#685846; }
+.leather-studio-controls input[type=range] { width:100%; padding:0; min-height:24px; margin:0; accent-color:#ac471d; }
+.leather-studio-controls button { grid-column:1/-1; justify-self:center; display:flex; align-items:center; gap:6px; padding:8px 14px; border:1px solid #d8c7b6; background:#fff; border-radius:9px; font:inherit; font-size:12px; cursor:pointer; }
+.leather-studio-controls button:focus-visible { outline:2px solid #b83c0a; outline-offset:3px; }
+@media(hover:none) { .leather-studio-caption small { display:none; } }
+@media(prefers-reduced-motion:reduce) { .leather-studio-object,.leather-studio-shadow { transition:none; } }

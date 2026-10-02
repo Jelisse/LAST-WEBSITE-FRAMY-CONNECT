@@ -67,6 +67,9 @@ export default async function Page({
           prices={hardwarePrices(products)}
           photos={productPhotos(products)}
           designImages={designImages}
+          leatherDimensions={
+            products.find((p) => p.id === 'keychain-leather')?.dimensions
+          }
           pricing={pricing}
           paymentAvailable={paysuiteReady(env) && !!pricing?.enabled}
           signedIn={!!user}

@@ -14,6 +14,11 @@ import {
   PenTool,
   BadgeCheck,
 } from 'lucide-react';
+
+import { LeatherConfigurator, LeatherPreview } from './leather-configurator';
+
+import { defaultLeather, type LeatherDesign } from '@/lib/leather-design';
+
 import { DeliverySelector } from './delivery-selector';
 import { readFulfilment, fulfilmentQuote } from '@/lib/fulfilment';
 import { readPurchaseDraft } from '@/lib/purchase-draft';
@@ -39,6 +44,9 @@ export function PurchaseConfigurator({
   initial = 'kit',
   prices,
   photos = [],
+
+  leatherDimensions,
+
   designImages = designImageDefaults,
   pricing = null,
   paymentAvailable = false,
@@ -47,6 +55,9 @@ export function PurchaseConfigurator({
   initial?: string;
   prices: HardwarePrice[];
   photos?: ProductPhoto[];
+
+  leatherDimensions?: string;
+
   designImages?: DesignImage[];
   pricing?: CheckoutPricing | null;
   paymentAvailable?: boolean;
@@ -58,7 +69,15 @@ export function PurchaseConfigurator({
   const [card, setCard] = useState<string>(selection.card);
   const [keychain, setKeychain] = useState<string>(selection.keychain);
   const [design, setDesign] = useState('standard');
-  const method = 'PDF vectorial';
+
+  const [leather, setLeather] = useState<LeatherDesign>(defaultLeather);
+
+  const [leatherBusy, setLeatherBusy] = useState(false);
+
+  const isLeather = format !== 'card' && keychain === 'Couro';
+
+  const method = isLeather ? 'Logótipo personalizado' : 'PDF vectorial';
+
   const [contact, setContact] = useState('');
   const [address, setAddress] = useState('');
   const [delivery, setDelivery] = useState('pickup');
@@ -80,6 +99,9 @@ export function PurchaseConfigurator({
         setCard(draft.card);
         setKeychain(draft.keychain);
         setDesign(draft.design);
+
+        setLeather(draft.leather ?? defaultLeather);
+
         setDelivery(draft.delivery);
         setCity(draft.city);
         setPickupPoint(draft.pickupPoint);
@@ -97,6 +119,9 @@ export function PurchaseConfigurator({
         'framy-checkout:configuration:' + initial,
         JSON.stringify({
           version: 2,
+
+          leather,
+
           expires: Date.now() + 1800000,
           card,
           keychain,
@@ -114,6 +139,9 @@ export function PurchaseConfigurator({
     }
   }, [
     draftReady,
+
+    leather,
+
     initial,
     card,
     keychain,
@@ -294,23 +322,37 @@ export function PurchaseConfigurator({
                     )}
                     {t(item.name)}
                   </strong>
-                  <p>{t(item.description)}</p>
+                  <p>
+                    {isLeather && item.id === 'customer'
+                      ? 'Carregue o seu logo em PDF, PNG ou JPG e veja a simulação.'
+                      : t(item.description)}
+                  </p>
                 </label>
               ))}
             </div>
-            {design !== 'standard' && (
+            {isLeather && (
+              <LeatherConfigurator
+                value={leather}
+                onChange={setLeather}
+                design={design}
+                signedIn={signedIn}
+                onBusy={setLeatherBusy}
+                dimensions={leatherDimensions}
+              />
+            )}
+            {(design === 'team' || (!isLeather && design === 'customer')) && (
               <label className="purchase-method">
                 Instruções para o design
                 <textarea
                   value={designInstructions}
                   onChange={(e) => setDesignInstructions(e.target.value)}
                   maxLength={2000}
-                  placeholder="Nome, cores e informações a incluir"
+
+                  placeholder="Descreva o logótipo, os textos e o estilo que pretende."
                 />
                 <small>
-                  Após o pedido, a equipa contacta-o para receber o PDF
-                  vectorial ou preparar o design. O editor online ainda não está
-                  disponível. A produção começa após a sua aprovação.
+                  A equipa revê as suas instruções e contacta-o para preparar o
+                  design. A produção começa após a sua aprovação.
                 </small>
               </label>
             )}
@@ -376,12 +418,26 @@ export function PurchaseConfigurator({
             />
             {t('A sua configuração')}
           </h2>
+          {isLeather && (
+            <p className="leather-summary">
+              Couro {leather.color === 'brown' ? 'castanho' : 'preto'} ·{' '}
+              {design === 'standard'
+                ? leather.logo === 'full'
+                  ? 'Logo completo'
+                  : 'Símbolo F'
+                : design === 'customer'
+                  ? 'O seu logótipo'
+                  : 'Design pela equipa'}
+            </p>
+          )}
           <div className="configuration-photos">
             {preview.map((material) => {
               const photo = photos.find((item) => item.material === material);
               return (
                 <figure key={material}>
-                  {photo ? (
+                  {isLeather && material === 'Couro' ? (
+                    <LeatherPreview value={leather} design={design} />
+                  ) : photo ? (
                     <SourceImage
                       src={photo.src}
                       alt={t(material)}
@@ -520,8 +576,13 @@ export function PurchaseConfigurator({
             </p>
           )}
           <PaySuiteCheckout
-            key={`${format}-${card}-${keychain}-${design}-${city}-${delivery}-${pickupPoint}-${total}`}
+            key={`${format}-${card}-${keychain}-${design}-${city}-${delivery}-${pickupPoint}-${total}-${isLeather ? JSON.stringify(leather) : ''}-${designInstructions}`}
+
             disabled={
+              (isLeather &&
+                (leatherBusy ||
+                  (design === 'customer' && !leather.assetId) ||
+                  (design === 'team' && !designInstructions.trim()))) ||
               !draftReady ||
               !signedIn ||
               !paymentAvailable ||
@@ -540,6 +601,9 @@ export function PurchaseConfigurator({
               contact,
               address,
               designInstructions,
+
+              ...(isLeather ? { leather } : {}),
+
               expectedAmount: total,
               pricingVersion: pricing?.version,
             }}

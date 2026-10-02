@@ -631,3 +631,23 @@ test('design image editing requires manager, validates safe sources and rejects 
  const foreign=request({...updated,version:1});foreign.headers.set('origin','https://other.example');assert.equal((await route.PUT(foreign)).status,422);
  assert.equal((await route.PUT(request({...row,version:1}))).status,200);
 });
+
+test('leather checkout preserves choices and validates ownership of uploaded logos',async(t)=>{
+ const f=fixture(t),checkout=await api('app/api/paysuite/checkout/route.ts');
+ const now=new Date().toISOString();
+ f.sql.prepare('INSERT INTO product_catalog(id,data_json,version,updated_by,updated_at) VALUES(?,?,1,?,?)').run('keychain-leather',JSON.stringify({amount:120000,published:true,available:true,availabilityConfigured:true,configurationPriceConfirmed:true}),'manager',now);
+ f.sql.prepare('INSERT INTO stock_movements(id,product_id,quantity,reason,actor,created_at) VALUES(?,?,100,?,?,?)').run('leather-test','keychain-leather','test','manager',now);
+ const leather={color:'black',logo:'symbol',page:1,scale:70,x:0,y:0};
+ const base={format:'keychain',keychain:'Couro',delivery:'pickup',city:'maputo',pickupPoint:'mahota',expectedAmount:120000,leather};
+ assert.equal((await checkout.POST(request(product({...base,leather:{...leather,color:'red'}})))).status,422);
+ assert.equal((await checkout.POST(request(product({...base,design:'customer',expectedAmount:135000})))).status,422);
+ assert.equal((await checkout.POST(request(product({...base,design:'team',expectedAmount:160000,designInstructions:''})))).status,422);
+ const assetId='abcd1234-1234-1234-1234-123456789abc';
+ globalThis.__paysuite.env.PROFILE_PHOTOS={head:async()=>({customMetadata:{ownerId:'other'},httpMetadata:{contentType:'image/png'}})};
+ const custom={...base,design:'customer',expectedAmount:135000,leather:{...leather,assetId,fileName:'logo.png',x:10,scale:60}};
+ assert.equal((await checkout.POST(request(product(custom)))).status,422);
+ globalThis.__paysuite.env.PROFILE_PHOTOS={head:async()=>({customMetadata:{ownerId:'buyer'},httpMetadata:{contentType:'image/png'}})};
+ const body=product(custom);assert.equal((await checkout.POST(request(body))).status,200);
+ const saved=JSON.parse(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders WHERE id=?').get(body.requestId).configuration_json);
+ assert.equal(saved.leather.assetId,assetId);assert.equal(saved.leather.color,'black');assert.equal(saved.leather.scale,60);assert.equal(saved.leather.x,10);assert.match(saved.leatherDimensions,/25 mm/);
+});

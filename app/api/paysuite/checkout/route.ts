@@ -1,3 +1,5 @@
+import { validateLeather } from '@/lib/leather-design';
+
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { profileBody, profileJSON as json } from '@/lib/profile-api';
@@ -156,7 +158,47 @@ export async function POST(request: Request) {
             : cleanText(b.address, 300, true);
       if (contact.length < 7 || address.length < 8)
         throw Error('Preencha o contacto e a morada de entrega.');
+
+      const leather =
+        quote.format !== 'card' && quote.keychain === 'Couro'
+          ? validateLeather(b.leather, String(quote.design))
+          : null;
+
+      if (leather?.assetId) {
+        const asset = await env.PROFILE_PHOTOS?.head(
+          `designs/${leather.assetId}`,
+        );
+
+        if (
+          !asset ||
+          asset.customMetadata?.ownerId !== user.userId ||
+          !['application/pdf', 'image/png', 'image/jpeg'].includes(
+            asset.httpMetadata?.contentType ?? '',
+          )
+        )
+          throw Error(
+            'O logótipo não está disponível para esta conta. Volte a carregá-lo.',
+          );
+      }
+
+      if (
+        leather &&
+        quote.design === 'team' &&
+        (typeof b.designInstructions !== 'string' ||
+          !b.designInstructions.trim())
+      )
+        throw Error('Descreva o design que pretende para a equipa.');
+
       const configuration = {
+        ...(leather
+          ? {
+              leather,
+              leatherDimensions:
+                products.find((p) => p.id === 'keychain-leather')?.dimensions ??
+                null,
+            }
+          : {}),
+
         ...quote,
         contact,
         address,

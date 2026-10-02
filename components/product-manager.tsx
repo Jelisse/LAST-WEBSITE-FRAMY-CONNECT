@@ -186,6 +186,19 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
         <p>{t('A carregar…')}</p>
       ) : draft ? (
         <form onSubmit={save} className="product-management-form">
+          {draft.id === 'keychain-leather' && (
+            <label>
+              Dimensões do porta-chaves de couro (mm)
+              <Input
+                value={draft.dimensions ?? ''}
+                maxLength={300}
+                placeholder="Altura × largura × espessura; área de gravação"
+                onChange={(e) =>
+                  setDraft({ ...draft, dimensions: e.target.value })
+                }
+              />
+            </label>
+          )}
           <div className="product-image-editor">
             <MediaUploadBox
               title={t('Adicionar fotografias')}

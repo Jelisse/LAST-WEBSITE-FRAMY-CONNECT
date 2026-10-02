@@ -79,6 +79,10 @@ export function validateProduct(input: unknown, existing: Product): Product {
     name: text('name', 90),
     tagline: text('tagline', 160),
     description: text('description', 2000),
+    dimensions:
+      typeof data.dimensions === 'string'
+        ? data.dimensions.trim().slice(0, 300)
+        : existing.dimensions,
     audience: text('audience', 60),
     category,
     amount: Number(amount),

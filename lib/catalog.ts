@@ -5,6 +5,7 @@ export type Product = {
   icon: string;
   tagline: string;
   description: string;
+  dimensions?: string;
   amount: number;
   cost: number;
   audience: string;
@@ -74,6 +75,7 @@ const seedProducts = [
   },
   {
     id: 'keychain-leather',
+    dimensions: 'Diâmetro: 25 mm · Espessura: 3 mm',
     name: 'Porta-chaves NFC em couro',
     category: 'Acessórios',
     icon: 'key',
