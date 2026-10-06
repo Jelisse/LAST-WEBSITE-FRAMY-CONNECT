@@ -165,9 +165,14 @@ function fixture(t) {
   globalThis.fetch = async (url, options) => {
     assert.ok(String(url).startsWith('https://paysuite.tech/api/v1/payments'));
     assert.equal(options.headers.Authorization, 'Bearer test-only-fake-token');
+    assert.equal(options.redirect, 'manual');
     if (options.method === 'POST') {
       creates++;
       const body = JSON.parse(options.body);
+      assert.equal(body.callback_url, 'https://framyconnect.co.mz/api/paysuite/webhook');
+      assert.equal(body.webhook_url, undefined);
+      // PaySuite only accepts letters and numbers in the reference.
+      assert.match(body.reference, /^[A-Za-z0-9]+$/);
       const id = '01H' + String(creates).padStart(23, '0');
       const record = {
         ...body,
@@ -216,7 +221,7 @@ function product(overrides = {}) {
     pricingVersion: 0,
     accepted: true,
     method: 'mpesa',
-    requestId: crypto.randomUUID(),
+    requestId: crypto.randomUUID().replaceAll('-', ''),
     ...overrides,
   };
 }
@@ -295,6 +300,23 @@ test('PaySuite product checkout -> hosted payment -> signed webhook -> paid is i
     ).status,
     404,
   );
+});
+test('references sent to PaySuite contain only letters and numbers', async (t) => {
+  const f = fixture(t);
+  const route = await api('app/api/paysuite/checkout/route.ts');
+  const body = product();
+  assert.match(body.requestId, /^[0-9a-f]{32}$/);
+  assert.equal((await route.POST(request(body))).status, 200);
+  // A hyphenated UUID reference is rejected before contacting the provider.
+  assert.equal(
+    (
+      await route.POST(
+        request(product({ requestId: crypto.randomUUID() })),
+      )
+    ).status,
+    422,
+  );
+  assert.equal(f.creates(), 1);
 });
 test('PaySuite rejects forged webhooks, changed amounts, unsupported delivery and out-of-stock checkout', async (t) => {
   const f = fixture(t);
@@ -380,7 +402,7 @@ test('annual and monthly subscription checkout waits for trial end and extends a
     expectedAmount: 100000,
     accepted: true,
     method: 'credit_card',
-    requestId: crypto.randomUUID(),
+    requestId: crypto.randomUUID().replaceAll('-', ''),
   };
   assert.equal((await route.POST(request(body))).status, 422);
   assert.equal(f.creates(), 0);
@@ -413,7 +435,7 @@ test('annual and monthly subscription checkout waits for trial end and extends a
   );
   const next = {
     ...body,
-    requestId: crypto.randomUUID(),
+    requestId: crypto.randomUUID().replaceAll('-', ''),
     cycle: 'monthly',
     expectedAmount: 10000,
   };
@@ -447,6 +469,54 @@ test('ambiguous provider timeout does not create another payment on retry', asyn
     f.sql.prepare('SELECT status FROM paysuite_payments').get().status,
     'creating',
   );
+});
+
+test('provider diagnostics classify rejection, timeout and malformed responses without leaking bodies', async () => {
+  const { paysuiteRequest, paymentDiagnostic } = await api('lib/paysuite.ts');
+  for (const [transport, expected] of [
+    [async () => new Response('secret-provider-body', { status: 401 }), { category: 'http', httpStatus: 401 }],
+    [async () => new Response(null, { status: 302, headers: { Location: 'https://other.example' } }), { category: 'http', httpStatus: 302 }],
+    [async () => { throw new DOMException('secret-network-details', 'TimeoutError'); }, { category: 'timeout', httpStatus: null }],
+    [async () => new Response('not-json'), { category: 'invalid_response', httpStatus: 200 }],
+  ]) {
+    await assert.rejects(() => paysuiteRequest('test-token', '/payments', {}, transport), error => {
+      assert.deepEqual(paymentDiagnostic(error), expected);
+      assert.doesNotMatch(JSON.stringify(paymentDiagnostic(error)) + error.message, /secret|test-token|not-json/);
+      return true;
+    });
+  }
+});
+
+test('pending order limit explains the blocker without contacting the provider again', async t => {
+  const f = fixture(t), route = await api('app/api/paysuite/checkout/route.ts');
+  for (let i = 0; i < 3; i++) assert.equal((await route.POST(request(product()))).status, 200);
+  const response = await route.POST(request(product()));
+  assert.equal(response.status, 409);
+  assert.match((await response.json()).error, /três encomendas pendentes/);
+  assert.equal(f.creates(), 3);
+});
+
+test('connection check is authenticated, read-only and does not expose provider bodies', async t => {
+  fixture(t);
+  const route = await api('app/api/paysuite/connection/route.ts');
+  const check = new Request('https://framyconnect.co.mz/api/paysuite/connection');
+  let calls=0;
+  globalThis.fetch = async (url, options) => {
+    calls++;
+    assert.match(url, /payments\/00000000-0000-0000-0000-000000000000$/);
+    assert.equal(options.method, 'GET');
+    assert.equal(options.redirect, 'manual');
+    return new Response('secret provider body', { status: 404 });
+  };
+  globalThis.__paysuite.user = null;
+  assert.equal((await route.GET(check)).status, 401);
+  assert.equal(calls, 0);
+  globalThis.__paysuite.user = {userId:'buyer',role:'customer'};
+  const response = await route.GET(check);
+  const body = await response.json();
+  assert.equal(body.providerHttpStatus, 404);
+  assert.equal(body.paymentCreated, false);
+  assert.doesNotMatch(JSON.stringify(body), /secret|token/);
 });
 test('only verified paid orders can be fulfilled and the customer sees the delivery state', async (t) => {
   const f = fixture(t), checkout = await api('app/api/paysuite/checkout/route.ts'), manager = await api('app/api/paysuite/manager/route.ts');
@@ -494,7 +564,7 @@ test('custom annual-only plan checks out and preserves effective terms when sche
  const f=fixture(t),route=await api('app/api/paysuite/checkout/route.ts');
  const plan={id:'plan-custom',name:'Custom',audience:'Creators',description:'Custom',active:true,meticais:150,annualMeticais:1500,links:12,bio:400,entitlementVersion:1,features:{whatsapp:false,location:false,showcase:true,enquiries:false,english:false,analytics:true,teams:false,domain:false},monthlyEnabled:false,annualEnabled:true};
  f.sql.prepare("INSERT INTO manager_records(id,kind,data_json,version,updated_at) VALUES(?,'plan',?,1,?)").run(plan.id,JSON.stringify(plan),new Date().toISOString());
- const base={kind:'subscription',planId:plan.id,planVersion:1,accepted:true,method:'credit_card',requestId:crypto.randomUUID(),cycle:'monthly',expectedAmount:15000};
+ const base={kind:'subscription',planId:plan.id,planVersion:1,accepted:true,method:'credit_card',requestId:crypto.randomUUID().replaceAll('-',''),cycle:'monthly',expectedAmount:15000};
  assert.equal((await route.POST(request(base))).status,422);
  const body={...base,cycle:'annual',expectedAmount:150000};assert.equal((await route.POST(request(body))).status,200);
  const [id,record]=[...f.records][0];record.status='paid';await notify(f,id);
@@ -502,7 +572,7 @@ test('custom annual-only plan checks out and preserves effective terms when sche
  // Model a previous scheduled change that has already become effective.
  const start=new Date(Date.now()-86400000).toISOString(),end=new Date(Date.now()+20*86400000).toISOString();
  f.sql.prepare("UPDATE sandbox_memberships SET plan_id='personal',terms_json='{}',next_plan_id=?,next_terms_json=?,next_starts_at=?,next_expires_at=?").run(plan.id,JSON.stringify(plan),start,end);
- assert.equal((await route.POST(request({...body,requestId:crypto.randomUUID()}))).status,200);
+ assert.equal((await route.POST(request({...body,requestId:crypto.randomUUID().replaceAll('-','')}))).status,200);
  const [nextId,nextRecord]=[...f.records][1];nextRecord.status='paid';await notify(f,nextId);
  const member=f.sql.prepare('SELECT * FROM profile_membership_view').get();assert.equal(member.plan_id,plan.id);assert.equal(JSON.parse(member.terms_json).features.analytics,true);assert.equal(member.paid_expires_at,end);assert.ok(member.next_starts_at>=end);
 });
@@ -662,4 +732,25 @@ test('PVC model selection is validated and snapshotted for fulfilment', async t 
    assert.equal(saved.pvcModel.id,id);
    assert.ok(saved.pvcModel.name);
  }
+});
+
+for (const [format, amount, fields] of [
+  ['card', 110000, ['cardArtwork']],
+  ['keychain', 65000, ['pvcArtwork']],
+  ['kit', 150000, ['cardArtwork', 'pvcArtwork']],
+]) test(`custom ${format} artwork requires owned uploads and retains production transforms`, async t => {
+  const f = fixture(t), checkout = await api('app/api/paysuite/checkout/route.ts');
+  const artwork = { color:'brown', logo:'full', page:2, scale:60, x:10, y:-5, assetId:'abcd1234-1234-1234-1234-123456789abc', fileName:'design.pdf' };
+  const input = { format, design:'customer', expectedAmount:amount, delivery:'pickup', pickupPoint:'mahota' };
+  assert.equal((await checkout.POST(request(product(input)))).status,422);
+  for (const field of fields) input[field] = artwork;
+  f.env.PROFILE_PHOTOS = { head:async () => ({customMetadata:{ownerId:'other'},httpMetadata:{contentType:'application/pdf'}}) };
+  assert.equal((await checkout.POST(request(product(input)))).status,422);
+  assert.equal(f.creates(),0);
+  f.env.PROFILE_PHOTOS = { head:async () => ({customMetadata:{ownerId:'buyer'},httpMetadata:{contentType:'application/pdf'}}) };
+  const body = product(input);
+  const result = await checkout.POST(request(body));
+  assert.equal(result.status,200,JSON.stringify(await result.json()));
+  const saved = JSON.parse(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders WHERE id=?').get(body.requestId).configuration_json);
+  for (const field of fields) assert.deepEqual(saved[field],artwork);
 });

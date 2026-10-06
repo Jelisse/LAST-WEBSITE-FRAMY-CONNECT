@@ -11,7 +11,7 @@ import {
   configurationQuote,
   type CheckoutPricing,
 } from '@/lib/checkout-pricing';
-import { paymentMethod } from '@/lib/paysuite';
+import { paymentMethod, paymentDiagnostic } from '@/lib/paysuite';
 import {
   paysuiteReady,
   launchPayment,
@@ -111,8 +111,9 @@ export async function POST(request: Request) {
     return json({ error: 'Aguarde antes de tentar novamente.' }, 429);
   try {
     const b = await profileBody(request);
-    const id = cleanText(b.requestId, 36, true);
-    if (!/^[0-9a-f-]{36}$/.test(id) || b.accepted !== true)
+    const id = cleanText(b.requestId, 32, true);
+    // PaySuite rejects references containing anything but letters and numbers.
+    if (!/^[0-9a-f]{32}$/.test(id) || b.accepted !== true)
       throw Error('Confirme o valor e as condições de pagamento.');
     const previous = await env.DB.prepare(
       'SELECT * FROM paysuite_payments WHERE id=?',
@@ -135,6 +136,10 @@ export async function POST(request: Request) {
     let cycle: 'once' | 'monthly' | 'annual';
     const kind = b.kind;
     if (kind === 'product') {
+      const pending = await env.DB.prepare("SELECT COUNT(*) AS total FROM paysuite_product_orders WHERE owner_id=? AND status='pending'")
+        .bind(user.userId).first<{ total: number }>();
+      if ((pending?.total ?? 0) >= 3)
+        return json({ error: 'Tem três encomendas pendentes. Consulte os seus pagamentos antes de criar outra encomenda.' }, 409);
       const settings = await env.DB.prepare(
         'SELECT * FROM checkout_pricing WHERE id=1',
       ).first<CheckoutPricing>();
@@ -165,9 +170,12 @@ export async function POST(request: Request) {
           ? validateLeather(b.leather, String(quote.design))
           : null;
 
-      if (leather?.assetId) {
+      const cardArtwork = quote.design === 'customer' && quote.format !== 'keychain' ? validateLeather(b.cardArtwork, 'customer') : null;
+      const pvcArtwork = quote.design === 'customer' && quote.format !== 'card' && quote.keychain === 'PVC + epóxi' ? validateLeather(b.pvcArtwork, 'customer') : null;
+      for (const artwork of [leather, cardArtwork, pvcArtwork]) {
+        if (!artwork?.assetId) continue;
         const asset = await env.PROFILE_PHOTOS?.head(
-          `designs/${leather.assetId}`,
+          `designs/${artwork.assetId}`,
         );
 
         if (
@@ -183,7 +191,6 @@ export async function POST(request: Request) {
       }
 
       if (
-        leather &&
         quote.design === 'team' &&
         (typeof b.designInstructions !== 'string' ||
           !b.designInstructions.trim())
@@ -197,6 +204,8 @@ export async function POST(request: Request) {
           ? pvcModel(b.pvcModel)
           : null;
       const configuration = {
+        ...(cardArtwork ? { cardArtwork } : {}),
+        ...(pvcArtwork ? { pvcArtwork } : {}),
         ...(selectedPvc ? { pvcModel: selectedPvc } : {}),
         ...(leather
           ? {
@@ -321,13 +330,15 @@ export async function POST(request: Request) {
         url: await launchPayment(env, payment),
         status: 'pending',
       });
-    } catch {
+    } catch (error) {
+      // Never log provider bodies, credentials, payer details or request payloads.
+      console.warn(JSON.stringify({ event: 'paysuite_checkout_failed', paymentReference: id, timestamp: new Date().toISOString(), ...paymentDiagnostic(error) }));
       return json(
         {
           paymentId: id,
           status: 'creating',
           message:
-            'Pedido registado. Estamos a confirmar a ligação ao prestador; não repita o pagamento.',
+            'Não foi possível abrir o pagamento. O pedido está registado para verificação; ainda não foi confirmado nenhum pagamento. Não crie outro pedido.',
         },
         202,
       );

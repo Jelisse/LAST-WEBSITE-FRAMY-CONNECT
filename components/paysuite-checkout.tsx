@@ -2,13 +2,16 @@
 import { useI18n } from '@/components/language-provider';
 import Link from '@/components/hard-link';
 import { useRef, useState } from 'react';
+import { checkoutURL } from '@/lib/paysuite';
 
 export function PaySuiteCheckout({
   payload,
   disabled = false,
+  compact = false,
 }: {
   payload: Record<string, unknown>;
   disabled?: boolean;
+  compact?: boolean;
 }) {
   const { t } = useI18n();
   const [busy, setBusy] = useState(false),
@@ -23,7 +26,8 @@ export function PaySuiteCheckout({
     inFlight.current = true;
     setBusy(true);
     setError('');
-    requestId.current ??= crypto.randomUUID();
+    // PaySuite only accepts letters and numbers in the reference.
+    requestId.current ??= crypto.randomUUID().replaceAll('-', '');
     try {
       const response = await fetch('/api/paysuite/checkout', {
         method: 'POST',
@@ -38,6 +42,8 @@ export function PaySuiteCheckout({
       const data = (await response.json()) as {
         error?: string;
         paymentId: string;
+        status?: string;
+        url?: string | null;
       };
       if (response.status === 401) {
         location.assign(
@@ -50,7 +56,11 @@ export function PaySuiteCheckout({
         requestId.current = null;
         throw Error(data.error || 'Não foi possível iniciar o pagamento.');
       }
-      // Always use our status page first. It obtains the URL from the authenticated server ledger.
+      if (data.status === 'pending' && data.url) {
+        location.assign(checkoutURL(data.url));
+        return;
+      }
+      // Uncertain creation remains attached to the same reference; never create a replacement automatically.
       location.assign(
         '/checkout/retorno?payment=' + encodeURIComponent(data.paymentId),
       );
@@ -81,7 +91,7 @@ export function PaySuiteCheckout({
       </label>
       <p>
         {t(
-          ' O pagamento é concluído na página segura da PaySuite. Não guardamos dados do cartão nem PINs. ',
+          compact ? 'Pagamento seguro na PaySuite. Não guardamos PINs nem dados do cartão.' : ' O pagamento é concluído na página segura da PaySuite. Não guardamos dados do cartão nem PINs. ',
         )}
       </p>
       <label className="growth-check">
@@ -93,7 +103,7 @@ export function PaySuiteCheckout({
           disabled={busy || disabled}
         />
         {t(
-          ' Confirmo o total apresentado. Este pagamento não autoriza débitos automáticos. ',
+          compact ? 'Confirmo o total. Sem débitos automáticos.' : ' Confirmo o total apresentado. Este pagamento não autoriza débitos automáticos. ',
         )}
       </label>
       {error && <p role="alert">{t(error)}</p>}
@@ -101,7 +111,7 @@ export function PaySuiteCheckout({
         className="btn btn-primary"
         disabled={busy || disabled || !accepted}
       >
-        {t(busy ? 'A preparar pagamento…' : 'Continuar para pagamento')}
+        {t(busy ? 'A preparar pagamento…' : compact ? 'Pagar' : 'Continuar para pagamento')}
       </button>
       <p>
         <Link href="/checkout/retorno">
