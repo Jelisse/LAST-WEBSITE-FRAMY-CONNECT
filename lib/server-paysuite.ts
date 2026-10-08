@@ -43,7 +43,7 @@ export async function launchPayment(
         ? 'Framy Connect - produtos'
         : 'Framy Connect - perfil digital',
     return_url: `${env.PUBLIC_SITE_URL}/checkout/retorno?payment=${payment.id}`,
-    webhook_url: `${env.PUBLIC_SITE_URL}/api/paysuite/webhook`,
+    callback_url: `${env.PUBLIC_SITE_URL}/api/paysuite/webhook`,
   });
   if (
     typeof data.id !== 'string' ||
@@ -98,21 +98,7 @@ export async function reconcilePayment(
     }
     await settlePayment(env.DB, payment, providerId);
   } else if (data.status === 'failed' || data.status === 'cancelled') {
-    await env.DB.batch([
-      env.DB.prepare(
-        "UPDATE paysuite_payments SET status='failed',updated_at=? WHERE id=? AND status IN ('creating','pending')",
-      ).bind(new Date().toISOString(), payment.id),
-      payment.kind === 'product'
-        ? env.DB.prepare(
-            "UPDATE paysuite_product_orders SET status='failed' WHERE id=? AND status='pending' AND EXISTS(SELECT 1 FROM paysuite_payments WHERE id=? AND status='failed')",
-          ).bind(payment.target_id, payment.id)
-        : env.DB.prepare(
-            "UPDATE profile_invoices SET status='cancelled' WHERE id=? AND status='pending' AND EXISTS(SELECT 1 FROM paysuite_payments WHERE id=? AND status='failed')",
-          ).bind(payment.target_id, payment.id),
-      env.DB.prepare(
-        "UPDATE paysuite_stock_reservations SET released=1 WHERE order_id=? AND EXISTS(SELECT 1 FROM paysuite_payments WHERE id=? AND kind='product' AND status='failed')",
-      ).bind(payment.target_id, payment.id),
-    ]);
+    await failGatewayPayment(env.DB, payment);
   }
   const finalStatus = (await env.DB.prepare(
     'SELECT status FROM paysuite_payments WHERE id=?',
@@ -127,6 +113,51 @@ export async function reconcilePayment(
     }
   }
   return finalStatus;
+}
+export async function failGatewayPayment(
+  db: D1Database,
+  payment: GatewayPayment,
+) {
+  const now = new Date().toISOString();
+  await db.batch([
+    db
+      .prepare(
+        "UPDATE paysuite_payments SET status='failed',updated_at=? WHERE id=? AND status IN ('creating','pending')",
+      )
+      .bind(now, payment.id),
+    payment.kind === 'product'
+      ? db
+          .prepare(
+            "UPDATE paysuite_product_orders SET status='failed' WHERE id=? AND status='pending' AND EXISTS(SELECT 1 FROM paysuite_payments WHERE id=? AND status='failed')",
+          )
+          .bind(payment.target_id, payment.id)
+      : db
+          .prepare(
+            "UPDATE profile_invoices SET status='cancelled' WHERE id=? AND status='pending' AND EXISTS(SELECT 1 FROM paysuite_payments WHERE id=? AND status='failed')",
+          )
+          .bind(payment.target_id, payment.id),
+    db
+      .prepare(
+        "UPDATE paysuite_stock_reservations SET released=1 WHERE order_id=? AND EXISTS(SELECT 1 FROM paysuite_payments WHERE id=? AND kind='product' AND status='failed')",
+      )
+      .bind(payment.target_id, payment.id),
+  ]);
+}
+// Abandoned checkouts must not reserve stock or block the pending-order limit
+// forever. Staleness uses created_at: reconciliation keeps touching updated_at.
+// A launch that never reached the provider ('creating') has no charge to lose.
+export async function expireStaleProductPayments(db: D1Database, now = Date.now()) {
+  const stale = await db
+    .prepare(
+      "SELECT * FROM paysuite_payments WHERE kind='product' AND ((status='creating' AND created_at<=?) OR (status='pending' AND created_at<=?)) ORDER BY created_at LIMIT 25",
+    )
+    .bind(
+      new Date(now - 3600000).toISOString(),
+      new Date(now - 86400000).toISOString(),
+    )
+    .all<GatewayPayment>();
+  for (const payment of stale.results) await failGatewayPayment(db, payment);
+  return stale.results.length;
 }
 export async function settlePayment(
   db: D1Database,

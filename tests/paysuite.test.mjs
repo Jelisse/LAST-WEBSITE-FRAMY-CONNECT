@@ -496,6 +496,70 @@ test('pending order limit explains the blocker without contacting the provider a
   assert.equal(f.creates(), 3);
 });
 
+test('stale product payments expire, release stock and free the pending-order limit', async (t) => {
+  const f = fixture(t),
+    route = await api('app/api/paysuite/checkout/route.ts');
+  const { expireStaleProductPayments } = await api('lib/server-paysuite.ts');
+  for (let i = 0; i < 3; i++)
+    assert.equal((await route.POST(request(product()))).status, 200);
+  assert.equal((await route.POST(request(product()))).status, 409);
+  // Recent attempts are never expired.
+  assert.equal(await expireStaleProductPayments(f.db), 0);
+  const dayAhead = Date.now() + 25 * 3600000;
+  assert.equal(await expireStaleProductPayments(f.db, dayAhead), 3);
+  assert.equal(
+    f.sql
+      .prepare("SELECT COUNT(*) n FROM paysuite_payments WHERE status='failed'")
+      .get().n,
+    3,
+  );
+  assert.equal(
+    f.sql
+      .prepare(
+        "SELECT COUNT(*) n FROM paysuite_product_orders WHERE status='failed'",
+      )
+      .get().n,
+    3,
+  );
+  assert.equal(
+    f.sql
+      .prepare(
+        'SELECT COUNT(*) n FROM paysuite_stock_reservations WHERE released=1',
+      )
+      .get().n,
+    6,
+  );
+  // Expiry is idempotent and the customer can order again.
+  assert.equal(await expireStaleProductPayments(f.db, dayAhead), 0);
+  assert.equal((await route.POST(request(product()))).status, 200);
+  // A launch that never reached the provider expires after one hour.
+  const transport = globalThis.fetch;
+  globalThis.fetch = async () => {
+    throw Error('timeout');
+  };
+  const stuck = product();
+  assert.equal((await route.POST(request(stuck))).status, 202);
+  globalThis.fetch = transport;
+  assert.equal(
+    await expireStaleProductPayments(f.db, Date.now() + 3600001),
+    1,
+  );
+  assert.equal(
+    f.sql
+      .prepare('SELECT status FROM paysuite_payments WHERE id=?')
+      .get(stuck.requestId).status,
+    'failed',
+  );
+  assert.equal(
+    f.sql
+      .prepare(
+        "SELECT COUNT(*) n FROM paysuite_stock_reservations WHERE released=1",
+      )
+      .get().n,
+    8,
+  );
+});
+
 test('connection check is authenticated, read-only and does not expose provider bodies', async t => {
   fixture(t);
   const route = await api('app/api/paysuite/connection/route.ts');

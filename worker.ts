@@ -6,7 +6,11 @@ import handler from 'vinext/server/fetch-handler';
 import { securityHeaders } from './lib/security-headers';
 import { localizedResponse } from './lib/localized-response';
 import { cleanupReservations } from './lib/reservation-cleanup';
-import { reconcilePayment, type GatewayPayment } from './lib/server-paysuite';
+import {
+  reconcilePayment,
+  expireStaleProductPayments,
+  type GatewayPayment,
+} from './lib/server-paysuite';
 const worker = {
   async scheduled(
     _controller: ScheduledController,
@@ -14,6 +18,7 @@ const worker = {
     ctx: ExecutionContext,
   ) {
     ctx.waitUntil(cleanupReservations(env.DB));
+    ctx.waitUntil(expireStaleProductPayments(env.DB));
     if (env.PAYSUITE_API_TOKEN)
       ctx.waitUntil(
         (async () => {
