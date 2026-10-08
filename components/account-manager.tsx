@@ -19,6 +19,7 @@ export function AccountManager() {
   const [search, setSearch] = useState('');
   const [recovery, setRecovery] = useState<Account | null>(null);
   const [notice, setNotice] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   useEffect(() => {
     if (recovery) recoveryHeading.current?.focus();
   }, [recovery]);
@@ -39,6 +40,7 @@ export function AccountManager() {
     );
     const d = (await r.json()) as NonNullable<typeof data> & { error?: string };
     if (!r.ok) throw Error(d.error);
+    setConfirmDelete(null);
     setData(d);
   }, [search]);
   useEffect(() => {
@@ -364,6 +366,30 @@ export function AccountManager() {
                           {t('Novo convite / recuperar acesso')}
                         </button>
                       )}
+                      <button
+                        disabled={busy}
+                        onClick={() => {
+                          if (confirmDelete !== a.id) {
+                            setConfirmDelete(a.id);
+                            setError('');
+                            setNotice('');
+                            return;
+                          }
+                          setConfirmDelete(null);
+                          void save({
+                            action: 'delete',
+                            id: a.id,
+                            version: a.version,
+                          }).then((ok) => {
+                            if (ok)
+                              setNotice('Conta eliminada permanentemente.');
+                          });
+                        }}
+                      >
+                        {confirmDelete === a.id
+                          ? t('Confirmar eliminação definitiva')
+                          : t('Eliminar')}
+                      </button>
                     </>
                   )}
                 </td>

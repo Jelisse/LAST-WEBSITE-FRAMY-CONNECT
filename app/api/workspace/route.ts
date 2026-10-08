@@ -387,15 +387,41 @@ export async function POST(request: Request) {
         }
       }
       if (body.action === 'publish-profile') {
-        const trial = await db
+        let trial = await db
           .prepare('SELECT * FROM profile_membership_view WHERE owner_id=?')
           .bind(user.userId)
           .first<import('@/lib/entitlement').Membership>();
+        if (!trial) {
+          // A first publish starts the 30-day free period automatically, so
+          // the profile link appears without a separate plan-activation step.
+          const plan = (await getManagedPlans()).find(
+            (p) => p.id === FREE_PLAN_ID && p.active,
+          );
+          if (plan) {
+            await db
+              .prepare(
+                'INSERT OR IGNORE INTO sandbox_memberships (owner_id,plan_id,version,updated_at,terms_json,trial_started_at,trial_expires_at) VALUES(?,?,1,?,?,?,?)',
+              )
+              .bind(
+                user.userId,
+                plan.id,
+                now,
+                JSON.stringify(plan),
+                now,
+                new Date(Date.parse(now) + 30 * 86400000).toISOString(),
+              )
+              .run();
+            trial = await db
+              .prepare('SELECT * FROM profile_membership_view WHERE owner_id=?')
+              .bind(user.userId)
+              .first<import('@/lib/entitlement').Membership>();
+          }
+        }
         if (!hasProfileAccess(trial))
           return json(
             {
               error:
-                'Active os 30 dias gratuitos antes de publicar. Se o período terminou, contacte a equipa.',
+                'O período gratuito terminou. Contacte a equipa para continuar.',
             },
             403,
           );

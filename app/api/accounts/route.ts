@@ -148,6 +148,158 @@ export async function POST(request: Request) {
         expiresAt: new Date(expires).toISOString(),
       });
     }
+    if (b.action === 'delete') {
+      if (typeof b.id !== 'string' || !Number.isSafeInteger(b.version))
+        return json({ error: 'Pedido inválido.' }, 422);
+      const row = await db
+        .prepare(
+          'SELECT id,name,email,role,active,version FROM auth_accounts WHERE id=?',
+        )
+        .bind(b.id)
+        .first<Row>();
+      if (!row) return json({ error: 'Conta não encontrada.' }, 404);
+      if (!mayChangeAccount({ id: user.userId, role: user.role }, row, row.role))
+        return json(
+          {
+            error:
+              'Não pode eliminar a sua conta ou este nível de acesso.',
+          },
+          403,
+        );
+      // Financial and operational history is never destroyed; deactivate instead.
+      const kept = await db
+        .prepare(
+          `SELECT EXISTS(SELECT 1 FROM paysuite_product_orders WHERE owner_id=?)
+          OR EXISTS(SELECT 1 FROM paysuite_payments WHERE owner_id=?)
+          OR EXISTS(SELECT 1 FROM profile_invoices WHERE owner_id=? OR confirmed_by=?)
+          OR EXISTS(SELECT 1 FROM payment_records WHERE verified_by=?)
+          OR EXISTS(SELECT 1 FROM manager_audit WHERE actor=?)
+          OR EXISTS(SELECT 1 FROM finance_entries WHERE actor=?)
+          OR EXISTS(SELECT 1 FROM plan_revisions WHERE actor=?)
+          OR EXISTS(SELECT 1 FROM finance_period_locks WHERE actor=?)
+          OR EXISTS(SELECT 1 FROM finance_documents WHERE updated_by=?)
+          OR EXISTS(SELECT 1 FROM manager_preferences WHERE updated_by=?)
+          OR EXISTS(SELECT 1 FROM profile_receipts WHERE actor=?)
+          OR EXISTS(SELECT 1 FROM auth_recovery WHERE created_by=?)
+          OR EXISTS(SELECT 1 FROM auth_invitations WHERE created_by=?) AS kept`,
+        )
+        .bind(
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+        )
+        .first<{ kept: number }>();
+      if (kept?.kept)
+        return json(
+          {
+            error:
+              'A conta tem historial financeiro ou operacional. Desactive-a em vez de a eliminar.',
+          },
+          422,
+        );
+      // The audit marker gates every delete: a stale version makes them all
+      // no-ops, so a conflict never leaves partial data behind.
+      const eventId = crypto.randomUUID(),
+        gate = ' AND EXISTS(SELECT 1 FROM manager_audit WHERE id=?)';
+      const statements = [
+        db
+          .prepare(
+            'INSERT INTO manager_audit(id,actor,action,subject,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM auth_accounts WHERE id=? AND version=?)',
+          )
+          .bind(
+            eventId,
+            user.userId,
+            'Conta eliminada permanentemente',
+            row.name + ' · ' + row.email,
+            now,
+            row.id,
+            b.version,
+          ),
+        db
+          .prepare(
+            'DELETE FROM profile_team_invites WHERE team_id IN (SELECT id FROM profile_teams WHERE owner_id=?)' +
+              gate,
+          )
+          .bind(row.id, eventId),
+        db
+          .prepare(
+            'DELETE FROM profile_team_members WHERE (account_id=? OR team_id IN (SELECT id FROM profile_teams WHERE owner_id=?))' +
+              gate,
+          )
+          .bind(row.id, row.id, eventId),
+        db
+          .prepare('DELETE FROM profile_teams WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM profile_domains WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM profile_engagement WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM profile_enquiries WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM profile_notices WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM profile_connections WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM agent_applications WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM stored_assets WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM sandbox_events WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM sandbox_orders WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM sandbox_memberships WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM profiles WHERE owner_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM auth_sessions WHERE account_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM auth_invitations WHERE account_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM auth_recovery WHERE account_id=?' + gate)
+          .bind(row.id, eventId),
+        db
+          .prepare(
+            "DELETE FROM manager_records WHERE id=? AND kind='agent'" + gate,
+          )
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM auth_accounts WHERE id=?' + gate)
+          .bind(row.id, eventId),
+      ];
+      const result = await db.batch(statements);
+      if (!result[0].meta.changes)
+        return json(
+          { error: 'A conta mudou. Actualize antes de eliminar.' },
+          409,
+        );
+      return json({ ok: true });
+    }
     if (
       !['update', 'invite'].includes(b.action) ||
       typeof b.id !== 'string' ||

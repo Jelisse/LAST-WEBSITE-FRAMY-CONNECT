@@ -724,23 +724,48 @@ test('manager edits store meticais without reconverting saved plan prices', asyn
   );
   sql.close();
 });
-test('launch: publication requires a valid trial, checkout is atomic, retries are safe, costs stay private', async () => {
+test('launch: a first publication auto-starts the trial, checkout is atomic, retries are safe, costs stay private', async () => {
   const sql = fixture(),
     workspace = await api('app/api/workspace/route.ts');
+  // Publishing without a plan starts the 30-day free period automatically.
   assert.equal(
     (await post(workspace, { action: 'publish-profile', version: 0, profile }))
       .status,
-    403,
+    200,
   );
-  const body = await checkoutFixture(workspace);
+  const autoTrial = sql
+    .prepare(
+      "SELECT plan_id,trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id='customer-a'",
+    )
+    .get();
+  assert.equal(autoTrial.plan_id, 'free-30');
   assert.equal(
+    (Date.parse(autoTrial.trial_expires_at) -
+      Date.parse(autoTrial.trial_started_at)) /
+      86400000,
+    30,
+  );
+  assert.ok(
     sql
       .prepare(
         "SELECT published_json FROM profiles WHERE owner_id='customer-a'",
       )
       .get().published_json,
-    null,
   );
+  const body = {
+    action: 'submit-order',
+    checkout: true,
+    approveProfile: true,
+    id: crypto.randomUUID(),
+    productId: 'keychain',
+    planId: 'free-30',
+    planVersion: 0,
+    profileVersion: 1,
+    design: { optionId: 'tiktok' },
+    deliveryCity: 'Maputo',
+    deliveryAddress: 'Bairro Central',
+    deliveryContact: '+258840000000',
+  };
   const result = await post(workspace, body);
   assert.equal(result.status, 200, JSON.stringify(result));
   assert.equal(result.body.order.paid, false);
@@ -954,6 +979,85 @@ test('launch: staff invitations create linked accounts, activate once, enforce r
       })
     ).status,
     409,
+  );
+  sql.close();
+});
+test('managers permanently delete only unused accounts; financial history blocks deletion', async () => {
+  const sql = fixture(),
+    accounts = await api('app/api/accounts/route.ts');
+  assert.equal(
+    (await post(accounts, { action: 'delete', id: 'customer-b', version: 1 }))
+      .status,
+    403,
+  );
+  globalThis.__launch.user = { userId: 'manager-a', role: 'manager' };
+  assert.equal(
+    (await post(accounts, { action: 'delete', id: 'manager-a', version: 1 }))
+      .status,
+    403,
+  );
+  sql
+    .prepare(
+      "INSERT INTO profiles(owner_id,username,draft_json,version,updated_at) VALUES('customer-b','gone-user','{}',1,?)",
+    )
+    .run(new Date().toISOString());
+  sql
+    .prepare(
+      "INSERT INTO sandbox_memberships(owner_id,plan_id,version,updated_at) VALUES('customer-b','free-30',1,?)",
+    )
+    .run(new Date().toISOString());
+  sql
+    .prepare('INSERT INTO auth_sessions VALUES(?,?,?)')
+    .run('gone-token', 'customer-b', Date.now() + 999999);
+  // A stale version aborts the whole deletion without touching any data.
+  assert.equal(
+    (await post(accounts, { action: 'delete', id: 'customer-b', version: 0 }))
+      .status,
+    409,
+  );
+  assert.ok(
+    sql
+      .prepare("SELECT owner_id FROM profiles WHERE owner_id='customer-b'")
+      .get(),
+  );
+  const gone = await post(accounts, {
+    action: 'delete',
+    id: 'customer-b',
+    version: 1,
+  });
+  assert.equal(gone.status, 200, JSON.stringify(gone));
+  for (const [table, column] of [
+    ['auth_accounts', 'id'],
+    ['profiles', 'owner_id'],
+    ['sandbox_memberships', 'owner_id'],
+    ['auth_sessions', 'account_id'],
+  ])
+    assert.equal(
+      sql
+        .prepare(`SELECT COUNT(*) n FROM ${table} WHERE ${column}='customer-b'`)
+        .get().n,
+      0,
+      table,
+    );
+  const audit = sql
+    .prepare(
+      "SELECT subject FROM manager_audit WHERE actor='manager-a' AND action='Conta eliminada permanentemente'",
+    )
+    .get();
+  assert.ok(audit.subject.includes('customer-b@example.com'));
+  // Financial history is never destroyed: deactivate instead.
+  sql
+    .prepare(
+      "INSERT INTO profile_invoices(id,owner_id,plan_id,terms_json,instructions,amount,status,created_at,expires_at) VALUES('inv-1','customer-a','personal','{}','{}',1000,'confirmed',?,?)",
+    )
+    .run(new Date().toISOString(), new Date().toISOString());
+  assert.equal(
+    (await post(accounts, { action: 'delete', id: 'customer-a', version: 1 }))
+      .status,
+    422,
+  );
+  assert.ok(
+    sql.prepare("SELECT id FROM auth_accounts WHERE id='customer-a'").get(),
   );
   sql.close();
 });
@@ -1257,6 +1361,10 @@ test('profile engagement requires consent, published access and valid actions; r
     assert.equal(report.summary.views, 1);
     assert.equal(report.summary.actions, 1);
     assert.equal(report.actions[0].label, 'WhatsApp');
+    assert.equal(report.summary.connections, 1);
+    const publicConnections = await api('app/api/profile-connections/[username]/route.ts');
+    const publicReport = await publicConnections.GET(new Request(origin + '/api/profile-connections/' + profile.username), { params: Promise.resolve({ username: profile.username }) });
+    assert.deepEqual(await publicReport.json(), { connections: 1, period: 'lifetime' });
     assert.equal(JSON.stringify(report).includes(payload.session), false);
     assert.equal(
       (
@@ -1267,6 +1375,7 @@ test('profile engagement requires consent, published access and valid actions; r
       422,
     );
     await post(workspace, { action: 'unpublish-profile', profile, version: 2 });
+    assert.equal((await publicConnections.GET(new Request(origin + '/api/profile-connections/' + profile.username), { params: Promise.resolve({ username: profile.username }) })).status, 404);
     globalThis.__launch.user = null;
     assert.equal(
       (

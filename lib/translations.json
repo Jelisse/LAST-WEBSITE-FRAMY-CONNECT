@@ -1,4 +1,43 @@
 {
+  "Pré-visualização em directo": ["Live preview", "即時預覽"],
+  "Mostrar": ["Show", "顯示"],
+  "Ocultar": ["Hide", "隱藏"],
+  "Ampliar": ["Expand", "放大"],
+  "Pré-visualização do perfil": ["Profile preview", "個人資料預覽"],
+  "Cor do contorno": ["Outline colour", "輪廓顏色"],
+  "Espessura do contorno": ["Outline thickness", "輪廓粗細"],
+  "Escolha zero para ocultar o contorno.": ["Choose zero to hide the outline.", "選擇零以隱藏輪廓。"],
+  "Forma da fotografia": ["Photo shape", "照片形狀"],
+  "Framy": ["Framy", "Framy"],
+  "Círculo": ["Circle", "圓形"],
+  "Quadrado arredondado": ["Rounded square", "圓角方形"],
+  "Fundo da fotografia": ["Photo background", "照片背景"],
+  "Cor sólida": ["Solid colour", "純色"],
+  "Ondas": ["Waves", "波浪"],
+  "Labirinto": ["Maze", "迷宮"],
+  "Traços": ["Hatching", "線條"],
+  "Anéis": ["Rings", "圓環"],
+  "Meios-tons": ["Halftone", "半色調"],
+  "Raios": ["Rays", "光芒"],
+  "Ziguezague": ["Zigzag", "鋸齒"],
+  "Folhas": ["Leaves", "葉子"],
+  "Fitas": ["Ribbons", "飄帶"],
+  "Losangos": ["Diamonds", "菱形"],
+  "Confetes": ["Sprinkles", "彩紙"],
+  "Pontos": ["Dots", "圓點"],
+  "Diagonais": ["Diagonal lines", "斜線"],
+  "Pétalas": ["Petals", "花瓣"],
+  "Dividido": ["Split", "分割"],
+  "Cor do padrão": ["Pattern colour", "圖案顏色"],
+  "Tamanho do padrão": ["Pattern size", "圖案大小"],
+  "Intensidade do padrão": ["Pattern intensity", "圖案強度"],
+  "Deixar a cabeça sair da forma": ["Let the head extend above the shape", "讓頭部延伸到形狀上方"],
+  "Intensidade da luz exterior": ["Outer glow intensity", "外部光暈強度"],
+  "Remova o fundo da fotografia para revelar o padrão atrás de si.": ["Remove the photo background to reveal the pattern behind you.", "移除照片背景以顯示您身後的圖案。"],
+  "Tem três encomendas pendentes. Consulte os seus pagamentos antes de criar outra encomenda.": ["You have three pending orders. View your payments before creating another order.", "您有三筆待處理訂單。建立另一筆訂單前，請先查看付款紀錄。"],
+  "Já existe um pedido pendente ou os dados mudaram. Consulte os seus pagamentos.": ["There is already a pending request or the details have changed. View your payments.", "已有待處理請求或資料已變更。請查看您的付款紀錄。"],
+  "Não foi possível abrir o pagamento": ["Could not open payment checkout", "無法開啟付款頁面"],
+  "Ainda não foi confirmado nenhum pagamento. O pedido está registado para verificação pela equipa. Não crie outro pedido enquanto verificamos a ligação ao prestador.": ["No payment has been confirmed yet. Your request is recorded for the team to review. Do not create another request while we check the provider connection.", "尚未確認任何付款。您的請求已登記供團隊查核。在我們檢查支付服務連線期間，請勿建立另一筆請求。"],
   "Produtos NFC": ["NFC products", "NFC 產品"],
   "Pague uma vez pelo produto. Active o seu perfil digital com um plano à parte.": ["Pay once for your product. Activate your digital profile with a separate plan.", "產品只需一次付款。另選方案啟用您的數位個人檔案。"],
   "Recomendado · Em stock, pronto para entrega": ["Recommended · In stock, ready to deliver", "推薦 · 現貨，可立即出貨"],
@@ -7,7 +46,7 @@
   "Subtotal dos produtos": ["Product subtotal", "商品小計"],
   "Rever encomenda": ["Review order", "查看訂單"],
   "Continuar para a entrega": ["Continue to delivery", "繼續選擇配送"],
-  "Levantamento": ["Pickup", "自取"],
+  "Levantamento": ["Collection", "自取"],
   "Escolher como receber": ["Choose how to receive", "選擇收貨方式"],
   "/ ano": [" / year", " / 年"],
   "MT / ano": ["MT / year", "MT / 年"],
@@ -783,9 +822,9 @@
     "Follow the result on this page. For questions or document deletion, contact",
     "請在此頁面查看結果。如有疑問或需要刪除文件，請聯絡"
   ],
-  "support@framyconnect.co.mz": [
-    "support@framyconnect.co.mz",
-    "support@framyconnect.co.mz"
+  "info@framyconnect.co.mz": [
+    "info@framyconnect.co.mz",
+    "info@framyconnect.co.mz"
   ],
   "Operações · Agente de execução": [
     "Operations · Fulfilment agent",
@@ -1914,10 +1953,6 @@
   "Torne-se agente": ["Become an agent", "成為代理員"],
   "Fale connosco": ["Contact us", "聯絡我們"],
   "Produtos e soluções": ["Products and solutions", "產品與解決方案"],
-  "info@framyconnect.co.mz": [
-    "info@framyconnect.co.mz",
-    "info@framyconnect.co.mz"
-  ],
   "Apoio ao cliente": ["Customer support", "客戶支援"],
   "Vamos conversar": ["Let's talk", "與我們聯絡"],
   "Conta e apoio": ["Account and support", "帳戶與支援"],
@@ -2222,10 +2257,7 @@
     "For product and solution information, contact info@framyconnect.co.mz. Your email app will send the message.",
     "產品與解決方案資訊請聯絡 info@framyconnect.co.mz。訊息將透過您的電子郵件應用程式傳送。"
   ],
-  "Para questões sobre o seu perfil, use support@framyconnect.co.mz. Indique a referência da encomenda ao contactar a equipa. O pagamento é confirmado após verificação no prestador.": [
-    "For profile questions, use support@framyconnect.co.mz. Include your order reference when contacting the team. Payment is confirmed after verification with the provider.",
-    "個人檔案問題請聯絡 support@framyconnect.co.mz，並提供訂單編號。付款須經付款服務商核實後才會確認。"
-  ],
+  "Para questões sobre o seu perfil, use info@framyconnect.co.mz. Indique a referência da encomenda ao contactar a equipa. O pagamento é confirmado após verificação no prestador.": ["For profile questions, use info@framyconnect.co.mz. Include your order reference when contacting the team. Payment is confirmed after verification with the provider.", "個人檔案問題請聯絡 info@framyconnect.co.mz，並提供訂單編號。付款須經付款服務商核實後才會確認。"],
   "Um toque mais simples.": ["A simpler tap.", "更簡單的輕觸體驗。"],
   "As respostas para começar a partilhar a sua identidade.": [
     "Answers to help you start sharing your identity.",
@@ -2294,10 +2326,7 @@
     "我們統計產品頁面瀏覽，包括「即將推出」產品，無須購買。隨機工作階段識別碼可避免同日重複計數；此統計不儲存 IP 位址。記錄新瀏覽時會刪除超過 90 天的紀錄。控制台顯示最近 30 天。"
   ],
   "Retirar um perfil": ["Removing a profile", "移除個人檔案"],
-  "Pode retirar a publicação no editor e terminar sessões em Segurança da conta. Para pedir correcção ou eliminação de dados e esclarecimentos sobre conservação, contacte support@framyconnect.co.mz. Os ficheiros carregados são conservados enquanto necessários ao perfil ou encomenda.": [
-    "You can unpublish in the editor and end sessions in Account security. For data correction or deletion and retention questions, contact support@framyconnect.co.mz. Uploaded files are kept for as long as needed for the profile or order.",
-    "您可在編輯器取消發佈，並於「帳戶安全」登出工作階段。如需更正或刪除資料，或詢問保留期限，請聯絡 support@framyconnect.co.mz。上傳檔案僅於檔案或訂單需要期間保留。"
-  ],
+  "Pode retirar a publicação no editor e terminar sessões em Segurança da conta. Para pedir correcção ou eliminação de dados e esclarecimentos sobre conservação, contacte info@framyconnect.co.mz. Os ficheiros carregados são conservados enquanto necessários ao perfil ou encomenda.": ["You can unpublish in the editor and end sessions in Account security. For data correction or deletion and retention questions, contact info@framyconnect.co.mz. Uploaded files are kept for as long as needed for the profile or order.", "您可在編輯器取消發佈，並於「帳戶安全」登出工作階段。如需更正或刪除資料，或詢問保留期限，請聯絡 info@framyconnect.co.mz。上傳檔案僅於檔案或訂單需要期間保留。"],
   "Antes de começar.": ["Before you begin.", "開始之前。"],
   "CONDIÇÕES DO SERVIÇO": ["SERVICE TERMS", "服務條款"],
   "Consulte as condições do perfil digital e confirme os detalhes da sua encomenda antes de efectuar o pagamento.": [
@@ -2316,10 +2345,7 @@
     "Delivery, cancellation and support",
     "配送、取消與支援"
   ],
-  "Confirme com a equipa o custo e prazo de entrega e as condições de cancelamento, personalização e devolução antes de pagar. Guarde a referência da encomenda e da transacção. Para apoio, contacte support@framyconnect.co.mz.": [
-    "Before paying, confirm delivery costs and timing, cancellation, customisation and return terms with the team. Keep your order and transaction references. For support, contact support@framyconnect.co.mz.",
-    "付款前請向團隊確認配送費用及時間、取消、自訂與退貨條件。請保留訂單及交易編號。需要協助請聯絡 support@framyconnect.co.mz。"
-  ],
+  "Confirme com a equipa o custo e prazo de entrega e as condições de cancelamento, personalização e devolução antes de pagar. Guarde a referência da encomenda e da transacção. Para apoio, contacte info@framyconnect.co.mz.": ["Before paying, confirm delivery costs and timing, cancellation, customisation and return terms with the team. Keep your order and transaction references. For support, contact info@framyconnect.co.mz.", "付款前請向團隊確認配送費用及時間、取消、自訂與退貨條件。請保留訂單及交易編號。需要協助請聯絡 info@framyconnect.co.mz。"],
   "Faça parte da próxima conexão.": [
     "Be part of the next connection.",
     "加入下一次連結。"
@@ -4501,10 +4527,7 @@
     "Design created by our team.",
     "由我們的團隊製作設計。"
   ],
-  "Envie o seu design em PDF vectorial à equipa após o pedido.": [
-    "Send your vector PDF design to the team after placing your order.",
-    "下單後，將向量 PDF 設計寄給團隊。"
-  ],
+  "Envie o seu design em PDF vectorial à equipa após o pedido.": ["Upload your design as PDF, PNG or JPG before checkout.", "結帳前以 PDF、PNG 或 JPG 上傳您的設計。"],
   "Por perfil": ["Per profile", "每個個人檔案"],
   "Catálogo, materiais, preços e stock dos produtos físicos.": [
     "Catalogue, materials, prices and stock for physical products.",
@@ -7251,5 +7274,56 @@
   "Pesquisar membros e convites": ["Search members and invitations", "搜尋成員及邀請"],
   "Nenhum resultado encontrado.": ["No results found.", "找不到結果。"],
   "Expira em": ["Expires on", "到期日"],
-  "Carregue o seu logo em PDF, PNG ou JPG e veja a simulação.": ["Upload your logo as PDF, PNG or JPG and view the preview.", "上傳 PDF、PNG 或 JPG 標誌並查看預覽。"]
+  "Conexões": ["Connections", "連結次數"],
+  "As conexões aparecem como um total público. Com a sua autorização, um identificador aleatório neste dispositivo evita contagens repetidas por até 90 dias.": ["Connections appear as a public total. With your permission, a random identifier on this device prevents repeat counting for up to 90 days.", "連結次數會以公開總數顯示。經您同意，本裝置上的隨機識別碼會在最多 90 天內避免重複計算。"],
+  "Cada perfil pode pedir consentimento para medir visitas e cliques. O titular recebe contagens agregadas, sem a identidade ou os contactos dos visitantes. O total público de conexões conta quem descarrega o contacto ou abre um link, uma vez por visitante medido nos últimos 90 dias. Com autorização, guardamos um identificador aleatório por perfil no dispositivo por até 90 dias para evitar repetições; é removido ao retirar a autorização. Pode recusar ou alterar a escolha no próprio perfil. Os eventos são conservados por até 90 dias.": ["Each profile may ask permission to measure visits and clicks. The owner receives aggregate counts without visitors’ identities or contact details. The public connection total counts visitors who download the contact or open a link, once per measured visitor over the last 90 days. With permission, we store a random identifier per profile on the device for up to 90 days to prevent repeat counting; withdrawing permission removes it. You can decline or change your choice on the profile. Events are retained for up to 90 days.", "每個個人檔案可要求同意量測瀏覽與點擊。擁有者只會收到彙總數字，不會取得訪客身分或聯絡資料。公開連結總數會計算下載聯絡資料或開啟連結的訪客，最近 90 天內每位接受量測的訪客只計算一次。經同意後，我們會在裝置上為每個個人檔案儲存隨機識別碼最多 90 天，避免重複計算；撤回同意時會移除此識別碼。您可拒絕或在個人檔案中變更選擇。事件最多保留 90 天。"],
+  "Após publicar": ["After publishing", "發佈後顯示"],
+  "Guardar contacto": ["Save contact", "儲存聯絡資料"],
+  "Pessoas que descarregaram o contacto ou abriram um link. Cada visitante medido conta uma vez nos últimos 90 dias.": ["People who downloaded the contact or opened a link. Each measured visitor counts once over the last 90 days.", "下載聯絡資料或開啟連結的人數。最近 90 天內，每位接受量測的訪客只計算一次。"],
+  "Use um retrato vertical. Remova o fundo para destacar a pessoa na forma do perfil.": ["Use a vertical portrait. Remove the background to place the person in the profile shape.", "請使用直向人像。移除背景，讓人物融入個人檔案的造型。"],
+  "Restaurar fotografia original": ["Restore original photo", "還原原始照片"],
+  "Pré-visualização sem fundo": ["Background-free preview", "去背預覽"],
+  "Confira os contornos antes de aplicar.": ["Check the edges before applying.", "套用前請檢查人物邊緣。"],
+  "Usar fotografia sem fundo": ["Use photo without background", "使用去背照片"],
+  "Tamanho da fotografia": ["Photo size", "照片大小"],
+  "Esta fotografia já tem fundo transparente": ["This photo already has a transparent background", "此照片已有透明背景"],
+  "A remoção do fundo acontece no seu dispositivo. A primeira utilização descarrega a ferramenta de retrato.": ["Background removal runs on your device. The portrait tool downloads on first use.", "去背會在您的裝置上執行。首次使用時會下載人像工具。"],
+  "A preparar a remoção do fundo…": ["Preparing background removal…", "正在準備去背…"],
+  "A carregar a ferramenta de retrato…": ["Loading the portrait tool…", "正在載入人像工具…"],
+  "A remover o fundo…": ["Removing the background…", "正在移除背景…"],
+  "Não foi possível abrir a fotografia.": ["Could not open the photo.", "無法開啟照片。"],
+  "A remoção demorou demasiado. Tente uma fotografia menor.": ["Background removal took too long. Try a smaller photo.", "去背時間過長，請嘗試較小的照片。"],
+  "Não foi possível remover o fundo. Pode carregar um PNG transparente.": ["Could not remove the background. You can upload a transparent PNG.", "無法移除背景。您可以上傳透明 PNG。"],
+  "Não foi possível remover o fundo neste navegador.": ["Could not remove the background in this browser.", "此瀏覽器無法執行去背。"],
+  "Contactos descarregados": ["Contact saves", "聯絡資料儲存次數"],
+  "Carregue o seu logo em PDF, PNG ou JPG e veja a simulação.": ["Upload your logo as PDF, PNG or JPG and view the preview.", "上傳 PDF、PNG 或 JPG 標誌並查看預覽。"],
+  "Cada perfil pode pedir consentimento para medir visitas e cliques. O titular recebe contagens agregadas, sem a identidade ou os contactos dos visitantes. O total público de conexões acumula contactos descarregados e links abertos desde o início da medição. Com autorização, guardamos um identificador aleatório por perfil no dispositivo por até 90 dias para evitar repetições; é removido ao retirar a autorização. Um resumo sem nomes, contactos, destinos ou datas, com identificadores convertidos em códigos por perfil, conserva a contagem acumulada. Os eventos detalhados são conservados por até 90 dias. Pode recusar ou alterar a escolha no próprio perfil.": ["Each profile may ask permission to count visits and clicks. The owner receives aggregates without visitor identities or contact details. The public connection total accumulates contact downloads and link interactions since measurement began. With permission, a random identifier per profile is stored on this device for up to 90 days to prevent repeats; withdrawal removes it. A summary without names, contact details, destinations or dates, using identifiers hashed per profile, preserves the accumulated count. Detailed events are retained for up to 90 days. You can decline or change your choice on the profile.", "每個個人檔案可要求同意計算瀏覽與點擊。擁有者只收到彙總資料，不包含訪客身分或聯絡資料。公開連結總數累積量測開始後的聯絡資料下載與連結互動。經同意後，本裝置會為每個個人檔案儲存隨機識別碼最多90天，以避免重複計算；撤回同意時會移除。沒有姓名、聯絡資料、目的地或日期的摘要，以每個檔案的雜湊識別碼保留累積總數。詳細事件最多保留90天。您可拒絕或在檔案中變更選擇。"],
+  "Cor interior da forma": ["Shape interior colour", "形狀內部顏色"],
+  "Cor da luz e sombra exterior": ["Outer glow and shadow colour", "外部光暈與陰影顏色"],
+  "Enquadramento horizontal": ["Horizontal framing", "水平構圖"],
+  "Enquadramento horizontal inválido.": ["Invalid horizontal framing.", "水平構圖無效。"],
+  "Seguinte": ["Next", "下一步"],
+  "O nosso WhatsApp": ["Our WhatsApp", "我們的 WhatsApp"],
+  "Personalize o produto": ["Personalise your product", "自訂您的產品"],
+  "Um toque para conectar": ["Tap to connect", "輕觸即可連結"],
+  "Pré-visualização do seu logótipo": ["Your logo preview", "您的標誌預覽"],
+  "Perfil após o pagamento": ["Profile after payment", "付款後設定個人檔案"],
+  "Pagamento seguro na PaySuite. Não guardamos PINs nem dados do cartão.": ["Secure payment with PaySuite. We do not store PINs or card details.", "透過 PaySuite 安全付款。我們不儲存 PIN 碼或卡片資料。"],
+  "Confirmo o total. Sem débitos automáticos.": ["I confirm the total. No automatic charges.", "我確認總金額。不會自動扣款。"],
+  "Porta-chaves PVC + epóxi": ["PVC + epoxy keychain", "PVC＋環氧樹脂鑰匙圈"],
+  "Escala": ["Scale", "比例"],
+  "Descarregar logótipo: ": ["Download logo: ", "下載標誌："],
+  "Materiais": ["Materials", "材質"],
+  "Design": ["Design", "設計"],
+  "Carregue o seu design em PDF, PNG ou JPG antes do pagamento.": ["Upload your design as PDF, PNG or JPG before checkout.", "結帳前以 PDF、PNG 或 JPG 上傳您的設計。"],
+  "PDF, PNG ou JPG": ["PDF, PNG or JPG", "PDF、PNG 或 JPG"],
+  "Carregue o logótipo e ajuste o tamanho e a posição. A pré-visualização actualiza automaticamente.": ["Upload your logo and adjust its size and position. The preview updates automatically.", "上傳您的標誌並調整大小與位置，預覽會自動更新。"],
+  "Pré-visualização do seu logótipo.": ["Your logo preview.", "您的標誌預覽。"],
+  "Entre ou crie uma conta para continuar.": ["Sign in or create an account to continue.", "登入或建立帳戶以繼續。"],
+  "2. Como pretende receber?": ["2. How would you like to receive it?", "2. 您希望如何收取？"],
+  "Confirmar eliminação definitiva": ["Confirm permanent deletion", "確認永久刪除"],
+  "Conta eliminada permanentemente.": ["Account permanently deleted.", "帳戶已永久刪除。"],
+  "Não pode eliminar a sua conta ou este nível de acesso.": ["You cannot delete your own account or this access level.", "您無法刪除自己的帳戶或此存取層級。"],
+  "A conta tem historial financeiro ou operacional. Desactive-a em vez de a eliminar.": ["This account has financial or operational history. Deactivate it instead of deleting it.", "此帳戶有財務或營運紀錄。請停用而不是刪除。"],
+  "A conta mudou. Actualize antes de eliminar.": ["The account changed. Refresh before deleting.", "帳戶已變更。請重新整理後再刪除。"]
 }

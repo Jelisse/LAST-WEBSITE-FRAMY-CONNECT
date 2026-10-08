@@ -57,6 +57,7 @@ const profile = {
   photoUrl: '',
   photoPosition: 35,
 };
+// A first publish auto-starts the 30-day free period — no separate plan step.
 assert.equal(
   (
     await post(
@@ -65,33 +66,13 @@ assert.equal(
       cookie,
     )
   ).r.status,
-  403,
-);
-assert.equal(
-  (
-    await post(
-      '/api/workspace',
-      { action: 'save-profile', profile, version: 0 },
-      cookie,
-    )
-  ).r.status,
   200,
 );
-assert.equal(
-  (
-    await post(
-      '/api/workspace',
-      {
-        action: 'activate-sandbox-plan',
-        planId: 'free-30',
-        planVersion: 0,
-        version: 0,
-      },
-      cookie,
-    )
-  ).r.status,
-  200,
-);
+{
+  const workspaceData = await get('/api/workspace', cookie);
+  assert.equal(workspaceData.membership.planId, 'free-30');
+  assert.equal(workspaceData.published, true);
+}
 const id = crypto.randomUUID();
 const body = {
   action: 'submit-order',
