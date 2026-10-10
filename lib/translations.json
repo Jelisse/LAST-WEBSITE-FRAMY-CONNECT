@@ -2664,6 +2664,17 @@
   ],
   "· teste": ["· test", "· 測試"],
   "Dados actualizados.": ["Data refreshed.", "資料已更新。"],
+  "Dados actualizados. As alterações por guardar foram mantidas.": [
+    "Data refreshed. Your unsaved changes were kept.",
+    "資料已更新，未儲存的變更已保留。"
+  ],
+  "Os dados foram alterados noutro separador ou dispositivo.": [
+    "The data was changed in another tab or device.",
+    "資料已在其他分頁或裝置上變更。"
+  ],
+  "Carregar dados do servidor": ["Load server data", "載入伺服器資料"],
+  "Manter as minhas alterações": ["Keep my changes", "保留我的變更"],
+  "Dados do servidor carregados.": ["Server data loaded.", "已載入伺服器資料。"],
   "Como quer ser conhecido?": [
     "How would you like to be known?",
     "您希望如何稱呼自己？"

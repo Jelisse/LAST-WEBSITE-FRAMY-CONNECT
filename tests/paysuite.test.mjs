@@ -469,6 +469,13 @@ test('ambiguous provider timeout does not create another payment on retry', asyn
     f.sql.prepare('SELECT status FROM paysuite_payments').get().status,
     'creating',
   );
+  // The sanitized failure category is persisted for after-the-fact diagnosis.
+  assert.equal(
+    f.sql
+      .prepare('SELECT event FROM paysuite_events WHERE payment_id=?')
+      .get(body.requestId).event,
+    'launch-failed:network',
+  );
 });
 
 test('provider diagnostics classify rejection, timeout and malformed responses without leaking bodies', async () => {

@@ -332,7 +332,25 @@ export async function POST(request: Request) {
       });
     } catch (error) {
       // Never log provider bodies, credentials, payer details or request payloads.
-      console.warn(JSON.stringify({ event: 'paysuite_checkout_failed', paymentReference: id, timestamp: new Date().toISOString(), ...paymentDiagnostic(error) }));
+      const diagnostic = paymentDiagnostic(error);
+      console.warn(JSON.stringify({ event: 'paysuite_checkout_failed', paymentReference: id, timestamp: new Date().toISOString(), ...diagnostic }));
+      // Persist the sanitized category so failures stay visible after the fact.
+      try {
+        await env.DB.prepare(
+          "INSERT OR IGNORE INTO paysuite_events(fingerprint,payment_id,event,received_at) VALUES(?,?,?,?)",
+        )
+          .bind(
+            'launch-failed:' + id,
+            id,
+            'launch-failed:' +
+              diagnostic.category +
+              (diagnostic.httpStatus ? ':' + diagnostic.httpStatus : ''),
+            new Date().toISOString(),
+          )
+          .run();
+      } catch {
+        /* Diagnostics must never change the response. */
+      }
       return json(
         {
           paymentId: id,

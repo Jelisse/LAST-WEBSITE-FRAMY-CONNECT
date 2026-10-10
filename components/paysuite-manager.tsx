@@ -174,6 +174,11 @@ export function PaySuiteManager() {
                         {c.pvcModel.name}
                       </p>
                     )}
+                    {(['cardArtwork', 'pvcArtwork'] as const).map((field) => c[field] && <div key={field}>
+                      <strong>{t(field === 'cardArtwork' ? 'Cartão' : 'Porta-chaves PVC + epóxi')}</strong>
+                      <p><a href={'/api/design-assets/' + c[field].assetId}>{t('Descarregar logótipo: ')}{c[field].fileName}</a></p>
+                      <p>{t('Página')} {c[field].page} · {t('Escala')} {c[field].scale}% · X {c[field].x} · Y {c[field].y}</p>
+                    </div>)}
                     {c.leather && (
                       <div>
                         <strong>{t('Porta-chaves de couro')}</strong>

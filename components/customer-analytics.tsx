@@ -12,11 +12,50 @@ import { useI18n } from './language-provider';
 import { csvCell } from '@/lib/site-analytics';
 
 type Report = {
-  summary: { views: number; sessions: number; actions: number };
+  summary: {
+    views: number;
+    sessions: number;
+    actions: number;
+    contactSaves: number;
+    connections: number;
+  };
   actions: { label: string; count: number }[];
   daily: { day: string; views: number; actions: number }[];
   generatedAt?: number;
 };
+export function ProfileIdentityCounters() {
+  const { t } = useI18n();
+  const [report, setReport] = useState<Report | null>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch('/api/profile-engagement?days=30', {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+      .then(async (response) =>
+        response.ok ? ((await response.json()) as Report) : null,
+      )
+      .then((value) => {
+        if (!controller.signal.aborted) setReport(value);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
+  if (!report) return null;
+  const connections = report.summary.connections ?? 0;
+  return (
+    <div className="identity-counters" aria-label={t('Últimos 30 dias')}>
+      <span>
+        <strong>{report.summary.views.toLocaleString(t.locale)}</strong>
+        {t('Visitas')} · {t('Últimos 30 dias')}
+      </span>
+      <span>
+        <strong>{connections.toLocaleString(t.locale)}</strong>
+        {t('Conexões')}
+      </span>
+    </div>
+  );
+}
 export function ProfileEngagementPanel({
   onEdit,
   onTools,
@@ -39,7 +78,7 @@ export function ProfileEngagementPanel({
       signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]),
     })
       .then(async (r) => {
-        const data = await r.json() as Report & { error?: string };
+        const data = (await r.json()) as Report & { error?: string };
         if (!r.ok)
           throw Error(
             data.error ?? 'Estatísticas temporariamente indisponíveis.',
@@ -75,7 +114,9 @@ export function ProfileEngagementPanel({
       month: 'short',
       timeZone: 'Africa/Maputo',
     });
-  const maximum = Math.ceil(Math.max(2, ...daily.flatMap((r) => [r.views, r.actions])) / 2) * 2;
+  const maximum =
+    Math.ceil(Math.max(2, ...daily.flatMap((r) => [r.views, r.actions])) / 2) *
+    2;
   const line = (key: 'views' | 'actions') =>
     daily
       .map(

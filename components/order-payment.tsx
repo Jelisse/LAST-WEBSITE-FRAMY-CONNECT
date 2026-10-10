@@ -81,7 +81,7 @@ export function OrderPayment({ orderId }: { orderId: string }) {
       )}
       <a
         href={
-          'mailto:support@framyconnect.co.mz?subject=' +
+          'mailto:info@framyconnect.co.mz?subject=' +
           encodeURIComponent('Pagamento da encomenda ' + orderId)
         }
       >

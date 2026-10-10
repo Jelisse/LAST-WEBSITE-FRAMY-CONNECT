@@ -1,14 +1,11 @@
 'use client';
+import { ProductArtworkPreview } from './product-artwork-preview';
 import { useEffect, useRef, useState } from 'react';
 import {
-  Package,
-  CreditCard,
-  UserRound,
   Layers,
   Palette,
   Truck,
   ClipboardList,
-  MapPin,
   Upload,
   PenTool,
   BadgeCheck,
@@ -66,6 +63,20 @@ export function PurchaseConfigurator({
   signedIn?: boolean;
 }) {
   const { t } = useI18n();
+  useEffect(() => {
+    const header = document.querySelector<HTMLElement>('.site-header');
+    if (!header) return;
+    const journey = document.querySelector<HTMLElement>('.checkout-journey');
+    const measure = () => {
+      document.documentElement.style.setProperty('--site-header-height', `${header.getBoundingClientRect().height}px`);
+      if (journey) document.documentElement.style.setProperty('--checkout-journey-height', `${journey.getBoundingClientRect().height}px`);
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    if (journey) observer.observe(journey);
+    measure();
+    return () => { observer.disconnect(); document.documentElement.style.removeProperty('--site-header-height'); document.documentElement.style.removeProperty('--checkout-journey-height'); };
+  }, []);
   const selection = purchaseSelection(initial);
   const format = selection.format;
   const [card, setCard] = useState<string>(selection.card);
@@ -77,20 +88,27 @@ export function PurchaseConfigurator({
     'materials' | 'design' | 'delivery'
   >('design');
 
+  const [paymentStep, setPaymentStep] = useState(false);
   const [cardBack, setCardBack] = useState(false);
   const [cardPaused, setCardPaused] = useState(false);
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (cardPaused) return;
+    if (cardPaused || design !== 'standard') return;
     const timer = window.setInterval(() => {
       if (!document.hidden && !query.matches) setCardBack((value) => !value);
     }, 6000);
     return () => window.clearInterval(timer);
-  }, [cardPaused]);
+  }, [cardPaused, design]);
   const [pvc, setPvc] = useState<PvcModel>('tiktok');
   const [pvcBack, setPvcBack] = useState(false);
   const isPvcStandard =
     format !== 'card' && keychain === 'PVC + epóxi' && design === 'standard';
+  const [cardArtworkValue, setCardArtworkValue] = useState<LeatherDesign>(defaultLeather);
+  const [pvcArtworkValue, setPvcArtworkValue] = useState<LeatherDesign>(defaultLeather);
+  const [cardCustomPreview, setCardCustomPreview] = useState('');
+  const [pvcCustomPreview, setPvcCustomPreview] = useState('');
+  const [cardBusy, setCardBusy] = useState(false);
+  const [pvcBusy, setPvcBusy] = useState(false);
   const [leatherPreview, setLeatherPreview] = useState('');
   const [leather, setLeather] = useState<LeatherDesign>(defaultLeather);
 
@@ -98,7 +116,7 @@ export function PurchaseConfigurator({
 
   const isLeather = format !== 'card' && keychain === 'Couro';
 
-  const method = isLeather ? 'Logótipo personalizado' : 'PDF vectorial';
+  const method = isLeather ? 'Logótipo personalizado' : 'PDF, PNG ou JPG';
 
   const [contact, setContact] = useState('');
   const [address, setAddress] = useState('');
@@ -122,6 +140,8 @@ export function PurchaseConfigurator({
         setKeychain(draft.keychain);
         setDesign(draft.design);
 
+        setCardArtworkValue(draft.cardArtwork ?? defaultLeather);
+        setPvcArtworkValue(draft.pvcArtwork ?? defaultLeather);
         setLeather(draft.leather ?? defaultLeather);
         setPvc(draft.pvcModel ?? 'tiktok');
 
@@ -145,6 +165,10 @@ export function PurchaseConfigurator({
           pvcModel: pvc,
 
           leather,
+    cardArtworkValue,
+    pvcArtworkValue,
+          cardArtwork: cardArtworkValue,
+          pvcArtwork: pvcArtworkValue,
 
           expires: Date.now() + 1800000,
           card,
@@ -212,10 +236,12 @@ export function PurchaseConfigurator({
     contact.trim().length >= 7 &&
     (delivery === 'pickup' || address.trim().length >= 8);
   const goToDelivery = () => {
+    setPaymentStep(false);
     setActiveConfiguration('delivery');
     document.getElementById('delivery-control')?.focus();
   };
   const showSummary = () => {
+    setPaymentStep(deliveryReady);
     document.getElementById('purchase-summary')?.focus();
   };
   const materialPresentation = (
@@ -263,31 +289,9 @@ export function PurchaseConfigurator({
   return (
     <div className="purchase-configurator">
       <ol className="checkout-journey" aria-label={t('Etapas da compra')}>
-        <li aria-current="step">
-          <span>1</span>
-          <strong>
-            <Package className="purchase-icon" size={18} aria-hidden="true" />
-            {t('Produto e entrega')}
-          </strong>
-        </li>
-        <li>
-          <span>2</span>
-          <strong>
-            <CreditCard
-              className="purchase-icon"
-              size={18}
-              aria-hidden="true"
-            />
-            {t('Pagamento')}
-          </strong>
-        </li>
-        <li>
-          <span>3</span>
-          <strong>
-            <UserRound className="purchase-icon" size={18} aria-hidden="true" />
-            {t('Configurar perfil')}
-          </strong>
-        </li>
+        {['Produto', 'Entrega', 'Pagamento', 'Configurar perfil'].map((label, index) => <li key={label} aria-current={(paymentStep ? index === 2 : activeConfiguration === 'delivery' ? index === 1 : index === 0) ? 'step' : undefined}>
+          <span>{index + 1}</span><strong>{t(label)}</strong>
+        </li>)}
       </ol>
       {!paymentAvailable && (
         <div className="purchase-maintenance">
@@ -316,7 +320,7 @@ export function PurchaseConfigurator({
                   size={20}
                   aria-hidden="true"
                 />
-                {t('1. Materiais')}
+                {t('Materiais')}
               </strong>
               <span>
                 {[
@@ -337,6 +341,7 @@ export function PurchaseConfigurator({
                 setDesignOptionsOpen(
                   activeConfiguration !== 'design' || !designOptionsOpen,
                 );
+                setPaymentStep(false);
                 setActiveConfiguration('design');
               }}
             >
@@ -346,7 +351,7 @@ export function PurchaseConfigurator({
                   size={20}
                   aria-hidden="true"
                 />
-                {t('2. Design')}
+                {t('Design')}
               </strong>
               <span>
                 {t(selectedDesign.name)}{' '}
@@ -362,7 +367,7 @@ export function PurchaseConfigurator({
             >
               <strong>
                 <Truck className="purchase-icon" size={20} aria-hidden="true" />
-                {t('3. Entrega')}
+                {t('Entrega')}
               </strong>
               <span>
                 {city
@@ -378,7 +383,7 @@ export function PurchaseConfigurator({
           >
             <legend>
               <Layers className="purchase-icon" size={20} aria-hidden="true" />
-              {t('1. Materiais')}
+              {t('Materiais')}
             </legend>
             <div className="purchase-materials">
               {format !== 'keychain' && (
@@ -470,12 +475,13 @@ export function PurchaseConfigurator({
               type="button"
               className="btn btn-primary material-continue"
               onClick={() => {
+                setPaymentStep(false);
                 setActiveConfiguration('design');
                 setDesignOptionsOpen(true);
                 designControl.current?.focus();
               }}
             >
-              {t('Continuar para o design')} →
+              {t('Seguinte')} →
             </button>
           </fieldset>
           <fieldset
@@ -485,7 +491,7 @@ export function PurchaseConfigurator({
           >
             <legend>
               <Palette className="purchase-icon" size={20} aria-hidden="true" />
-              {t('2. Design')}
+              {t('Design')}
             </legend>
             <div
               className="purchase-design-options"
@@ -643,6 +649,14 @@ export function PurchaseConfigurator({
                   dimensions={leatherDimensions}
                 />
               )}
+              {design !== 'standard' && format !== 'keychain' && <LeatherConfigurator
+                value={cardArtworkValue} onChange={setCardArtworkValue} preview={cardCustomPreview}
+                onPreviewChange={setCardCustomPreview} design={design} signedIn={signedIn} onBusy={setCardBusy}
+                product={card} renderPreview={(back) => <ProductArtworkPreview material={card} value={cardArtworkValue} preview={cardCustomPreview} back={back} />} />}
+              {design !== 'standard' && format !== 'card' && keychain === 'PVC + epóxi' && <LeatherConfigurator
+                value={pvcArtworkValue} onChange={setPvcArtworkValue} preview={pvcCustomPreview}
+                onPreviewChange={setPvcCustomPreview} design={design} signedIn={signedIn} onBusy={setPvcBusy}
+                product={keychain} renderPreview={(back) => <ProductArtworkPreview material={keychain} value={pvcArtworkValue} preview={pvcCustomPreview} back={back} />} />}
               {(design === 'team' || (!isLeather && design === 'customer')) && (
                 <label className="purchase-method">
                   {t('Instruções para o design')}
@@ -667,7 +681,7 @@ export function PurchaseConfigurator({
                 className="btn btn-primary configuration-next"
                 onClick={goToDelivery}
               >
-                {t('Continuar para a entrega')} →
+                {t('Seguinte')} →
               </button>
             </div>
           </fieldset>
@@ -679,7 +693,7 @@ export function PurchaseConfigurator({
           >
             <h2 className="configuration-panel-heading">
               <Truck className="purchase-icon" size={20} aria-hidden="true" />
-              {t('3. Como pretende receber?')}
+              {t('2. Como pretende receber?')}
             </h2>
             <DeliverySelector
               settings={fulfilmentSettings}
@@ -728,7 +742,7 @@ export function PurchaseConfigurator({
               className="btn btn-primary configuration-next"
               onClick={showSummary}
             >
-              {t('Rever encomenda')} →
+              {t('Seguinte')} →
             </button>
           </section>
         </div>
@@ -775,7 +789,11 @@ export function PurchaseConfigurator({
               const photo = photos.find((item) => item.material === material);
               return (
                 <figure key={material}>
-                  {cardArtwork[material] ? (
+                  {design !== 'standard' && cardArtwork[material] ? (
+                    <ProductArtworkPreview material={material} value={cardArtworkValue} preview={cardCustomPreview} back={false} />
+                  ) : design !== 'standard' && material === 'PVC + epóxi' ? (
+                    <ProductArtworkPreview material={material} value={pvcArtworkValue} preview={pvcCustomPreview} back={false} />
+                  ) : cardArtwork[material] ? (
                     <CardMaterialImage material={material} back={cardBack} />
                   ) : isLeather && material === 'Couro' ? (
                     <LeatherPreview
@@ -795,7 +813,7 @@ export function PurchaseConfigurator({
                   ) : (
                     <span>{t('Fotografia do produto em preparação')}</span>
                   )}
-                  <figcaption>{t(material)}</figcaption>
+                  {preview.length > 1 && <figcaption>{t(material)}</figcaption>}
                 </figure>
               );
             })}
@@ -806,48 +824,17 @@ export function PurchaseConfigurator({
           >
             <h3>{t(selected.name)}</h3>
             <p>
-              {t(selectedDesign.name)}
+              {!isLeather && t(selectedDesign.name)}
               {design === 'customer' ? ` · ${t(method)}` : ''}
             </p>
           </div>
-          <hr />
-          <p>
-            <strong>{t('Produtos · pagamento único')}</strong>
-            <br />
-            <span
-              aria-live="polite"
-              key={`${card}-${keychain}-${estimate?.amount}-${t.locale}`}
-            >
-              {estimate
-                ? money(estimate.amount, t.locale)
-                : t('Preço a confirmar')}
-            </span>
-          </p>
-          {!!estimate?.saving && (
-            <p>
-              {t('Poupa {0} face aos produtos separados.', [
-                money(estimate.saving, t.locale),
-              ])}
-            </p>
-          )}
-          <p>
-            {t('Design:')}{' '}
-            {designAmount === null
-              ? t('Sob consulta')
-              : money(designAmount, t.locale)}
-          </p>
-          {delivery === 'pickup' && fulfilment && (
-            <p>
-              <MapPin className="purchase-icon" size={16} aria-hidden="true" />
-              {t('Levantamento gratuito ·')} {fulfilment.point?.name}
-            </p>
-          )}
-          {delivery !== 'pickup' && city && (
-            <p>
-              {t(delivery === 'express' ? 'Entrega expressa' : 'Entrega')}:{' '}
-              {fulfilment ? money(fulfilment.fee, t.locale) : t('Sob cotação')}
-            </p>
-          )}
+          <dl className="purchase-price-breakdown">
+            <div><dt>{t('Produtos')}</dt><dd>{estimate ? money(estimate.amount, t.locale) : t('Preço a confirmar')}</dd></div>
+            <div><dt>{t('Design')}</dt><dd>{designAmount === null ? t('Sob consulta') : money(designAmount, t.locale)}</dd></div>
+            <div><dt>{t(delivery === 'pickup' ? 'Levantamento' : 'Entrega')}</dt><dd>{fulfilment ? money(fulfilment.fee, t.locale) : t('Sob cotação')}</dd></div>
+          </dl>
+          {delivery === 'pickup' && fulfilment && <small>{fulfilment.point?.name}</small>}
+          {!!estimate?.saving && <small>{t('Poupa {0} face aos produtos separados.', [money(estimate.saving, t.locale)])}</small>}
           <div className="purchase-total" aria-live="polite">
             <strong>
               {totalLabel}: {amountText}
@@ -860,38 +847,16 @@ export function PurchaseConfigurator({
               </small>
             )}
           </div>
-          <div className="purchase-next-step">
-            <strong>
-              <UserRound
-                className="purchase-icon"
-                size={18}
-                aria-hidden="true"
-              />
-              {t('O perfil fica para depois do pagamento')}
-            </strong>
-            <p>
-              {t(
-                'Após a confirmação, crie o seu perfil ou continue com o que já tem. O cartão e o porta-chaves podem partilhar o mesmo perfil.',
-              )}
-            </p>
-            <small>
-              {t(
-                'A compra do produto não inclui uma subscrição paga nem renova a experiência gratuita.',
-              )}
-            </small>
-          </div>
-          {!paymentAvailable && (
-            <p>
-              {t(
-                'Valores propostos, sujeitos a publicação pelo gestor. Pagamentos ainda indisponíveis.',
-              )}
-            </p>
-          )}
+          <details className="purchase-next-step">
+            <summary>{t('Perfil após o pagamento')}</summary>
+            <p>{t('Após a confirmação, crie o seu perfil ou continue com o que já tem. O cartão e o porta-chaves podem partilhar o mesmo perfil.')}</p>
+            <small>{t('A compra do produto não inclui uma subscrição paga nem renova a experiência gratuita.')}</small>
+          </details>
           {!signedIn && (
             <div className="purchase-signin">
               <p>
                 {t(
-                  'Entre ou crie uma conta para guardar a encomenda. O perfil será configurado depois do pagamento.',
+                  'Entre ou crie uma conta para continuar.',
                 )}
               </p>
               <Link
@@ -913,9 +878,13 @@ export function PurchaseConfigurator({
             </p>
           )}
           <PaySuiteCheckout
-            key={`${format}-${card}-${keychain}-${design}-${city}-${delivery}-${pickupPoint}-${total}-${isLeather ? JSON.stringify(leather) : ''}-${designInstructions}-${isPvcStandard ? pvc : ''}`}
+            compact
+            key={`${format}-${card}-${keychain}-${design}-${city}-${delivery}-${pickupPoint}-${total}-${JSON.stringify([leather, cardArtworkValue, pvcArtworkValue])}-${designInstructions}-${isPvcStandard ? pvc : ''}`}
 
             disabled={
+              cardBusy || pvcBusy ||
+              (design === 'customer' && ((format !== 'keychain' && !cardArtworkValue.assetId) || (format !== 'card' && keychain === 'PVC + epóxi' && !pvcArtworkValue.assetId))) ||
+              (design === 'team' && !designInstructions.trim()) ||
               (isLeather &&
                 (leatherBusy ||
                   (design === 'customer' && !leather.assetId) ||
@@ -939,6 +908,8 @@ export function PurchaseConfigurator({
               address,
               designInstructions,
 
+              ...(design === 'customer' && format !== 'keychain' ? { cardArtwork: cardArtworkValue } : {}),
+              ...(design === 'customer' && format !== 'card' && keychain === 'PVC + epóxi' ? { pvcArtwork: pvcArtworkValue } : {}),
               ...(isPvcStandard ? { pvcModel: pvc } : {}),
               ...(isLeather ? { leather } : {}),
 
@@ -959,16 +930,15 @@ export function PurchaseConfigurator({
           className="btn btn-primary"
           onClick={() => {
             if (activeConfiguration === 'materials') {
-              setActiveConfiguration('design');
+              setPaymentStep(false);
+                setActiveConfiguration('design');
               setDesignOptionsOpen(true);
               designControl.current?.focus();
             } else if (activeConfiguration === 'design') goToDelivery();
             else showSummary();
           }}
         >
-          {activeConfiguration === 'delivery'
-            ? t('Rever encomenda')
-            : t('Continuar')}{' '}
+          {t('Seguinte')}{' '}
           →
         </button>
       </div>

@@ -7,6 +7,32 @@ import { Nfc, ScanLine, Globe, Camera, Zap } from 'lucide-react';
 import { MobileProfile } from './mobile-profile';
 import { demoProfile } from '@/lib/demo-profile';
 import { DemoCardQr } from './demo-card-qr';
+import { useEffect, useRef, useState } from 'react';
+
+function LockedDemoProfile() {
+  const { t } = useI18n();
+  const host = useRef<HTMLDivElement>(null);
+  const [{ scale, height }, setSize] = useState({ scale: 0, height: 0 });
+  useEffect(() => {
+    const element = host.current;
+    if (!element) return;
+    const resize = () => {
+      const scale = element.clientWidth / 390;
+      if (scale > 0) setSize({ scale, height: element.clientHeight / scale });
+    };
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div ref={host} className="sharing-example-profile" inert aria-hidden="true">
+      <div className="locked-demo-canvas" style={{ width:390, height, transform:`scale(${scale})`, transformOrigin:'top left', visibility:scale ? 'visible' : 'hidden' }}>
+        <MobileProfile demoConnectionLabel="12k" profile={demoProfile(t)} published measure={false} />
+      </div>
+    </div>
+  );
+}
 
 function DemoPhone({
   image,
@@ -19,8 +45,6 @@ function DemoPhone({
   label: string;
   alt: string;
 }) {
-  const { t } = useI18n();
-  const profile = demoProfile(t);
   return (
     <div className={`sharing-phone${scan ? ' sharing-phone-scan' : ''}`}>
       <SourceImage
@@ -56,13 +80,7 @@ function DemoPhone({
             <span className="home-phone-island" />
           </div>
         ) : (
-          <div className="sharing-example-profile" inert aria-hidden="true">
-            <MobileProfile
-              profile={profile}
-              published
-              measure={false}
-            />
-          </div>
+          <LockedDemoProfile />
         )}
       </div>
     </div>

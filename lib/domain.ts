@@ -1,3 +1,4 @@
+import { portraitShapes, portraitPatterns, type PortraitShape, type PortraitPattern } from './portrait-design.ts';
 import type { PlanControls } from './plan-features';
 import { validateExtras, type ProfileExtras } from './profile-growth.ts';
 import { validateBusiness, type ProfileBusiness } from './profile-business.ts';
@@ -127,6 +128,21 @@ export type Profile = {
   bio?: string;
   photoUrl?: string;
   photoPosition?: number;
+  photoPositionX?: number;
+  photoCutout?: boolean;
+  photoScale?: number;
+  photoShapeColor?: string;
+  photoGlowColor?: string;
+  photoShape?: PortraitShape;
+  photoPattern?: PortraitPattern;
+  photoPatternColor?: string;
+  photoPatternScale?: number;
+  photoPatternStrength?: number;
+  photoHeadEscape?: boolean;
+  photoGlowStrength?: number;
+  photoOutlineColor?: string;
+  photoOutlineWidth?: number;
+
 };
 export const blankProfile: Profile = {
   name: '',
@@ -264,6 +280,21 @@ export function validateProfile(input: unknown): Profile {
   )
     throw new Error('Carregue uma fotografia válida.');
   const photoPosition = p.photoPosition ?? 35;
+  const photoPositionX = p.photoPositionX ?? 50;
+  if (typeof photoPositionX !== 'number' || !Number.isFinite(photoPositionX) || photoPositionX < 0 || photoPositionX > 100)
+    throw new Error('Enquadramento horizontal inválido.');
+  const photoScale = p.photoScale ?? 100;
+  if (p.photoShape !== undefined && !portraitShapes.includes(p.photoShape as PortraitShape)) throw new Error('Fotografia inválida.');
+  if (p.photoPattern !== undefined && !portraitPatterns.includes(p.photoPattern as PortraitPattern)) throw new Error('Fotografia inválida.');
+  if (p.photoHeadEscape !== undefined && typeof p.photoHeadEscape !== 'boolean') throw new Error('Fotografia inválida.');
+  for (const [value, min, max] of [[p.photoPatternScale, 50, 200], [p.photoPatternStrength, 0, 100], [p.photoGlowStrength, 0, 100], [p.photoOutlineWidth, 0, 20]] as const)
+    if (value !== undefined && (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max)) throw new Error('Fotografia inválida.');
+
+  for (const color of [p.photoShapeColor, p.photoGlowColor, p.photoPatternColor, p.photoOutlineColor])
+    if (color !== undefined && (typeof color !== 'string' || !/^#[0-9a-f]{6}$/i.test(color)))
+      throw new Error('Cor inválida.');
+  if (p.photoCutout !== undefined && typeof p.photoCutout !== 'boolean') throw new Error('Fotografia inválida.');
+  if (typeof photoScale !== 'number' || !Number.isFinite(photoScale) || photoScale < 75 || photoScale > 150) throw new Error('Escala da fotografia inválida.');
   if (
     typeof photoPosition !== 'number' ||
     !Number.isFinite(photoPosition) ||
@@ -284,6 +315,20 @@ export function validateProfile(input: unknown): Profile {
     bio: typeof p.bio === 'string' ? p.bio.trim() : '',
     photoUrl,
     photoPosition,
+    photoPositionX,
+    photoCutout: p.photoCutout === true,
+    photoScale,
+    photoShapeColor: typeof p.photoShapeColor === 'string' ? p.photoShapeColor : undefined,
+    photoGlowColor: typeof p.photoGlowColor === 'string' ? p.photoGlowColor : undefined,
+    photoShape: p.photoShape as Profile['photoShape'],
+    photoPattern: p.photoPattern as Profile['photoPattern'],
+    photoPatternColor: p.photoPatternColor as Profile['photoPatternColor'],
+    photoPatternScale: p.photoPatternScale as Profile['photoPatternScale'],
+    photoPatternStrength: p.photoPatternStrength as Profile['photoPatternStrength'],
+    photoHeadEscape: p.photoHeadEscape as Profile['photoHeadEscape'],
+    photoGlowStrength: p.photoGlowStrength as Profile['photoGlowStrength'],
+    photoOutlineColor: p.photoOutlineColor as Profile['photoOutlineColor'],
+    photoOutlineWidth: p.photoOutlineWidth as Profile['photoOutlineWidth'],
     business: validateBusiness(p.business),
     extras: validateExtras(p.extras),
   };

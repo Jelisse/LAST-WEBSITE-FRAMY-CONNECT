@@ -9,6 +9,7 @@ import { activeProfileSQL } from '@/lib/entitlement';
 import { tokenHash } from '@/lib/server-auth';
 import { rateLimit } from '@/lib/request-limits';
 import { engagementLabel } from '@/lib/profile-engagement';
+import { connectionActionSQL } from '@/lib/profile-connections';
 import type { Profile } from '@/lib/domain';
 export const dynamic = 'force-dynamic';
 const json = (value: unknown, status = 200) =>
@@ -68,7 +69,10 @@ export async function POST(request: Request) {
     const user = await getChatGPTUser();
     if (user?.userId === row.owner_id || (user && user.role !== 'customer'))
       return json({ recorded: false });
-    if (!hasPlanFeature(await profileMembership(row.owner_id), 'analytics'))
+    if (
+      b.kind === 'view' &&
+      !hasPlanFeature(await profileMembership(row.owner_id), 'analytics')
+    )
       return json({ recorded: false });
     const target = b.kind === 'view' ? '' : b.target;
     const label =
@@ -84,9 +88,10 @@ export async function POST(request: Request) {
     if (label === null) return json({ recorded: false }, 422);
     if (!(await rateLimit(request, 'profile-engagement', 3000)))
       return json({ recorded: false }, 429);
-    const session = await tokenHash(
-      `${row.owner_id}:${now.slice(0, 10)}:${b.session}`,
-    );
+    const session = await tokenHash(`${row.owner_id}:${b.session}`);
+    if (b.kind === 'action' && target !== 'enquiry')
+      await db.prepare('INSERT OR IGNORE INTO profile_connections(owner_id,session_hash) VALUES(?,?)')
+        .bind(row.owner_id, session).run();
     await db
       .prepare(
         'INSERT OR IGNORE INTO profile_engagement(id,owner_id,session_hash,at,kind,target,label) VALUES(?,?,?,?,?,?,?)',
@@ -119,7 +124,7 @@ export async function GET(request: Request) {
     const [summary, actions, daily] = await Promise.all([
       db
         .prepare(
-          "SELECT COUNT(CASE WHEN kind='view' THEN 1 END) AS views,COUNT(DISTINCT CASE WHEN kind='view' THEN session_hash END) AS sessions,COUNT(CASE WHEN kind='action' THEN 1 END) AS actions FROM profile_engagement WHERE owner_id=? AND at>=?",
+          `SELECT COUNT(CASE WHEN kind='view' THEN 1 END) AS views,COUNT(DISTINCT CASE WHEN kind='view' THEN session_hash END) AS sessions,COUNT(CASE WHEN kind='action' THEN 1 END) AS actions,COUNT(CASE WHEN kind='action' AND target='contact' THEN 1 END) AS contactSaves,COUNT(DISTINCT CASE WHEN ${connectionActionSQL} THEN session_hash END) AS connections FROM profile_engagement WHERE owner_id=? AND at>=?`,
         )
         .bind(user.userId, since)
         .first(),

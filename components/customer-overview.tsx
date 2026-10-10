@@ -8,6 +8,7 @@ import { ArrowRight, ArrowUpRight, Link2, Plus, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TrialNotice } from './trial-notice';
 import { Progress } from '@/components/ui/progress';
+import { ProfileIdentityCounters } from './customer-analytics';
 import { orderLabels } from '@/lib/domain';
 import type { WorkspaceData } from '@/lib/profile-types';
 
@@ -50,7 +51,7 @@ export function CustomerOverview({
         >
           <span className="essential-kicker">{t('A SUA IDENTIDADE')}</span>
           <div className="essential-person">
-            <span className="essential-avatar">{initials}</span>
+            <span className="essential-avatar">{profile?.photoUrl ? <img src={profile.photoUrl} alt="" /> : initials}</span>
             <div>
               <h2 id="identity-title">{name}</h2>
               <p>{profile?.title || t('Comece por se apresentar.')}</p>
@@ -62,6 +63,7 @@ export function CustomerOverview({
               : t('O seu endereço Framy começa aqui.')}
             <span>{data.published ? t('Publicada') : t('Rascunho')}</span>
           </p>
+          <ProfileIdentityCounters />
           <div className="essential-actions">
             <Button
               className="essential-dark-button"

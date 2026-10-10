@@ -6,6 +6,7 @@ import {
   useState,
   type Dispatch,
   type SetStateAction,
+  type ReactNode,
 } from 'react';
 import { Upload, RotateCcw, Ruler, Check, Eraser } from 'lucide-react';
 import { SourceImage } from './source-image';
@@ -99,6 +100,8 @@ export function LeatherConfigurator({
   signedIn,
   onBusy,
   dimensions,
+  product,
+  renderPreview,
   onPreviewChange,
   preview,
 }: {
@@ -108,6 +111,8 @@ export function LeatherConfigurator({
   signedIn: boolean;
   onBusy: (busy: boolean) => void;
   dimensions?: string;
+  product?: string;
+  renderPreview?: (back: boolean) => ReactNode;
   onPreviewChange: (preview: string) => void;
   preview: string;
 }) {
@@ -252,13 +257,13 @@ export function LeatherConfigurator({
   return (
     <section className="leather-config">
       <div className="leather-controls">
-        <h3>{t('Personalize o porta-chaves de couro')}</h3>
+        <h3>{product ? t('Personalize o produto') + ' · ' + t(product) : t('Personalize o porta-chaves de couro')}</h3>
         <p className="leather-live-note">
           {t(
-            ' Escolha a cor, carregue o logótipo e ajuste o tamanho. A imagem e o resumo actualizam automaticamente. ',
+            product ? 'Carregue o logótipo e ajuste o tamanho e a posição. A pré-visualização actualiza automaticamente.' : ' Escolha a cor, carregue o logótipo e ajuste o tamanho. A imagem e o resumo actualizam automaticamente. ',
           )}
         </p>
-        <fieldset disabled={busy}>
+        {!product && <fieldset disabled={busy}>
           <legend>{t('Cor do couro')}</legend>
           <div className="leather-swatches">
             {(['brown', 'black'] as const).map((color) => (
@@ -285,8 +290,8 @@ export function LeatherConfigurator({
               </button>
             ))}
           </div>
-        </fieldset>
-        {design === 'standard' && (
+        </fieldset>}
+        {!product && design === 'standard' && (
           <>
             <fieldset>
               <legend>{t('Logótipo frontal')}</legend>
@@ -481,7 +486,7 @@ export function LeatherConfigurator({
             {t(' Verso ')}
           </button>
         </div>
-        <div
+        {renderPreview ? <div className="product-artwork-stage">{renderPreview(back)}</div> : <div
           className={`leather-studio ${value.color === 'black' ? 'is-black' : ''}`}
         >
           <div className="leather-studio-stage">
@@ -511,10 +516,10 @@ export function LeatherConfigurator({
               {colorCaption}
             </span>
           </div>
-        </div>
+        </div>}
         <figcaption>
-          {t(back ? 'Verso com símbolo NFC' : 'Pré-visualização da frente')}
-          {!back &&
+          {t(back ? 'Verso' : 'Pré-visualização da frente')}
+          {!product && !back &&
             design === 'standard' &&
             value.color === 'black' &&
             value.logo === 'full' && (
@@ -528,7 +533,7 @@ export function LeatherConfigurator({
             <small>
               {t(
                 design === 'customer'
-                  ? 'Pré-visualização do seu logótipo sobre a fotografia do produto. '
+                  ? product ? 'Pré-visualização do seu logótipo. ' : 'Pré-visualização do seu logótipo sobre a fotografia do produto. '
                   : 'Frente disponível para o design da equipa. ',
               )}
               {t(

@@ -1,8 +1,11 @@
 'use client';
 import { ProfilePublicExtras } from './profile-public-extras';
+import { ProfileConnectionCount } from './profile-connection-count';
 import { useI18n } from '@/components/language-provider';
 
 import Image from 'next/image';
+import { PortraitBackground } from './portrait-background';
+import { portraitMask, portraitPath } from '@/lib/portrait-design';
 import { useState, type CSSProperties } from 'react';
 import {
   whatsappURL,
@@ -16,8 +19,10 @@ import {
 } from './profile-engagement';
 import {
   Camera,
+  Languages,
   Globe2,
   Mail,
+  MessageCircle,
   Phone,
   QrCode,
   Share2,
@@ -62,15 +67,18 @@ export function MobileProfile({
   preview = false,
   brandHref = '/',
   measure = true,
+  demoConnectionLabel,
 }: {
   profile: Profile;
   published?: boolean;
   preview?: boolean;
   brandHref?: string;
   measure?: boolean;
+  demoConnectionLabel?: string;
 }) {
   const { t } = useI18n();
   const [english, setEnglish] = useState(false);
+  const [photoOpen, setPhotoOpen] = useState(false);
   const translation = sourceProfile.extras?.english;
   const profile = english
     ? {
@@ -182,93 +190,128 @@ export function MobileProfile({
       className="mobile-profile-frame"
       data-accent={business?.accent ?? 'orange'}
       data-tone={
-        !business?.accent || business.accent === 'orange'
-          ? 'dark'
-          : profileColorIsLight(business.accent)
-            ? 'light'
-            : 'dark'
+        profileColorIsLight(business?.accent) ? 'light' : 'dark'
       }
       style={
         {
           '--profile-accent': profileColorHex(business?.accent),
+          ...(profile.photoShapeColor ? { '--portrait-fill': profile.photoShapeColor } : {}),
+          ...(profile.photoGlowColor ? { '--studio-glow': profile.photoGlowColor } : {}),
         } as CSSProperties
       }
       data-layout={business?.layout ?? 'portrait'}
+      data-presentation="studio"
     >
       <article className="mobile-identity-page">
-        <div className="mobile-portrait">
-          {profile.photoUrl ? (
-            <Image
-              src={profile.photoUrl}
-              alt={
-                profile.name
-                  ? t('Fotografia de {0}', [profile.name])
-                  : t('Fotografia de perfil')
-              }
-              fill
-              unoptimized
-              sizes="(max-width: 600px) 100vw, 500px"
-              style={{
-                objectFit: 'cover',
-                objectPosition: `center ${profile.photoPosition ?? 35}%`,
-              }}
-            />
-          ) : (
-            <div className="mobile-photo-placeholder">
-              <Camera />
-              <span>{t('A sua fotografia aparece aqui')}</span>
-            </div>
-          )}
-        </div>
         <div className="mobile-profile-body">
-          {(translation?.title ||
-            translation?.bio ||
-            translation?.hours ||
-            profile.extras?.services.some(
-              (s) => s.englishTitle || s.englishDescription || s.englishPrice,
-            )) && (
-            <nav
-              className="profile-content-languages"
-              aria-label="Idioma do conteúdo"
-            >
-              <button
-                type="button"
-                aria-pressed={!english}
-                onClick={() => setEnglish(false)}
+          <header className="studio-hero">
+            <div className="studio-portrait-stage" data-head-escape={!!profile.photoCutout && profile.photoHeadEscape !== false} style={{ '--portrait-glow-strength': `${(profile.photoGlowStrength ?? 32)}%` } as CSSProperties}>
+              <PortraitBackground className="studio-portrait-shape" shape={profile.photoShape} pattern={profile.photoPattern}
+                color={profile.photoShapeColor} ink={profile.photoPatternColor} scale={profile.photoPatternScale} strength={profile.photoPatternStrength} />
+              <div
+                className="mobile-portrait"
+                data-cutout={profile.photoCutout ? 'true' : 'false'}
+                style={{ maskImage: portraitMask(profile.photoShape, !!profile.photoCutout && profile.photoHeadEscape !== false) }}
               >
-                Português
-              </button>
-              <button
-                type="button"
-                aria-pressed={english}
-                onClick={() => setEnglish(true)}
-              >
-                English
-              </button>
-            </nav>
-          )}
-          <Heading>{profile.name || t('O seu nome')}</Heading>
-          <p className="mobile-profile-title">
-            {profile.title || t('O seu título ou profissão')}
-          </p>
-          {profile.bio && <p className="mobile-profile-bio">{profile.bio}</p>}
-          {(whatsapp || business?.address || business?.hours) && (
+                {profile.photoUrl ? (
+                  <Image
+                    src={profile.photoUrl}
+                    alt={
+                      profile.name
+                        ? t('Fotografia de {0}', [profile.name])
+                        : t('Fotografia de perfil')
+                    }
+                    fill
+                    unoptimized
+                    sizes="(max-width: 600px) 100vw, 500px"
+                    style={{
+                      objectFit: profile.photoCutout ? 'contain' : 'cover',
+                      objectPosition: `${profile.photoPositionX ?? 50}% 35%`,
+                      transformOrigin: `${profile.photoPositionX ?? 50}% bottom`,
+                      transform: `translateY(${((profile.photoPosition ?? 35) - 35) * 0.6}%) scale(${(profile.photoScale ?? 100) / 100})`,
+                    }}
+                  />
+                ) : (
+                  <div className="mobile-photo-placeholder">
+                    <Camera />
+                    <span>{t('A sua fotografia aparece aqui')}</span>
+                  </div>
+                )}
+              </div>
+              <svg className="studio-portrait-outline" viewBox="0 0 420 440" aria-hidden="true">
+                <path d={portraitPath(profile.photoShape)} style={{ fill: 'none', stroke: profile.photoOutlineColor ?? 'var(--portrait-outline-color, #ffffffbd)', strokeWidth: profile.photoOutlineWidth ?? 3 }} />
+              </svg>
+              {profile.photoUrl && (
+                <button type="button" className="studio-portrait-expand"
+                  aria-label={t('Fotografia de {0}', [profile.name])}
+                  aria-haspopup="dialog" onClick={() => setPhotoOpen(true)} />
+              )}
+              <ProfileConnectionCount
+                demoLabel={demoConnectionLabel}
+                username={profile.username}
+                enabled={published && !preview}
+                preview={preview || !published}
+              />
+            </div>
+            <div className="studio-intro">
+              <Heading>{profile.name || t('O seu nome')}</Heading>
+              <p className="mobile-profile-title">
+                {profile.title || t('O seu título ou profissão')}
+              </p>
+              {profile.bio && (
+                <p className="mobile-profile-bio">{profile.bio}</p>
+              )}
+            </div>
+              <div className="studio-contact-actions">
+                <button
+                  type="button"
+                  className="studio-save-contact"
+                  disabled={!profile.name}
+                  onClick={download}
+                  aria-label={english ? 'Save contact' : t('Guardar contacto')}
+                  title={english ? 'Save contact' : t('Guardar contacto')}
+                >
+                  <UserRoundPlus size={20} aria-hidden="true" />
+                </button>
+                {whatsapp && (
+                  <a
+                    href={whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => measurement.record('whatsapp')}
+                    aria-label="WhatsApp"
+                    title="WhatsApp"
+                  >
+                    <MessageCircle size={20} aria-hidden="true" />
+                  </a>
+                )}
+              {(translation?.title ||
+                translation?.bio ||
+                translation?.hours ||
+                profile.extras?.services.some(
+                  (s) =>
+                    s.englishTitle || s.englishDescription || s.englishPrice,
+                )) && (
+                <nav
+                  className="profile-content-languages"
+                  aria-label="Idioma do conteúdo"
+                >
+                  <button
+                    type="button"
+                    aria-label={english ? 'Mudar para português' : 'Switch to English'}
+                    onClick={() => setEnglish((value) => !value)}
+                  >
+                    <Languages size={20} aria-hidden="true" />
+                  </button>
+                </nav>
+              )}
+              </div>
+          </header>
+          {(business?.address || business?.hours) && (
             <section
               className="public-business"
               aria-label={t('Informações do negócio')}
             >
-              {whatsapp && (
-                <a
-                  className="profile-whatsapp"
-                  href={whatsapp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => measurement.record('whatsapp')}
-                >
-                  {english ? 'Chat on WhatsApp' : t('Falar no WhatsApp')}{' '}
-                  <span aria-hidden="true">↗</span>
-                </a>
-              )}
               {business?.hours && (
                 <p>
                   <strong>
@@ -410,6 +453,13 @@ export function MobileProfile({
           </footer>
         </div>
       </article>
+      <Dialog open={photoOpen} onOpenChange={setPhotoOpen}>
+        <DialogContent className="profile-photo-dialog">
+          <DialogTitle className="sr-only">{t('Fotografia de {0}', [profile.name])}</DialogTitle>
+          {profile.photoUrl && <Image src={profile.photoUrl} alt={t('Fotografia de {0}', [profile.name])}
+            width={1000} height={1000} unoptimized />}
+        </DialogContent>
+      </Dialog>
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
         <DialogContent className="profile-qr-dialog">
           <DialogTitle>{t('O seu QR Framy')}</DialogTitle>

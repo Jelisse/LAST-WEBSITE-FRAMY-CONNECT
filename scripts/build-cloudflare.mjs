@@ -1,6 +1,18 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
+const portrait = spawnSync(
+  process.execPath,
+  [
+    'node_modules/vite/bin/vite.js',
+    'build',
+    '--config',
+    'vite.portrait.config.ts',
+  ],
+  { stdio: 'inherit' },
+);
+if (portrait.status !== 0) process.exit(portrait.status ?? 1);
+
 const build = spawnSync(
   process.execPath,
   ['node_modules/vinext/dist/cli.js', 'build'],
@@ -14,17 +26,14 @@ if (build.status !== 0) {
   process.exit(build.status ?? 1);
 }
 
-const config = JSON.parse(
-  readFileSync('dist/server/wrangler.json', 'utf8'),
-);
+const config = JSON.parse(readFileSync('dist/server/wrangler.json', 'utf8'));
 
 const databases = config.d1_databases ?? [];
 
 if (
   databases.length !== 1 ||
   databases[0].binding !== 'DB' ||
-  databases[0].database_id !==
-    'd53a1009-119e-41c2-9f05-db685dc9a0f4'
+  databases[0].database_id !== 'd53a1009-119e-41c2-9f05-db685dc9a0f4'
 ) {
   throw Error(
     'Invalid Cloudflare staging database binding; deployment stopped.',

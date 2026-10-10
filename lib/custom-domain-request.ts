@@ -45,12 +45,13 @@ export async function customDomainRequest(
   const asset =
     /^\/(assets|_next|brand|social|fonts)\//.test(url.pathname) ||
     url.pathname.startsWith('/api/profile-photo/');
+  const publicStats = request.method === 'GET' && url.pathname === `/api/profile-connections/${row.username}`;
   const publicPost =
     ['/api/profile-enquiries', '/api/profile-engagement'].includes(
       url.pathname,
     ) && request.method === 'POST';
   if (
-    (!root && !asset && !publicPost) ||
+    (!root && !asset && !publicPost && !publicStats) ||
     (!['GET', 'HEAD'].includes(request.method) && !publicPost)
   )
     return new Response('Não encontrado', { status: 404 });

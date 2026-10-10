@@ -26,3 +26,13 @@ test('purchase restoration rejects expired and malformed data and keeps selectio
   assert.equal(readPurchaseDraft(JSON.stringify({ ...draft, address: 123 }), 1000), null);
   assert.equal(readPurchaseDraft('broken', 1000), null);
 });
+
+test('card and PVC artwork drafts restore independently and reject malformed transforms', () => {
+  const artwork = {color:'brown',logo:'full',page:2,scale:65,x:12,y:-4,assetId:'abcd1234-1234-1234-1234-123456789abc',fileName:'card.pdf'};
+  const draft = {version:2,expires:1100,card:'PVC',keychain:'PVC + epóxi',design:'customer',delivery:'pickup',city:'maputo',pickupPoint:'mahota',contact:'841234567',address:'',designInstructions:'',cardArtwork:artwork,pvcArtwork:{...artwork,page:1,x:-8}};
+  const restored = readPurchaseDraft(JSON.stringify(draft),1000);
+  assert.deepEqual(restored.cardArtwork,artwork);
+  assert.equal(restored.pvcArtwork.page,1);
+  assert.equal(restored.pvcArtwork.x,-8);
+  assert.equal(readPurchaseDraft(JSON.stringify({...draft,cardArtwork:{...artwork,scale:200}}),1000),null);
+});

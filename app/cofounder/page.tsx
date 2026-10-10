@@ -1,4 +1,3 @@
-import { PanelBrand } from '@/components/panel-brand';
 import { UsersRound, ClipboardList, ShoppingBag } from 'lucide-react';
 import { getTranslations } from '@/lib/server-i18n';
 import { DashboardTools } from '@/components/mobile-navigation';
@@ -26,7 +25,6 @@ export default async function Page() {
   return (
     <main id="main" className="staff-page">
       <header>
-          <PanelBrand />
         <DashboardTools />
         <div>
           <h1>

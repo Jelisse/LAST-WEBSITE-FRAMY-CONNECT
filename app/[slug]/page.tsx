@@ -51,7 +51,7 @@ const pages: Record<
       },
       {
         title: 'Apoio ao cliente',
-        text: 'Para questões sobre o seu perfil, use support@framyconnect.co.mz. Indique a referência da encomenda ao contactar a equipa. O pagamento é confirmado após verificação no prestador.',
+        text: 'Para questões sobre o seu perfil, use info@framyconnect.co.mz. Indique a referência da encomenda ao contactar a equipa. O pagamento é confirmado após verificação no prestador.',
       },
     ],
   },
@@ -94,7 +94,7 @@ const pages: Record<
       },
       {
         title: 'Medição dos perfis digitais',
-        text: 'Cada perfil pode pedir consentimento para medir visitas e cliques. O titular recebe contagens agregadas, sem a identidade ou os contactos dos visitantes. Pode recusar ou alterar a escolha no próprio perfil. Os eventos são conservados por até 90 dias.',
+        text: 'Cada perfil pode pedir consentimento para medir visitas e cliques. O titular recebe contagens agregadas, sem a identidade ou os contactos dos visitantes. O total público de conexões acumula contactos descarregados e links abertos desde o início da medição. Com autorização, guardamos um identificador aleatório por perfil no dispositivo por até 90 dias para evitar repetições; é removido ao retirar a autorização. Um resumo sem nomes, contactos, destinos ou datas, com identificadores convertidos em códigos por perfil, conserva a contagem acumulada. Os eventos detalhados são conservados por até 90 dias. Pode recusar ou alterar a escolha no próprio perfil.',
       },
       {
         title: 'Dados que escolhe guardar',
@@ -122,7 +122,7 @@ const pages: Record<
       },
       {
         title: 'Retirar um perfil',
-        text: 'Pode retirar a publicação no editor e terminar sessões em Segurança da conta. Para pedir correcção ou eliminação de dados e esclarecimentos sobre conservação, contacte support@framyconnect.co.mz. Os ficheiros carregados são conservados enquanto necessários ao perfil ou encomenda.',
+        text: 'Pode retirar a publicação no editor e terminar sessões em Segurança da conta. Para pedir correcção ou eliminação de dados e esclarecimentos sobre conservação, contacte info@framyconnect.co.mz. Os ficheiros carregados são conservados enquanto necessários ao perfil ou encomenda.',
       },
     ],
   },
@@ -138,7 +138,7 @@ const pages: Record<
       },
       {
         title: 'Entrega, cancelamento e apoio',
-        text: 'Confirme com a equipa o custo e prazo de entrega e as condições de cancelamento, personalização e devolução antes de pagar. Guarde a referência da encomenda e da transacção. Para apoio, contacte support@framyconnect.co.mz.',
+        text: 'Confirme com a equipa o custo e prazo de entrega e as condições de cancelamento, personalização e devolução antes de pagar. Guarde a referência da encomenda e da transacção. Para apoio, contacte info@framyconnect.co.mz.',
       },
     ],
   },
@@ -216,8 +216,8 @@ export default async function Page({
               <ArrowUpRight size={20} />
             </a>
           )}
-          <Link className="text-link" href="/produtos">
-            {t('Descobrir produtos ')}
+          <Link className="text-link" href={slug === 'contacto' ? 'https://wa.me/258846847629' : '/produtos'}>
+            {t(slug === 'contacto' ? 'O nosso WhatsApp' : 'Descobrir produtos ')}
             <ArrowUpRight size={19} />
           </Link>
         </main>

@@ -22,7 +22,7 @@ type Payment = {
   } | null;
 };
 const labels: Record<string, string> = {
-  creating: 'A confirmar a ligação ao prestador',
+  creating: 'Não foi possível abrir o pagamento',
   pending: 'A aguardar pagamento',
   paid: 'Pagamento feito com sucesso',
   failed: 'Pagamento não concluído',
@@ -229,7 +229,7 @@ export function PaySuiteStatus() {
               {payment.status === 'creating' && (
                 <p>
                   {t(
-                    ' Não crie outro pedido. A equipa verificará este pedido no prestador. ',
+                    'Ainda não foi confirmado nenhum pagamento. O pedido está registado para verificação pela equipa. Não crie outro pedido enquanto verificamos a ligação ao prestador.',
                   )}
                 </p>
               )}

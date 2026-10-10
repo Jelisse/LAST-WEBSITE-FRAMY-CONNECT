@@ -30,6 +30,8 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
         return null;
     if (value.pvcModel !== undefined)
       value.pvcModel = pvcModel(value.pvcModel).id;
+    for (const field of ['cardArtwork', 'pvcArtwork'])
+      if (value[field]) value[field] = validateLeather(value[field], value[field].assetId ? 'customer' : 'standard');
     if (value.leather)
       value.leather = validateLeather(
         value.leather,
@@ -37,6 +39,8 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
       );
     return value as {
       leather?: LeatherDesign;
+      cardArtwork?: LeatherDesign;
+      pvcArtwork?: LeatherDesign;
       pvcModel?: PvcModel;
       card: string;
       keychain: string;

@@ -38,7 +38,7 @@ import { ProfileEngagementPanel } from './profile-engagement';
 import { TrialNotice } from './trial-notice';
 import { ProfileLinksEditor } from '@/components/profile-links-editor';
 import { MobileProfile } from '@/components/mobile-profile';
-import { IPhonePreview } from '@/components/iphone-preview';
+import { EditorLivePreview } from '@/components/editor-live-preview';
 import { ProfilePhotoUpload } from '@/components/profile-photo-upload';
 import { ProfileHandoff } from '@/components/profile-handoff';
 import {
@@ -148,6 +148,11 @@ export function Workspace({ displayName }: { displayName: string }) {
     [testToolsOpen, setTestToolsOpen] = useState(false),
     [plansOpen, setPlansOpen] = useState(false),
     [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [conflict, setConflict] = useState<string | null>(null);
+  const dirtyRef = useRef(false);
+  useEffect(() => {
+    dirtyRef.current = dirty;
+  }, [dirty]);
   useEffect(() => {
     if (tab !== 'profile' || !toolSection.current) return;
     const section = document.getElementById(
@@ -168,8 +173,19 @@ export function Workspace({ displayName }: { displayName: string }) {
     const r = await fetch('/api/workspace', { cache: 'no-store' });
     const d = (await r.json()) as WorkspaceData & { error?: string };
     if (!r.ok) throw new Error(d.error ?? 'Não foi possível carregar.');
-    setData(d);
-    if (resetProfile) setProfile(d.profile ?? blankProfile);
+    if (!resetProfile && dirtyRef.current) {
+      // Unsaved edits win: refreshing must neither clear the form nor resync
+      // the profile version behind the user's back — a later save would
+      // otherwise pass the version check and overwrite newer server data.
+      setData((prev) =>
+        prev
+          ? { ...d, profile: prev.profile, profileVersion: prev.profileVersion }
+          : d,
+      );
+    } else {
+      setData(d);
+      setProfile(d.profile ?? blankProfile);
+    }
     return d as WorkspaceData;
   }, []);
   useEffect(() => {
@@ -257,9 +273,17 @@ export function Workspace({ displayName }: { displayName: string }) {
         error?: string;
         ok?: boolean;
         id?: string;
+        profileVersion?: number;
+        published?: boolean;
+        publishedUsername?: string | null;
       };
-      if (!response.ok)
-        throw new Error(result.error ?? 'Não foi possível guardar.');
+      if (!response.ok) {
+        const failure = new Error(
+          result.error ?? 'Não foi possível guardar.',
+        ) as Error & { status?: number };
+        failure.status = response.status;
+        throw failure;
+      }
       return result;
     },
     [canEditOrders],
@@ -359,26 +383,95 @@ export function Workspace({ displayName }: { displayName: string }) {
       setBusy(false);
     }
   }
+  const savedMessage = (action: string) =>
+    action === 'publish-profile'
+      ? 'Perfil publicado nesta prévia privada.'
+      : action === 'unpublish-profile'
+        ? 'Perfil retirado da publicação.'
+        : 'Rascunho guardado.';
+  function applySavedProfile(result: {
+    profileVersion?: number;
+    published?: boolean;
+    publishedUsername?: string | null;
+  }) {
+    // Apply the saved state right away so a publish is visible without
+    // waiting for the follow-up reload.
+    setData((prev) =>
+      prev
+        ? {
+            ...prev,
+            profile,
+            profileVersion: result.profileVersion ?? prev.profileVersion,
+            published: result.published ?? prev.published,
+            publishedUsername:
+              result.publishedUsername !== undefined
+                ? result.publishedUsername
+                : prev.publishedUsername,
+          }
+        : prev,
+    );
+    setDirty(false);
+    setConflict(null);
+  }
   async function save(action: string) {
-    if (!data || uploadingPhoto) return;
-    await run(
-      async () => {
-        await send({
-          action,
-          profile,
-          version: data.profileVersion,
-          autoUsername:
-            data.profileVersion === 0 &&
-            profile.username === usernameFromName(profile.name),
-        });
+    if (!data || uploadingPhoto || busy) return;
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const result = await send({
+        action,
+        profile,
+        version: data.profileVersion,
+        autoUsername:
+          data.profileVersion === 0 &&
+          profile.username === usernameFromName(profile.name),
+      });
+      applySavedProfile(result);
+      setNotice(savedMessage(action));
+      // Best-effort revalidation; the save itself already succeeded.
+      void load(true).catch(() => {});
+    } catch (e) {
+      if ((e as { status?: number }).status === 409) {
+        // Never auto-merge: ask the user which side wins.
+        setConflict(action);
+      } else {
+        setError(e instanceof Error ? e.message : 'Tente novamente.');
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function resolveConflict(reload: boolean) {
+    if (!conflict) return;
+    const action = conflict;
+    setConflict(null);
+    if (reload) {
+      await run(async () => {
         await load(true);
         setDirty(false);
+      }, 'Dados do servidor carregados.');
+      return;
+    }
+    // Keep my edits: resync the version explicitly, then retry the same action.
+    if (!data) return;
+    await run(
+      async () => {
+        const r = await fetch('/api/workspace', { cache: 'no-store' });
+        const fresh = (await r.json()) as WorkspaceData & { error?: string };
+        if (!r.ok) throw new Error(fresh.error ?? 'Não foi possível carregar.');
+        const result = await send({
+          action,
+          profile,
+          version: fresh.profileVersion,
+          autoUsername:
+            fresh.profileVersion === 0 &&
+            profile.username === usernameFromName(profile.name),
+        });
+        applySavedProfile(result);
+        void load(true).catch(() => {});
       },
-      action === 'publish-profile'
-        ? 'Perfil publicado nesta prévia privada.'
-        : action === 'unpublish-profile'
-          ? 'Perfil retirado da publicação.'
-          : 'Rascunho guardado.',
+      savedMessage(action),
     );
   }
   function openPlans() {
@@ -620,7 +713,6 @@ export function Workspace({ displayName }: { displayName: string }) {
       <SidebarInset>
         <header className="workspace-header">
           <PanelBrand />
-          <LanguageSelector />
           <div>
             <SidebarTrigger />
             <span>
@@ -630,14 +722,7 @@ export function Workspace({ displayName }: { displayName: string }) {
               </span>
             </span>
           </div>
-          <Button
-            className="plan-upgrade header-upgrade"
-            disabled={loading || busy || uploadingPhoto || !data}
-            onClick={openPlans}
-          >
-            {t('Escolher plano ')}
-            <ArrowUpRight size={17} />
-          </Button>
+          <LanguageSelector />
         </header>
         <main
           id="main"
@@ -671,7 +756,14 @@ export function Workspace({ displayName }: { displayName: string }) {
               className="control-btn"
               aria-label={t('Actualizar dados')}
               disabled={busy || loading || uploadingPhoto}
-              onClick={() => run(() => load(false), 'Dados actualizados.')}
+              onClick={() =>
+                run(
+                  () => load(false),
+                  dirty
+                    ? 'Dados actualizados. As alterações por guardar foram mantidas.'
+                    : 'Dados actualizados.',
+                )
+              }
             >
               <RefreshCw size={17} />
               {t(' Actualizar')}
@@ -680,6 +772,31 @@ export function Workspace({ displayName }: { displayName: string }) {
           {error && (
             <div role="alert" className="message error-message">
               {t(error)}
+            </div>
+          )}
+          {conflict && (
+            <div role="alert" className="message error-message">
+              <p>
+                {t('Os dados foram alterados noutro separador ou dispositivo.')}
+              </p>
+              <div className="form-actions">
+                <Button
+                  variant="outline"
+                  className="control-btn"
+                  disabled={busy}
+                  onClick={() => resolveConflict(true)}
+                >
+                  {t('Carregar dados do servidor')}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="control-btn"
+                  disabled={busy}
+                  onClick={() => resolveConflict(false)}
+                >
+                  {t('Manter as minhas alterações')}
+                </Button>
+              </div>
             </div>
           )}
           {notice && <output className="message">{t(notice)}</output>}
@@ -961,12 +1078,18 @@ export function Workspace({ displayName }: { displayName: string }) {
                         'Quem tiver o endereço pode consultar o perfil publicado enquanto o plano estiver activo. Pode retirar a publicação a qualquer momento. O perfil não é indexado em motores de pesquisa.',
                       )}
                     </p>
+                    <ProfileHandoff
+                      username={
+                        data.publishedUsername || data.profile?.username
+                      }
+                      published={data.published}
+                    />
                   </section>
                   <aside className="profile-preview-column">
                     <span className="preview-label">
                       {t('O SEU PERFIL · PRÉ-VISUALIZAÇÃO')}
                     </span>
-                    <IPhonePreview>
+                    <EditorLivePreview>
                       <MobileProfile
                         profile={profilePresentation(
                           publicProfile(profile),
@@ -979,13 +1102,8 @@ export function Workspace({ displayName }: { displayName: string }) {
                         published={data.published}
                         preview
                       />
-                    </IPhonePreview>
-                    <ProfileHandoff
-                      username={
-                        data.publishedUsername || data.profile?.username
-                      }
-                      published={data.published}
-                    />
+                    </EditorLivePreview>
+
                   </aside>
                 </div>
               )}

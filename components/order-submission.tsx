@@ -18,7 +18,7 @@ import {
 } from '@/lib/domain';
 import { validateDelivery } from '@/lib/delivery';
 import { MobileProfile } from './mobile-profile';
-import { IPhonePreview } from './iphone-preview';
+import { EditorLivePreview } from './editor-live-preview';
 import { ProfilePhotoUpload } from './profile-photo-upload';
 import { ProfileLinksEditor } from './profile-links-editor';
 import { OrderPayment } from './order-payment';
@@ -536,9 +536,9 @@ export function OrderSubmission({
                   onUpgrade={() => setStep(1)}
                 />
               </div>
-              <IPhonePreview>
+              <aside className="purchase-profile-preview"><EditorLivePreview>
                 <MobileProfile profile={profile} preview />
-              </IPhonePreview>
+              </EditorLivePreview></aside>
             </div>
           )}
           {step === 4 && (
@@ -643,9 +643,7 @@ export function OrderSubmission({
               >
                 {busy
                   ? t('A guardar…')
-                  : step === 3
-                    ? t('Guardar e continuar')
-                    : t('Continuar')}
+                  : t('Seguinte')}
               </button>
             ) : (
               <button

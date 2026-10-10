@@ -19,7 +19,10 @@ const materials: Record<string, string> = {
 export function productPhotos(products: Product[]): ProductPhoto[] {
   return products.flatMap((product) => {
     if (product.published === false || !materials[product.id]) return [];
-    const src = product.imageUrl;
+    const src = product.id === 'keychain' &&
+      ['/products/keychain.png', '/products/keychain.webp'].includes(product.imageUrl ?? '')
+      ? '/products/keychain-transparent.png'
+      : product.imageUrl;
     // The legacy leather seed uses the epoxy photograph, which is not a leather preview.
     if (
       !src ||

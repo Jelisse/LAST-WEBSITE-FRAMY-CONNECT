@@ -336,8 +336,8 @@ export function AgentApplicationForm({
           {t(
             'Acompanhe o resultado nesta página. Para esclarecimentos ou eliminação de documentos, contacte',
           )}{' '}
-          <a href="mailto:support@framyconnect.co.mz">
-            {t('support@framyconnect.co.mz')}
+          <a href="mailto:info@framyconnect.co.mz">
+            {t('info@framyconnect.co.mz')}
           </a>
           .
         </p>

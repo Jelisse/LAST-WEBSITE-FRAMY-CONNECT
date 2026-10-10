@@ -29,7 +29,7 @@ export const designServices = [
   {
     id: 'customer',
     name: 'O seu design',
-    description: 'Envie o seu design em PDF vectorial à equipa após o pedido.',
+    description: 'Carregue o seu design em PDF, PNG ou JPG antes do pagamento.',
   },
   {
     id: 'team',

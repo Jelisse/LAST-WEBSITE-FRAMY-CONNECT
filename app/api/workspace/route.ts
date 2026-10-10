@@ -457,9 +457,11 @@ export async function POST(request: Request) {
           ? JSON.stringify(publicProfile(profile))
           : null;
       const current = await db
-        .prepare('SELECT username FROM profiles WHERE owner_id = ?')
+        .prepare(
+          'SELECT username, published_json IS NOT NULL AS hasPublished FROM profiles WHERE owner_id = ?',
+        )
         .bind(user.userId)
-        .first<{ username: string }>();
+        .first<{ username: string; hasPublished: number }>();
       if (current && current.username !== profile.username)
         return json(
           {
@@ -521,7 +523,25 @@ export async function POST(request: Request) {
           },
           409,
         );
-      return json({ ok: true });
+      // Return the persisted state so the client can reflect a publish
+      // immediately instead of depending on a follow-up GET.
+      const nowPublished =
+        body.action === 'publish-profile'
+          ? true
+          : body.action === 'unpublish-profile'
+            ? false
+            : !!current?.hasPublished;
+      const visible =
+        nowPublished &&
+        hasProfileAccess(
+          membership as import('@/lib/entitlement').Membership | null,
+        );
+      return json({
+        ok: true,
+        profileVersion: body.version === 0 ? 1 : Number(body.version) + 1,
+        published: visible,
+        publishedUsername: visible ? profile.username : null,
+      });
     }
     if (
       body.action !== 'submit-order' &&

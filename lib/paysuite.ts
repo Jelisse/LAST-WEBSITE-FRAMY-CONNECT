@@ -1,5 +1,19 @@
 // Pure provider boundary. No secrets or customer details are logged.
 export const PAYSUITE_API = 'https://paysuite.tech/api/v1';
+export class PaySuiteError extends Error {
+  category: 'http' | 'timeout' | 'network' | 'invalid_response';
+  httpStatus: number | null;
+  constructor(category: 'http' | 'timeout' | 'network' | 'invalid_response', httpStatus: number | null = null) {
+    super('Não foi possível abrir o pagamento no prestador.');
+    this.category = category;
+    this.httpStatus = httpStatus;
+  }
+}
+export function paymentDiagnostic(error: unknown) {
+  return error instanceof PaySuiteError
+    ? { category: error.category, httpStatus: error.httpStatus }
+    : { category: 'invalid_response', httpStatus: null };
+}
 export type PaySuiteMethod = 'mpesa' | 'emola' | 'credit_card';
 export function paymentMethod(value: unknown): PaySuiteMethod {
   if (value !== 'mpesa' && value !== 'emola' && value !== 'credit_card')
@@ -59,9 +73,11 @@ export async function paysuiteRequest(
   transport: typeof fetch = fetch,
 ) {
   if (!token) throw Error('Pagamentos indisponíveis.');
-  const response = await transport(`${PAYSUITE_API}${path}`, {
+  let response: Response;
+  try { response = await transport(`${PAYSUITE_API}${path}`, {
     method: body ? 'POST' : 'GET',
-    redirect: 'error',
+    // Workers supports follow/manual only. Inspect redirects without forwarding credentials.
+    redirect: 'manual',
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: 'application/json',
@@ -69,16 +85,19 @@ export async function paysuiteRequest(
     },
     body: body ? JSON.stringify(body) : undefined,
     signal: AbortSignal.timeout(body ? 12000 : 3000),
-  });
+  }); } catch (error) {
+    throw new PaySuiteError(error instanceof Error && ['TimeoutError', 'AbortError'].includes(error.name) ? 'timeout' : 'network');
+  }
   // Never surface the provider body: it may contain credentials or customer information.
   if (!response.ok)
-    throw Error('Não foi possível confirmar o pedido no prestador.');
-  const result = (await response.json()) as {
+    throw new PaySuiteError('http', response.status);
+  let result: {
     status?: string;
     data?: Record<string, unknown>;
   };
+  try { result = await response.json(); } catch { throw new PaySuiteError('invalid_response', response.status); }
   if (result.status !== 'success' || !result.data)
-    throw Error('Resposta de pagamento inválida.');
+    throw new PaySuiteError('invalid_response', response.status);
   return result.data;
 }
 export function billingPeriodEnd(start: string, cycle: 'monthly' | 'annual') {
