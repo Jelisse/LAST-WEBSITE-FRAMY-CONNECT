@@ -470,6 +470,19 @@ export async function POST(request: Request) {
           },
           422,
         );
+        if (body.version === 0 && !current) {
+        const taken = await db
+          .prepare(
+            'SELECT owner_id FROM profiles WHERE username=? AND owner_id<>?',
+          )
+          .bind(profile.username, user.userId)
+          .first();
+        if (taken)
+          return json(
+            { error: 'O nome de utilizador já está em uso. Escolha outro.' },
+            422,
+          );
+      }
       let result;
       if (body.version === 0) {
         result = await db
