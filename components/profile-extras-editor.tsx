@@ -283,7 +283,7 @@ export function ProfileExtrasEditor({
             <option value="">{t('Primeiro contacto disponível')}</option>
             {contacts.map((c, i) => (
               <option key={c.url + i} value={c.url}>
-                {c.label}
+                {t(c.label)}
               </option>
             ))}
           </select>

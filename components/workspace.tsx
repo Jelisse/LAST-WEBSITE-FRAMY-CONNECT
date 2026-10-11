@@ -105,8 +105,8 @@ const menu = [
   { id: 'agent', label: 'Agente · teste', icon: BriefcaseBusiness },
   { id: 'ceo', label: 'CEO · teste', icon: ChartNoAxesCombined },
 ];
-const date = (value: string) =>
-  new Intl.DateTimeFormat('pt-MZ', {
+const date = (value: string, locale: string) =>
+  new Intl.DateTimeFormat(locale, {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',
@@ -570,21 +570,21 @@ export function Workspace({ displayName }: { displayName: string }) {
               <TableCell>
                 <strong>{t(o.productName)}</strong>
                 <small>
-                  #{o.id.slice(0, 8).toUpperCase()} · {date(o.createdAt)}
+                  #{o.id.slice(0, 8).toUpperCase()} · {date(o.createdAt, t.locale)}
                 </small>
               </TableCell>
               <TableCell>
                 <Button variant="ghost" onClick={() => inspect(o)}>
                   {o.deliveryCity ||
                     (['DELIVERED', 'CANCELLED'].includes(o.status)
-                      ? 'Não indicado'
-                      : 'Indicar local de entrega')}
+                      ? t('Não indicado')
+                      : t('Indicar local de entrega'))}
                 </Button>
               </TableCell>
               <TableCell>
                 <span className="status-badge">{t(orderLabels[o.status])}</span>
               </TableCell>
-              <TableCell>{payment(o)}</TableCell>
+              <TableCell>{t(payment(o))}</TableCell>
               <TableCell>{money(o.amount, t.locale)}</TableCell>
               <TableCell>{o.agent || t('Por atribuir')}</TableCell>
               <TableCell>
@@ -945,7 +945,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                                   });
                                   setDirty(true);
                                 }}
-                                placeholder={f.placeholder}
+                                placeholder={t(f.placeholder)}
                               />
                             </label>
                           ))}
@@ -1342,22 +1342,24 @@ export function Workspace({ displayName }: { displayName: string }) {
                         <div className="audit-row" key={e.id}>
                           <span className="tiny-dot" />
                           <strong>
-                            {(
-                              {
-                                created: 'Pedido criado',
-                                'delivery-address': 'Local de entrega indicado',
-                                pay: 'Pagamento simulado',
-                                assign: 'Agente atribuído',
-                                start: 'Produção iniciada',
-                                ready: 'QC concluído',
-                                deliver: 'Entrega simulada',
-                                cancel: 'Pedido cancelado',
-                                refund: 'Reembolso simulado',
-                              } as Record<string, string>
-                            )[e.action] ?? e.action}
+                            {t(
+                              (
+                                {
+                                  created: 'Pedido criado',
+                                  'delivery-address': 'Local de entrega indicado',
+                                  pay: 'Pagamento simulado',
+                                  assign: 'Agente atribuído',
+                                  start: 'Produção iniciada',
+                                  ready: 'QC concluído',
+                                  deliver: 'Entrega simulada',
+                                  cancel: 'Pedido cancelado',
+                                  refund: 'Reembolso simulado',
+                                } as Record<string, string>
+                              )[e.action] ?? e.action,
+                            )}
                           </strong>
                           <span>#{e.orderId.slice(0, 8).toUpperCase()}</span>
-                          <time>{date(e.createdAt)}</time>
+                          <time>{date(e.createdAt, t.locale)}</time>
                         </div>
                       ))
                     ) : (
@@ -1379,7 +1381,7 @@ export function Workspace({ displayName }: { displayName: string }) {
         }}
       >
         <DialogContent className="order-dialog">
-          <DialogTitle>{selected?.productName}</DialogTitle>
+          <DialogTitle>{selected ? t(selected.productName) : null}</DialogTitle>
           <DialogDescription>
             {t('Pedido #')}
             {selected?.id.slice(0, 8).toUpperCase()}
@@ -1392,7 +1394,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                 </span>
                 <strong>{money(selected.amount, t.locale)}</strong>
               </div>
-              <p>{payment(selected)}</p>
+              <p>{t(payment(selected))}</p>
               <OrderPayment orderId={selected.id} />
               <AgentContact order={selected} />
               <DeliveryEditor
@@ -1434,20 +1436,22 @@ export function Workspace({ displayName }: { displayName: string }) {
                           {new Date(e.createdAt).toLocaleString(t.locale)}
                         </time>{' '}
                         —{' '}
-                        {(
-                          {
-                            created: 'Pedido criado',
-                            'delivery-address': 'Local de entrega indicado',
-                            pay: 'Pagamento confirmado',
-                            assign: 'Agente atribuído',
-                            start: 'Produção iniciada',
-                            ready:
-                              'Controlo de qualidade concluído · Pronto para entrega',
-                            deliver: 'Entrega concluída',
-                            cancel: 'Pedido cancelado',
-                            refund: 'Pagamento reembolsado',
-                          } as Record<string, string>
-                        )[e.action] ?? e.action}
+                        {t(
+                          (
+                            {
+                              created: 'Pedido criado',
+                              'delivery-address': 'Local de entrega indicado',
+                              pay: 'Pagamento confirmado',
+                              assign: 'Agente atribuído',
+                              start: 'Produção iniciada',
+                              ready:
+                                'Controlo de qualidade concluído · Pronto para entrega',
+                              deliver: 'Entrega concluída',
+                              cancel: 'Pedido cancelado',
+                              refund: 'Pagamento reembolsado',
+                            } as Record<string, string>
+                          )[e.action] ?? e.action,
+                        )}
                       </li>
                     ))}
                 </ol>

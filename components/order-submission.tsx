@@ -444,7 +444,7 @@ export function OrderSubmission({
                       {p.id === FREE_PLAN_ID
                         ? t('30 dias grátis · 0 MT')
                         : p.id === data?.membership.planId
-                          ? `${t(p.name)} · plano actual`
+                          ? `${t(p.name)} · ${t('plano actual')}`
                           : t('{0} · {1}/mês · Em breve', [
                               t(p.name),
                               planPrice(p, t.locale),

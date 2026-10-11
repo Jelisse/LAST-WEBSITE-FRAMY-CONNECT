@@ -14,6 +14,7 @@ import {
   cardCopyFields,
 } from '@/lib/card-art';
 import { clearLogoBackground } from '@/lib/logo-background';
+import type { translator } from '@/lib/i18n';
 import { artworkFile } from '@/lib/artwork-storage';
 import {
   blankOption,
@@ -52,7 +53,11 @@ export function InventoryPhoto({
     </svg>
   );
 }
-async function renderFile(blob: Blob, page: number) {
+async function renderFile(
+  blob: Blob,
+  page: number,
+  t: ReturnType<typeof translator>,
+) {
   if (blob.type === 'application/pdf') {
     const pdfjs = await import('pdfjs-dist');
     pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -63,7 +68,7 @@ async function renderFile(blob: Blob, page: number) {
     try {
       const pdf = await task.promise;
       if (page > pdf.numPages)
-        throw Error(`Este PDF tem ${pdf.numPages} páginas.`);
+        throw Error(t('Este PDF tem {0} páginas.', [pdf.numPages]));
       const p = await pdf.getPage(page);
       const base = p.getViewport({ scale: 1 });
       const viewport = p.getViewport({
@@ -213,7 +218,7 @@ export function ProductDesigner({
             if (!r.ok) throw Error('Ficheiro indisponível.');
             blob = await r.blob();
           }
-          if (blob) next[s] = await renderFile(blob, a.page);
+          if (blob) next[s] = await renderFile(blob, a.page, t);
           else throw Error('Seleccione novamente o ficheiro de design.');
         }
         if (active) {
@@ -244,6 +249,7 @@ export function ProductDesigner({
     design.back?.page,
     design.front?.assetId,
     design.back?.assetId,
+    t,
   ]);
   async function upload(file?: File) {
     if (!file) return;
@@ -261,7 +267,7 @@ export function ProductDesigner({
       )
         throw Error('Use PNG, JPG ou PDF até 8 MB.');
       const fileKey = crypto.randomUUID();
-      await renderFile(file, 1);
+      await renderFile(file, 1, t);
       await artworkFile(fileKey, file);
       setOriginals((prev) => ({ ...prev, [side]: undefined }));
       onChange({
@@ -531,14 +537,14 @@ export function ProductDesigner({
       ctx.fillStyle = '#222';
       ctx.font = 'bold 30px Arial';
       ctx.fillText(
-        profile.name || 'Nome do titular',
+        profile.name || t('Nome do titular'),
         w * 0.05,
         h * 0.77,
         w * 0.61,
       );
       ctx.font = '24px Arial';
       ctx.fillText(
-        profile.email || 'Email do titular',
+        profile.email || t('Email do titular'),
         w * 0.05,
         h * 0.85,
         w * 0.61,
@@ -567,7 +573,7 @@ export function ProductDesigner({
         {!readOnly && stockError && (
           <div role="alert">
             <p>
-              {stockError}
+              {t(stockError)}
               {t(' As opções serão activadas após confirmar o stock.')}
             </p>
             <button
@@ -838,12 +844,12 @@ export function ProductDesigner({
                       const defaults = {
                         brand: 'Logo',
                         subtitle: '',
-                        name: profile.name || 'Nome do titular',
-                        email: profile.email || 'Email do titular',
+                        name: profile.name || t('Nome do titular'),
+                        email: profile.email || t('Email do titular'),
                         action:
                           design.cardTheme === 'plain' && side === 'front'
                             ? ''
-                            : 'Aproxime ou leia o QR',
+                            : t('Aproxime ou leia o QR'),
                       };
                       const labels = {
                         brand: 'Logo / nome da marca',

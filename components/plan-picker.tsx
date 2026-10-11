@@ -149,7 +149,7 @@ export function PlanPicker({
                       ? t('O seu plano')
                       : plan.id === 'professional-v2'
                         ? t('A nossa sugestão')
-                        : plan.audience}
+                        : t(plan.audience)}
                   </span>
                   <h3>{t(plan.name)}</h3>
                   <p>{t(plan.description)}</p>
@@ -188,7 +188,7 @@ export function PlanPicker({
                       : plan.id === 'free-30'
                         ? t('Começar 30 dias grátis')
                         : paidAvailable
-                          ? 'Ver opções de pagamento'
+                          ? t('Ver opções de pagamento')
                           : t('Em breve')}
                     {plan.id !== current && <ArrowRight size={16} />}
                   </Button>

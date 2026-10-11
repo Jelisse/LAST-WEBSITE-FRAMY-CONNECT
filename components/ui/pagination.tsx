@@ -1,6 +1,9 @@
+'use client';
+
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/components/language-provider';
 import { Button } from '@/components/ui/button';
 import {
   ChevronLeftIcon,
@@ -9,10 +12,11 @@ import {
 } from 'lucide-react';
 
 function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
+  const { t } = useI18n();
   return (
     <nav
       role="navigation"
-      aria-label="pagination"
+      aria-label={t('Paginação')}
       data-slot="pagination"
       className={cn('mx-auto flex w-full justify-center', className)}
       {...props}
@@ -68,35 +72,37 @@ function PaginationLink({
 
 function PaginationPrevious({
   className,
-  text = 'Previous',
+  text,
   ...props
 }: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
+  const { t } = useI18n();
   return (
     <PaginationLink
-      aria-label="Go to previous page"
+      aria-label={t('Ir para a página anterior')}
       size="default"
       className={cn('pl-1.5!', className)}
       {...props}
     >
       <ChevronLeftIcon data-icon="inline-start" className="cn-rtl-flip" />
-      <span className="hidden sm:block">{text}</span>
+      <span className="hidden sm:block">{text ?? t('Anterior')}</span>
     </PaginationLink>
   );
 }
 
 function PaginationNext({
   className,
-  text = 'Next',
+  text,
   ...props
 }: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
+  const { t } = useI18n();
   return (
     <PaginationLink
-      aria-label="Go to next page"
+      aria-label={t('Ir para a página seguinte')}
       size="default"
       className={cn('pr-1.5!', className)}
       {...props}
     >
-      <span className="hidden sm:block">{text}</span>
+      <span className="hidden sm:block">{text ?? t('Seguinte')}</span>
       <ChevronRightIcon data-icon="inline-end" className="cn-rtl-flip" />
     </PaginationLink>
   );
@@ -106,6 +112,7 @@ function PaginationEllipsis({
   className,
   ...props
 }: React.ComponentProps<'span'>) {
+  const { t } = useI18n();
   return (
     <span
       aria-hidden
@@ -117,7 +124,7 @@ function PaginationEllipsis({
       {...props}
     >
       <MoreHorizontalIcon />
-      <span className="sr-only">More pages</span>
+      <span className="sr-only">{t('Mais páginas')}</span>
     </span>
   );
 }

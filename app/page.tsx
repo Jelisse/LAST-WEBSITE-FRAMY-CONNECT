@@ -217,7 +217,7 @@ export default async function Home() {
             {questions.map(([q, a]) => (
               <details key={q}>
                 <summary>{t(q)}</summary>
-                <p>{q === 'Já posso comprar?' && checkoutAvailable ? 'Sim. Configure o produto e confirme o total antes de pagar na PaySuite. Entregas fora da cidade de Maputo requerem proposta.' : t(a)}</p>
+                <p>{q === 'Já posso comprar?' && checkoutAvailable ? t('Sim. Configure o produto e confirme o total antes de pagar na PaySuite. Entregas fora da cidade de Maputo requerem proposta.') : t(a)}</p>
               </details>
             ))}
           </div>

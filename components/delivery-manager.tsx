@@ -97,7 +97,7 @@ export function DeliveryManager() {
         </button>
       </div>
       {error && <p role="alert">{t(error)}</p>}
-      {message && <output>{message}</output>}
+      {message && <output>{t(message)}</output>}
       {settings && (
         <form
           className="suite-form"

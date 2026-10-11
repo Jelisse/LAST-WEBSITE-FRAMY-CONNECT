@@ -188,11 +188,11 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
         <form onSubmit={save} className="product-management-form">
           {draft.id === 'keychain-leather' && (
             <label>
-              Dimensões do porta-chaves de couro (mm)
+              {t('Dimensões do porta-chaves de couro (mm)')}
               <Input
                 value={draft.dimensions ?? ''}
                 maxLength={300}
-                placeholder="Altura × largura × espessura; área de gravação"
+                placeholder={t('Altura × largura × espessura; área de gravação')}
                 onChange={(e) =>
                   setDraft({ ...draft, dimensions: e.target.value })
                 }
@@ -273,7 +273,9 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
                   }
                 >
                   {['Cartões', 'Acessórios', 'Para organizações'].map((c) => (
-                    <option key={c}>{c}</option>
+                    <option key={c} value={c}>
+                      {t(c)}
+                    </option>
                   ))}
                 </select>
               </label>

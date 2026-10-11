@@ -31,7 +31,7 @@ export function PaySuitePlanCheckout({
   const amount = cycle === 'annual' ? planAnnualMeticais(plan) : plan.meticais;
   return (
     <article>
-      <h3>{plan.name}</h3>
+      <h3>{t(plan.name)}</h3>
       <label>
         {t(' Período de acesso ')}
         <select value={cycle} onChange={(e) => setCycle(e.target.value)}>

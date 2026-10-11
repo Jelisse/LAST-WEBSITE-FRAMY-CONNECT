@@ -1,9 +1,13 @@
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { PaymentReturn } from '@/components/payment-return';
-export const metadata = {
-  title: 'Framy Connect — Pagamento',
-  robots: { index: false, follow: false },
-};
+import { getTranslations } from '@/lib/server-i18n';
+export async function generateMetadata() {
+  const t = await getTranslations();
+  return {
+    title: t('Framy Connect — Pagamento'),
+    robots: { index: false, follow: false },
+  };
+}
 export default function Page() {
   return (
     <>

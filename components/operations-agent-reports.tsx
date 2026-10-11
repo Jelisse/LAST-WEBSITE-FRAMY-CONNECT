@@ -53,7 +53,7 @@ export function OperationsAgentReports() {
           <p>
             {r.orderId && t('Pedido #{0}', [r.orderId])}
             {r.productId &&
-              `Produto: ${r.productId} · Quantidade: ${r.quantity}`}
+              `${t('Produto: {0}', [r.productId])} · ${t('Quantidade: {0}', [r.quantity])}`}
           </p>
           {r.summary && (
             <p>

@@ -48,7 +48,7 @@ export default async function Page({
           </Link>
         </aside>
       )}
-      <Workspace displayName={user.fullName ?? 'Olá'} />
+      <Workspace displayName={user.fullName ?? t('Olá')} />
     </>
   );
 }

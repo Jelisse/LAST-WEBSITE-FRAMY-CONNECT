@@ -32,13 +32,13 @@ type Data = {
     description: string;
   }[];
 };
-const money = (v: number) =>
-  new Intl.NumberFormat('pt-MZ', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(v / 100) + ' MT';
 export function FinanceManager() {
   const { t } = useI18n();
+  const money = (v: number) =>
+    new Intl.NumberFormat(t.locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(v / 100) + ' MT';
   const today = maputoDay(new Date().toISOString());
   const [from, setFrom] = useState(today.slice(0, 7) + '-01'),
     [to, setTo] = useState(today),
@@ -215,7 +215,7 @@ export function FinanceManager() {
                         min={0}
                         max={Math.max(totals.received, 1)}
                         value={Number(value)}
-                        aria-label={String(label)}
+                        aria-label={t(String(label))}
                       />
                     </div>
                   ))}
@@ -341,7 +341,7 @@ export function FinanceManager() {
                         <td>{money(o.amount)}</td>
                         <td>
                           {data.documents.find((d) => d.operation_id === o.id)
-                            ?.reference ?? 'Por associar'}
+                            ?.reference ?? t('Por associar')}
                         </td>
                         <td>
                           <button onClick={() => setSelected(o)}>
@@ -595,7 +595,7 @@ export function FinanceManager() {
                         .map((e) => (
                           <tr key={e.id}>
                             <td>{e.occurred_on}</td>
-                            <td>{entryLabels[e.kind]}</td>
+                            <td>{t(entryLabels[e.kind])}</td>
                             <td>{e.reference}</td>
                             <td>{money(e.amount)}</td>
                             <td>{e.notes}</td>
@@ -711,7 +711,7 @@ export function FinanceManager() {
                 <h3>{t('Fecho dos registos de gestão')}</h3>
                 <p>
                   {t(' Fechado até: ')}
-                  {data.closedThrough ?? 'Nenhum período'}
+                  {data.closedThrough ?? t('Nenhum período')}
                   {t(
                     '. Impede novos movimentos manuais e alterações a documentos nos períodos fechados. Correcções por estorno ficam no período aberto; o fecho não interrompe confirmações automáticas do prestador. ',
                   )}

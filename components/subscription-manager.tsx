@@ -60,12 +60,12 @@ const states: Record<string, string> = {
   grace: 'Em tolerância',
   basic: 'Contacto básico',
 };
-const when = (s?: string) =>
+const when = (s: string | undefined, locale: string) =>
   s
-    ? new Date(s).toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo' })
+    ? new Date(s).toLocaleDateString(locale, { timeZone: 'Africa/Maputo' })
     : '—';
 export function SubscriptionManager() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [data, setData] = useState<Data | null>(null),
     [tab, setTab] = useState('plans'),
     [error, setError] = useState(''),
@@ -272,7 +272,7 @@ export function SubscriptionManager() {
                   <div className="suite-grid">
                     {(['name', 'audience'] as const).map((key, i) => (
                       <label key={key}>
-                        {['Nome do plano', 'Público'][i]}
+                        {t(['Nome do plano', 'Público'][i])}
                         <input
                           required
                           maxLength={90}
@@ -389,13 +389,13 @@ export function SubscriptionManager() {
                             setEditing({ ...editing, [k]: e.target.checked })
                           }
                         />
-                        {
+                        {t(
                           [
                             'Publicar plano',
                             'Permitir pagamento mensal',
                             'Permitir pagamento anual',
-                          ][i]
-                        }
+                          ][i],
+                        )}
                       </label>
                     ))}
                   </div>
@@ -464,14 +464,21 @@ export function SubscriptionManager() {
                     <span className="manager-eyebrow">
                       {t(p.active ? 'PUBLICADO' : 'ARQUIVADO')}
                     </span>
-                    <h2>{p.name}</h2>
-                    <p>{p.description}</p>
+                    <h2>{t(p.name)}</h2>
+                    <p>{t(p.description)}</p>
                     <strong>
-                      {t(
-                        p.id === 'free-30'
-                          ? 'Grátis'
-                          : `${p.monthlyEnabled ? 'Mensal: ' + planPrice(p) : 'Mensal indisponível'} · ${p.annualEnabled ? 'Anual: ' + planPrice({ meticais: planAnnualMeticais(p) }) : 'Anual indisponível'}`,
-                      )}
+                      {p.id === 'free-30'
+                        ? t('Grátis')
+                        : [
+                            p.monthlyEnabled
+                              ? t('Mensal: {0}', [planPrice(p)])
+                              : t('Mensal indisponível'),
+                            p.annualEnabled
+                              ? t('Anual: {0}', [
+                                  planPrice({ meticais: planAnnualMeticais(p) }),
+                                ])
+                              : t('Anual indisponível'),
+                          ].join(' · ')}
                     </strong>
                     <p>
                       {p.links} {t(' links · ')}
@@ -555,11 +562,13 @@ export function SubscriptionManager() {
                           })()}
                         </td>
                         <td>{t(states[m.state])}</td>
-                        <td>{when(m.paid_expires_at ?? m.trial_expires_at)}</td>
+                        <td>
+                          {when(m.paid_expires_at ?? m.trial_expires_at, locale)}
+                        </td>
                         <td>
                           {t(
                             m.next_starts_at
-                              ? `${m.next_plan_id} · ${when(m.next_starts_at)}`
+                              ? `${m.next_plan_id} · ${when(m.next_starts_at, locale)}`
                               : '—',
                           )}
                         </td>
@@ -723,7 +732,7 @@ export function SubscriptionManager() {
               {data.audit.length ? (
                 data.audit.map((a, i) => (
                   <p key={i}>
-                    {when(a.created_at)} · {a.actor} · {a.action} ·{' '}
+                    {when(a.created_at, locale)} · {a.actor} · {a.action} ·{' '}
                     {t(
                       a.action.startsWith('Renovação:')
                         ? 'Definições de comunicação'

@@ -23,5 +23,5 @@ export default async function Page() {
         <Link href="/dashboard">{t('Abrir a minha conta')}</Link>
       </main>
     );
-  return <ManagerWorkspace displayName={user.fullName ?? 'Gestor'} />;
+  return <ManagerWorkspace displayName={user.fullName ?? t('Gestor')} />;
 }

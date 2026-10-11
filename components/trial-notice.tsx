@@ -22,7 +22,13 @@ export function TrialNotice({
               ? 'A página pública mostra apenas nome, fotografia e um contacto. Os restantes dados continuam guardados.'
               : membership.accessState === 'grace'
                 ? 'Está nos 7 dias de tolerância. Renove para manter todas as funcionalidades.'
-                : `Plano pago até ${membership.expiresAt ? new Intl.DateTimeFormat(locale).format(new Date(membership.expiresAt)) : '—'}. Sem renovação automática.`,
+                : t('Plano pago até {0}. Sem renovação automática.', [
+                    membership.expiresAt
+                      ? new Intl.DateTimeFormat(locale).format(
+                          new Date(membership.expiresAt),
+                        )
+                      : '—',
+                  ]),
           )}
         </p>
         <Link href="/perfil?tools=1">{t('Gerir plano e renovação →')}</Link>

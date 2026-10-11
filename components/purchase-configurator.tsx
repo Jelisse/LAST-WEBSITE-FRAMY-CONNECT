@@ -527,7 +527,11 @@ export function PurchaseConfigurator({
                         item.id === 'standard'
                           ? t(pvcModel(pvc).name)
                           : isLeather
-                            ? `Fotografia de referência · couro ${leather.color === 'black' ? 'preto' : 'castanho'}`
+                            ? t('Fotografia de referência · couro {0}', [
+                                leather.color === 'black'
+                                  ? t('preto')
+                                  : t('castanho'),
+                              ])
                             : (
                                 designImages.find(
                                   (row) => row.id === item.id,
@@ -714,8 +718,8 @@ export function PurchaseConfigurator({
             {city && (
               <label>
                 {delivery === 'pickup'
-                  ? 'Contacto para o aviso de levantamento'
-                  : 'Contacto do destinatário'}
+                  ? t('Contacto para o aviso de levantamento')
+                  : t('Contacto do destinatário')}
                 <input
                   type="tel"
                   value={contact}
@@ -772,11 +776,11 @@ export function PurchaseConfigurator({
               ·{' '}
               {design === 'standard'
                 ? leather.logo === 'full'
-                  ? 'Logo completo'
-                  : 'Símbolo F'
+                  ? t('Logo completo')
+                  : t('Símbolo F')
                 : design === 'customer'
-                  ? 'O seu logótipo'
-                  : 'Design pela equipa'}
+                  ? t('O seu logótipo')
+                  : t('Design pela equipa')}
             </p>
           )}
           {isPvcStandard && (
@@ -873,8 +877,8 @@ export function PurchaseConfigurator({
           {signedIn && paymentAvailable && total !== null && !deliveryReady && (
             <p className="purchase-help">
               {delivery === 'pickup'
-                ? 'Indique o contacto para o aviso de levantamento.'
-                : 'Preencha o contacto e a morada para continuar.'}
+                ? t('Indique o contacto para o aviso de levantamento.')
+                : t('Preencha o contacto e a morada para continuar.')}
             </p>
           )}
           <PaySuiteCheckout

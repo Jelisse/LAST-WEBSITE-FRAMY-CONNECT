@@ -1,9 +1,13 @@
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { PaySuiteStatus } from '@/components/paysuite-status';
-export const metadata = {
-  title: 'Estado do pagamento',
-  robots: { index: false, follow: false },
-};
+import { getTranslations } from '@/lib/server-i18n';
+export async function generateMetadata() {
+  const t = await getTranslations();
+  return {
+    title: t('Estado do pagamento'),
+    robots: { index: false, follow: false },
+  };
+}
 export default function Page() {
   return (
     <>

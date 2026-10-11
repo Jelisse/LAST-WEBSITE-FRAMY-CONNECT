@@ -590,14 +590,16 @@ function GrowthTool({
               <h3>{domains.domain.hostname}</h3>
               <p>
                 {t(' Estado:')}{' '}
-                {(
-                  {
-                    pending: 'A aguardar prova de propriedade',
-                    verified: 'Propriedade verificada · aguarda configuração',
-                    validating: 'A validar DNS e certificado',
-                    active: 'Activo com HTTPS',
-                  } as Record<string, string>
-                )[domains.domain.status] ?? domains.domain.status}
+                {t(
+                  (
+                    {
+                      pending: 'A aguardar prova de propriedade',
+                      verified: 'Propriedade verificada · aguarda configuração',
+                      validating: 'A validar DNS e certificado',
+                      active: 'Activo com HTTPS',
+                    } as Record<string, string>
+                  )[domains.domain.status] ?? domains.domain.status,
+                )}
               </p>
               <ol>
                 <li>

@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useI18n } from './language-provider';
+import { translator } from '@/lib/i18n';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from './ui/dialog';
 import {
   readConsent,
@@ -138,37 +139,36 @@ export function ProfileMeasurementChoice({
   english?: boolean;
   choose: (value: string) => void;
 }) {
-  const { t } = useI18n();
+  const { locale } = useI18n();
+  const tc = translator(english ? 'en' : locale);
   if (consent === 'pending' || consent === 'blocked') return null;
   if (consent) return (
     <button type="button" className="sr-only focus:not-sr-only" onClick={() => choose('')}>
-      {english ? 'Measurement preferences' : t('Preferências de medição')}
+      {tc('Preferências de medição')}
     </button>
   );
   return (
     <aside className="profile-measurement">
       {consent ? (
         <button type="button" onClick={() => choose('')}>
-          {english ? 'Measurement preferences' : t('Preferências de medição')}
+          {tc('Preferências de medição')}
         </button>
       ) : (
         <Dialog open onOpenChange={(open) => { if (!open) choose('no'); }}>
           <DialogContent className="profile-consent-dialog" showCloseButton={false}>
-          <DialogTitle className="sr-only">{english ? 'Measurement preferences' : t('Preferências de medição')}</DialogTitle>
+          <DialogTitle className="sr-only">{tc('Preferências de medição')}</DialogTitle>
           <DialogDescription>
-            {english
-              ? 'Allow this profile owner to count visits and clicks? This is optional. We do not share your identity or contact details.'
-              : t(
-                  'Permitir a contagem de visitas e cliques para o titular deste perfil? É opcional. Não partilhamos a sua identidade ou os seus contactos.',
-                )}
+            {tc(
+              'Permitir a contagem de visitas e cliques para o titular deste perfil? É opcional. Não partilhamos a sua identidade ou os seus contactos.',
+            )}
           </DialogDescription>
-          <p>{english ? 'Connections appear as a public total. With your permission, a random identifier on this device prevents repeat counting for up to 90 days.' : t('As conexões aparecem como um total público. Com a sua autorização, um identificador aleatório neste dispositivo evita contagens repetidas por até 90 dias.')}</p>
+          <p>{tc('As conexões aparecem como um total público. Com a sua autorização, um identificador aleatório neste dispositivo evita contagens repetidas por até 90 dias.')}</p>
           <div>
             <button type="button" onClick={() => choose('no')}>
-              {english ? 'Decline' : t('Recusar')}
+              {tc('Recusar')}
             </button>
             <button type="button" onClick={() => choose('yes')}>
-              {english ? 'Allow' : t('Permitir')}
+              {tc('Permitir')}
             </button>
           </div>
           </DialogContent>

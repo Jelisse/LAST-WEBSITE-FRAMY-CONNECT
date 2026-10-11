@@ -11,9 +11,14 @@ import {
 import { Upload, RotateCcw, Ruler, Check, Eraser } from 'lucide-react';
 import { SourceImage } from './source-image';
 import { useI18n } from './language-provider';
+import type { translator } from '@/lib/i18n';
 import { removeLogoBackground } from '@/lib/logo-background';
 import type { LeatherDesign } from '@/lib/leather-design';
-async function previewFile(blob: Blob, page: number) {
+async function previewFile(
+  blob: Blob,
+  page: number,
+  t: ReturnType<typeof translator>,
+) {
   if (blob.type === 'application/pdf') {
     const pdfjs = await import('pdfjs-dist');
     pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -24,7 +29,7 @@ async function previewFile(blob: Blob, page: number) {
     try {
       const pdf = await task.promise;
       if (page > pdf.numPages)
-        throw Error(`O PDF tem ${pdf.numPages} página(s).`);
+        throw Error(t('O PDF tem {0} página(s).', [pdf.numPages]));
       const sheet = await pdf.getPage(page),
         base = sheet.getViewport({ scale: 1 }),
         viewport = sheet.getViewport({
@@ -71,7 +76,16 @@ export function LeatherPreview({
       <SourceImage
         className="leather-photo"
         src={photo}
-        alt={`Porta-chaves de couro ${value.color === 'brown' ? 'castanho' : 'preto'} · ${back ? 'verso NFC' : custom ? 'frente para personalizar' : logo === 'full' ? 'logo completo' : 'símbolo F'}`}
+        alt={t('Porta-chaves de couro {0} · {1}', [
+          value.color === 'brown' ? t('castanho') : t('preto'),
+          back
+            ? t('verso NFC')
+            : custom
+              ? t('frente para personalizar')
+              : logo === 'full'
+                ? t('logo completo')
+                : t('símbolo F'),
+        ])}
         width={985}
         height={1024}
       />
@@ -155,7 +169,7 @@ export function LeatherConfigurator({
         if (!originalRef.current)
           originalRef.current = { blob, name: originalName() };
         if (alive) setIsPdf(blob.type === 'application/pdf');
-        return previewFile(blob, value.page);
+        return previewFile(blob, value.page, t);
       })
       .then((src) => {
         if (alive && seq === sequence.current) setPreview(src);
@@ -173,7 +187,7 @@ export function LeatherConfigurator({
       alive = false;
       onBusy(false);
     };
-  }, [value.assetId, value.page, onBusy, setPreview]);
+  }, [value.assetId, value.page, onBusy, setPreview, t]);
   async function upload(file?: File, preserveOriginal = false) {
     if (!file) return;
     const seq = ++sequence.current;
@@ -184,7 +198,7 @@ export function LeatherConfigurator({
       if (file.size > 8 * 1024 * 1024) throw Error('Máximo: 8 MB.');
       if (!['application/pdf', 'image/png', 'image/jpeg'].includes(file.type))
         throw Error('Use PDF, PNG ou JPG.');
-      const src = await previewFile(file, 1);
+      const src = await previewFile(file, 1, t);
       if (seq !== sequence.current) return;
       setPreview(src);
       if (!preserveOriginal) {
@@ -312,7 +326,7 @@ export function LeatherConfigurator({
               <Ruler size={18} aria-hidden="true" />
               <div>
                 <strong>{t('Dimensões do produto')}</strong>
-                <p>{dimensions || 'Medidas a confirmar pela equipa.'}</p>
+                <p>{dimensions || t('Medidas a confirmar pela equipa.')}</p>
                 <small>
                   {t('Couro · Argola metálica · Verso com símbolo NFC')}
                 </small>
@@ -396,7 +410,7 @@ export function LeatherConfigurator({
                         if (Number.isInteger(page) && page > 0 && page <= 100) {
                           update({ page });
                           if (!value.assetId && fileRef.current)
-                            void previewFile(fileRef.current, page)
+                            void previewFile(fileRef.current, page, t)
                               .then((src) => {
                                 setPreview(src);
                                 setError('');

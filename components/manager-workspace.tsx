@@ -342,7 +342,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                 <td>
                   <button
                     className="manager-icon"
-                    aria-label={'Abrir pedido ' + o.id.slice(0, 8)}
+                    aria-label={t('Abrir pedido {0}', [o.id.slice(0, 8)])}
                     onClick={() => inspect(o)}
                   >
                     <ArrowUpRight size={18} />
@@ -406,7 +406,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
           <AccountMenu />
         </header>
         <main id="main" className="manager-main">
-          <Link className="btn" href="/manager/pagamentos">Checkout e pagamentos PaySuite</Link>
+          <Link className="btn" href="/manager/pagamentos">{t('Checkout e pagamentos PaySuite')}</Link>
           <div className="manager-heading">
             <div>
               <span className="manager-eyebrow">{t('CENTRO DE GESTÃO')}</span>
@@ -433,7 +433,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                                   'Crie acessos, recupere contas e controle a disponibilidade da equipa.',
                                 )
                               : section === 'subscriptions'
-                                ? 'Gerir adesões e pagamentos dos planos digitais.'
+                                ? t('Gerir adesões e pagamentos dos planos digitais.')
                               : t(
                                   'Acompanhe os valores recebidos, pendentes e reconhecidos.',
                                 )}
@@ -897,7 +897,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                                   return physical || reserved ? (
                                     <tr key={a.id + p.id}>
                                       <td>
-                                        {a.name}
+                                        {t(a.name)}
                                         {!a.active ? t(' · Inactivo') : ''}
                                       </td>
                                       <td>{t(p.name)}</td>

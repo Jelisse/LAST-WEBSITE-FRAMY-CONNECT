@@ -25,7 +25,7 @@ export function DeliverySelector({
     settings?.points.filter((p) => p.cityId === city && p.active) ?? [];
   const selectedPoint = points.find((p) => p.id === point);
   const amount = (n: number) =>
-    new Intl.NumberFormat('pt-MZ', {
+    new Intl.NumberFormat(t.locale, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(n / 100) + ' MT';

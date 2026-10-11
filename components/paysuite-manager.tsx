@@ -235,7 +235,7 @@ export function PaySuiteManager() {
                     <p>
                       {t(' Perfil:')}{' '}
                       {c.profileUsername ||
-                        'A aguardar configuração pelo cliente'}
+                        t('A aguardar configuração pelo cliente')}
                     </p>
                     <p>
                       {t(' Produtos: ')}

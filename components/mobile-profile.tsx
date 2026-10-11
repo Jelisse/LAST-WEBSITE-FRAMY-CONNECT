@@ -2,6 +2,7 @@
 import { ProfilePublicExtras } from './profile-public-extras';
 import { ProfileConnectionCount } from './profile-connection-count';
 import { useI18n } from '@/components/language-provider';
+import { translator } from '@/lib/i18n';
 
 import Image from 'next/image';
 import { PortraitBackground } from './portrait-background';
@@ -76,8 +77,9 @@ export function MobileProfile({
   measure?: boolean;
   demoConnectionLabel?: string;
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [english, setEnglish] = useState(false);
+  const tc = translator(english ? 'en' : locale);
   const [photoOpen, setPhotoOpen] = useState(false);
   const translation = sourceProfile.extras?.english;
   const profile = english
@@ -268,8 +270,8 @@ export function MobileProfile({
                   className="studio-save-contact"
                   disabled={!profile.name}
                   onClick={download}
-                  aria-label={english ? 'Save contact' : t('Guardar contacto')}
-                  title={english ? 'Save contact' : t('Guardar contacto')}
+                  aria-label={tc('Guardar contacto')}
+                  title={tc('Guardar contacto')}
                 >
                   <UserRoundPlus size={20} aria-hidden="true" />
                 </button>
@@ -279,8 +281,8 @@ export function MobileProfile({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => measurement.record('whatsapp')}
-                    aria-label="WhatsApp"
-                    title="WhatsApp"
+                    aria-label={t('WhatsApp')}
+                    title={t('WhatsApp')}
                   >
                     <MessageCircle size={20} aria-hidden="true" />
                   </a>
@@ -294,11 +296,11 @@ export function MobileProfile({
                 )) && (
                 <nav
                   className="profile-content-languages"
-                  aria-label="Idioma do conteúdo"
+                  aria-label={tc('Idioma do conteúdo')}
                 >
                   <button
                     type="button"
-                    aria-label={english ? 'Mudar para português' : 'Switch to English'}
+                    aria-label={english ? tc('Mudar para português') : tc('Mudar para inglês')}
                     onClick={() => setEnglish((value) => !value)}
                   >
                     <Languages size={20} aria-hidden="true" />
@@ -315,7 +317,7 @@ export function MobileProfile({
               {business?.hours && (
                 <p>
                   <strong>
-                    {english ? 'Business hours' : t('Horário de atendimento')}
+                    {tc('Horário de atendimento')}
                   </strong>
                   <span>{business.hours}</span>
                 </p>
@@ -323,7 +325,7 @@ export function MobileProfile({
               {business?.address && (
                 <p>
                   <strong>
-                    {english ? 'Business address' : t('Endereço do negócio')}
+                    {tc('Endereço do negócio')}
                   </strong>
                   <span>{business.address}</span>
                   <a
@@ -332,7 +334,7 @@ export function MobileProfile({
                     rel="noopener noreferrer"
                     onClick={() => measurement.record('directions')}
                   >
-                    {english ? 'Get directions' : t('Como chegar')} ↗
+                    {tc('Como chegar')} ↗
                   </a>
                 </p>
               )}
@@ -356,7 +358,7 @@ export function MobileProfile({
                 aria-disabled={!/^(https:\/\/|mailto:|tel:)/i.test(link.url)}
               >
                 <SocialIcon url={link.url} />
-                <span>{link.label || t('Título do link')}</span>
+                <span>{tc(link.label) || t('Título do link')}</span>
               </a>
             ))}
             {!links.length && preview && (
@@ -374,10 +376,8 @@ export function MobileProfile({
           <div className="mobile-profile-actions">
             <button
               type="button"
-              aria-label={
-                english ? 'Save contact' : t('Adicionar aos contactos')
-              }
-              title={english ? 'Save contact' : t('Adicionar aos contactos')}
+              aria-label={tc('Adicionar aos contactos')}
+              title={tc('Adicionar aos contactos')}
               disabled={!profile.name}
               onClick={download}
             >
@@ -385,14 +385,10 @@ export function MobileProfile({
             </button>
             <button
               type="button"
-              aria-label={
-                english ? 'Show profile QR' : t('Mostrar QR do perfil')
-              }
+              aria-label={tc('Mostrar QR do perfil')}
               title={
                 published
-                  ? english
-                    ? 'Show profile QR'
-                    : t('Mostrar QR do perfil')
+                  ? tc('Mostrar QR do perfil')
                   : t('Publique o perfil para activar o QR')
               }
               disabled={!published || qrBusy}
@@ -403,12 +399,10 @@ export function MobileProfile({
             {!preview && (
               <button
                 type="button"
-                aria-label={english ? 'Share profile' : t('Partilhar perfil')}
+                aria-label={tc('Partilhar perfil')}
                 title={
                   published
-                    ? english
-                      ? 'Share profile'
-                      : t('Partilhar perfil')
+                    ? tc('Partilhar perfil')
                     : t('Publique o perfil para partilhar')
                 }
                 disabled={!published}

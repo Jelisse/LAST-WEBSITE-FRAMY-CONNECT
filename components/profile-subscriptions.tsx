@@ -41,16 +41,16 @@ type Data = {
     read_at: number | null;
   }[];
 };
-const money = (amount: number) =>
-  (amount / 100).toLocaleString('pt-MZ', { minimumFractionDigits: 2 }) + ' MT';
-const date = (s: string) =>
-  new Date(s).toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo' });
+const money = (amount: number, locale: string) =>
+  (amount / 100).toLocaleString(locale, { minimumFractionDigits: 2 }) + ' MT';
+const date = (s: string, locale: string) =>
+  new Date(s).toLocaleDateString(locale, { timeZone: 'Africa/Maputo' });
 export function ProfileSubscriptions({
   manager = false,
 }: {
   manager?: boolean;
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [data, setData] = useState<Data | null>(null),
     [error, setError] = useState(''),
     [notice, setNotice] = useState(''),
@@ -238,7 +238,7 @@ export function ProfileSubscriptions({
             <>
               <p>
                 <strong>
-                  {
+                  {t(
                     (
                       {
                         inactive: 'Active o perfil para começar',
@@ -248,18 +248,18 @@ export function ProfileSubscriptions({
                         grace: 'Período de tolerância de 7 dias',
                         basic: 'Página de contacto básica',
                       } as Record<string, string>
-                    )[data.state]
-                  }
+                    )[data.state] ?? data.state,
+                  )}
                 </strong>
                 {data.expiresAt &&
                   data.state !== 'launch' &&
-                  ` · até ${date(data.expiresAt)}`}
+                  ` · até ${date(data.expiresAt, locale)}`}
               </p>
               {data.membership?.next_starts_at &&
                 Date.parse(data.membership.next_starts_at) > observedAt && (
                   <p>
                     {t(' Alteração paga agendada para')}{' '}
-                    {date(data.membership.next_starts_at)}
+                    {date(data.membership.next_starts_at, locale)}
                     {t('. Até lá mantém o plano actual. ')}
                   </p>
                 )}
@@ -313,12 +313,12 @@ export function ProfileSubscriptions({
                               });
                             }}
                           >
-                            <h3>{p.name}</h3>
+                            <h3>{t(p.name)}</h3>
                             <strong>
-                              {money(Math.round(p.meticais * 100))}{' '}
+                              {money(Math.round(p.meticais * 100), locale)}{' '}
                               {t(' / mês ')}
                             </strong>
-                            <p>{p.description}</p>
+                            <p>{t(p.description)}</p>
                             <label className="growth-check">
                               <input type="checkbox" required />
                               {t(
@@ -385,7 +385,7 @@ export function ProfileSubscriptions({
                         return i.plan_id;
                       }
                     })()}{' '}
-                  · {money(i.amount)}
+                  · {money(i.amount, locale)}
                 </strong>
                 {i.email && <p>{i.email}</p>}
                 <p>
@@ -393,7 +393,7 @@ export function ProfileSubscriptions({
                   <code>{i.id}</code>
                 </p>
                 <p>
-                  {
+                  {t(
                     (
                       {
                         pending:
@@ -403,13 +403,13 @@ export function ProfileSubscriptions({
                         confirmed: 'Pagamento confirmado',
                         cancelled: 'Cancelado',
                       } as Record<string, string>
-                    )[i.status]
-                  }
+                    )[i.status] ?? i.status,
+                  )}
                 </p>
                 {i.period_start && i.period_end && (
                   <p>
                     {t(' Período: ')}
-                    {date(i.period_start)} — {date(i.period_end)}
+                    {date(i.period_start, locale)} — {date(i.period_end, locale)}
                   </p>
                 )}
                 {i.status === 'pending' &&
@@ -436,7 +436,7 @@ export function ProfileSubscriptions({
                         {t(
                           ' Indique a referência acima ao pagar. A equipa activa o período após verificar o valor e a transacção. Pedido válido até ',
                         )}
-                        {date(i.expires_at)}.
+                        {date(i.expires_at, locale)}.
                       </p>
                       <button
                         disabled={busy}
@@ -466,7 +466,7 @@ export function ProfileSubscriptions({
               >
                 <h3>
                   {t('Verificar ')}
-                  {money(selected.amount)}
+                  {money(selected.amount, locale)}
                 </h3>
                 <label>
                   {t(' Referência única no prestador ')}

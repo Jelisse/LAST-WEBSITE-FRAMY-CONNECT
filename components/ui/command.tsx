@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Command as CommandPrimitive } from 'cmdk';
 
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/components/language-provider';
 import {
   Dialog,
   DialogContent,
@@ -31,8 +32,8 @@ function Command({
 }
 
 function CommandDialog({
-  title = 'Command Palette',
-  description = 'Search for a command to run...',
+  title,
+  description,
   children,
   className,
   showCloseButton = false,
@@ -44,11 +45,14 @@ function CommandDialog({
   showCloseButton?: boolean;
   children: React.ReactNode;
 }) {
+  const { t } = useI18n();
   return (
     <Dialog {...props}>
       <DialogHeader className="sr-only">
-        <DialogTitle>{title}</DialogTitle>
-        <DialogDescription>{description}</DialogDescription>
+        <DialogTitle>{title ?? t('Paleta de comandos')}</DialogTitle>
+        <DialogDescription>
+          {description ?? t('Procure um comando…')}
+        </DialogDescription>
       </DialogHeader>
       <DialogContent
         className={cn(

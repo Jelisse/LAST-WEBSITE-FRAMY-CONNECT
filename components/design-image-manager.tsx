@@ -104,7 +104,7 @@ export function DesignImageManager() {
           return (
             row && (
               <fieldset key={row.id} disabled={busy}>
-                <legend>{service.name}</legend>
+                <legend>{t(service.name)}</legend>
                 <MediaUploadBox
                   title={t('Imagem da opção')}
                   src={row.image}
@@ -144,7 +144,7 @@ export function DesignImageManager() {
           );
         })}
       </div>
-      <output>{message}</output>
+      <output>{t(message)}</output>
     </section>
   );
 }

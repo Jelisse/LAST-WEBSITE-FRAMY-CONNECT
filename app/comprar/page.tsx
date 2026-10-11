@@ -11,10 +11,13 @@ import { productPhotos } from '@/lib/product-gallery';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { designImageDefaults, type DesignImage } from '@/lib/design-images';
 export const dynamic = 'force-dynamic';
-export const metadata = {
-  title: 'Configurar a sua solução',
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata() {
+  const t = await getTranslations();
+  return {
+    title: t('Configurar a sua solução'),
+    robots: { index: false, follow: false },
+  };
+}
 export default async function Page({
   searchParams,
 }: {
