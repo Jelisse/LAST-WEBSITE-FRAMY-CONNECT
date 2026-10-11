@@ -5,6 +5,8 @@
 -- can be retried safely.
 PRAGMA foreign_keys=OFF;
 --> statement-breakpoint
+PRAGMA defer_foreign_keys=ON;
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS paysuite_payments_new (
  id TEXT PRIMARY KEY,
  owner_id TEXT NOT NULL REFERENCES auth_accounts(id),
