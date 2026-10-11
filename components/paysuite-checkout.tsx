@@ -43,12 +43,28 @@ export function PaySuiteCheckout({
         paymentId: string;
         status?: string;
         url?: string | null;
+        resumePaymentId?: string | null;
+        resumeUrl?: string | null;
       };
       if (response.status === 401) {
         location.assign(
           '/entrar?return_to=' +
             encodeURIComponent(location.pathname + location.search),
         );
+        return;
+      }
+      // Pending-order limit: continue the existing PaySuite checkout (or open
+      // the payments page) instead of dead-ending on the error.
+      if (response.status === 409 && 'resumeUrl' in data) {
+        if (data.resumeUrl) {
+          try {
+            location.assign(checkoutURL(data.resumeUrl));
+            return;
+          } catch {
+            /* Untrusted URL: fall back to the payments page. */
+          }
+        }
+        location.assign('/checkout/retorno');
         return;
       }
       if (!response.ok) {

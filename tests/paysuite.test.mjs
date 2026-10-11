@@ -499,7 +499,12 @@ test('pending order limit explains the blocker without contacting the provider a
   for (let i = 0; i < 3; i++) assert.equal((await route.POST(request(product()))).status, 200);
   const response = await route.POST(request(product()));
   assert.equal(response.status, 409);
-  assert.match((await response.json()).error, /três encomendas pendentes/);
+  const payload = await response.json();
+  assert.match(payload.error, /três encomendas pendentes/);
+  // The blocker offers the customer's existing PaySuite checkout to resume.
+  const record = [...f.records.values()].find((r) => r.reference === payload.resumePaymentId);
+  assert.ok(record);
+  assert.equal(payload.resumeUrl, record.checkout_url);
   assert.equal(f.creates(), 3);
 });
 

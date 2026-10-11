@@ -138,8 +138,20 @@ export async function POST(request: Request) {
     if (kind === 'product') {
       const pending = await env.DB.prepare("SELECT COUNT(*) AS total FROM paysuite_product_orders WHERE owner_id=? AND status='pending'")
         .bind(user.userId).first<{ total: number }>();
-      if ((pending?.total ?? 0) >= 3)
-        return json({ error: 'Tem três encomendas pendentes. Consulte os seus pagamentos antes de criar outra encomenda.' }, 409);
+      if ((pending?.total ?? 0) >= 3) {
+        // Offer the newest resumable checkout so a retry continues the
+        // existing order instead of hitting a dead end.
+        const resumable = await env.DB.prepare(
+          "SELECT id,checkout_url FROM paysuite_payments WHERE owner_id=? AND kind='product' AND status='pending' AND checkout_url IS NOT NULL ORDER BY created_at DESC LIMIT 1",
+        )
+          .bind(user.userId)
+          .first<{ id: string; checkout_url: string }>();
+        return json({
+          error: 'Tem três encomendas pendentes. Consulte os seus pagamentos antes de criar outra encomenda.',
+          resumePaymentId: resumable?.id ?? null,
+          resumeUrl: resumable?.checkout_url ?? null,
+        }, 409);
+      }
       const settings = await env.DB.prepare(
         'SELECT * FROM checkout_pricing WHERE id=1',
       ).first<CheckoutPricing>();
