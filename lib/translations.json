@@ -1,4 +1,5 @@
-{
+{ 
+  "O nome de utilizador já está em uso. Escolha outro.": ["That username is already taken. Choose another.", "此使用者名稱已被使用，請選擇其他名稱。"],
   "Pré-visualização em directo": ["Live preview", "即時預覽"],
   "Mostrar": ["Show", "顯示"],
   "Ocultar": ["Hide", "隱藏"],
