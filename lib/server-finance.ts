@@ -53,7 +53,7 @@ export async function financeData() {
       email: String(p.email),
       amount: Number(p.amount),
       status: String(p.status),
-      method: String(p.method),
+      method: typeof p.method === 'string' ? p.method : '',
       cycle: String(p.cycle),
       createdAt: String(p.created_at),
       paidAt: p.status === 'paid' ? String(p.updated_at) : null,

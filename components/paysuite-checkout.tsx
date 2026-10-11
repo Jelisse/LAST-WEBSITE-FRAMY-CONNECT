@@ -16,7 +16,6 @@ export function PaySuiteCheckout({
   const { t } = useI18n();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
-  const [method, setMethod] = useState('mpesa');
   const [accepted, setAccepted] = useState(false);
   const requestId = useRef<string | null>(null);
   const inFlight = useRef(false);
@@ -32,9 +31,9 @@ export function PaySuiteCheckout({
       const response = await fetch('/api/paysuite/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // No method: the customer chooses it on the PaySuite checkout page.
         body: JSON.stringify({
           ...payload,
-          method,
           accepted,
           requestId: requestId.current,
         }),
@@ -77,18 +76,6 @@ export function PaySuiteCheckout({
   }
   return (
     <form onSubmit={pay} className="paysuite-checkout">
-      <label>
-        {t(' Método de pagamento ')}
-        <select
-          value={method}
-          onChange={(e) => setMethod(e.target.value)}
-          disabled={busy || disabled}
-        >
-          <option value="mpesa">{t('M-Pesa')}</option>
-          <option value="emola">{t('e-Mola')}</option>
-          <option value="credit_card">{t('Visa / Mastercard')}</option>
-        </select>
-      </label>
       <p>
         {t(
           compact ? 'Pagamento seguro na PaySuite. Não guardamos PINs nem dados do cartão.' : ' O pagamento é concluído na página segura da PaySuite. Não guardamos dados do cartão nem PINs. ',

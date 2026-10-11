@@ -13,7 +13,7 @@ export type GatewayPayment = {
   kind: 'product' | 'subscription';
   target_id: string;
   amount: number;
-  method: PaySuiteMethod;
+  method: PaySuiteMethod | null;
   cycle: 'once' | 'monthly' | 'annual';
   provider_id: string | null;
   checkout_url: string | null;
@@ -36,7 +36,9 @@ export async function launchPayment(
   // A timeout is ambiguous: never automatically repeat a charge-creation POST.
   const data = await paysuiteRequest(env.PAYSUITE_API_TOKEN!, '/payments', {
     amount: (payment.amount / 100).toFixed(2),
-    method: payment.method,
+    // Omitted on purpose when the customer has not chosen: the PaySuite
+    // checkout page then offers every available method.
+    ...(payment.method ? { method: payment.method } : {}),
     reference: payment.id,
     description:
       payment.kind === 'product'
@@ -81,10 +83,18 @@ export async function reconcilePayment(
     (data.currency !== undefined && data.currency !== 'MZN')
   )
     throw Error('Pagamento não corresponde ao pedido.');
+  // The customer chooses the method on the hosted checkout; record the
+  // provider-reported method once it is known.
+  const reported =
+    data.method === 'mpesa' ||
+    data.method === 'emola' ||
+    data.method === 'credit_card'
+      ? data.method
+      : null;
   await env.DB.prepare(
-    'UPDATE paysuite_payments SET provider_id=COALESCE(provider_id,?) WHERE id=? AND (provider_id IS NULL OR provider_id=?)',
+    'UPDATE paysuite_payments SET provider_id=COALESCE(provider_id,?), method=COALESCE(method,?) WHERE id=? AND (provider_id IS NULL OR provider_id=?)',
   )
-    .bind(providerId, payment.id, providerId)
+    .bind(providerId, reported, payment.id, providerId)
     .run();
   if (payment.status === 'paid') return 'paid';
   if (data.status === 'paid') {

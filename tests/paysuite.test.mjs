@@ -825,3 +825,38 @@ for (const [format, amount, fields] of [
   const saved = JSON.parse(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders WHERE id=?').get(body.requestId).configuration_json);
   for (const field of fields) assert.deepEqual(saved[field],artwork);
 });
+
+test('checkout without a method lets the PaySuite page collect it and backfills the reported method', async (t) => {
+  const f = fixture(t);
+  const route = await api('app/api/paysuite/checkout/route.ts');
+  const body = product();
+  delete body.method;
+  const created = await route.POST(request(body));
+  assert.equal(created.status, 200, await created.clone().text());
+  const [id, record] = [...f.records][0];
+  // The provider request omits the method so the hosted checkout offers every method.
+  assert.equal('method' in record, false);
+  assert.equal(
+    f.sql
+      .prepare('SELECT method FROM paysuite_payments WHERE id=?')
+      .get(body.requestId).method,
+    null,
+  );
+  // Once the customer pays, the provider reports the chosen method.
+  record.method = 'emola';
+  record.status = 'paid';
+  assert.equal((await notify(f, id)).status, 204);
+  const row = f.sql
+    .prepare('SELECT method,status FROM paysuite_payments WHERE id=?')
+    .get(body.requestId);
+  assert.equal(row.method, 'emola');
+  assert.equal(row.status, 'paid');
+});
+
+test('checkout still rejects an unknown method', async (t) => {
+  const f = fixture(t);
+  const route = await api('app/api/paysuite/checkout/route.ts');
+  const res = await route.POST(request(product({ method: 'bogus' })));
+  assert.equal(res.ok, false);
+  assert.equal(f.creates(), 0);
+});

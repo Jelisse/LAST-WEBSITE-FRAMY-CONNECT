@@ -7,11 +7,13 @@ export const schemaInventorySQL = `SELECT type || ':' || name AS key FROM sqlite
  FROM sqlite_master m JOIN pragma_table_info(m.name) p
  WHERE m.type='table' AND m.name NOT LIKE 'sqlite_%'`;
 export const stockMarker = 'owner-maputo-keychain-count-20260919';
+export const methodMarker = 'paysuite-method-optional-20261010';
 
 export function migrationPlan(
   actualKeys,
   stockRecorded,
   directory = 'drizzle',
+  methodRecorded = true,
 ) {
   const expected = new DatabaseSync(':memory:');
   const available = new Set(actualKeys);
@@ -41,8 +43,14 @@ export function migrationPlan(
         if (file === '0011_maputo_keychain_stock.sql' && !stockRecorded)
           apply.push(file);
         else if (
+          file === '0027_paysuite_method_optional.sql' &&
+          !methodRecorded
+        )
+          apply.push(file);
+        else if (
           file === '0008_printed_pvc_price.sql' ||
-          file === '0011_maputo_keychain_stock.sql'
+          file === '0011_maputo_keychain_stock.sql' ||
+          file === '0027_paysuite_method_optional.sql'
         )
           skipped.push(file);
         else

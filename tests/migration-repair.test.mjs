@@ -68,3 +68,74 @@ test('base product publication exposes approved prices without inventing stock a
   assert.equal(product.published,true);assert.equal(product.available,false);assert.equal(product.amount,95000);assert.equal(product.kitAmount,135000);assert.equal(row.version,2);
   db.close();
 });
+
+test('paysuite method-optional rebuild is planned only while its marker is missing', () => {
+  const full = snapshot(files.length);
+  assert.deepEqual(migrationPlan(full, true, 'drizzle', true).apply, []);
+  assert.deepEqual(migrationPlan(full, true, 'drizzle', false).apply, [
+    '0027_paysuite_method_optional.sql',
+  ]);
+});
+
+test('paysuite method-optional rebuild preserves rows, relaxes the check and stays idempotent', () => {
+  const db = new DatabaseSync(':memory:');
+  db.exec('PRAGMA foreign_keys=ON');
+  for (const file of files.filter((f) => f < '0027'))
+    db.exec(readFileSync(`drizzle/${file}`, 'utf8'));
+  db.exec(
+    "INSERT INTO auth_accounts(id,name,email,password_hash,role,active,version,created_at) VALUES('u1','U','u@x.co','x','customer',1,1,'2026-01-01')",
+  );
+  db.exec(
+    "INSERT INTO paysuite_payments(id,owner_id,kind,target_id,amount,method,cycle,status,created_at,updated_at) VALUES('pay1','u1','product','pay1',50000,'mpesa','once','paid','2026-01-02','2026-01-02')",
+  );
+  db.exec(
+    "INSERT INTO paysuite_events(fingerprint,payment_id,event,received_at) VALUES('fp1','pay1','payment.success','2026-01-02')",
+  );
+  const migration = readFileSync(
+    'drizzle/0027_paysuite_method_optional.sql',
+    'utf8',
+  );
+  db.exec(migration);
+  const kept = db
+    .prepare('SELECT method,status FROM paysuite_payments WHERE id=?')
+    .get('pay1');
+  assert.equal(kept.method, 'mpesa');
+  assert.equal(kept.status, 'paid');
+  db.prepare(
+    "INSERT INTO paysuite_payments(id,owner_id,kind,target_id,amount,method,cycle,status,created_at,updated_at) VALUES('pay2','u1','product','pay2',100,NULL,'once','creating','2026-01-03','2026-01-03')",
+  ).run();
+  assert.throws(() =>
+    db
+      .prepare(
+        "INSERT INTO paysuite_payments(id,owner_id,kind,target_id,amount,method,cycle,status,created_at,updated_at) VALUES('pay3','u1','product','pay3',100,'bogus','once','creating','2026-01-03','2026-01-03')",
+      )
+      .run(),
+  );
+  // The events ledger still enforces its reference to the rebuilt table.
+  assert.throws(() =>
+    db
+      .prepare(
+        "INSERT INTO paysuite_events(fingerprint,payment_id,event,received_at) VALUES('fp2','missing','x','2026-01-03')",
+      )
+      .run(),
+  );
+  assert.equal(
+    db
+      .prepare("SELECT COUNT(*) AS n FROM manager_audit WHERE id='paysuite-method-optional-20261010'")
+      .get().n,
+    1,
+  );
+  // A retried run keeps every row and never duplicates the marker.
+  db.exec(migration);
+  assert.equal(
+    db.prepare('SELECT COUNT(*) AS n FROM paysuite_payments').get().n,
+    2,
+  );
+  assert.equal(
+    db
+      .prepare("SELECT COUNT(*) AS n FROM manager_audit WHERE id='paysuite-method-optional-20261010'")
+      .get().n,
+    1,
+  );
+  db.close();
+});

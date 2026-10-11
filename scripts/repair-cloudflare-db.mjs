@@ -1,6 +1,6 @@
 import { readFileSync, mkdirSync, appendFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { migrationPlan, stockMarker } from './cloudflare-migration-plan.mjs';
+import { migrationPlan, stockMarker, methodMarker } from './cloudflare-migration-plan.mjs';
 import { readCloudflareSchema } from './cloudflare-schema.mjs';
 
 const config = JSON.parse(readFileSync('wrangler.jsonc','utf8'));
@@ -25,7 +25,8 @@ function queryBatch(sql) {
 function query(sql) { return queryBatch(sql).flat(); }
 const keys = readCloudflareSchema(queryBatch);
 const recorded = keys.includes('table:manager_audit') && query(`SELECT 1 AS recorded FROM manager_audit WHERE id='${stockMarker}'`).length > 0;
-const plan = migrationPlan(keys, recorded);
+const methodRecorded = keys.includes('table:manager_audit') && query(`SELECT 1 AS recorded FROM manager_audit WHERE id='${methodMarker}'`).length > 0;
+const plan = migrationPlan(keys, recorded, 'drizzle', methodRecorded);
 console.log('Pending compatible migrations:', plan.apply.join(', ') || 'none');
 if (!process.argv.includes('--apply')) {
   console.log('Read-only plan. Use --apply to back up and apply these pending migrations. Partial migrations always require manual inspection.');

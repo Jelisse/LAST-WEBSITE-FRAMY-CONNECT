@@ -20,6 +20,11 @@ export function paymentMethod(value: unknown): PaySuiteMethod {
     throw Error('Método de pagamento inválido.');
   return value;
 }
+// Omitted method: the customer chooses on the PaySuite hosted checkout page.
+export function optionalPaymentMethod(value: unknown): PaySuiteMethod | null {
+  if (value === null || value === undefined || value === '') return null;
+  return paymentMethod(value);
+}
 export function minorAmount(value: unknown): number {
   const text = String(value);
   if (!/^\d{1,9}(\.\d{1,2})?$/.test(text)) throw Error('Valor inválido.');

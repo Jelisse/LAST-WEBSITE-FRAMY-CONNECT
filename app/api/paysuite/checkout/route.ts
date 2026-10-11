@@ -11,7 +11,7 @@ import {
   configurationQuote,
   type CheckoutPricing,
 } from '@/lib/checkout-pricing';
-import { paymentMethod, paymentDiagnostic } from '@/lib/paysuite';
+import { optionalPaymentMethod, paymentDiagnostic } from '@/lib/paysuite';
 import {
   paysuiteReady,
   launchPayment,
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
         status: previous.status,
       });
     }
-    const method = paymentMethod(b.method);
+    const method = optionalPaymentMethod(b.method);
     const now = new Date().toISOString();
     const statements: D1PreparedStatement[] = [];
     let amount: number;
