@@ -29,3 +29,7 @@ Profiles and `/exemplo` do not show the website analytics banner or preferences.
 Migration `0028_profile_click_totals.sql` must be applied through the existing guarded deployment process before deploying this revision. It adds two counter tables and does not rewrite customer profiles or historical events. Daily counters expire after 90 days; the public lifetime total remains. Reports combine old consented history and new click totals; repeated clicks are not unique people. Owner statistics use calendar days in Maputo. Marketing website/product analytics retain their existing consent behavior.
 
 Owner-authored text still requires owner-provided translations; no automatic translation service has been configured.
+
+## Deployment status
+
+Deployed on 18 October 2026 after a private database backup and guarded application of migration `0028_profile_click_totals.sql`. Full schema and relationship checks passed. Worker version: `00b86ec9-6800-4c8a-8c05-7fad6465fa53`. The canonical domain and Worker URL serve the new portfolio. Public-page, language-menu, stock endpoint and anonymous access-control checks passed. Real customer publication/uploads and email/payment delivery were not exercised during deployment verification.
