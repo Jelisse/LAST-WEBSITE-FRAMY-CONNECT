@@ -2612,3 +2612,24 @@ test('finance period close protects dated records and corrections stay in the op
  const result=await route.GET(new Request(origin+'/api/manager-finance?from=2026-01-01&to=2026-01-31&export=summary'));assert.match(await result.text(),/Despesas registadas/);
  }finally{sql.close();}
 });
+
+test('bare website and social addresses save and publish canonical links visible to management', async () => {
+ const sql=fixture();try {
+ const workspace=await api('app/api/workspace/route.ts');
+ const rejected=await post(workspace,{action:'publish-profile',version:0,profile:{...profile,website:'not a website'}});
+ assert.equal(rejected.status,422);assert.equal(rejected.body.errorField,'website');
+ assert.equal(sql.prepare('SELECT COUNT(*) n FROM profiles').get().n,0);
+ const draft={...profile,website:'www.example.com/about',links:[{label:'Instagram',url:'instagram.com/fictional_example'}]};
+ const saved=await post(workspace,{action:'save-profile',version:0,profile:draft});
+ assert.equal(saved.status,200,JSON.stringify(saved));
+ assert.equal(saved.body.profile.website,'https://www.example.com/about');
+ assert.equal(saved.body.profile.links[0].url,'https://instagram.com/fictional_example');
+ const published=await post(workspace,{action:'publish-profile',version:saved.body.profileVersion,profile:saved.body.profile});
+ assert.equal(published.status,200,JSON.stringify(published));assert.equal(published.body.published,true);
+ const row=sql.prepare('SELECT published_json FROM profiles WHERE owner_id=?').get('customer-a');
+ assert.equal(JSON.parse(row.published_json).website,'https://www.example.com/about');
+ globalThis.__launch.user={userId:'manager-a',role:'manager'};
+ const accounts=await api('app/api/accounts/route.ts');const result=await (await accounts.GET()).json();
+ const customer=result.accounts.find(a=>a.id==='customer-a');assert.equal(customer.profilePublished,1);assert.equal(customer.profileUsername,published.body.publishedUsername);
+ } finally {sql.close();}
+});

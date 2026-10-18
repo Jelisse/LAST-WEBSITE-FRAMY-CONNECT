@@ -145,3 +145,29 @@ test('all eight curated themes meet AA contrast for body text, secondary text an
     }
   }
 });
+
+test('profile web addresses normalize without losing translations, privacy selections or preferred contact', () => {
+ const original = base();
+ original.website = '  www.example.com/work?from=profile#about  ';
+ original.links = [{ label: 'Work', url: 'example.org/portfolio' }];
+ original.extras = { ...defaultExtras, visibleLinks: ['example.org/portfolio'], primaryContact: 'example.org/portfolio', services: [{title:'Consultation',description:'Details',price:'Ask',url:'example.net/book'}] };
+ original.translations = { fr: { ...emptyProfileTranslation(), links: [{url:'example.org/portfolio',label:'Portfolio'}] } };
+ const saved = validateProfile(original);
+ assert.equal(saved.website, 'https://www.example.com/work?from=profile#about');
+ assert.equal(saved.links[0].url,'https://example.org/portfolio');
+ assert.deepEqual(saved.extras.visibleLinks,['https://example.org/portfolio']);
+ assert.equal(saved.extras.primaryContact,saved.links[0].url);
+ assert.equal(saved.extras.services[0].url,'https://example.net/book');
+ assert.equal(profileInLanguage(saved,'fr').profile.links[0].label,'Portfolio');
+ for (const bad of ['not a website','@someone','javascript:alert(1)','data:text/html,test','http://example.com','//example.com','https://user:secret@example.com','https://example.com\\evil','https://exa\nmple.com']) {
+   assert.throws(()=>validateProfile({...base(),website:bad}),/Website ou portefólio/);
+ }
+ for (const bad of ['javascript:alert(1)','http://example.com','https://user:secret@example.com','https://example.com\\evil','https://exa\nmple.com']) {
+  assert.throws(()=>validateProfile({...base(),links:[{label:'Unsafe',url:bad}]}));
+  assert.throws(()=>validateProfile({...base(),extras:{...defaultExtras,services:[{title:'Offer',description:'',price:'',url:bad}]}}));
+ }
+ assert.equal(validateProfile({...base(),website:''}).website,'');
+ assert.equal(validateProfile({...base(),website:'https://例子.中国/作品'}).website,new URL('https://例子.中国/作品').href);
+ assert.equal(validateProfile({...base(),website:'例子.中国/作品'}).website,new URL('https://例子.中国/作品').href);
+ assert.throws(()=>validateProfile({...base(),website:'example.com/'+'x'.repeat(288)}),/Website ou portefólio/);
+});

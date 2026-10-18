@@ -94,7 +94,10 @@ export function ProfileLinksEditor({
               <Input
                 id={`link-url-${index}`}
                 value={link.url}
-                type="url"
+                type="text"
+                inputMode="url"
+                autoCapitalize="none"
+                spellCheck={false}
                 maxLength={300}
                 required
                 placeholder={t('https://…')}

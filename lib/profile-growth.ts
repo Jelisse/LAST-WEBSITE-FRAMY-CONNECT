@@ -1,3 +1,4 @@
+import { hasInvalidProfileURLCharacters, normalizeProfileURL } from './profile-url.ts';
 import type { Profile } from './domain.ts';
 export type ShowcaseItem = {
   englishTitle?: string;
@@ -42,8 +43,9 @@ export function cleanText(
 export function safeLink(value: unknown): string {
   const text = cleanText(value, 300);
   if (!text) return '';
-  const u = new URL(text);
-  if (u.protocol !== 'https:' || u.username || u.password)
+  let u: URL;
+  try { u = new URL(normalizeProfileURL(text)); } catch { throw Error('Use um endereço HTTPS sem credenciais.'); }
+  if (u.protocol !== 'https:' || u.username || u.password || u.href.length > 300 || hasInvalidProfileURLCharacters(text))
     throw Error('Use um endereço HTTPS sem credenciais.');
   return u.href;
 }
@@ -88,8 +90,8 @@ export function validateExtras(value: unknown): ProfileExtras {
       bio: cleanText(english.bio ?? '', 600),
       hours: cleanText(english.hours ?? '', 240),
     },
-    visibleLinks: visible as string[] | null,
-    primaryContact: cleanText(b.primaryContact ?? '', 300),
+    visibleLinks: visible === null ? null : (visible as string[]).map((url) => cleanText(normalizeProfileURL(url), 300)),
+    primaryContact: cleanText(normalizeProfileURL(cleanText(b.primaryContact ?? '', 300)), 300),
   };
 }
 export function visibleProfileLinks(p: Profile, limit: number) {

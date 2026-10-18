@@ -1,3 +1,4 @@
+import { normalizeProfileURL } from './profile-url.ts';
 import type { Profile } from './domain.ts';
 import { cleanText } from './profile-growth.ts';
 export const profileLanguages = [
@@ -57,7 +58,7 @@ export function validateProfileTranslations(
       hours: cleanText(v.hours ?? '', 240),
       address: cleanText(v.address ?? '', 240),
       links: links.map((l) => ({
-        url: cleanText(l?.url ?? '', 300),
+        url: cleanText(normalizeProfileURL(cleanText(l?.url ?? '', 300)), 300),
         label: cleanText(l?.label ?? '', 60),
       })),
       services: services.map((s) => ({

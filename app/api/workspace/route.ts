@@ -1,3 +1,4 @@
+import { ProfileWebsiteError } from '@/lib/profile-url';
 import { customerOrder } from '@/lib/customer-order';
 import { productCheckoutEnabled } from '@/lib/server-checkout';
 import { checkoutMaintenanceMessage } from '@/lib/purchase-structure';
@@ -922,6 +923,7 @@ export async function POST(request: Request) {
       }),
     );
   } catch (error) {
+    if (error instanceof ProfileWebsiteError) return json({ error: error.message, errorField: error.errorField }, 422);
     const message = error instanceof Error ? error.message : '';
     if (/D1|SQLITE|database|constraint|Armazenamento|no such table|no such column|no such view/i.test(message) || failureArea === 'profile-photo-check')
       return serviceFailure(error, failureArea, 'Não foi possível guardar. Tente novamente.');

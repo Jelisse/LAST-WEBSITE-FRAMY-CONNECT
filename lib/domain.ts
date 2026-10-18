@@ -1,3 +1,4 @@
+import { hasInvalidProfileURLCharacters, normalizeProfileURL, ProfileWebsiteError } from './profile-url.ts';
 import { portraitShapes, portraitPatterns, type PortraitShape, type PortraitPattern } from './portrait-design.ts';
 import { validateProfileTranslations, type ProfileTranslations, type ProfileLanguage } from './profile-locales.ts';
 import type { PlanControls } from './plan-features';
@@ -228,7 +229,7 @@ export function validateProfile(input: unknown): Profile {
     title = s('title', 120),
     email = s('email', 160),
     phone = s('phone', 24),
-    website = s('website', 300);
+    website = normalizeProfileURL(s('website', 300));
   if (name.length < 2) throw new Error('Indique o seu nome.');
   if (!/^[a-z0-9_]{3,40}$/.test(username) || reserved.has(username))
     throw new Error(
@@ -243,10 +244,10 @@ export function validateProfile(input: unknown): Profile {
     try {
       url = new URL(website);
     } catch {
-      throw new Error('O link deve começar por https://.');
+      throw new ProfileWebsiteError('Website ou portefólio: use um endereço válido, como https://exemplo.com, ou deixe o campo vazio.');
     }
-    if (url.protocol !== 'https:' || url.username || url.password)
-      throw new Error('Use um endereço https:// sem credenciais.');
+    if (url.protocol !== 'https:' || url.username || url.password || url.href.length > 300 || hasInvalidProfileURLCharacters(website))
+      throw new ProfileWebsiteError('Website ou portefólio: use um endereço válido, como https://exemplo.com, ou deixe o campo vazio.');
   }
   if (typeof p.showEmail !== 'boolean' || typeof p.showPhone !== 'boolean')
     throw new Error('Reveja a visibilidade dos contactos.');
@@ -266,11 +267,11 @@ export function validateProfile(input: unknown): Profile {
       throw new Error('Cada link precisa de um título e endereço válidos.');
     let url;
     try {
-      url = new URL(link.url.trim());
+      url = new URL(normalizeProfileURL(link.url));
     } catch {
       throw new Error('Os links devem começar por https://.');
     }
-    if (url.protocol !== 'https:' || url.username || url.password)
+    if (url.protocol !== 'https:' || url.username || url.password || hasInvalidProfileURLCharacters(link.url.trim()))
       throw new Error('Use links https:// sem credenciais.');
     if (url.href.length > 300)
       throw new Error('O endereço do link é demasiado longo.');

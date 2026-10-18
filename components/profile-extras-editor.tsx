@@ -112,7 +112,10 @@ export function ProfileExtrasEditor({
               <label>
                 {t(' Link HTTPS ')}
                 <input
-                  type="url"
+                  type="text"
+                  inputMode="url"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   maxLength={300}
                   value={s.url}
                   onChange={(ev) =>

@@ -91,6 +91,7 @@ import { OrderPayment } from './order-payment';
 import { CustomerOrders, OrderProgressLine } from './customer-orders';
 import { DeliveryEditor } from './delivery-editor';
 import { usernameFromName } from '@/lib/domain';
+import { normalizeProfileURL } from '@/lib/profile-url';
 import { money } from '@/lib/catalog';
 import { ProductManager } from './product-manager';
 import type { WorkspaceData } from '@/lib/profile-types';
@@ -150,6 +151,7 @@ export function Workspace({ displayName }: { displayName: string }) {
     [plansOpen, setPlansOpen] = useState(false),
     [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [conflict, setConflict] = useState<string | null>(null);
+  const [errorField, setErrorField] = useState('');
   const dirtyRef = useRef(false);
   useEffect(() => {
     dirtyRef.current = dirty;
@@ -272,6 +274,7 @@ export function Workspace({ displayName }: { displayName: string }) {
       });
       const result = (await response.json()) as {
         error?: string;
+        errorField?: string;
         ok?: boolean;
         id?: string;
         profileVersion?: number;
@@ -282,8 +285,9 @@ export function Workspace({ displayName }: { displayName: string }) {
       if (!response.ok) {
         const failure = new Error(
           result.error ?? 'Não foi possível guardar.',
-        ) as Error & { status?: number };
+        ) as Error & { status?: number; errorField?: string };
         failure.status = response.status;
+        failure.errorField = result.errorField;
         throw failure;
       }
       return result;
@@ -428,6 +432,7 @@ export function Workspace({ displayName }: { displayName: string }) {
       : profile;
     setProfile(submittedProfile);
     setBusy(true);
+    setErrorField('');
     setError('');
     setNotice('');
     try {
@@ -449,6 +454,10 @@ export function Workspace({ displayName }: { displayName: string }) {
         setConflict(action);
       } else {
         setError(e instanceof Error ? e.message : 'Tente novamente.');
+        if ((e as { errorField?: string }).errorField === 'website') {
+          setErrorField('website');
+          requestAnimationFrame(() => document.getElementById('profile-website')?.focus());
+        }
       }
     } finally {
       setBusy(false);
@@ -896,7 +905,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                               {
                                 key: 'website',
                                 label: 'Website ou portefólio',
-                                placeholder: 'https://…',
+                                placeholder: 'www.exemplo.com',
                               },
                               {
                                 key: 'email',
@@ -919,6 +928,8 @@ export function Workspace({ displayName }: { displayName: string }) {
                               <Input
                                 id={`profile-${f.key}`}
                                 value={profile[f.key]}
+                                aria-invalid={f.key === errorField || undefined}
+                                aria-describedby={f.key === 'website' ? 'profile-website-help' : undefined}
                                 maxLength={
                                   f.key === 'username'
                                     ? 40
@@ -939,8 +950,9 @@ export function Workspace({ displayName }: { displayName: string }) {
                                   f.key === 'username' &&
                                   data.profileVersion > 0
                                 }
-                                autoCapitalize={f.key === 'username' ? 'none' : undefined}
-                                spellCheck={f.key === 'username' ? false : undefined}
+                                inputMode={f.key === 'website' ? 'url' : undefined}
+                                autoCapitalize={f.key === 'username' || f.key === 'website' ? 'none' : undefined}
+                                spellCheck={f.key === 'username' || f.key === 'website' ? false : undefined}
                                 onBlur={f.key === 'username' && data.profileVersion === 0
                                   ? () => {
                                       const username = usernameFromName(profile.username || profile.name);
@@ -949,8 +961,12 @@ export function Workspace({ displayName }: { displayName: string }) {
                                         setDirty(true);
                                       }
                                     }
-                                  : undefined}
+                                  : f.key === 'website' ? () => {
+                                      const website = normalizeProfileURL(profile.website);
+                                      if (website !== profile.website) { setProfile({ ...profile, website }); setDirty(true); }
+                                    } : undefined}
                                 onChange={(e) => {
+                                  if (f.key === errorField) { setErrorField(''); setError(''); }
                                   setProfile({
                                     ...profile,
                                     [f.key]: e.target.value,
@@ -970,6 +986,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                                 }}
                                 placeholder={t(f.placeholder)}
                               />
+                              {f.key === 'website' && <small id="profile-website-help">{errorField === 'website' ? t(error) : t('Opcional. Pode escrever www.exemplo.com; adicionamos https:// automaticamente.')}</small>}
                             </label>
                           ))}
                         </div>
