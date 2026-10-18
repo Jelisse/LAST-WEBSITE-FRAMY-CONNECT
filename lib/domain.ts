@@ -1,4 +1,5 @@
 import { portraitShapes, portraitPatterns, type PortraitShape, type PortraitPattern } from './portrait-design.ts';
+import { validateProfileTranslations, type ProfileTranslations, type ProfileLanguage } from './profile-locales.ts';
 import type { PlanControls } from './plan-features';
 import { validateExtras, type ProfileExtras } from './profile-growth.ts';
 import { validateBusiness, type ProfileBusiness } from './profile-business.ts';
@@ -114,6 +115,10 @@ export function getPlan(id: unknown) {
 }
 export type ProfileLink = { label: string; url: string };
 export type Profile = {
+  coverUrl?: string;
+  coverPosition?: number;
+  contentLanguage?: ProfileLanguage;
+  translations?: ProfileTranslations;
   business?: ProfileBusiness;
   extras?: ProfileExtras;
   name: string;
@@ -274,6 +279,11 @@ export function validateProfile(input: unknown): Profile {
   if (p.bio !== undefined && (typeof p.bio !== 'string' || p.bio.length > 1200))
     throw new Error('A biografia deve ter até 1200 caracteres.');
   const photoUrl = p.photoUrl ?? '';
+  const coverUrl = p.coverUrl ?? '';
+  if (typeof coverUrl !== 'string' || (coverUrl && !/^\/api\/profile-photo\/[0-9a-f-]{36}$/.test(coverUrl))) throw Error('Carregue uma fotografia válida.');
+  const coverPosition = p.coverPosition ?? 50;
+  if (typeof coverPosition !== 'number' || !Number.isFinite(coverPosition) || coverPosition < 0 || coverPosition > 100) throw Error('Enquadramento horizontal inválido.');
+  if (p.contentLanguage !== undefined && !['en', 'pt-MZ', 'zh-Hant', 'uk', 'pl', 'fr', 'zh-Hans'].includes(p.contentLanguage as string)) throw Error('Tradução inválida.');
   if (
     typeof photoUrl !== 'string' ||
     (photoUrl && !/^\/api\/profile-photo\/[0-9a-f-]{36}$/.test(photoUrl))
@@ -304,6 +314,10 @@ export function validateProfile(input: unknown): Profile {
     throw new Error('Posição da fotografia inválida.');
   return {
     name,
+    coverUrl,
+    coverPosition,
+    contentLanguage: (p.contentLanguage ?? 'pt-MZ') as ProfileLanguage,
+    translations: validateProfileTranslations(p.translations),
     username,
     title,
     email,

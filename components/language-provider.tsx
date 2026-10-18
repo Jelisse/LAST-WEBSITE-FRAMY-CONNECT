@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Languages } from 'lucide-react';
 import { translator, validLocale, type Locale } from '@/lib/i18n';
 const LanguageContext = createContext<Locale>('pt-MZ');
@@ -10,8 +10,15 @@ export function LanguageProvider({
   locale: Locale;
   children: ReactNode;
 }) {
+  const [profileLocale, setProfileLocale] = useState<Locale | null>(null);
+  const currentLocale = profileLocale ?? locale;
+  useEffect(() => {
+    const onProfileLanguage = (event: Event) => setProfileLocale(validLocale((event as CustomEvent).detail));
+    window.addEventListener('framy-profile-language', onProfileLanguage);
+    return () => window.removeEventListener('framy-profile-language', onProfileLanguage);
+  }, []);
   return (
-    <LanguageContext.Provider value={locale}>
+    <LanguageContext.Provider value={currentLocale}>
       {children}
     </LanguageContext.Provider>
   );
@@ -19,6 +26,10 @@ export function LanguageProvider({
 export function useI18n() {
   const locale = useContext(LanguageContext);
   return { locale, t: useMemo(() => translator(locale), [locale]) };
+}
+export function SkipToContentLink() {
+  const { t } = useI18n();
+  return <a className="skip-link" href="#main">{t('Saltar para o conteúdo')}</a>;
 }
 export function LanguageSelector() {
   const { locale, t } = useI18n();

@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { publicPageRobots, siteURL } from '@/lib/server-site';
 import { Poppins } from 'next/font/google';
 import { getLocale } from '@/lib/server-i18n';
-import { LanguageProvider } from '@/components/language-provider';
+import { LanguageProvider, SkipToContentLink } from '@/components/language-provider';
 import './globals.css';
 import './footer.css';
 import './products.css';
@@ -19,6 +19,8 @@ import './ui-polish.css';
 import './profile-studio.css';
 import './editor-live-preview.css';
 import './panel-refinements.css';
+import './profile-portfolio.css';
+import './profile-name-fonts.css';
 import { InternalPageChrome } from '@/components/internal-page-chrome';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { SiteAnalyticsTracker } from '@/components/site-analytics-tracker';
@@ -58,15 +60,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const t = await getTranslations();
   const locale = await getLocale();
   return (
     <html lang={locale}>
       <body className={poppins.variable}>
-        <a className="skip-link" href="#main">
-          {t('Saltar para o conteúdo')}
-        </a>
         <LanguageProvider locale={locale}>
+          <SkipToContentLink />
           <InternalPageChrome
             header={<SiteHeader focused />}
             footer={<SiteFooter compact />}

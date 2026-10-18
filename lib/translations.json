@@ -504,7 +504,7 @@
     "請稍後再試。已儲存的資料沒有變更。"
   ],
   "Tentar novamente": ["Try again", "再試一次"],
-  "Saltar para o conteúdo": ["Skip to content", "跳至主要內容"],
+  "Saltar para o conteúdo": ["Skip to content", "跳至主要內容", "Перейти до вмісту", "Przejdź do treści", "Aller au contenu", "跳至内容"],
   "Acesso reservado": ["Restricted access", "存取受限"],
   "Esta conta não tem acesso ao Gestor.": [
     "This account cannot access the management dashboard.",
@@ -677,8 +677,8 @@
     "邀請已建立，有效期為 24 小時。離開此頁面前請先儲存。"
   ],
   "Ligação privada de activação": ["Private activation link", "私人啟用連結"],
-  "Nome": ["Name", "姓名"],
-  "Email": ["Email", "電子郵件"],
+  "Nome": ["Name", "姓名", "Ім’я", "Imię", "Nom", "姓名"],
+  "Email": ["Email", "電子郵件", "Електронна пошта", "E-mail", "E-mail", "电子邮箱"],
   "Nível de acesso": ["Access level", "存取層級"],
   "Agente": ["Agent", "代理員"],
   "Gestor": ["Manager", "管理員"],
@@ -941,7 +941,7 @@
     "自動包含以下期間更新的訂單狀態統計："
   ],
   "24 horas": ["24 hours", "24 小時"],
-  "A enviar…": ["Sending…", "正在傳送…"],
+  "A enviar…": ["Sending…", "正在傳送…", "Надсилання…", "Wysyłanie…", "Envoi…", "正在发送…"],
   "Enviar a Operações": ["Send to Operations", "傳送至營運團隊"],
   "Histórico e respostas": ["History and responses", "紀錄與回覆"],
   "Ainda não enviou relatórios.": [
@@ -1396,7 +1396,7 @@
     "Terms for new subscriptions, in meticais per month.",
     "新訂閱條件，以每月梅蒂卡爾計價。"
   ],
-  "Telefone": ["Phone", "電話"],
+  "Telefone": ["Phone", "電話", "Телефон", "Telefon", "Téléphone", "电话"],
   "Público": ["Audience", "適用對象"],
   "Descrição": ["Description", "說明"],
   "MT / mês": ["MT / month", "MT / 月"],
@@ -1431,38 +1431,26 @@
     "Your photo appears here",
     "您的照片將顯示於此"
   ],
-  "O seu nome": ["Your name", "您的姓名"],
-  "O seu título ou profissão": ["Your title or occupation", "您的職稱或職業"],
-  "Links do perfil — deslize para ver mais": [
-    "Profile links — scroll for more",
-    "個人檔案連結 — 捲動查看更多"
-  ],
-  "Título do link": ["Link title", "連結標題"],
-  "Adicione os seus links no editor.": [
-    "Add your links in the editor.",
-    "在編輯器中新增您的連結。"
-  ],
-  "Adicionar aos contactos": ["Add to contacts", "新增至聯絡人"],
-  "Mostrar QR do perfil": ["Show profile QR code", "顯示個人檔案 QR 碼"],
+  "O seu nome": ["Your name", "您的姓名", "Ваше ім’я", "Twoje imię", "Votre nom", "您的姓名"],
+  "O seu título ou profissão": ["Your title or occupation", "您的職稱或職業", "Ваша посада або професія", "Twoje stanowisko lub zawód", "Votre titre ou profession", "您的职位或职业"],
+  "Links do perfil — deslize para ver mais": ["Profile links — scroll for more", "個人檔案連結 — 捲動查看更多", "Посилання профілю — гортайте, щоб побачити більше", "Linki profilu — przewiń, aby zobaczyć więcej", "Liens du profil — faites défiler pour en voir plus", "个人资料链接 — 滚动查看更多"],
+  "Título do link": ["Link title", "連結標題", "Назва посилання", "Nazwa linku", "Titre du lien", "链接标题"],
+  "Adicione os seus links no editor.": ["Add your links in the editor.", "在編輯器中新增您的連結。", "Додайте свої посилання в редакторі.", "Dodaj swoje linki w edytorze.", "Ajoutez vos liens dans l’éditeur.", "请在编辑器中添加您的链接。"],
+  "Adicionar aos contactos": ["Add to contacts", "新增至聯絡人", "Додати до контактів", "Dodaj do kontaktów", "Ajouter aux contacts", "添加到通讯录"],
+  "Mostrar QR do perfil": ["Show profile QR code", "顯示個人檔案 QR 碼", "Показати QR-код профілю", "Pokaż kod QR profilu", "Afficher le QR code du profil", "显示个人资料二维码"],
   "Publique o perfil para activar o QR": [
     "Publish your profile to activate the QR code",
     "發佈個人檔案以啟用 QR 碼"
   ],
-  "Partilhar perfil": ["Share profile", "分享個人檔案"],
+  "Partilhar perfil": ["Share profile", "分享個人檔案", "Поділитися профілем", "Udostępnij profil", "Partager le profil", "分享个人资料"],
   "Publique o perfil para partilhar": [
     "Publish your profile to share",
     "發佈個人檔案後即可分享"
   ],
-  "Visitar o site Framy Connect (abre num novo separador)": [
-    "Visit the Framy Connect website (opens in a new tab)",
-    "造訪 Framy Connect 網站（在新分頁開啟）"
-  ],
-  "Todos direitos reservados": ["All rights reserved", "版權所有"],
-  "O seu QR Framy": ["Your Framy QR code", "您的 Framy QR 碼"],
-  "Digitalize para abrir o perfil publicado.": [
-    "Scan to open the published profile.",
-    "掃描以開啟已發佈的個人檔案。"
-  ],
+  "Visitar o site Framy Connect (abre num novo separador)": ["Visit the Framy Connect website (opens in a new tab)", "造訪 Framy Connect 網站（在新分頁開啟）", "Відвідати сайт Framy Connect (відкриється в новій вкладці)", "Odwiedź stronę Framy Connect (otworzy się w nowej karcie)", "Visiter le site Framy Connect (s’ouvre dans un nouvel onglet)", "访问 Framy Connect 网站（在新标签页中打开）"],
+  "Todos direitos reservados": ["All rights reserved", "版權所有", "Усі права захищено", "Wszelkie prawa zastrzeżone", "Tous droits réservés", "版权所有"],
+  "O seu QR Framy": ["Your Framy QR code", "您的 Framy QR 碼", "Ваш QR-код Framy", "Twój kod QR Framy", "Votre QR code Framy", "您的 Framy 二维码"],
+  "Digitalize para abrir o perfil publicado.": ["Scan to open the published profile.", "掃描以開啟已發佈的個人檔案。", "Відскануйте, щоб відкрити опублікований профіль.", "Zeskanuj, aby otworzyć opublikowany profil.", "Scannez pour ouvrir le profil publié.", "扫描以打开已发布的个人资料。"],
   "Relatórios e alertas dos agentes": [
     "Agent reports and alerts",
     "代理員報告與通知"
@@ -1883,7 +1871,7 @@
   ],
   "Guardar produto": ["Save product", "儲存產品"],
   "Cancelar": ["Cancel", "取消"],
-  "Link do perfil": ["Profile link", "個人檔案連結"],
+  "Link do perfil": ["Profile link", "個人檔案連結", "Посилання на профіль", "Link do profilu", "Lien du profil", "个人资料链接"],
   "Link do perfil do cliente": ["Customer profile link", "客戶個人檔案連結"],
   "Pré-visualizar perfil": ["Preview profile", "預覽個人檔案"],
   "Publicado": ["Published", "已發佈"],
@@ -1941,8 +1929,8 @@
   ],
   "Enquadramento vertical": ["Vertical framing", "垂直裁切位置"],
   "Website / portefólio": ["Website / portfolio", "網站／作品集"],
-  "Adicionar contacto": ["Add contact", "新增聯絡人"],
-  "Partilhar": ["Share", "分享"],
+  "Adicionar contacto": ["Add contact", "新增聯絡人", "Додати контакт", "Dodaj kontakt", "Ajouter un contact", "添加联系人"],
+  "Partilhar": ["Share", "分享", "Поділитися", "Udostępnij", "Partager", "分享"],
   "Página Inicial": ["Home", "首頁"],
   "Compre agora": ["Buy now", "立即購買"],
   "A sua identidade, os seus contactos e o seu trabalho. Tudo ligado, num único toque.": [
@@ -2490,12 +2478,9 @@
   "Receita reconhecida": ["Recognised revenue", "已認列收入"],
   "Custos reconhecidos": ["Recognised costs", "已認列成本"],
   "Margem bruta": ["Gross margin", "毛利"],
-  "Contacto descarregado.": ["Contact downloaded.", "聯絡人已下載。"],
+  "Contacto descarregado.": ["Contact downloaded.", "聯絡人已下載。", "Контакт завантажено.", "Kontakt pobrany.", "Contact téléchargé.", "联系人已下载。"],
   "Link copiado.": ["Link copied.", "連結已複製。"],
-  "Não foi possível gerar o QR. Tente novamente.": [
-    "Unable to generate the QR code. Please try again.",
-    "無法產生 QR 碼。請再試一次。"
-  ],
+  "Não foi possível gerar o QR. Tente novamente.": ["Unable to generate the QR code. Please try again.", "無法產生 QR 碼。請再試一次。", "Не вдалося створити QR-код. Спробуйте ще раз.", "Nie udało się wygenerować kodu QR. Spróbuj ponownie.", "Impossible de générer le QR code. Réessayez.", "无法生成二维码。请重试。"],
   "Não foi possível responder.": ["Unable to reply.", "無法回覆。"],
   "Pagamento da encomenda": ["Order payment", "訂單付款"],
   "Inicie sessão novamente para continuar.": [
@@ -2970,7 +2955,7 @@
     "完整展現組織形象。"
   ],
   "Plano inválido.": ["Invalid plan.", "方案無效。"],
-  "Perfil inválido.": ["Invalid profile.", "個人檔案無效。"],
+  "Perfil inválido.": ["Invalid profile.", "個人檔案無效。", "Недійсний профіль.", "Nieprawidłowy profil.", "Profil invalide.", "个人资料无效。"],
   "Indique o seu nome.": ["Enter your name.", "請填寫姓名。"],
   "Escolha outro nome de utilizador: 3–40 letras minúsculas, números ou _.": [
     "Choose another username: 3–40 lowercase letters, numbers or _.",
@@ -3588,10 +3573,7 @@
     "Sharing is not available in this browser.",
     "此瀏覽器不支援分享。"
   ],
-  "Não foi possível partilhar o perfil.": [
-    "Unable to share the profile.",
-    "無法分享個人檔案。"
-  ],
+  "Não foi possível partilhar o perfil.": ["Unable to share the profile.", "無法分享個人檔案。", "Не вдалося поділитися профілем.", "Nie udało się udostępnić profilu.", "Impossible de partager le profil.", "无法分享个人资料。"],
   "Pedido {0}": ["Order {0}", "訂單 {0}"],
   "Ver detalhes do pedido {0}": [
     "View details for order {0}",
@@ -3601,7 +3583,7 @@
     "{0} of {1} links used",
     "已使用 {0} 個連結，共 {1} 個"
   ],
-  "QR do perfil {0}": ["QR code for {0}'s profile", "{0} 的個人檔案 QR 碼"],
+  "QR do perfil {0}": ["QR code for {0}'s profile", "{0} 的個人檔案 QR 碼", "QR-код профілю {0}", "Kod QR profilu {0}", "QR code du profil de {0}", "{0} 的个人资料二维码"],
   "Design {0}": ["Design {0}", "設計 {0}"],
   "Textos {0}": ["Text {0}", "文字 {0}"],
   "{0}: seleccionar cor": ["{0}: select colour", "{0}：選擇顏色"],
@@ -3612,7 +3594,7 @@
   "Mover link {0} para baixo": ["Move link {0} down", "將連結 {0} 下移"],
   "Remover link {0}": ["Remove link {0}", "移除連結 {0}"],
   "Abrir pedido {0}": ["Open order {0}", "開啟訂單 {0}"],
-  "Fotografia de {0}": ["Photo of {0}", "{0} 的照片"],
+  "Fotografia de {0}": ["Photo of {0}", "{0} 的照片", "Фото {0}", "Zdjęcie: {0}", "Photo de {0}", "{0} 的照片"],
   "{0} · {1}/mês · Em breve": [
     "{0} · {1}/month · Coming soon",
     "{0} · {1}/月 · 即將推出"
@@ -3661,7 +3643,7 @@
   "tagline": ["tagline", "標語"],
   "description": ["description", "說明"],
   "audience": ["audience", "適用對象"],
-  "Fechar": ["Close", "關閉"],
+  "Fechar": ["Close", "關閉", "Закрити", "Zamknij", "Fermer", "关闭"],
   "Menu lateral": ["Sidebar", "側邊選單"],
   "Navegação da conta no telemóvel.": [
     "Account navigation on mobile.",
@@ -3937,9 +3919,9 @@
     "Hello, I would like to know more about your services.",
     "您好，我想進一步了解您的服務。"
   ],
-  "Endereço do negócio": ["Business address", "商家地址"],
+  "Endereço do negócio": ["Business address", "商家地址", "Адреса компанії", "Adres firmy", "Adresse de l’entreprise", "商家地址"],
   "Rua, cidade e país": ["Street, city and country", "街道、城市及國家"],
-  "Horário de atendimento": ["Business hours", "營業時間"],
+  "Horário de atendimento": ["Business hours", "營業時間", "Години роботи", "Godziny otwarcia", "Horaires d’ouverture", "营业时间"],
   "Segunda a sexta: 08:00–17:00": [
     "Monday to Friday: 08:00–17:00",
     "星期一至五：08:00–17:00"
@@ -4002,9 +3984,9 @@
     "Access will be extended at no charge until monthly subscriptions open. You do not need to delete links.",
     "月費訂閱開放前將免費延長使用權。您無需刪除連結。"
   ],
-  "Informações do negócio": ["Business information", "商家資訊"],
+  "Informações do negócio": ["Business information", "商家資訊", "Інформація про бізнес", "Informacje o firmie", "Informations sur l’entreprise", "商家信息"],
   "Falar no WhatsApp": ["Chat on WhatsApp", "透過 WhatsApp 聯絡"],
-  "Como chegar": ["Get directions", "查看路線"],
+  "Como chegar": ["Get directions", "查看路線", "Як дістатися", "Jak dojechać", "Itinéraire", "路线指引"],
   "Descarregar contacto": ["Download contact", "下載聯絡資料"],
   "Estatísticas temporariamente indisponíveis.": [
     "Statistics are temporarily unavailable.",
@@ -5375,10 +5357,7 @@
     "Subject",
     "主旨"
   ],
-  "Mensagem": [
-    "Message",
-    "訊息"
-  ],
+  "Mensagem": ["Message", "訊息", "Повідомлення", "Wiadomość", "Message", "消息"],
   "Variáveis:": [
     "Variables:",
     "變數："
@@ -6483,10 +6462,7 @@
     "Profile tools",
     "檔案工具"
   ],
-  "O envio está desactivado na pré-visualização.": [
-    "Sending is disabled in preview.",
-    "預覽時停用發送功能。"
-  ],
+  "O envio está desactivado na pré-visualização.": ["Sending is disabled in preview.", "預覽時停用發送功能。", "Надсилання вимкнено в попередньому перегляді.", "Wysyłanie jest wyłączone w podglądzie.", "L’envoi est désactivé dans l’aperçu.", "预览中无法发送。"],
   "Explique ao cliente como efectuar e renovar o pagamento.": [
     "Explain how the customer can pay and renew.",
     "說明客戶如何付款及續訂。"
@@ -6591,10 +6567,7 @@
     "Invalid period. Use dates no later than today.",
     "期間無效，請使用不晚於今天的日期。"
   ],
-  "Preencha os campos obrigatórios.": [
-    "Complete the required fields.",
-    "請填寫必填欄位。"
-  ],
+  "Preencha os campos obrigatórios.": ["Complete the required fields.", "請填寫必填欄位。", "Заповніть обов’язкові поля.", "Wypełnij wymagane pola.", "Remplissez les champs obligatoires.", "请填写必填字段。"],
   "Confirme um período terminado.": [
     "Confirm a completed period.",
     "請確認已結束的期間。"
@@ -6675,30 +6648,12 @@
     "Inbox unavailable.",
     "收件匣暫不可用。"
   ],
-  "Autorize a partilha da mensagem e contacto com este negócio.": [
-    "Authorize sharing your message and contact details with this business.",
-    "請授權與此商家分享訊息及聯絡資料。"
-  ],
-  "Indique um email válido e uma mensagem com pelo menos 10 caracteres.": [
-    "Enter a valid email and a message of at least 10 characters.",
-    "請輸入有效電郵及至少 10 個字元的訊息。"
-  ],
-  "Enviou várias mensagens. Tente mais tarde.": [
-    "You sent several messages. Try again later.",
-    "您已發送多則訊息，請稍後再試。"
-  ],
-  "Este formulário está indisponível.": [
-    "This form is unavailable.",
-    "此表格暫不可用。"
-  ],
-  "Identificador inválido.": [
-    "Invalid identifier.",
-    "識別碼無效。"
-  ],
-  "Este negócio atingiu o limite diário de mensagens. Use outro contacto.": [
-    "This business has reached its daily message limit. Use another contact method.",
-    "此商家已達每日訊息上限，請使用其他聯絡方式。"
-  ],
+  "Autorize a partilha da mensagem e contacto com este negócio.": ["Authorize sharing your message and contact details with this business.", "請授權與此商家分享訊息及聯絡資料。", "Дозвольте передати повідомлення та контактні дані цій компанії.", "Wyraź zgodę na przekazanie wiadomości i danych kontaktowych tej firmie.", "Autorisez le partage du message et de vos coordonnées avec cette entreprise.", "请允许将您的消息和联系方式发送给此商家。"],
+  "Indique um email válido e uma mensagem com pelo menos 10 caracteres.": ["Enter a valid email and a message of at least 10 characters.", "請輸入有效電郵及至少 10 個字元的訊息。", "Вкажіть дійсну електронну адресу та повідомлення щонайменше з 10 символів.", "Podaj prawidłowy adres e-mail i wiadomość zawierającą co najmniej 10 znaków.", "Indiquez une adresse e-mail valide et un message d’au moins 10 caractères.", "请输入有效的电子邮箱及至少包含 10 个字符的消息。"],
+  "Enviou várias mensagens. Tente mais tarde.": ["You sent several messages. Try again later.", "您已發送多則訊息，請稍後再試。", "Ви надіслали забагато повідомлень. Спробуйте пізніше.", "Wysłano zbyt wiele wiadomości. Spróbuj później.", "Vous avez envoyé trop de messages. Réessayez plus tard.", "您发送的消息过多。请稍后重试。"],
+  "Este formulário está indisponível.": ["This form is unavailable.", "此表格暫不可用。", "Ця форма недоступна.", "Ten formularz jest niedostępny.", "Ce formulaire est indisponible.", "此表单暂不可用。"],
+  "Identificador inválido.": ["Invalid identifier.", "識別碼無效。", "Недійсний ідентифікатор.", "Nieprawidłowy identyfikator.", "Identifiant invalide.", "标识符无效。"],
+  "Este negócio atingiu o limite diário de mensagens. Use outro contacto.": ["This business has reached its daily message limit. Use another contact method.", "此商家已達每日訊息上限，請使用其他聯絡方式。", "Компанія досягла денного ліміту повідомлень. Скористайтеся іншим способом зв’язку.", "Firma osiągnęła dzienny limit wiadomości. Skorzystaj z innej formy kontaktu.", "Cette entreprise a atteint sa limite quotidienne de messages. Utilisez un autre moyen de contact.", "此商家已达到每日消息上限。请使用其他联系方式。"],
   "Subscrições temporariamente indisponíveis.": [
     "Subscriptions are temporarily unavailable.",
     "訂閱暫不可用。"
@@ -7091,10 +7046,7 @@
     "The provider could not update the domain. Check Cloudflare for SaaS configuration.",
     "服務商無法更新網域，請檢查 Cloudflare for SaaS 設定。"
   ],
-  "Texto inválido ou demasiado longo.": [
-    "Invalid or overly long text.",
-    "文字無效或過長。"
-  ],
+  "Texto inválido ou demasiado longo.": ["Invalid or overly long text.", "文字無效或過長。", "Текст недійсний або задовгий.", "Tekst jest nieprawidłowy lub zbyt długi.", "Texte invalide ou trop long.", "文本无效或过长。"],
   "Use um endereço HTTPS sem credenciais.": [
     "Use an HTTPS address without credentials.",
     "請使用不含憑證的 HTTPS 網址。"
@@ -7211,10 +7163,7 @@
     "_framy.",
     "_framy."
   ],
-  "Website": [
-    "Website",
-    "Website"
-  ],
+  "Website": ["Website", "Website", "Вебсайт", "Strona internetowa", "Site web", "网站"],
   "+258 84 000 0000": [
     "+258 84 000 0000",
     "+258 84 000 0000"
@@ -7223,30 +7172,12 @@
     "Describe the logo, text and style you would like.",
     "請描述您想要的標誌、文字及風格。"
   ],
-  "Produtos e serviços": [
-    "Products and services",
-    "產品與服務"
-  ],
-  "Saber mais": [
-    "Find out more",
-    "了解更多"
-  ],
-  "Pedir informações": [
-    "Ask for information",
-    "索取資訊"
-  ],
-  "A sua mensagem está na caixa de entrada do negócio. Poderão responder para o seu email.": [
-    "Your message is in the business inbox. They can reply to your email.",
-    "您的訊息已傳送至商家的收件匣。商家可透過電子郵件回覆您。"
-  ],
-  "Enviar o meu nome, email e mensagem a este negócio. Conservados por até 90 dias.": [
-    "Send my name, email and message to this business. Stored for up to 90 days.",
-    "將我的姓名、電子郵件及訊息傳送給此商家。資料最多保留 90 天。"
-  ],
-  "Enviar pedido": [
-    "Send enquiry",
-    "傳送查詢"
-  ]
+  "Produtos e serviços": ["Products and services", "產品與服務", "Товари та послуги", "Produkty i usługi", "Produits et services", "产品与服务"],
+  "Saber mais": ["Find out more", "了解更多", "Дізнатися більше", "Dowiedz się więcej", "En savoir plus", "了解更多"],
+  "Pedir informações": ["Ask for information", "索取資訊", "Запитати інформацію", "Zapytaj o informacje", "Demander des informations", "咨询详情"],
+  "A sua mensagem está na caixa de entrada do negócio. Poderão responder para o seu email.": ["Your message is in the business inbox. They can reply to your email.", "您的訊息已傳送至商家的收件匣。商家可透過電子郵件回覆您。", "Ваше повідомлення надійшло до компанії. Відповідь може надійти на вашу електронну пошту.", "Twoja wiadomość trafiła do firmy. Odpowiedź może zostać wysłana na Twój adres e-mail.", "Votre message a été transmis à l’entreprise. Elle pourra vous répondre par e-mail.", "您的消息已发送给商家。商家可通过电子邮件回复您。"],
+  "Enviar o meu nome, email e mensagem a este negócio. Conservados por até 90 dias.": ["Send my name, email and message to this business. Stored for up to 90 days.", "將我的姓名、電子郵件及訊息傳送給此商家。資料最多保留 90 天。", "Надіслати моє ім’я, електронну пошту та повідомлення цій компанії. Зберігаються до 90 днів.", "Wyślij moje imię, e-mail i wiadomość do tej firmy. Przechowywane do 90 dni.", "Envoyer mon nom, mon e-mail et mon message à cette entreprise. Conservation pendant 90 jours maximum.", "将我的姓名、电子邮箱和消息发送给此商家。最多保存 90 天。"],
+  "Enviar pedido": ["Send enquiry", "傳送查詢", "Надіслати запит", "Wyślij zapytanie", "Envoyer la demande", "发送咨询"]
 ,
   "Simulação ilustrativa": ["Illustrative preview", "示意預覽"],
   "Descubra o que atrai interesse e transforme os resultados em melhorias no perfil.": ["Discover what attracts interest and use the results to improve your profile.", "了解哪些內容吸引關注，並用結果改善您的個人檔案。"],
@@ -7286,7 +7217,7 @@
   "Pesquisar membros e convites": ["Search members and invitations", "搜尋成員及邀請"],
   "Nenhum resultado encontrado.": ["No results found.", "找不到結果。"],
   "Expira em": ["Expires on", "到期日"],
-  "Conexões": ["Connections", "連結次數"],
+  "Conexões": ["Connections", "連結次數", "Зв’язки", "Połączenia", "Connexions", "连接"],
   "As conexões aparecem como um total público. Com a sua autorização, um identificador aleatório neste dispositivo evita contagens repetidas por até 90 dias.": ["Connections appear as a public total. With your permission, a random identifier on this device prevents repeat counting for up to 90 days.", "連結次數會以公開總數顯示。經您同意，本裝置上的隨機識別碼會在最多 90 天內避免重複計算。"],
   "Cada perfil pode pedir consentimento para medir visitas e cliques. O titular recebe contagens agregadas, sem a identidade ou os contactos dos visitantes. O total público de conexões conta quem descarrega o contacto ou abre um link, uma vez por visitante medido nos últimos 90 dias. Com autorização, guardamos um identificador aleatório por perfil no dispositivo por até 90 dias para evitar repetições; é removido ao retirar a autorização. Pode recusar ou alterar a escolha no próprio perfil. Os eventos são conservados por até 90 dias.": ["Each profile may ask permission to measure visits and clicks. The owner receives aggregate counts without visitors’ identities or contact details. The public connection total counts visitors who download the contact or open a link, once per measured visitor over the last 90 days. With permission, we store a random identifier per profile on the device for up to 90 days to prevent repeat counting; withdrawing permission removes it. You can decline or change your choice on the profile. Events are retained for up to 90 days.", "每個個人檔案可要求同意量測瀏覽與點擊。擁有者只會收到彙總數字，不會取得訪客身分或聯絡資料。公開連結總數會計算下載聯絡資料或開啟連結的訪客，最近 90 天內每位接受量測的訪客只計算一次。經同意後，我們會在裝置上為每個個人檔案儲存隨機識別碼最多 90 天，避免重複計算；撤回同意時會移除此識別碼。您可拒絕或在個人檔案中變更選擇。事件最多保留 90 天。"],
   "Após publicar": ["After publishing", "發佈後顯示"],
@@ -7342,7 +7273,7 @@
   "Framy Connect — Pagamento": ["Framy Connect — Payment", "Framy Connect — 付款"],
   "Recuperar acesso | Framy Connect": ["Recover access | Framy Connect", "恢復存取權限 | Framy Connect"],
   "Sim. Configure o produto e confirme o total antes de pagar na PaySuite. Entregas fora da cidade de Maputo requerem proposta.": ["Yes. Configure the product and confirm the total before paying via PaySuite. Deliveries outside Maputo city require a quote.", "可以。請先設定產品並確認總金額，再透過 PaySuite 付款。馬普托市以外的配送需另行報價。"],
-  "Idioma do conteúdo": ["Content language", "內容語言"],
+  "Idioma do conteúdo": ["Content language", "內容語言", "Мова сторінки", "Język strony", "Langue du contenu", "内容语言"],
   "Mudar para português": ["Switch to Portuguese", "切換為葡萄牙文"],
   "Mudar para inglês": ["Switch to English", "切換為英文"],
   "o_seu_nome": ["your_username", "您的使用者名稱"],
@@ -7402,6 +7333,29 @@
   "Não foi possível guardar. Verifique referências repetidas.": ["Could not save. Check for duplicate references.", "無法儲存，請檢查是否有重複的參考編號。"],
   "Não foi possível abrir o pagamento. O pedido está registado para verificação; ainda não foi confirmado nenhum pagamento. Não crie outro pedido.": ["Could not open the payment. The order is registered for verification; no payment has been confirmed yet. Do not create another order.", "無法開啟付款。訂單已登記待核實，尚未確認任何付款。請勿建立新訂單。"],
   "Domínio indisponível ou já associado a outra conta.": ["Domain unavailable or already linked to another account.", "網域不可用或已連結至其他帳戶。"],
-  "Não foi possível enviar a mensagem.": ["Could not send the message.", "無法傳送訊息。"],
-  "Não foi possível actualizar a equipa.": ["Could not update the team.", "無法更新團隊。"]
+  "Não foi possível enviar a mensagem.": ["Could not send the message.", "無法傳送訊息。", "Не вдалося надіслати повідомлення.", "Nie udało się wysłać wiadomości.", "Impossible d’envoyer le message.", "无法发送消息。"],
+  "Não foi possível actualizar a equipa.": ["Could not update the team.", "無法更新團隊。"],
+  "Laranja Framy": ["Framy Orange", "Framy 橙"],
+  "Carvão": ["Charcoal", "炭灰"],
+  "Porcelana": ["Porcelain", "暖瓷白"],
+  "Rosa": ["Rose", "玫瑰粉"],
+  "Sálvia": ["Sage", "鼠尾草綠"],
+  "Areia": ["Sand", "沙米色"],
+  "Fotografia de capa": ["Cover photo", "封面照片"],
+  "Enquadramento da capa": ["Cover position", "封面位置"],
+  "Remover capa": ["Remove cover", "移除封面"],
+  "Zoom da fotografia": ["Photo zoom", "照片縮放"],
+  "Sobre mim": ["About me", "關於我", "Про мене", "O mnie", "À propos de moi", "关于我"],
+  "Código QR": ["QR code", "QR 碼", "QR-код", "Kod QR", "QR code", "二维码"],
+  "Alguns conteúdos são apresentados no idioma original.": ["Some content is shown in its original language.", "部分內容以原文顯示。", "Деякі матеріали відображаються мовою оригіналу.", "Niektóre treści są wyświetlane w języku oryginału.", "Certains contenus sont affichés dans leur langue d’origine.", "部分内容以原文显示。"],
+  "Idiomas do portefólio": ["Portfolio languages", "個人頁面語言"],
+  "A interface abre em inglês. Adicione as versões do seu conteúdo; os campos vazios mantêm o texto original. Não usamos tradução automática.": ["The page opens in English. Add translated versions of your content; empty fields keep the original text. We do not use automatic translation.", "頁面預設以英文顯示。請加入各語言的內容；空白欄位將保留原文。我們不使用自動翻譯。"],
+  "Idioma do conteúdo original": ["Original content language", "原文語言"],
+  "Tradução inválida.": ["Invalid translation.", "翻譯內容無效。"],
+  "Remover fotografia": ["Remove photo", "移除照片"],
+  "Copie este link para partilhar o contacto.": ["Copy this link to share the contact.", "複製此連結以分享聯絡資訊。", "Скопіюйте це посилання, щоб поділитися контактом.", "Skopiuj ten link, aby udostępnić kontakt.", "Copiez ce lien pour partager le contact.", "复制此链接以分享联系人。"],
+  "Cliques agregados por dia, sem identificar visitantes. Cliques repetidos contam novamente. Visitas e sessões apresentadas pertencem ao histórico com consentimento. As suas próprias acções e pré-visualizações são excluídas.": ["Clicks are totalled by day without identifying visitors. Repeat clicks count again. Displayed visits and sessions are consented history. Your own actions and previews are excluded.", "點擊按日彙總，不識別訪客。重複點擊會再次計算。顯示的瀏覽及工作階段來自已同意的歷史記錄。您的操作和預覽不計入。"],
+  "Dias apresentados na hora de Maputo. Totais diários conservados por até 90 dias; o total público de conexões mantém o histórico e os novos cliques.": ["Days use Maputo time. Daily totals are kept for up to 90 days; the public connection total preserves history and adds new clicks.", "日期使用馬布托時間。每日總數保留最多90天；公開連結總數保留歷史並加入新點擊。"],
+  "Os perfis contam cliques por dia, sem cookies analíticos, identificadores de visitantes ou registos individuais de eventos. Cliques repetidos contam novamente. Os totais diários são conservados por até 90 dias; o total público de conexões preserva o histórico e acrescenta novos cliques. O histórico anterior foi recolhido com consentimento. Limites de segurança podem usar um código do IP por uma hora para prevenir abuso; não integra os relatórios. Respeitamos os sinais de não rastrear e de privacidade global.": ["Profiles count clicks by day without analytics cookies, visitor identifiers or individual event logs. Repeat clicks count again. Daily totals are kept for up to 90 days; the public connection total preserves history and adds new clicks. Earlier history was collected with consent. Security limits may use an IP hash for one hour to prevent abuse; it is not included in reports. Do Not Track and Global Privacy Control are respected.", "個人檔案按日彙總點擊，不使用分析 Cookie、訪客識別碼或個別事件記錄。重複點擊再次計算。每日總數保留最多90天；公開連結總數保留歷史並加入新點擊。過往資料已取得同意。防濫用安全限制可能使用一小時的IP雜湊，不會納入報告。尊重瀏覽器的禁止追蹤及全球隱私控制設定。"],
+  "A sessão utiliza um cookie necessário, protegido contra acesso por scripts, que expira após 24 horas. A preferência de idioma é guardada durante um ano. A configuração da compra fica neste separador por até 30 minutos e é removida ao terminar sessão. As estatísticas são opcionais: só começam após Permitir, e Recusar mantém o website funcional. Guardamos essa escolha por 180 dias; depois pedimos novamente. Pode retirar a autorização nas Preferências de estatísticas. Os perfis usam apenas totais diários de cliques, sem identificadores de visitantes. Respeitamos os sinais de não rastrear e de privacidade global do navegador.": ["The session uses a necessary cookie protected from scripts that expires after 24 hours. Language preference lasts one year. Purchase configuration stays in this tab for up to 30 minutes and is removed on sign-out. Website statistics are optional and start only after Allow; refusing keeps the website functional. That choice lasts 180 days and can be withdrawn in Analytics preferences. Profiles use daily click totals without visitor identifiers. We respect Do Not Track and Global Privacy Control.", "工作階段使用受保護的必要 Cookie，24小時後到期。語言偏好儲存一年。購買設定在此分頁保留最多30分鐘，登出後清除。網站統計為選用，僅在允許後開始；拒絕不影響使用。選擇保留180天，可於分析偏好撤回。個人檔案僅彙總每日點擊，不使用訪客識別碼。我們尊重禁止追蹤與全球隱私控制。"]
 }

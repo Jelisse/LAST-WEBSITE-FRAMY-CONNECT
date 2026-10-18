@@ -57,6 +57,7 @@ const worker = {
         .run(),
     );
     const cutoff = Date.now() - 90 * 86400000;
+    ctx.waitUntil(env.DB.prepare('DELETE FROM profile_click_totals WHERE at<?').bind(cutoff).run());
     ctx.waitUntil(
       env.DB.prepare(
         'DELETE FROM profile_engagement WHERE id IN (SELECT id FROM profile_engagement WHERE at<? LIMIT 10000)',

@@ -10,6 +10,7 @@ export async function localizedResponse(request: Request, response: Response) {
   )
     return response;
   const locale = validLocale(
+    request.headers.get('X-Framy-Language') ??
     request.headers
       .get('cookie')
       ?.match(/(?:^|;\s*)framy-language=([^;]+)/)?.[1],

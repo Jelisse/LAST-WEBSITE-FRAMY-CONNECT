@@ -28,9 +28,9 @@ export async function GET(
       );
     const total = await db
       .prepare(
-        'SELECT COUNT(*) AS connections FROM profile_connections WHERE owner_id=?',
+        'SELECT (SELECT COUNT(*) FROM profile_connections WHERE owner_id=?) + COALESCE((SELECT count FROM profile_click_lifetime WHERE owner_id=?),0) AS connections',
       )
-      .bind(profile.owner_id)
+      .bind(profile.owner_id, profile.owner_id)
       .first<{ connections: number }>();
     return Response.json(
       { connections: total?.connections ?? 0, period: 'lifetime' },

@@ -32,7 +32,7 @@ export function ProfilePublicExtras({
     try {
       const r = await fetch('/api/profile-enquiries', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Framy-Language': t.locale },
         body: JSON.stringify({
           id: id.current,
           username: profile.username,

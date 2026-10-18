@@ -41,6 +41,7 @@ test('database repair identifies missing post-auth migrations without replaying 
       '0024_agent_pickup_brand.sql',
     '0025_design_images.sql',
     '0026_lifetime_connections.sql',
+    '0028_profile_click_totals.sql',
   ]);
 });
 test('database repair is a no-op when schema and inventory migration are applied', () => {

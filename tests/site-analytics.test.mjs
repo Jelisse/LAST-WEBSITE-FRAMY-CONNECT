@@ -27,6 +27,8 @@ function fixture() {
   const sql = new DatabaseSync(':memory:');
   sql.exec(readFileSync('drizzle/0013_website_analytics.sql', 'utf8'));
   sql.exec(readFileSync('drizzle/0014_profile_engagement.sql', 'utf8'));
+  sql.exec('CREATE TABLE auth_accounts(id TEXT PRIMARY KEY)');
+  sql.exec(readFileSync('drizzle/0028_profile_click_totals.sql', 'utf8'));
   sql.exec(
     'CREATE TABLE auth_recovery(token_hash TEXT PRIMARY KEY,expires_at INTEGER)',
   );
@@ -295,6 +297,10 @@ test('scheduled retention removes old analytics without touching recent events o
   try {
     const now = Date.now(),
       old = now - 91 * 86400000;
+    f.sql.exec("INSERT INTO auth_accounts VALUES('profile-owner')");
+    f.sql.prepare('INSERT INTO profile_click_totals VALUES(?,?,?,?,?)').run('profile-owner', old, 'contact', 'Contact', 2);
+    f.sql.prepare('INSERT INTO profile_click_totals VALUES(?,?,?,?,?)').run('profile-owner', now, 'contact', 'Contact', 3);
+    f.sql.exec("INSERT INTO profile_click_lifetime VALUES('profile-owner',5)");
     f.sql
       .prepare(
         "INSERT INTO site_sessions VALUES('old',?,?, '/', 'direct','','desktop','MZ')",
@@ -351,6 +357,8 @@ test('scheduled retention removes old analytics without touching recent events o
       },
     );
     await Promise.all(pending);
+    assert.equal(f.sql.prepare('SELECT SUM(count) n FROM profile_click_totals').get().n, 3);
+    assert.equal(f.sql.prepare('SELECT count FROM profile_click_lifetime').get().count, 5);
     assert.equal(
       f.sql
         .prepare("SELECT COUNT(*) n FROM site_events WHERE id='old-event'")
@@ -372,4 +380,10 @@ test('scheduled retention removes old analytics without touching recent events o
   } finally {
     f.sql.close();
   }
+});
+
+test('profile example and customer profiles never enter website session analytics', () => {
+  assert.equal(analyticsPath('/exemplo'), null);
+  assert.equal(analyticsPath('/ana_matavele'), null);
+  assert.equal(analyticsPath('/produtos'), '/produtos');
 });

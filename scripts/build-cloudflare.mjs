@@ -1,18 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
-const portrait = spawnSync(
-  process.execPath,
-  [
-    'node_modules/vite/bin/vite.js',
-    'build',
-    '--config',
-    'vite.portrait.config.ts',
-  ],
-  { stdio: 'inherit' },
-);
-if (portrait.status !== 0) process.exit(portrait.status ?? 1);
-
 const build = spawnSync(
   process.execPath,
   ['node_modules/vinext/dist/cli.js', 'build'],

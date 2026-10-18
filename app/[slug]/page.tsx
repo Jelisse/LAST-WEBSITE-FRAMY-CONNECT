@@ -86,7 +86,7 @@ const pages: Record<
     blocks: [
       {
         title: 'Cookies e armazenamento no dispositivo',
-        text: 'A sessão utiliza um cookie necessário, protegido contra acesso por scripts, que expira após 24 horas. A preferência de idioma é guardada durante um ano. A configuração da compra fica neste separador por até 30 minutos e é removida ao terminar sessão. As estatísticas são opcionais: só começam após Permitir, e Recusar mantém o website funcional. Guardamos essa escolha por 180 dias; depois pedimos novamente. Pode retirar a autorização nas Preferências de estatísticas. As preferências de medição de cada perfil são separadas e podem ser alteradas nesse perfil. Respeitamos os sinais de não rastrear e de privacidade global do navegador.',
+        text: 'A sessão utiliza um cookie necessário, protegido contra acesso por scripts, que expira após 24 horas. A preferência de idioma é guardada durante um ano. A configuração da compra fica neste separador por até 30 minutos e é removida ao terminar sessão. As estatísticas são opcionais: só começam após Permitir, e Recusar mantém o website funcional. Guardamos essa escolha por 180 dias; depois pedimos novamente. Pode retirar a autorização nas Preferências de estatísticas. Os perfis usam apenas totais diários de cliques, sem identificadores de visitantes. Respeitamos os sinais de não rastrear e de privacidade global do navegador.',
       },
       {
         title: 'Pedidos de informação e equipas',
@@ -94,7 +94,7 @@ const pages: Record<
       },
       {
         title: 'Medição dos perfis digitais',
-        text: 'Cada perfil pode pedir consentimento para medir visitas e cliques. O titular recebe contagens agregadas, sem a identidade ou os contactos dos visitantes. O total público de conexões acumula contactos descarregados e links abertos desde o início da medição. Com autorização, guardamos um identificador aleatório por perfil no dispositivo por até 90 dias para evitar repetições; é removido ao retirar a autorização. Um resumo sem nomes, contactos, destinos ou datas, com identificadores convertidos em códigos por perfil, conserva a contagem acumulada. Os eventos detalhados são conservados por até 90 dias. Pode recusar ou alterar a escolha no próprio perfil.',
+        text: 'Os perfis contam cliques por dia, sem cookies analíticos, identificadores de visitantes ou registos individuais de eventos. Cliques repetidos contam novamente. Os totais diários são conservados por até 90 dias; o total público de conexões preserva o histórico e acrescenta novos cliques. O histórico anterior foi recolhido com consentimento. Limites de segurança podem usar um código do IP por uma hora para prevenir abuso; não integra os relatórios. Respeitamos os sinais de não rastrear e de privacidade global.',
       },
       {
         title: 'Dados que escolhe guardar',

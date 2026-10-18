@@ -1,5 +1,13 @@
 import messages from './translations.json';
-export const locales = ['pt-MZ', 'en', 'zh-Hant'] as const;
+export const locales = [
+  'pt-MZ',
+  'en',
+  'zh-Hant',
+  'uk',
+  'pl',
+  'fr',
+  'zh-Hans',
+] as const;
 export type Locale = (typeof locales)[number];
 export function validLocale(value: unknown): Locale {
   return locales.includes(value as Locale) ? (value as Locale) : 'pt-MZ';
@@ -38,7 +46,9 @@ export function translator(locale: Locale) {
     const translated =
       locale === 'pt-MZ' || !entry
         ? value.trim()
-        : entry[locale === 'en' ? 0 : 1];
+        : (entry[
+            { en: 0, 'zh-Hant': 1, uk: 2, pl: 3, fr: 4, 'zh-Hans': 5 }[locale]
+          ] ?? entry[0]);
     return (value.match(/^\s*/)?.[0] +
       translated.replace(/\{(\d+)\}/g, (match, index) =>
         index in params ? String(params[index]) : match,

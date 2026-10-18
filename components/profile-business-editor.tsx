@@ -3,7 +3,7 @@ import type { Profile } from '@/lib/domain';
 import {
   defaultBusiness,
   profileColors,
-  profileColorHex,
+  profileTheme,
 } from '@/lib/profile-business';
 import { useI18n } from './language-provider';
 export function ProfileBusinessEditor({
@@ -89,7 +89,7 @@ export function ProfileBusinessEditor({
                   type="radio"
                   name={`profile-color-${profile.username}`}
                   value={color.value}
-                  checked={business.accent === color.value}
+                  checked={profileTheme(business.accent).value === color.value}
                   onChange={() => update('accent', color.value)}
                 />
                 <span
@@ -101,26 +101,7 @@ export function ProfileBusinessEditor({
               </label>
             ))}
           </div>
-          <label className="profile-custom-color">
-            <span>{t('Cor personalizada')}</span>
-            <input
-              type="color"
-              value={profileColorHex(business.accent)}
-              onChange={(e) => update('accent', e.target.value)}
-            />
-            <output>{profileColorHex(business.accent).toUpperCase()}</output>
-          </label>
         </fieldset>
-        <label>
-          {t('Apresentação')}
-          <select
-            value={business.layout}
-            onChange={(e) => update('layout', e.target.value)}
-          >
-            <option value="portrait">{t('Fotografia em destaque')}</option>
-            <option value="compact">{t('Compacta')}</option>
-          </select>
-        </label>
       </div>
       <p>
         {t(

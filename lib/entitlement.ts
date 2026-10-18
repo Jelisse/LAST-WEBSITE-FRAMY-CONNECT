@@ -169,6 +169,8 @@ export function profilePresentation(
       showEmail: false,
       showPhone: false,
       photoUrl: p.photoUrl,
+      coverUrl: p.coverUrl,
+      coverPosition: p.coverPosition,
       photoPosition: p.photoPosition,
       photoPositionX: p.photoPositionX,
       photoCutout: p.photoCutout,
@@ -218,6 +220,14 @@ export function profilePresentation(
   }
   return {
     ...p,
+    translations: Object.fromEntries(Object.entries(p.translations ?? {}).map(([locale, version]) => [locale, {
+      ...version,
+      bio: version.bio.slice(0, limits.bio),
+      address: features.location ? version.address : '',
+      hours: features.location ? version.hours : '',
+      links: version.links.filter(l => visibleProfileLinks(p, limits.links).some(source => source.url === l.url)),
+      services: features.showcase ? version.services.slice(0, p.extras?.services.length ?? 0) : [],
+    }])),
     business,
     links: visibleProfileLinks(p, limits.links),
     bio: (p.bio ?? '').slice(0, limits.bio),
@@ -240,6 +250,7 @@ export function profilePresentation(
       english: features.english
         ? {
             ...(p.extras?.english ?? defaultExtras.english),
+            bio: (p.extras?.english.bio ?? '').slice(0, limits.bio),
             hours: features.location ? (p.extras?.english.hours ?? '') : '',
           }
         : defaultExtras.english,

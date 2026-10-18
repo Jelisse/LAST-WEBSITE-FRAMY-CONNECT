@@ -20,9 +20,10 @@ export async function GET(
   if (object.customMetadata?.ownerId !== user?.userId) {
     const published = await database()
       .prepare(
-        `SELECT owner_id FROM profiles WHERE json_extract(published_json, '$.photoUrl')=? AND owner_id=? AND ${activeProfileSQL} LIMIT 1`,
+        `SELECT owner_id FROM profiles WHERE (json_extract(published_json, '$.photoUrl')=? OR json_extract(published_json, '$.coverUrl')=?) AND owner_id=? AND ${activeProfileSQL} LIMIT 1`,
       )
       .bind(
+        `/api/profile-photo/${id}`,
         `/api/profile-photo/${id}`,
         object.customMetadata?.ownerId ?? '',
         new Date().toISOString(),

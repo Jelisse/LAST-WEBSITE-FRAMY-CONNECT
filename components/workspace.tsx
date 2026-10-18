@@ -4,6 +4,7 @@ import { PanelBrand } from '@/components/panel-brand';
 import { membershipFeatures } from '@/lib/entitlement';
 import { profilePresentation } from '@/lib/entitlement';
 import { ProfileExtrasEditor } from './profile-extras-editor';
+import { ProfileTranslationsEditor } from './profile-translations-editor';
 import { ProfileGrowthHub } from './profile-growth-hub';
 import { AgentContact } from '@/components/agent-contact';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
@@ -1054,6 +1055,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                           }}
                           onUpgrade={openPlans}
                         />
+                        <ProfileTranslationsEditor profile={profile} onChange={next => { setProfile(next); setDirty(true); }} />
                         <div className="form-actions">
                           <Button
                             className="control-btn"

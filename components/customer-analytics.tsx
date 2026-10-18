@@ -22,6 +22,7 @@ type Report = {
   actions: { label: string; count: number }[];
   daily: { day: string; views: number; actions: number }[];
   generatedAt?: number;
+  anonymousClicks?: boolean;
 };
 export function ProfileIdentityCounters() {
   const { t } = useI18n();
@@ -94,9 +95,9 @@ export function ProfileEngagementPanel({
     return () => controller.abort();
   }, [days, refresh]);
   const now = report?.generatedAt ?? Date.now();
-  // The endpoint uses a rolling window; include the partial first day in Maputo.
-  const daily = Array.from({ length: days + 1 }, (_, i) => {
-    const day = new Date(now + 7200000 - (days - i) * 86400000)
+  // Anonymous counters use calendar days in Maputo, including today.
+  const daily = Array.from({ length: days }, (_, i) => {
+    const day = new Date(now + 7200000 - (days - 1 - i) * 86400000)
       .toISOString()
       .slice(0, 10);
     return (
@@ -196,10 +197,10 @@ export function ProfileEngagementPanel({
                 help: 'Aberturas do perfil com consentimento.',
               },
               {
-                label: 'Sessões estimadas',
-                value: report.summary.sessions,
+                label: report.anonymousClicks ? 'Descarregar contacto' : 'Sessões estimadas',
+                value: report.anonymousClicks ? report.summary.contactSaves : report.summary.sessions,
                 Icon: Users,
-                help: 'Sessões por dia; não representa pessoas únicas.',
+                help: report.anonymousClicks ? 'Cliques nos contactos, ligações e serviços.' : 'Sessões por dia; não representa pessoas únicas.',
               },
               {
                 label: 'Cliques de interesse',
@@ -401,12 +402,12 @@ export function ProfileEngagementPanel({
             <summary>{t('Como interpretar estes resultados')}</summary>
             <p>
               {t(
-                'Apenas visitas com consentimento. As suas próprias visitas e pré-visualizações são excluídas. Cliques indicam interesse, não vendas ou mensagens enviadas.',
+                'Cliques agregados por dia, sem identificar visitantes. Cliques repetidos contam novamente. Visitas e sessões apresentadas pertencem ao histórico com consentimento. As suas próprias acções e pré-visualizações são excluídas.',
               )}
             </p>
             <p>
               {t(
-                'Dias apresentados na hora de Maputo. Sessões são estimativas, não pessoas identificadas. Dados conservados por até 90 dias.',
+                'Dias apresentados na hora de Maputo. Totais diários conservados por até 90 dias; o total público de conexões mantém o histórico e os novos cliques.',
               )}
             </p>
           </details>

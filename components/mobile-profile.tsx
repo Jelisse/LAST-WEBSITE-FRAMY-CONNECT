@@ -1,42 +1,47 @@
 'use client';
-import { ProfilePublicExtras } from './profile-public-extras';
-import { ProfileConnectionCount } from './profile-connection-count';
-import { useI18n } from '@/components/language-provider';
-import { translator } from '@/lib/i18n';
-
+/* oxlint-disable jsx-a11y/no-noninteractive-tabindex -- The links panel must be keyboard-focusable so visitors can scroll it independently of the fixed header and footer. */
 import Image from 'next/image';
-import { PortraitBackground } from './portrait-background';
-import { portraitMask, portraitPath } from '@/lib/portrait-design';
-import { useState, type CSSProperties } from 'react';
-import {
-  whatsappURL,
-  directionsURL,
-  profileColorHex,
-  profileColorIsLight,
-} from '@/lib/profile-business';
-import {
-  useProfileEngagement,
-  ProfileMeasurementChoice,
-} from './profile-engagement';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import {
   Camera,
   Languages,
   Globe2,
   Mail,
-  MessageCircle,
   Phone,
   QrCode,
   Share2,
   UserRoundPlus,
+  ArrowUpRight,
+  UserRound,
+  MessageCircle,
+  Clock3,
+  MapPin,
 } from 'lucide-react';
+import { LanguageProvider, useI18n } from './language-provider';
+import { ProfilePublicExtras } from './profile-public-extras';
+import { ProfileConnectionCount } from './profile-connection-count';
+import { useProfileEngagement } from './profile-engagement';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from './ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import type { Profile } from '@/lib/domain';
+} from './ui/dialog';
+import {
+  profileTheme,
+  whatsappURL,
+  directionsURL,
+} from '@/lib/profile-business';
+import { profileInLanguage, type ProfileLanguage } from '@/lib/profile-locales';
 import { socialPlatform } from '@/lib/social-platform';
+import type { Profile } from '@/lib/domain';
 
 function SocialIcon({ url }: { url: string }) {
   const brand = socialPlatform(url);
@@ -45,15 +50,15 @@ function SocialIcon({ url }: { url: string }) {
       <Image
         src={`/social/${brand}.svg`}
         alt=""
-        width={48}
-        height={48}
+        width={28}
+        height={28}
         unoptimized
         className="mobile-social-icon"
       />
     );
-  if (url.startsWith('mailto:')) return <Mail />;
-  if (url.startsWith('tel:')) return <Phone />;
-  return <Globe2 />;
+  if (url.startsWith('mailto:')) return <Mail aria-hidden="true" />;
+  if (url.startsWith('tel:')) return <Phone aria-hidden="true" />;
+  return <Globe2 aria-hidden="true" />;
 }
 const escapeVcf = (text: string) =>
   text
@@ -62,14 +67,7 @@ const escapeVcf = (text: string) =>
     .replace(/\n/g, '\\n')
     .replace(/;/g, '\\;')
     .replace(/,/g, '\\,');
-export function MobileProfile({
-  profile: sourceProfile,
-  published = false,
-  preview = false,
-  brandHref = '/',
-  measure = true,
-  demoConnectionLabel,
-}: {
+export function MobileProfile(props: {
   profile: Profile;
   published?: boolean;
   preview?: boolean;
@@ -77,24 +75,54 @@ export function MobileProfile({
   measure?: boolean;
   demoConnectionLabel?: string;
 }) {
-  const { t, locale } = useI18n();
-  const [english, setEnglish] = useState(false);
-  const tc = translator(english ? 'en' : locale);
-  const [photoOpen, setPhotoOpen] = useState(false);
-  const translation = sourceProfile.extras?.english;
-  const profile = english
-    ? {
-        ...sourceProfile,
-        title: translation?.title || sourceProfile.title,
-        bio: translation?.bio || sourceProfile.bio,
-        business: sourceProfile.business
-          ? {
-              ...sourceProfile.business,
-              hours: translation?.hours || sourceProfile.business.hours,
-            }
-          : undefined,
-      }
-    : sourceProfile;
+  const [language, setLanguage] = useState<ProfileLanguage>('en');
+  return (
+    <LanguageProvider locale={language}>
+      <PortfolioProfile
+        {...props}
+        language={language}
+        setLanguage={setLanguage}
+      />
+    </LanguageProvider>
+  );
+}
+function PortfolioProfile({
+  profile: source,
+  published = false,
+  preview = false,
+  brandHref = '/',
+  measure = true,
+  demoConnectionLabel,
+  language,
+  setLanguage,
+}: {
+  profile: Profile;
+  published?: boolean;
+  preview?: boolean;
+  brandHref?: string;
+  measure?: boolean;
+  demoConnectionLabel?: string;
+  language: ProfileLanguage;
+  setLanguage: (value: ProfileLanguage) => void;
+}) {
+  const { t } = useI18n();
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    // The public page's consent controls follow its language too. Editor and
+    // homepage previews never change the surrounding application's language.
+    if (!root.current?.closest('.standalone-mobile-profile')) return;
+    const frame = requestAnimationFrame(() =>
+      window.dispatchEvent(
+        new CustomEvent('framy-profile-language', { detail: language }),
+      ),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [language]);
+  const { profile, missing } = profileInLanguage(source, language);
+  const theme = profileTheme(profile.business?.accent);
+  const [photoOpen, setPhotoOpen] = useState(false),
+    [bioOpen, setBioOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [message, setMessage] = useState(''),
     [qr, setQr] = useState(''),
     [qrOpen, setQrOpen] = useState(false),
@@ -103,47 +131,48 @@ export function MobileProfile({
     profile.username,
     published && !preview && measure,
   );
-  const business = profile.business;
-  const whatsapp = whatsappURL(business);
   const Heading = preview ? 'h2' : 'h1';
+  const whatsapp = whatsappURL(profile.business);
   const links = [
     ...(profile.links ?? []).map((link, index) => ({
       ...link,
       target: `link:${index}`,
     })),
     ...(profile.email && profile.showEmail
-      ? [{ target: 'email', label: 'Email', url: `mailto:${profile.email}` }]
+      ? [{ target: 'email', label: t('Email'), url: `mailto:${profile.email}` }]
       : []),
     ...(profile.phone && profile.showPhone
       ? [
           {
             target: 'phone',
-            label: 'Telefone',
+            label: t('Telefone'),
             url: `tel:${profile.phone.replace(/[^+0-9]/g, '')}`,
           },
         ]
       : []),
     ...(profile.website
-      ? [{ target: 'website', label: 'Website', url: profile.website }]
+      ? [{ target: 'website', label: t('Website'), url: profile.website }]
+      : []),
+    ...(whatsapp
+      ? [{ target: 'whatsapp', label: 'WhatsApp', url: whatsapp }]
       : []),
   ];
-  function profileUrl() {
-    return new URL(`/${profile.username}`, window.location.origin).href;
-  }
+  const profileUrl = () =>
+    new URL(`/${profile.username}`, window.location.origin).href;
   function download() {
     measurement.record('contact');
     const values = [
       'BEGIN:VCARD',
       'VERSION:3.0',
-      `FN:${escapeVcf(profile.name)}`,
+      `FN:${escapeVcf(source.name)}`,
       `TITLE:${escapeVcf(profile.title)}`,
-      ...(profile.showEmail && profile.email
-        ? [`EMAIL:${escapeVcf(profile.email)}`]
+      ...(source.showEmail && source.email
+        ? [`EMAIL:${escapeVcf(source.email)}`]
         : []),
-      ...(profile.showPhone && profile.phone
-        ? [`TEL:${escapeVcf(profile.phone)}`]
+      ...(source.showPhone && source.phone
+        ? [`TEL:${escapeVcf(source.phone)}`]
         : []),
-      ...(profile.website ? [`URL:${escapeVcf(profile.website)}`] : []),
+      ...(source.website ? [`URL:${escapeVcf(source.website)}`] : []),
       'END:VCARD',
     ];
     const url = URL.createObjectURL(
@@ -160,9 +189,7 @@ export function MobileProfile({
     try {
       if (navigator.share)
         await navigator.share({ title: profile.name, url: profileUrl() });
-      else {
-        setMessage('A partilha não está disponível neste navegador.');
-      }
+      else setShareOpen(true);
     } catch (e) {
       if (!(e instanceof Error && e.name === 'AbortError'))
         setMessage('Não foi possível partilhar o perfil.');
@@ -189,242 +216,257 @@ export function MobileProfile({
   }
   return (
     <div
+      ref={root}
       className="mobile-profile-frame"
-      data-accent={business?.accent ?? 'orange'}
-      data-tone={
-        profileColorIsLight(business?.accent) ? 'light' : 'dark'
-      }
+      data-presentation="portfolio"
+      data-theme={theme.value}
+      lang={language}
       style={
         {
-          '--profile-accent': profileColorHex(business?.accent),
-          ...(profile.photoShapeColor ? { '--portrait-fill': profile.photoShapeColor } : {}),
-          ...(profile.photoGlowColor ? { '--studio-glow': profile.photoGlowColor } : {}),
+          '--portfolio-paper': theme.hex,
+          '--portfolio-ink': theme.ink,
+          '--portfolio-muted': theme.muted,
+          '--portfolio-accent': theme.accent,
         } as CSSProperties
       }
-      data-layout={business?.layout ?? 'portrait'}
-      data-presentation="studio"
     >
       <article className="mobile-identity-page">
         <div className="mobile-profile-body">
-          <header className="studio-hero">
-            <div className="studio-portrait-stage" data-head-escape={!!profile.photoCutout && profile.photoHeadEscape !== false} style={{ '--portrait-glow-strength': `${(profile.photoGlowStrength ?? 32)}%` } as CSSProperties}>
-              <PortraitBackground className="studio-portrait-shape" shape={profile.photoShape} pattern={profile.photoPattern}
-                color={profile.photoShapeColor} ink={profile.photoPatternColor} scale={profile.photoPatternScale} strength={profile.photoPatternStrength} />
-              <div
-                className="mobile-portrait"
-                data-cutout={profile.photoCutout ? 'true' : 'false'}
-                style={{ maskImage: portraitMask(profile.photoShape, !!profile.photoCutout && profile.photoHeadEscape !== false) }}
-              >
-                {profile.photoUrl ? (
-                  <Image
-                    src={profile.photoUrl}
-                    alt={
-                      profile.name
-                        ? t('Fotografia de {0}', [profile.name])
-                        : t('Fotografia de perfil')
+          <header className="portfolio-header">
+            <div className="portfolio-cover" aria-hidden="true">
+              {(profile.coverUrl || profile.photoUrl) && (
+                <Image
+                  src={profile.coverUrl || profile.photoUrl!}
+                  alt=""
+                  fill
+                  unoptimized
+                  sizes="(max-width: 600px) 100vw, 480px"
+                  style={{
+                    objectFit: 'cover',
+                    objectPosition: `50% ${profile.coverPosition ?? 35}%`,
+                  }}
+                />
+              )}
+            </div>
+            <div className="portfolio-language">
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className="portfolio-language-trigger"
+                  aria-label={t('Idioma do conteúdo')}
+                >
+                  <Languages size={21} aria-hidden="true" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="portfolio-language-menu"
+                >
+                  <DropdownMenuRadioGroup
+                    value={language}
+                    onValueChange={(value) =>
+                      setLanguage(value as ProfileLanguage)
                     }
-                    fill
-                    unoptimized
-                    sizes="(max-width: 600px) 100vw, 500px"
-                    style={{
-                      objectFit: profile.photoCutout ? 'contain' : 'cover',
-                      objectPosition: `${profile.photoPositionX ?? 50}% 35%`,
-                      transformOrigin: `${profile.photoPositionX ?? 50}% bottom`,
-                      transform: `translateY(${((profile.photoPosition ?? 35) - 35) * 0.6}%) scale(${(profile.photoScale ?? 100) / 100})`,
-                    }}
-                  />
-                ) : (
-                  <div className="mobile-photo-placeholder">
-                    <Camera />
-                    <span>{t('A sua fotografia aparece aqui')}</span>
-                  </div>
-                )}
-              </div>
-              <svg className="studio-portrait-outline" viewBox="0 0 420 440" aria-hidden="true">
-                <path d={portraitPath(profile.photoShape)} style={{ fill: 'none', stroke: profile.photoOutlineColor ?? 'var(--portrait-outline-color, #ffffffbd)', strokeWidth: profile.photoOutlineWidth ?? 3 }} />
-              </svg>
-              {profile.photoUrl && (
-                <button type="button" className="studio-portrait-expand"
-                  aria-label={t('Fotografia de {0}', [profile.name])}
-                  aria-haspopup="dialog" onClick={() => setPhotoOpen(true)} />
-              )}
-              <ProfileConnectionCount
-                demoLabel={demoConnectionLabel}
-                username={profile.username}
-                enabled={published && !preview}
-                preview={preview || !published}
-              />
+                  >
+                    {Object.entries({
+                      en: 'English',
+                      'pt-MZ': 'Português',
+                      'zh-Hant': '繁體中文',
+                      uk: 'Українська',
+                      pl: 'Polski',
+                      fr: 'Français',
+                      'zh-Hans': '简体中文',
+                    }).map(([value, name]) => (
+                      <DropdownMenuRadioItem
+                        closeOnClick
+                        key={value}
+                        value={value}
+                        lang={value}
+                      >
+                        {name}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <div className="studio-intro">
-              <Heading>{profile.name || t('O seu nome')}</Heading>
-              <p className="mobile-profile-title">
-                {profile.title || t('O seu título ou profissão')}
-              </p>
-              {profile.bio && (
-                <p className="mobile-profile-bio">{profile.bio}</p>
-              )}
-            </div>
-              <div className="studio-contact-actions">
+            <div className="portfolio-identity">
+              <div className="portfolio-portrait-wrap">
                 <button
+                  className="portfolio-portrait"
                   type="button"
-                  className="studio-save-contact"
-                  disabled={!profile.name}
-                  onClick={download}
-                  aria-label={tc('Guardar contacto')}
-                  title={tc('Guardar contacto')}
+                  disabled={!profile.photoUrl}
+                  aria-haspopup="dialog"
+                  aria-label={t('Fotografia de {0}', [profile.name])}
+                  onClick={() => setPhotoOpen(true)}
                 >
-                  <UserRoundPlus size={20} aria-hidden="true" />
+                  {profile.photoUrl ? (
+                    <Image
+                      src={profile.photoUrl}
+                      alt={t('Fotografia de {0}', [profile.name])}
+                      fill
+                      unoptimized
+                      sizes="140px"
+                      style={{
+                        objectFit: 'cover',
+                        objectPosition: `${profile.photoPositionX ?? 50}% ${profile.photoPosition ?? 50}%`,
+                        transform: `scale(${Math.max(100, profile.photoScale ?? 100) / 100})`,
+                      }}
+                    />
+                  ) : (
+                    <Camera aria-hidden="true" />
+                  )}
                 </button>
-                {whatsapp && (
-                  <a
-                    href={whatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => measurement.record('whatsapp')}
-                    aria-label={t('WhatsApp')}
-                    title={t('WhatsApp')}
-                  >
-                    <MessageCircle size={20} aria-hidden="true" />
-                  </a>
-                )}
-              {(translation?.title ||
-                translation?.bio ||
-                translation?.hours ||
-                profile.extras?.services.some(
-                  (s) =>
-                    s.englishTitle || s.englishDescription || s.englishPrice,
-                )) && (
-                <nav
-                  className="profile-content-languages"
-                  aria-label={tc('Idioma do conteúdo')}
-                >
-                  <button
-                    type="button"
-                    aria-label={english ? tc('Mudar para português') : tc('Mudar para inglês')}
-                    onClick={() => setEnglish((value) => !value)}
-                  >
-                    <Languages size={20} aria-hidden="true" />
-                  </button>
-                </nav>
-              )}
+                <ProfileConnectionCount
+                  demoLabel={demoConnectionLabel}
+                  username={profile.username}
+                  enabled={published && !preview}
+                  preview={preview || !published}
+                />
               </div>
+              <Heading
+                className="portfolio-name"
+                title={profile.name}
+                data-long-name={profile.name.length > 32}
+                data-cjk={/\p{Script=Han}/u.test(profile.name)}
+              >
+                {profile.name || t('O seu nome')}
+              </Heading>
+              <p className="portfolio-profession">
+                {profile.title ||
+                  (preview ? t('O seu título ou profissão') : '')}
+              </p>
+            </div>
           </header>
-          {(business?.address || business?.hours) && (
-            <section
-              className="public-business"
-              aria-label={t('Informações do negócio')}
-            >
-              {business?.hours && (
-                <p>
-                  <strong>
-                    {tc('Horário de atendimento')}
-                  </strong>
-                  <span>{business.hours}</span>
-                </p>
-              )}
-              {business?.address && (
-                <p>
-                  <strong>
-                    {tc('Endereço do negócio')}
-                  </strong>
-                  <span>{business.address}</span>
-                  <a
-                    href={directionsURL(business.address)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => measurement.record('directions')}
-                  >
-                    {tc('Como chegar')} ↗
-                  </a>
-                </p>
-              )}
-            </section>
-          )}
-          <nav
-            className="mobile-profile-links"
+          <section
+            className="portfolio-scroll"
+            tabIndex={0}
             aria-label={t('Links do perfil — deslize para ver mais')}
           >
-            {links.map((link, index) => (
-              <a
-                key={index}
-                onClick={() => measurement.record(link.target)}
-                href={
-                  /^(https:\/\/|mailto:|tel:)/i.test(link.url)
-                    ? link.url
-                    : undefined
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-disabled={!/^(https:\/\/|mailto:|tel:)/i.test(link.url)}
+            <nav
+              className="mobile-profile-links"
+              aria-label={t('Links do perfil — deslize para ver mais')}
+            >
+              {profile.bio && (
+                <button
+                  type="button"
+                  className="portfolio-link"
+                  aria-haspopup="dialog"
+                  onClick={() => setBioOpen(true)}
+                >
+                  <UserRound aria-hidden="true" />
+                  <span>{t('Sobre mim')}</span>
+                  <ArrowUpRight aria-hidden="true" />
+                </button>
+              )}
+              {links.map((link, i) => (
+                <a
+                  key={`${link.target}-${i}`}
+                  className="portfolio-link"
+                  onClick={() => measurement.record(link.target)}
+                  href={
+                    /^(https:\/\/|mailto:|tel:)/i.test(link.url)
+                      ? link.url
+                      : undefined
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-disabled={!/^(https:\/\/|mailto:|tel:)/i.test(link.url)}
+                >
+                  {link.target === 'whatsapp' ? (
+                    <MessageCircle aria-hidden="true" />
+                  ) : (
+                    <SocialIcon url={link.url} />
+                  )}
+                  <span>{t(link.label) || t('Título do link')}</span>
+                  <ArrowUpRight aria-hidden="true" />
+                </a>
+              ))}
+              {!links.length && preview && (
+                <p className="mobile-links-placeholder">
+                  {t('Adicione os seus links no editor.')}
+                </p>
+              )}
+            </nav>
+            {(profile.business?.address || profile.business?.hours) && (
+              <section
+                className="portfolio-business"
+                aria-label={t('Informações do negócio')}
               >
-                <SocialIcon url={link.url} />
-                <span>{tc(link.label) || t('Título do link')}</span>
-              </a>
-            ))}
-            {!links.length && preview && (
-              <p className="mobile-links-placeholder">
-                {t('Adicione os seus links no editor.')}
+                {profile.business.hours && (
+                  <p>
+                    <Clock3 size={16} aria-hidden="true" />
+                    <span>
+                      <strong>{t('Horário de atendimento')}</strong>
+                      {profile.business.hours}
+                    </span>
+                  </p>
+                )}
+                {profile.business.address && (
+                  <p>
+                    <MapPin size={16} aria-hidden="true" />
+                    <span>
+                      <strong>{t('Endereço do negócio')}</strong>
+                      {profile.business.address}
+                      <a
+                        href={directionsURL(profile.business.address)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => measurement.record('directions')}
+                      >
+                        {t('Como chegar')} ↗
+                      </a>
+                    </span>
+                  </p>
+                )}
+              </section>
+            )}
+            <ProfilePublicExtras
+              profile={profile}
+              english={false}
+              preview={preview || !published}
+              onAction={measurement.record}
+            />
+            {missing && (
+              <p className="portfolio-translation-note">
+                {t('Alguns conteúdos são apresentados no idioma original.')}
               </p>
             )}
-          </nav>
-          <ProfilePublicExtras
-            profile={profile}
-            english={english}
-            preview={preview || !published}
-            onAction={measurement.record}
-          />
-          <div className="mobile-profile-actions">
-            <button
-              type="button"
-              aria-label={tc('Adicionar aos contactos')}
-              title={tc('Adicionar aos contactos')}
-              disabled={!profile.name}
-              onClick={download}
-            >
-              <UserRoundPlus />
-            </button>
-            <button
-              type="button"
-              aria-label={tc('Mostrar QR do perfil')}
-              title={
-                published
-                  ? tc('Mostrar QR do perfil')
-                  : t('Publique o perfil para activar o QR')
-              }
-              disabled={!published || qrBusy}
-              onClick={showQr}
-            >
-              <QrCode />
-            </button>
-            {!preview && (
+          </section>
+          <footer className="portfolio-dock">
+            <div className="mobile-profile-wave" aria-hidden="true" />
+            <div className="mobile-profile-actions">
               <button
                 type="button"
-                aria-label={tc('Partilhar perfil')}
-                title={
-                  published
-                    ? tc('Partilhar perfil')
-                    : t('Publique o perfil para partilhar')
-                }
+                disabled={!profile.name}
+                onClick={download}
+                aria-label={t('Adicionar aos contactos')}
+              >
+                <UserRoundPlus aria-hidden="true" />
+                <span>{t('Adicionar contacto')}</span>
+              </button>
+              <button
+                type="button"
+                disabled={!published || qrBusy}
+                onClick={showQr}
+                aria-label={t('Mostrar QR do perfil')}
+              >
+                <QrCode aria-hidden="true" />
+                <span>{t('Código QR')}</span>
+              </button>
+              <button
+                type="button"
                 disabled={!published}
                 onClick={share}
+                aria-label={t('Partilhar perfil')}
               >
-                <Share2 />
+                <Share2 aria-hidden="true" />
+                <span>{t('Partilhar')}</span>
               </button>
+            </div>
+            {message && (
+              <output className="mobile-profile-message">{t(message)}</output>
             )}
-          </div>
-          {message && (
-            <output className="mobile-profile-message">{t(message)}</output>
-          )}
-          {!preview && published && measure && (
-            <ProfileMeasurementChoice
-              english={english}
-              consent={measurement.consent}
-              choose={measurement.choose}
-            />
-          )}
-          <footer className="mobile-profile-footer">
-            <div className="mobile-profile-wave" aria-hidden="true" />
             <a
+              className="portfolio-brand"
               href={brandHref}
               target="_blank"
               rel="noopener noreferrer"
@@ -434,9 +476,9 @@ export function MobileProfile({
             >
               <Image
                 src="/brand/logo.svg"
-                alt={t('Framy Connect')}
-                width={220}
-                height={100}
+                alt="Framy Connect"
+                width={140}
+                height={60}
                 unoptimized
               />
             </a>
@@ -447,15 +489,46 @@ export function MobileProfile({
           </footer>
         </div>
       </article>
+      <Dialog open={bioOpen} onOpenChange={setBioOpen}>
+        <DialogContent className="portfolio-bio-dialog" lang={language}>
+          <DialogTitle>{t('Sobre mim')}</DialogTitle>
+          <DialogDescription>{profile.name}</DialogDescription>
+          <p>{profile.bio}</p>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={shareOpen} onOpenChange={setShareOpen}>
+        <DialogContent className="portfolio-bio-dialog" lang={language}>
+          <DialogTitle>{t('Partilhar perfil')}</DialogTitle>
+          <DialogDescription>
+            {t('Copie este link para partilhar o contacto.')}
+          </DialogDescription>
+          <input
+            className="portfolio-share-url"
+            aria-label={t('Link do perfil')}
+            readOnly
+            value={shareOpen ? profileUrl() : ''}
+            onFocus={(e) => e.currentTarget.select()}
+          />
+        </DialogContent>
+      </Dialog>
       <Dialog open={photoOpen} onOpenChange={setPhotoOpen}>
-        <DialogContent className="profile-photo-dialog">
-          <DialogTitle className="sr-only">{t('Fotografia de {0}', [profile.name])}</DialogTitle>
-          {profile.photoUrl && <Image src={profile.photoUrl} alt={t('Fotografia de {0}', [profile.name])}
-            width={1000} height={1000} unoptimized />}
+        <DialogContent className="profile-photo-dialog" lang={language}>
+          <DialogTitle className="sr-only">
+            {t('Fotografia de {0}', [profile.name])}
+          </DialogTitle>
+          {profile.photoUrl && (
+            <Image
+              src={profile.photoUrl}
+              alt={t('Fotografia de {0}', [profile.name])}
+              width={1000}
+              height={1000}
+              unoptimized
+            />
+          )}
         </DialogContent>
       </Dialog>
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
-        <DialogContent className="profile-qr-dialog">
+        <DialogContent className="profile-qr-dialog" lang={language}>
           <DialogTitle>{t('O seu QR Framy')}</DialogTitle>
           <DialogDescription>
             {t('Digitalize para abrir o perfil publicado.')}

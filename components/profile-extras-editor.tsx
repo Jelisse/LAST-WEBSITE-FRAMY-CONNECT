@@ -124,32 +124,7 @@ export function ProfileExtrasEditor({
                   }
                 />
               </label>
-              <details>
-                <summary>{t('Versão inglesa desta oferta')}</summary>
-                {(
-                  [
-                    ['englishTitle', 'Nome em inglês', 80],
-                    ['englishDescription', 'Descrição em inglês', 300],
-                    ['englishPrice', 'Preço em inglês', 60],
-                  ] as const
-                ).map(([key, label, max]) => (
-                  <label key={key}>
-                    {t(label)}
-                    <input
-                      disabled={features?.english === false}
-                      maxLength={max}
-                      value={s[key] ?? ''}
-                      onChange={(ev) =>
-                        set({
-                          services: e.services.map((x, j) =>
-                            j === i ? { ...x, [key]: ev.target.value } : x,
-                          ),
-                        })
-                      }
-                    />
-                  </label>
-                ))}
-              </details>
+
               <button
                 type="button"
                 onClick={() =>
@@ -190,47 +165,7 @@ export function ProfileExtrasEditor({
           ' As mensagens ficam na sua caixa de entrada durante 90 dias. Não são enviadas automaticamente por email. ',
         )}
       </p>
-      <fieldset disabled={features?.english === false}>
-        <details>
-          <summary>{t('Conteúdo em inglês')}</summary>
-          <p>
-            {t(
-              ' Escreva a sua própria versão. O visitante pode alternar entre Português e English. Campos vazios mantêm o texto original. ',
-            )}
-          </p>
-          <label>
-            {t(' Título em inglês ')}
-            <input
-              value={e.english.title}
-              maxLength={120}
-              onChange={(ev) =>
-                set({ english: { ...e.english, title: ev.target.value } })
-              }
-            />
-          </label>
-          <label>
-            {t(' Biografia em inglês ')}
-            <textarea
-              value={e.english.bio}
-              maxLength={600}
-              onChange={(ev) =>
-                set({ english: { ...e.english, bio: ev.target.value } })
-              }
-            />
-          </label>
-          <label>
-            {t(' Horário em inglês ')}
-            <textarea
-              disabled={features?.location === false}
-              value={e.english.hours}
-              maxLength={240}
-              onChange={(ev) =>
-                set({ english: { ...e.english, hours: ev.target.value } })
-              }
-            />
-          </label>
-        </details>
-      </fieldset>
+
       <details>
         <summary>{t('Links visíveis e contacto após o período pago')}</summary>
         <p>

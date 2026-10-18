@@ -752,6 +752,54 @@ test('invalid publication never starts the trial and database failures are not r
   }
 });
 
+test('multilingual profiles save within a bounded UTF-8 payload without rejecting valid translations', async () => {
+  const sql = fixture();
+  try {
+    const workspace = await api('app/api/workspace/route.ts');
+    const { emptyProfileTranslation } = await import('../lib/profile-locales.ts');
+    const links = Array.from({ length: 50 }, (_, i) => ({ label: 'Portfolio ' + i, url: 'https://example.com/' + String(i) + 'a'.repeat(240) }));
+    const translations = Object.fromEntries(['en', 'pt-MZ', 'zh-Hant'].map(locale => [locale, {
+      ...emptyProfileTranslation(), bio: '文'.repeat(1000), links: links.map(l => ({ ...l, label: '文'.repeat(50) })),
+    }]));
+    const payload = { action: 'save-profile', version: 0, profile: { ...profile, links, translations } };
+    assert.ok(new TextEncoder().encode(JSON.stringify(payload)).length > 64000);
+    assert.equal((await post(workspace, payload)).status, 200);
+    assert.equal((await post(workspace, { ...payload, profile: { ...profile, bio: 'x'.repeat(256001) } })).status, 413);
+  } finally { sql.close(); }
+});
+
+test('cover photos require ownership and anonymous access starts only after publication', async () => {
+  const sql = fixture();
+  try {
+    const workspace = await api('app/api/workspace/route.ts');
+    const media = await api('app/api/profile-photo/[id]/route.ts');
+    const id = '11111111-1111-4111-8111-111111111111';
+    const coverUrl = '/api/profile-photo/' + id;
+    const photos = globalThis.__launch.env.PROFILE_PHOTOS;
+    photos.head = async () => ({ customMetadata: { ownerId: 'customer-b' } });
+    const denied = await post(workspace, { action: 'publish-profile', version: 0, profile: { ...profile, coverUrl } });
+    assert.equal(denied.status, 422);
+    assert.equal(sql.prepare('SELECT COUNT(*) n FROM profiles').get().n, 0);
+    photos.head = async () => ({ customMetadata: { ownerId: 'customer-a' } });
+    photos.get = async () => ({ body: 'photo bytes', customMetadata: { ownerId: 'customer-a' }, httpMetadata: { contentType: 'image/jpeg' } });
+    const saved = await post(workspace, { action: 'save-profile', version: 0, profile: { ...profile, coverUrl } });
+    assert.equal(saved.status, 200);
+    globalThis.__launch.user = null;
+    const request = () => media.GET(new Request(origin + coverUrl), { params: Promise.resolve({ id }) });
+    assert.equal((await request()).status, 404, 'draft covers stay private');
+    globalThis.__launch.user = { userId: 'customer-a', role: 'customer' };
+    assert.equal((await post(workspace, { action: 'publish-profile', version: 1, profile: saved.body.profile })).status, 200);
+    globalThis.__launch.user = null;
+    const publicCover = await request();
+    assert.equal(publicCover.status, 200);
+    assert.equal(publicCover.headers.get('X-Content-Type-Options'), 'nosniff');
+    globalThis.__launch.user = { userId: 'customer-a', role: 'customer' };
+    assert.equal((await post(workspace, { action: 'unpublish-profile', version: 2, profile: saved.body.profile })).status, 200);
+    globalThis.__launch.user = null;
+    assert.equal((await request()).status, 404, 'unpublished covers are private again');
+  } finally { sql.close(); }
+});
+
 test('human-entered username text can publish after editor normalization without weakening server validation', async () => {
   const sql = fixture();
   try {
@@ -1462,6 +1510,24 @@ test('profile engagement requires consent, published access and valid actions; r
       ).status,
       422,
     );
+    globalThis.__launch.user = null;
+    const click = { mode: 'aggregate', username: profile.username, kind: 'action', target: 'whatsapp' };
+    for (let i = 0; i < 2; i++) assert.deepEqual(await (await engagement.POST(request(click))).json(), { recorded: true });
+    assert.equal(sql.prepare('SELECT COUNT(*) n FROM profile_click_totals').get().n, 1);
+    assert.equal(sql.prepare('SELECT count FROM profile_click_totals').get().count, 2);
+    assert.deepEqual(sql.prepare('PRAGMA table_info(profile_click_totals)').all().map((c) => c.name), ['owner_id', 'at', 'target', 'label', 'count']);
+    assert.equal(sql.prepare('SELECT COUNT(*) n FROM profile_engagement').get().n, 2, 'anonymous clicks never create event logs');
+    assert.equal((await engagement.POST(request({ ...click, session: crypto.randomUUID() }))).status, 422);
+    assert.equal((await engagement.POST(request({ ...click, target: 'link:49' }))).status, 422);
+    const dntRequest = request(click); dntRequest.headers.set('dnt', '1');
+    assert.equal((await (await engagement.POST(dntRequest)).json()).recorded, false);
+    assert.equal((await (await publicConnections.GET(new Request(origin + '/api/profile-connections/' + profile.username), { params: Promise.resolve({ username: profile.username }) })).json()).connections, 3);
+    globalThis.__launch.user = { userId: 'customer-a', role: 'customer' };
+    const combined = await (await engagement.GET(new Request(origin + '/api/profile-engagement'))).json();
+    assert.equal(combined.summary.actions, 3); assert.equal(combined.summary.sessions, 1);
+    assert.equal(combined.summary.connections, 3); assert.equal(combined.actions[0].count, 3);
+    assert.equal(combined.anonymousClicks, true);
+    assert.equal((await (await engagement.POST(request(click))).json()).recorded, false, 'owner excluded from aggregate clicks');
     await post(workspace, { action: 'unpublish-profile', profile, version: 2 });
     assert.equal((await publicConnections.GET(new Request(origin + '/api/profile-connections/' + profile.username), { params: Promise.resolve({ username: profile.username }) })).status, 404);
     globalThis.__launch.user = null;

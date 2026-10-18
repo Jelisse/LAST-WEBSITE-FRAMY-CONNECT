@@ -170,15 +170,17 @@ export async function POST(request: Request) {
   const origin = request.headers.get('origin');
   if (!origin || origin !== new URL(request.url).origin)
     return json({ error: 'Origem não autorizada.' }, 403);
-  if (Number(request.headers.get('content-length')) > 64000)
+  if (Number(request.headers.get('content-length')) > 256000)
     return json({ error: 'Pedido demasiado grande.' }, 413);
   let body: Record<string, unknown>;
   try {
     const raw = await request.text();
-    if (raw.length > 64000)
+    if (new TextEncoder().encode(raw).length > 256000)
       return json({ error: 'Pedido demasiado grande.' }, 413);
     body = JSON.parse(raw);
     if (!body || typeof body !== 'object' || Array.isArray(body)) throw Error();
+    if (!['save-profile', 'publish-profile', 'unpublish-profile'].includes(String(body.action)) && raw.length > 64000)
+      return json({ error: 'Pedido demasiado grande.' }, 413);
   } catch {
     return json({ error: 'Pedido inválido.' }, 422);
   }
@@ -389,10 +391,11 @@ export async function POST(request: Request) {
         }
       }
       const profile = validateProfile(profileInput);
-      if (profile.photoUrl && body.action !== 'unpublish-profile') {
+      for (const photoUrl of new Set([profile.photoUrl, profile.coverUrl].filter(Boolean))) {
+        if (body.action === 'unpublish-profile') continue;
         failureArea = 'profile-photo-check';
         const photo = await env.PROFILE_PHOTOS?.head(
-          `profiles/${profile.photoUrl.split('/').pop()}`,
+          `profiles/${photoUrl!.split('/').pop()}`,
         );
         if (!photo || photo.customMetadata?.ownerId !== user.userId)
           return json(

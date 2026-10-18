@@ -48,12 +48,18 @@ export async function POST(request: Request) {
     } catch {
       return json({ recorded: false }, 422);
     }
+    const aggregate = b?.mode === 'aggregate';
     if (
       !b ||
-      b.consent !== true ||
+      (!aggregate && b.consent !== true) ||
+      (aggregate &&
+        (b.kind !== 'action' ||
+          Object.keys(b).some(
+            (key) => !['mode', 'username', 'kind', 'target'].includes(key),
+          ))) ||
       !/^[a-z0-9_]{3,40}$/.test(b.username ?? '') ||
-      !/^[a-f0-9-]{36}$/.test(b.id ?? '') ||
-      !/^[a-f0-9-]{36}$/.test(b.session ?? '') ||
+      (!aggregate && !/^[a-f0-9-]{36}$/.test(b.id ?? '')) ||
+      (!aggregate && !/^[a-f0-9-]{36}$/.test(b.session ?? '')) ||
       !['view', 'action'].includes(b.kind)
     )
       return json({ recorded: false }, 422);
@@ -88,10 +94,35 @@ export async function POST(request: Request) {
     if (label === null) return json({ recorded: false }, 422);
     if (!(await rateLimit(request, 'profile-engagement', 3000)))
       return json({ recorded: false }, 429);
+    if (aggregate) {
+      const day =
+        Math.floor((Date.now() + 7200000) / 86400000) * 86400000 - 7200000;
+      const statements = [
+        db
+          .prepare(
+            'INSERT INTO profile_click_totals(owner_id,at,target,label,count) VALUES(?,?,?,?,1) ON CONFLICT(owner_id,at,target) DO UPDATE SET count=count+1,label=excluded.label',
+          )
+          .bind(row.owner_id, day, target, label),
+      ];
+      if (target !== 'enquiry')
+        statements.push(
+          db
+            .prepare(
+              'INSERT INTO profile_click_lifetime(owner_id,count) VALUES(?,1) ON CONFLICT(owner_id) DO UPDATE SET count=count+1',
+            )
+            .bind(row.owner_id),
+        );
+      await db.batch(statements);
+      return json({ recorded: true });
+    }
     const session = await tokenHash(`${row.owner_id}:${b.session}`);
     if (b.kind === 'action' && target !== 'enquiry')
-      await db.prepare('INSERT OR IGNORE INTO profile_connections(owner_id,session_hash) VALUES(?,?)')
-        .bind(row.owner_id, session).run();
+      await db
+        .prepare(
+          'INSERT OR IGNORE INTO profile_connections(owner_id,session_hash) VALUES(?,?)',
+        )
+        .bind(row.owner_id, session)
+        .run();
     await db
       .prepare(
         'INSERT OR IGNORE INTO profile_engagement(id,owner_id,session_hash,at,kind,target,label) VALUES(?,?,?,?,?,?,?)',
@@ -120,29 +151,33 @@ export async function GET(request: Request) {
       );
     const db = database(),
       generatedAt = Date.now(),
-      since = generatedAt - days * 86400000;
+      since = Math.floor((generatedAt + 7200000) / 86400000) * 86400000 - 7200000 - (days - 1) * 86400000;
+    // Merge consented history with anonymous counters; NULL sessions never imply unique visitors.
+    const source =
+      "(SELECT owner_id,at,kind,target,label,session_hash,1 AS total FROM profile_engagement UNION ALL SELECT owner_id,at,'action' AS kind,target,label,NULL AS session_hash,count AS total FROM profile_click_totals)";
     const [summary, actions, daily] = await Promise.all([
       db
         .prepare(
-          `SELECT COUNT(CASE WHEN kind='view' THEN 1 END) AS views,COUNT(DISTINCT CASE WHEN kind='view' THEN session_hash END) AS sessions,COUNT(CASE WHEN kind='action' THEN 1 END) AS actions,COUNT(CASE WHEN kind='action' AND target='contact' THEN 1 END) AS contactSaves,COUNT(DISTINCT CASE WHEN ${connectionActionSQL} THEN session_hash END) AS connections FROM profile_engagement WHERE owner_id=? AND at>=?`,
+          `SELECT COALESCE(SUM(CASE WHEN kind='view' THEN total ELSE 0 END),0) AS views,COUNT(DISTINCT CASE WHEN kind='view' THEN session_hash END) AS sessions,COALESCE(SUM(CASE WHEN kind='action' THEN total ELSE 0 END),0) AS actions,COALESCE(SUM(CASE WHEN kind='action' AND target='contact' THEN total ELSE 0 END),0) AS contactSaves,COUNT(DISTINCT CASE WHEN ${connectionActionSQL} THEN session_hash END) + COALESCE(SUM(CASE WHEN session_hash IS NULL AND (${connectionActionSQL}) THEN total ELSE 0 END),0) AS connections FROM ${source} WHERE owner_id=? AND at>=?`,
         )
         .bind(user.userId, since)
         .first(),
       db
         .prepare(
-          "SELECT label,COUNT(*) AS count FROM profile_engagement WHERE owner_id=? AND at>=? AND kind='action' GROUP BY label ORDER BY count DESC LIMIT 20",
+          `SELECT label,SUM(total) AS count FROM ${source} WHERE owner_id=? AND at>=? AND kind='action' GROUP BY label ORDER BY count DESC LIMIT 20`,
         )
         .bind(user.userId, since)
         .all(),
       db
         .prepare(
-          "SELECT date(at/1000,'unixepoch','+2 hours') AS day,COUNT(CASE WHEN kind='view' THEN 1 END) AS views,COUNT(CASE WHEN kind='action' THEN 1 END) AS actions FROM profile_engagement WHERE owner_id=? AND at>=? GROUP BY day ORDER BY day DESC",
+          `SELECT date(at/1000,'unixepoch','+2 hours') AS day,COALESCE(SUM(CASE WHEN kind='view' THEN total ELSE 0 END),0) AS views,COALESCE(SUM(CASE WHEN kind='action' THEN total ELSE 0 END),0) AS actions FROM ${source} WHERE owner_id=? AND at>=? GROUP BY day ORDER BY day DESC`,
         )
         .bind(user.userId, since)
         .all(),
     ]);
     return json({
       summary,
+      anonymousClicks: true,
       actions: actions.results,
       daily: daily.results,
       generatedAt,

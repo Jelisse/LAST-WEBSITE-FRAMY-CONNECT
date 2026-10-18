@@ -52,17 +52,30 @@ const { ProfileHandoff } = (await module('components/profile-handoff.tsx'))
   .exports;
 const { translator, validLocale } = i18n.exports;
 const { LanguageProvider, LanguageSelector } = language.exports;
-const { localizedResponse } = (await module('lib/localized-response.ts', {
-  './i18n': i18n.url,
-})).exports;
-const { PasswordInput } = (await module('components/password-input.tsx', {
-  './language-provider': language.url,
-})).exports;
+const { localizedResponse } = (
+  await module('lib/localized-response.ts', {
+    './i18n': i18n.url,
+  })
+).exports;
+const { PasswordInput } = (
+  await module('components/password-input.tsx', {
+    './language-provider': language.url,
+  })
+).exports;
 
 test('password visibility is an accessible non-submit control and starts hidden in each locale', () => {
   for (const locale of ['pt-MZ', 'en', 'zh-Hant']) {
-    const html = renderToStaticMarkup(React.createElement(LanguageProvider, { locale },
-      React.createElement(PasswordInput, { id: 'password', name: 'password', autoComplete: 'current-password' })));
+    const html = renderToStaticMarkup(
+      React.createElement(
+        LanguageProvider,
+        { locale },
+        React.createElement(PasswordInput, {
+          id: 'password',
+          name: 'password',
+          autoComplete: 'current-password',
+        }),
+      ),
+    );
     assert.match(html, /type="password"/);
     assert.match(html, /type="button"/);
     assert.match(html, /aria-controls="password"/);
@@ -71,14 +84,41 @@ test('password visibility is an accessible non-submit control and starts hidden 
   }
 });
 
+test('public profile requests can translate errors into the selected language without changing the account cookie', async () => {
+  const request = new Request('https://example.com/api/profile-enquiries', {
+    headers: { cookie: 'framy-language=en', 'X-Framy-Language': 'zh-Hant' },
+  });
+  const response = await localizedResponse(
+    request,
+    Response.json({ error: 'Não foi possível enviar.' }, { status: 422 }),
+  );
+  assert.equal(
+    (await response.json()).error,
+    translator('zh-Hant')('Não foi possível enviar.'),
+  );
+  assert.equal(response.headers.get('set-cookie'), null);
+});
+
 test('API errors follow the selected locale without changing protocol or customer data', async () => {
   for (const locale of ['en', 'zh-Hant']) {
-    const request = new Request('https://example.com/api/example', { headers: { cookie: `framy-language=${locale}` } });
-    const response = await localizedResponse(request, Response.json({ error: 'Não foi possível enviar.', status: 'pending', name: 'Ana' }, { status: 400, headers: { 'Set-Cookie': 'example=1; HttpOnly' } }));
+    const request = new Request('https://example.com/api/example', {
+      headers: { cookie: `framy-language=${locale}` },
+    });
+    const response = await localizedResponse(
+      request,
+      Response.json(
+        { error: 'Não foi possível enviar.', status: 'pending', name: 'Ana' },
+        { status: 400, headers: { 'Set-Cookie': 'example=1; HttpOnly' } },
+      ),
+    );
     assert.equal(response.status, 400);
     assert.equal(response.headers.get('Content-Language'), locale);
     assert.equal(response.headers.get('Set-Cookie'), 'example=1; HttpOnly');
-    assert.deepEqual(await response.json(), { error: translator(locale)('Não foi possível enviar.'), status: 'pending', name: 'Ana' });
+    assert.deepEqual(await response.json(), {
+      error: translator(locale)('Não foi possível enviar.'),
+      status: 'pending',
+      name: 'Ana',
+    });
     const successful = Response.json({ biography: 'Não foi possível enviar.' });
     assert.equal(await localizedResponse(request, successful), successful);
     const plain = new Response('Unavailable', { status: 503 });
@@ -123,7 +163,7 @@ test('locale validation, system notices and parameter interpolation preserve dat
 test('all translated messages have English and Traditional Chinese with matching placeholders', () => {
   const params = (s) => [...s.matchAll(/\{\d+\}/g)].map((m) => m[0]).sort();
   for (const [key, values] of Object.entries(messages)) {
-    assert.equal(values.length, 2, key);
+    assert.ok(values.length === 2 || values.length === 6, key);
     for (const value of values) {
       assert.ok(typeof value === 'string' && value.trim(), key);
       assert.deepEqual(params(value), params(key), key);
@@ -215,4 +255,34 @@ test('Chinese names generate valid profile URLs without changing the name', () =
   assert.equal(profile.name, name);
   assert.match(profile.username, /^[a-z0-9_]{3,40}$/);
   assert.equal(usernameFromName(''), '');
+});
+
+test('profile Ukrainian and Polish strings translate and missing application keys fall back to English', () => {
+  assert.equal(validLocale('uk'), 'uk');
+  assert.equal(validLocale('pl'), 'pl');
+  assert.equal(translator('uk')('Sobre mim'), 'Про мене');
+  assert.equal(translator('pl')('Adicionar contacto'), 'Dodaj kontakt');
+  for (const [key, values] of Object.entries(messages)) {
+    if (values.length === 6) {
+      assert.equal(translator('uk')(key), values[2]);
+      assert.equal(translator('pl')(key), values[3]);
+    }
+  }
+});
+
+test('French and Simplified Chinese cover every extended profile message with English fallback elsewhere', () => {
+  assert.equal(validLocale('fr'), 'fr');
+  assert.equal(validLocale('zh-Hans'), 'zh-Hans');
+  assert.equal(translator('fr')('Sobre mim'), 'À propos de moi');
+  assert.equal(translator('zh-Hans')('Adicionar contacto'), '添加联系人');
+  assert.equal(translator('zh-Hant')('Adicionar contacto'), '新增聯絡人');
+  for (const [key, values] of Object.entries(messages)) {
+    if (values.length === 6) {
+      assert.equal(translator('fr')(key), values[4]);
+      assert.equal(translator('zh-Hans')(key), values[5]);
+    } else {
+      assert.equal(translator('fr')(key), values[0]);
+      assert.equal(translator('zh-Hans')(key), values[0]);
+    }
+  }
 });

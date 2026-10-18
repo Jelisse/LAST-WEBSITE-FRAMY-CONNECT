@@ -15,6 +15,7 @@
 # next.js
 /.next/
 /.vinext/
+/.portfolio-dev.log
 /out/
 
 # misc
