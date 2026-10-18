@@ -82,6 +82,10 @@ Saved 16 October 2026. This is a repository-based continuation aid, not an expor
 - Browser verified the seven-option menu, French profile/bio/close action, Simplified Chinese interface and demo link labels, and automatic menu closure. Restored English and the normal viewport. Screenshot `portfolio-seven-languages.png` is in this chat's visualization directory.
 - Changes remain local and uncommitted. No new schema migration is needed for these languages. The prior anonymous-counter migration `0028_profile_click_totals.sql` still needs the guarded Cloudflare migration/deployment workflow before that complete pending revision can go live. Customer-authored text still requires supplied translations.
 
+## Git delivery — 18 October 2026
+
+- User authorized committing and pushing all pending changes to Jelisse’s GitHub `main`. Fetched that branch and verified it matched the local base before committing the portfolio, seven languages, anonymous-counter migration, assets, removals and documentation. The 178-test suite, typecheck and Cloudflare build passed before delivery. Deployment and the remote counter-table migration remain separate and have not been performed.
+
 ## Privacy and deletion
 
 Verify you can continue from your own account before deleting the source chats. Archiving is recoverable and does not provide privacy from someone with the same account. Logging out does not erase chat history or local files. Use a separate private Windows login if other people also use this computer; account switching alone is not a filesystem privacy boundary.
