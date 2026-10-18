@@ -724,6 +724,94 @@ test('manager edits store meticais without reconverting saved plan prices', asyn
   );
   sql.close();
 });
+test('invalid publication never starts the trial and database failures are not reported as edit conflicts', async () => {
+  const sql = fixture();
+  const originalLog = console.error, logs = [];
+  try {
+    const workspace = await api('app/api/workspace/route.ts');
+    const invalid = await post(workspace, {
+      action: 'publish-profile', version: 0, profile: { ...profile, phone: 'invalid' },
+    });
+    assert.equal(invalid.status, 422);
+    assert.equal(sql.prepare('SELECT COUNT(*) n FROM sandbox_memberships').get().n, 0);
+    sql.exec('DROP VIEW profile_membership_view');
+    console.error = (message) => logs.push(message);
+    const failed = await post(workspace, {
+      action: 'publish-profile', version: 0, profile,
+    });
+    assert.equal(failed.status, 503);
+    assert.ok(failed.body.reference);
+    const diagnostic = JSON.parse(logs[0]);
+    assert.equal(diagnostic.area, 'profile-membership');
+    assert.equal(diagnostic.category, 'schema-missing');
+    assert.equal(diagnostic.reference, failed.body.reference);
+    assert.doesNotMatch(JSON.stringify(failed.body), /SELECT|profile_membership_view/);
+  } finally {
+    console.error = originalLog;
+    sql.close();
+  }
+});
+
+test('human-entered username text can publish after editor normalization without weakening server validation', async () => {
+  const sql = fixture();
+  try {
+    const workspace = await api('app/api/workspace/route.ts');
+    const { usernameFromName } = await import('../lib/domain.ts');
+    const entered = { ...profile, name: 'Ana Silva', username: 'Ana Silva' };
+    const rejected = await post(workspace, { action: 'publish-profile', version: 0, profile: entered });
+    assert.equal(rejected.status, 422);
+    assert.match(rejected.body.error, /nome de utilizador/);
+    const accepted = await post(workspace, {
+      action: 'publish-profile', version: 0,
+      profile: { ...entered, username: usernameFromName(entered.username) },
+    });
+    assert.equal(accepted.status, 200);
+    assert.equal(accepted.body.publishedUsername, 'ana_silva');
+    assert.equal(accepted.body.published, true);
+    for (const text of ['Ana Réis', 'Cliente Exemplo', 'Maria Banda', '陳小明']) {
+      assert.match(usernameFromName(text), /^[a-z0-9_]{3,40}$/);
+    }
+  } finally { sql.close(); }
+});
+
+test('saving returns the reserved username so a duplicate-name customer can publish without a reload', async () => {
+  const sql = fixture();
+  try {
+    const workspace = await api('app/api/workspace/route.ts');
+    assert.equal((await post(workspace, {
+      action: 'save-profile', version: 0, profile, autoUsername: true,
+    })).status, 200);
+    globalThis.__launch.user = { userId: 'customer-b', role: 'customer' };
+    const response = await post(workspace, {
+      action: 'save-profile', version: 0, profile, autoUsername: true,
+    });
+    assert.equal(response.status, 200);
+    const saved = response.body;
+    assert.equal(saved.profile.username, 'cliente_teste_2');
+    assert.equal(saved.profileVersion, 1);
+    // No workspace GET: the save acknowledgement must be enough to publish.
+    const publishedResponse = await post(workspace, {
+      action: 'publish-profile', version: saved.profileVersion,
+      profile: { ...saved.profile, title: 'Actualizado' },
+    });
+    assert.equal(publishedResponse.status, 200);
+    const published = publishedResponse.body;
+    assert.equal(published.published, true);
+    assert.equal(published.publishedUsername, 'cliente_teste_2');
+    globalThis.__launch.user = { userId: 'manager-a', role: 'manager' };
+    const accounts = await api('app/api/accounts/route.ts');
+    const data = await (await accounts.GET()).json();
+    const customer = data.accounts.find((a) => a.id === 'customer-b');
+    assert.equal(customer.profilePublished, 1);
+    assert.equal(customer.profileUsername, published.publishedUsername);
+    const row = sql.prepare('SELECT draft_json,published_json FROM profiles WHERE owner_id=?').get('customer-b');
+    assert.equal(JSON.parse(row.draft_json).title, 'Actualizado');
+    assert.equal(JSON.parse(row.published_json).title, 'Actualizado');
+  } finally {
+    sql.close();
+  }
+});
+
 test('launch: a first publication auto-starts the trial, checkout is atomic, retries are safe, costs stay private', async () => {
   const sql = fixture(),
     workspace = await api('app/api/workspace/route.ts');

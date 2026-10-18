@@ -50,6 +50,21 @@ export function AccountManager() {
     );
     return () => clearTimeout(timer);
   }, [load]);
+  useEffect(() => {
+    // Refresh published links while management stays open, without interrupting
+    // account changes or an open confirmation/recovery flow.
+    const refresh = () => {
+      if (document.visibilityState !== 'visible' || busy || recovery || confirmDelete)
+        return;
+      void load().catch((e) => setError(e.message));
+    };
+    const timer = window.setInterval(refresh, 15000);
+    window.addEventListener('focus', refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('focus', refresh);
+    };
+  }, [load, busy, recovery, confirmDelete]);
   async function save(body: Record<string, unknown>) {
     setBusy(true);
     setError('');

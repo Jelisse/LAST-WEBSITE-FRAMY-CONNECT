@@ -274,6 +274,7 @@ export function Workspace({ displayName }: { displayName: string }) {
         ok?: boolean;
         id?: string;
         profileVersion?: number;
+        profile?: Profile;
         published?: boolean;
         publishedUsername?: string | null;
       };
@@ -390,6 +391,7 @@ export function Workspace({ displayName }: { displayName: string }) {
         ? 'Perfil retirado da publicação.'
         : 'Rascunho guardado.';
   function applySavedProfile(result: {
+    profile?: Profile;
     profileVersion?: number;
     published?: boolean;
     publishedUsername?: string | null;
@@ -400,7 +402,7 @@ export function Workspace({ displayName }: { displayName: string }) {
       prev
         ? {
             ...prev,
-            profile,
+            profile: result.profile ?? profile,
             profileVersion: result.profileVersion ?? prev.profileVersion,
             published: result.published ?? prev.published,
             publishedUsername:
@@ -410,27 +412,36 @@ export function Workspace({ displayName }: { displayName: string }) {
           }
         : prev,
     );
+    setProfile(result.profile ?? profile);
+    dirtyRef.current = false;
     setDirty(false);
     setConflict(null);
   }
   async function save(action: string) {
     if (!data || uploadingPhoto || busy) return;
+    // Human names pasted into a new username field must produce a valid URL,
+    // just like usernames generated from the full-name field. Existing URLs
+    // remain immutable and the server still validates and reserves the result.
+    const submittedProfile = data.profileVersion === 0
+      ? { ...profile, username: usernameFromName(profile.username || profile.name) }
+      : profile;
+    setProfile(submittedProfile);
     setBusy(true);
     setError('');
     setNotice('');
     try {
       const result = await send({
         action,
-        profile,
+        profile: submittedProfile,
         version: data.profileVersion,
         autoUsername:
           data.profileVersion === 0 &&
-          profile.username === usernameFromName(profile.name),
+          submittedProfile.username === usernameFromName(submittedProfile.name),
       });
-      applySavedProfile(result);
+      applySavedProfile({ ...result, profile: result.profile ?? submittedProfile });
       setNotice(savedMessage(action));
       // Best-effort revalidation; the save itself already succeeded.
-      void load(true).catch(() => {});
+      await load().catch(() => {});
     } catch (e) {
       if ((e as { status?: number }).status === 409) {
         // Never auto-merge: ask the user which side wins.
@@ -469,7 +480,7 @@ export function Workspace({ displayName }: { displayName: string }) {
             profile.username === usernameFromName(profile.name),
         });
         applySavedProfile(result);
-        void load(true).catch(() => {});
+        await load().catch(() => {});
       },
       savedMessage(action),
     );
@@ -927,6 +938,17 @@ export function Workspace({ displayName }: { displayName: string }) {
                                   f.key === 'username' &&
                                   data.profileVersion > 0
                                 }
+                                autoCapitalize={f.key === 'username' ? 'none' : undefined}
+                                spellCheck={f.key === 'username' ? false : undefined}
+                                onBlur={f.key === 'username' && data.profileVersion === 0
+                                  ? () => {
+                                      const username = usernameFromName(profile.username || profile.name);
+                                      if (username !== profile.username) {
+                                        setProfile({ ...profile, username });
+                                        setDirty(true);
+                                      }
+                                    }
+                                  : undefined}
                                 onChange={(e) => {
                                   setProfile({
                                     ...profile,
@@ -1054,6 +1076,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                         </div>
                       </fieldset>
                     </form>
+                    {error && <p role="alert" className="message error-message">{t(error)}</p>}
                     {data.published && (
                       <div className="published-actions">
                         <a

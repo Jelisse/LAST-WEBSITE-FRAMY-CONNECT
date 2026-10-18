@@ -184,6 +184,7 @@ export async function POST(request: Request) {
   }
   if ((body.action === 'submit-order' || body.action === 'create-order') && !productCheckoutEnabled())
     return json({ error: checkoutMaintenanceMessage, code: 'CHECKOUT_MAINTENANCE' }, 503);
+  let failureArea = 'workspace-write';
   try {
     const db = database(),
       now = new Date().toISOString();
@@ -353,6 +354,7 @@ export async function POST(request: Request) {
       body.action === 'publish-profile' ||
       body.action === 'unpublish-profile'
     ) {
+      failureArea = 'profile-validation';
       if (!Number.isInteger(body.version) || Number(body.version) < 0)
         return json({ error: 'Versão inválida.' }, 422);
       let profileInput = body.profile;
@@ -386,6 +388,19 @@ export async function POST(request: Request) {
           profileInput = { ...input, username: candidate };
         }
       }
+      const profile = validateProfile(profileInput);
+      if (profile.photoUrl && body.action !== 'unpublish-profile') {
+        failureArea = 'profile-photo-check';
+        const photo = await env.PROFILE_PHOTOS?.head(
+          `profiles/${profile.photoUrl.split('/').pop()}`,
+        );
+        if (!photo || photo.customMetadata?.ownerId !== user.userId)
+          return json(
+            { error: 'Carregue a sua própria fotografia antes de guardar.' },
+            422,
+          );
+      }
+      failureArea = 'profile-membership';
       if (body.action === 'publish-profile') {
         let trial = await db
           .prepare('SELECT * FROM profile_membership_view WHERE owner_id=?')
@@ -426,17 +441,6 @@ export async function POST(request: Request) {
             403,
           );
       }
-      const profile = validateProfile(profileInput);
-      if (profile.photoUrl && body.action !== 'unpublish-profile') {
-        const photo = await env.PROFILE_PHOTOS?.head(
-          `profiles/${profile.photoUrl.split('/').pop()}`,
-        );
-        if (!photo || photo.customMetadata?.ownerId !== user.userId)
-          return json(
-            { error: 'Carregue a sua própria fotografia antes de guardar.' },
-            422,
-          );
-      }
       const membership = await db
         .prepare('SELECT * FROM profile_membership_view WHERE owner_id=?')
         .bind(user.userId)
@@ -470,7 +474,7 @@ export async function POST(request: Request) {
           },
           422,
         );
-        if (body.version === 0 && !current) {
+      if (body.version === 0 && !current) {
         const taken = await db
           .prepare(
             'SELECT owner_id FROM profiles WHERE username=? AND owner_id<>?',
@@ -483,6 +487,7 @@ export async function POST(request: Request) {
             422,
           );
       }
+      failureArea = 'profile-persistence';
       let result;
       if (body.version === 0) {
         result = await db
@@ -551,6 +556,7 @@ export async function POST(request: Request) {
         );
       return json({
         ok: true,
+        profile,
         profileVersion: body.version === 0 ? 1 : Number(body.version) + 1,
         published: visible,
         publishedUsername: visible ? profile.username : null,
@@ -914,14 +920,8 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : '';
-    if (/D1|SQLITE|database|constraint/i.test(message))
-      return json(
-        {
-          error:
-            'Não foi possível guardar. Actualize os dados e tente novamente.',
-        },
-        409,
-      );
+    if (/D1|SQLITE|database|constraint|Armazenamento|no such table|no such column|no such view/i.test(message) || failureArea === 'profile-photo-check')
+      return serviceFailure(error, failureArea, 'Não foi possível guardar. Tente novamente.');
     return json(
       { error: message || 'Não foi possível completar a acção.' },
       422,
