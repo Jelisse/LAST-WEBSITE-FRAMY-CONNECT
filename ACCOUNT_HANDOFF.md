@@ -215,3 +215,10 @@ User authorized all pending source changes to main and deployment. Latest local 
 ## Account counts commit/push - 19 October 2026
 
 User authorized commit and push of account numbering/totals and first-publication alerts to Jelisse github/main. Final 205 tests, typecheck, targeted lint and Cloudflare build passed. This source commit includes migration0033 but does not apply it remotely or publish the Worker. Deployment remains pending; live is still 83e67de9-cbed-4fa3-9abe-31812d6da5df.
+
+## Account counts and publication alerts deployed - 19 October 2026
+
+- User explicitly authorized deploy of source commit c4fa4fc. Guarded planner identified only 0033_profile_publication_alerts.sql; private ignored backup succeeded, migration applied, schema and relationship checks passed. Existing published profiles were baselined, without queuing historical notifications.
+- Fresh guarded build/deployment succeeded: Worker 0d593529-2d77-4f37-9ee1-4d29a2116bdc. Existing D1/R2, canonical URL, sender, PaySuite configuration and 15-minute schedule preserved. Read-only secret-name inspection confirmed RESEND_API_KEY is configured, without reading its value.
+- Both canonical and workers.dev: homepage and product-options 200, anonymous /manager redirects to sign-in (307), /api/accounts refuses anonymous access (403). AccountManager bundle and CSS containing account-totals SHA-256 match the final local build on both domains. No customer accounts, approvals, profiles, credentials or payments were changed during smoke checks; no test email was sent.
+- This supersedes the local-only/migration-pending status for account counts and publication alerts above. New-publication notices target firminochambale@framyconnect.co.mz. Real inbox delivery remains unverified; provider acceptance is not delivery proof. Automated behavior is covered by the previously passed 205-test suite. Logs ignored under tmp/portfolio-review-20261018/account-counts-*.
