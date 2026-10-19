@@ -26,3 +26,7 @@ Corporate organization tools are implemented locally; see CORPORATE.md. The cano
 ## Corporate approval flow - 19 October 2026 (local)
 
 Corporate selection now opens company setup before payment. A Framy manager reviews the submitted request in Accounts and explicitly approves a 1-500 employee operational limit. This manual grant is independent of billing and remains until manager suspension; it never records a payment, changes prices or modifies paid plan snapshots. Existing paid Corporate eligibility still works without a manual override. Individual remains free while the request is pending. Migration 0032 is required. See CORPORATE.md.
+
+## Corporate onboarding release - 19 October 2026
+
+The guided setup, manual manager approval, authorization/password administration and email-only invitations are now published. Migration 0032 applied after private backup; Worker 83e67de9-cbed-4fa3-9abe-31812d6da5df, source d1bb074. This supersedes local-only/pending release statements above. Production public access and anonymous access protection verified on canonical/workers.dev domains; real email delivery and employee acceptance still require external confirmation. See ACCOUNT_HANDOFF.md for exact verification.

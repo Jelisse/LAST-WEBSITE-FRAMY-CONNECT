@@ -77,3 +77,7 @@ Paid Corporate access now gates organization onboarding, delegated leaders, team
 ## Corporate onboarding approval - 19 October 2026 (local)
 
 Accounts now expose versioned Corporate approval/suspension for submitted company requests, with a configurable employee limit. Manual operational approval unlocks organization tools without fabricating payment evidence or changing personal membership. It has no automatic expiry or debit; management can suspend it. Normal paid-plan renewal and verified settlement remain unchanged. Existing paid Corporate eligibility is retained unless an explicit manual approval/suspension overrides it. See CORPORATE.md and migration 0032.
+
+## Corporate onboarding release - 19 October 2026
+
+The guided setup, manual manager approval, authorization/password administration and email-only invitations are now published. Migration 0032 applied after private backup; Worker 83e67de9-cbed-4fa3-9abe-31812d6da5df, source d1bb074. This supersedes local-only/pending release statements above. Production public access and anonymous access protection verified on canonical/workers.dev domains; real email delivery and employee acceptance still require external confirmation. See ACCOUNT_HANDOFF.md for exact verification.
