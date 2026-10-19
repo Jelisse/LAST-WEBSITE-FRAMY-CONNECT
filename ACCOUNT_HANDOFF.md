@@ -169,3 +169,9 @@ Official references: https://learn.chatgpt.com/docs/build-skills ; https://learn
 ## Requested commit, push and deployment - 19 October 2026
 
 User authorized all pending source changes to main and deployment. Latest local checks: 193 tests passed, typecheck and targeted Corporate lint passed, Cloudflare build passed. Remote migration planner stopped before mutation with Cloudflare D1 authorization error 7403. Corporate migration 0031 remains unapplied and publication is pending restored Cloudflare authorization. GitHub main was fetched for safe push verification.
+
+## Deployment completed - 19 October 2026
+
+- Source commit c25d022 pushed to github/main (Jelisse). Cloudflare authorization retry succeeded after session inspection; the initial 7403 did not persist. Guarded migration created an ignored private backup, applied only 0031_corporate_organisations.sql, and passed schema and database-relationship checks. No historical migrations replayed.
+- Guarded deployment rebuilt successfully and published Worker version 85793040-c5c8-4ecd-b5b7-3980f070d18c. Existing D1/R2, canonical URL, email sender, PaySuite configuration and 15-minute schedule preserved. This supersedes all local-only Corporate and compact-account-row statuses above.
+- Both canonical and workers.dev origins: /corporativo redirects anonymous visitors to sign-in (307), /api/corporate returns 401, /corporativo/aceitar and /api/product-options return 200. Corporate dashboard bundle SHA-256 matches the new local build on both domains. No authenticated customer mutations, real invitation emails or payments were performed as deployment checks; real inbox delivery/employee acceptance remain external verification.
