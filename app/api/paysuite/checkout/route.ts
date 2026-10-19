@@ -1,3 +1,4 @@
+import { referralQuote } from '@/lib/server-ambassador';
 import { pvcModel } from '@/lib/pvc-models';
 import { validateLeather } from '@/lib/leather-design';
 
@@ -19,7 +20,7 @@ import {
   type GatewayPayment,
 } from '@/lib/server-paysuite';
 import { profileMembership } from '@/lib/server-profile-access';
-import { hasActiveTrial } from '@/lib/entitlement';
+import { isPaidProfilePlan } from '@/lib/plan-policy';
 import { cleanText } from '@/lib/profile-growth';
 import { rateLimit } from '@/lib/request-limits';
 export const dynamic = 'force-dynamic';
@@ -158,7 +159,9 @@ export async function POST(request: Request) {
       if (!settings?.enabled)
         throw Error('Compras de produtos ainda indisponíveis.');
       const products = await getProducts();
-      const quote = configurationQuote(products, settings, b);
+      const baseQuote = configurationQuote(products, settings, b);
+      const referral = await referralQuote(b.ambassadorCode, baseQuote.hardware, user.userId);
+      const quote = { ...baseQuote, discount: referral?.discount ?? 0, total: baseQuote.total - (referral?.discount ?? 0) };
       if (
         b.expectedAmount !== quote.total ||
         b.pricingVersion !== settings.version
@@ -216,6 +219,8 @@ export async function POST(request: Request) {
           ? pvcModel(b.pvcModel)
           : null;
       const configuration = {
+        ambassadorCode: referral?.code ?? null,
+        originalTotal: baseQuote.total,
         ...(cardArtwork ? { cardArtwork } : {}),
         ...(pvcArtwork ? { pvcArtwork } : {}),
         ...(selectedPvc ? { pvcModel: selectedPvc } : {}),
@@ -261,6 +266,7 @@ export async function POST(request: Request) {
           user.userId,
         ),
       );
+      if (referral) statements.push(env.DB.prepare('INSERT INTO ambassador_sales(order_id,ambassador_id,code,base_amount,discount_amount,commission_bps,commission_amount,created_at) VALUES(?,?,?,?,?,?,?,?)').bind(id,referral.account_id,referral.code,referral.base,referral.discount,referral.commission_bps,referral.commission,now));
       for (const pid of quote.ids)
         statements.push(
           env.DB.prepare(
@@ -277,14 +283,10 @@ export async function POST(request: Request) {
       const member = await profileMembership(user.userId);
       if (!settings?.enabled || !member)
         throw Error('Subscrições indisponíveis.');
-      if (hasActiveTrial(member))
-        throw Error(
-          'O pagamento do perfil estará disponível após os 30 dias grátis.',
-        );
       if (member.next_starts_at && member.next_starts_at > now)
         throw Error('Já tem uma alteração de plano agendada.');
       const plan = (await getManagedPlans()).find(
-        (p) => p.id === b.planId && p.active && p.id !== 'free-30',
+        (p) => p.id === b.planId && p.active && isPaidProfilePlan(p.id),
       );
       if (
         !plan ||

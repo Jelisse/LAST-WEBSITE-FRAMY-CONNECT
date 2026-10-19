@@ -145,7 +145,7 @@ export async function GET(request: Request) {
       return json(
         {
           error:
-            'As estatísticas estão incluídas no plano Profissional e na experiência gratuita.',
+            'As estatísticas exigem um plano pago com esta funcionalidade activa.',
         },
         403,
       );

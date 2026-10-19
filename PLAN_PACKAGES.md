@@ -1,14 +1,24 @@
-# Framy packages — approved 24 September 2026
+# Profile plans - approved 18 October 2026
 
-| Offer | Price | Links | Biography |
-| --- | --- | ---: | ---: |
-| Pessoal | 65 MT per profile/month | 8 | 200 characters |
-| Profissional | 150 MT per profile/month | 20 | 600 characters |
-| Corporativo | By consultation | Agreed in proposal | Agreed in proposal |
-| 30-day trial | Free, no automatic renewal | 20 | 600 characters |
+This policy supersedes the September pricing and trial description.
 
-The trial is displayed separately from the three commercial offers. Corporate is an enquiry via /contacto, not a self-service membership or a promise of implemented team administration. Products, customisation, support, team size, pricing and limits must be agreed in a proposal. Physical products and delivery are separate.
+| Plan | Price | Renewal |
+| --- | --- | --- |
+| Individual (`personal`) | Free permanently | None; no expiry |
+| Professional (`professional-v2`) | Manager-published monthly/annual price | Confirmed payment for each period |
+| Corporate (`corporate` or an existing versioned negotiated contract) | Manager-approved price and features | Confirmed payment for each enabled period |
 
-New catalogue IDs are personal and professional-v2. Historical IDs remain readable through legacyPlans; saved paid membership terms are not rewritten. Retired offers and arbitrary historical manager records are excluded from the new catalogue. Managers can edit the current paid offers in meticais. Existing trial terms gain at least 20 links and 600 biography characters without resetting trial dates or deleting content.
+The public 30-day trial is retired. New Individual terms provide eight links and a 200-character biography; managers retain established content controls. Physical NFC products, design and delivery are separate purchases. Corporate starts unpublished: a zero seed price is not a free Corporate offer. Its price must be configured before publishing checkout.
 
-Monthly subscription activation remains unavailable. The existing server guard rejects a downgrade that would discard saved or published content. No links are automatically deleted. Selecting retained links or managing inactive excess links during a future paid downgrade remains part of the subscription activation workflow, not an enabled feature today.
+Migration `0030_permanent_individual.sql` archives former trial terms and dates, converts those memberships to Individual and provides Individual membership for active customer/agent accounts without one. Profile drafts, published content, receipts and paid contracts are preserved. Historical Individual payment snapshots remain stored, but Individual no longer expires or generates renewal requests. Former trial data remains readable for compatibility, not as a new offer.
+
+Professional/Corporate renewals support enabled monthly or annual calendar periods. Verified provider evidence or the established manager-verified receipt flow activates access. Paid renewals before expiry retain scheduled future periods. No automatic recurring debit is enabled. After expiry and seven days of grace, public presentation uses Individual limits while excess content remains privately saved. Renewal reminders exclude Individual and former trials. Email service acceptance does not prove inbox delivery.
+
+See `AMBASSADORS.md` for physical-product referrals. Ambassador codes never discount a subscription or generate subscription commission.
+
+Deployed 19 October 2026 through the guarded `CLOUDFLARE.md` workflow after a private database backup. Migrations 0029/0030 and application version `794f454a-5caa-45da-808e-a7fceaf04435` are live. Real payment and email delivery checks remain external.
+
+
+## Corporate organization configuration - 19 October 2026
+
+Corporate organization tools are implemented locally; see CORPORATE.md. The canonical Corporate plan or a versioned paid contract with corporateEnabled=true and teams enabled qualifies the owner. memberLimit accepts 1-500 employees (default 25), excluding the owner and counting valid pending invitations. Prices and renewal periods remain manager-controlled; there is no automatic per-seat billing. Existing paid contract snapshots are preserved. Migration 0031 and deployment are still pending.

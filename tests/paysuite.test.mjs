@@ -5,6 +5,42 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import ts from 'typescript';
+import { referralAmounts } from '../lib/ambassador.ts';
+import {parseCorporateBatch,processCorporateBatch} from '../lib/corporate.ts';
+test('corporate batch stops on failure and resumes remaining workers without resending successful invitations',async()=>{
+ const rows=parseCorporateBatch('Ana;ana@example.invalid\nBruno;bruno@example.invalid\nCelia;celia@example.invalid');const attempted=[];
+ const first=await processCorporateBatch(rows,async row=>{attempted.push(row.name);if(row.name==='Bruno')throw Error('Rate limited');return 'accepted';});
+ assert.deepEqual(attempted,['Ana','Bruno']);assert.equal(first.completed,1);assert.equal(first.error,'Rate limited');assert.deepEqual(first.remaining.map(row=>row.name),['Bruno','Celia']);
+ const second=await processCorporateBatch(first.remaining,async()=> 'uncertain');assert.equal(second.completed,2);assert.equal(second.uncertain,2);assert.deepEqual(second.remaining,[]);
+});
+test('corporate batch validation checks every row before invitations are sent',()=>{
+ assert.deepEqual(parseCorporateBatch('Ana;ANA@example.invalid;Promotores\n陳美玲\tchen@example.invalid\tConteúdo'),[{name:'Ana',email:'ana@example.invalid',team:'Promotores'},{name:'陳美玲',email:'chen@example.invalid',team:'Conteúdo'}]);
+ assert.throws(()=>parseCorporateBatch('Ana;a@example.invalid\nOutra;A@example.invalid'));
+ assert.throws(()=>parseCorporateBatch('Ana;invalid-email'));
+ assert.throws(()=>parseCorporateBatch(Array.from({length:26},(_,i)=>'Worker;worker'+i+'@example.invalid').join('\n')));
+ assert.throws(()=>parseCorporateBatch(''));
+});
+
+test('ambassador commission uses original hardware and rounds each amount to cents', () => {
+  assert.deepEqual(referralAmounts(100000,1000),{discount:10000,commission:10000});
+  assert.deepEqual(referralAmounts(100000,1500),{discount:10000,commission:15000});
+  assert.deepEqual(referralAmounts(100005,1500),{discount:10001,commission:15001});
+  for (const invalid of [999,1501,1000.5,NaN]) assert.throws(()=>referralAmounts(100000,invalid));
+});
+
+test('changing ambassador conditions during checkout rolls back the order and all reservations', async t => {
+  const f=fixture(t), checkout=await api('app/api/paysuite/checkout/route.ts');
+  f.sql.prepare("INSERT INTO ambassadors(account_id,code,created_at) VALUES('other','ANA0001',?)").run(new Date().toISOString());
+  const batch=f.db.batch.bind(f.db);
+  f.db.batch=async statements=>{
+    f.sql.exec("UPDATE ambassadors SET commission_bps=1500,version=version+1 WHERE account_id='other'");
+    return batch(statements);
+  };
+  const result=await checkout.POST(request(product({ambassadorCode:'ANA0001',expectedAmount:141500})));
+  assert.ok(result.status>=400,await result.clone().text());
+  assert.equal(f.creates(),0);
+  for(const table of ['paysuite_product_orders','ambassador_sales','paysuite_payments','paysuite_stock_reservations']) assert.equal(f.sql.prepare(`SELECT COUNT(*) n FROM ${table}`).get().n,0,table);
+});
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const moduleURL = (code) =>
@@ -51,6 +87,122 @@ function loadModule(name) {
   return result;
 }
 const api = async (file) => import(loadModule(file));
+async function corporateFixture(t,seats=2) {
+ const f=fixture(t);const now=new Date().toISOString();
+ f.sql.prepare("UPDATE sandbox_memberships SET plan_id='corporate',terms_json=?,paid_started_at=?,paid_expires_at=? WHERE owner_id='buyer'").run(JSON.stringify({id:'corporate',entitlementVersion:1,memberLimit:seats,links:50,bio:1200,features:{teams:true}}),new Date(Date.now()-86400000).toISOString(),new Date(Date.now()+30*86400000).toISOString());
+ f.env.RESEND_API_KEY='fake-email-key';f.env.PROFILE_EMAIL_FROM='Framy <info@example.invalid>';
+ const provider=globalThis.fetch;const emails=[];
+ globalThis.fetch=async(url,options)=>{if(String(url)==='https://api.resend.com/emails'){emails.push(JSON.parse(options.body));return Response.json({id:'fake-message'});}return provider(url,options);};
+ const route=await api('app/api/corporate/route.ts');const created=await route.POST(request({action:'create',name:'Fictional organisation'}));assert.equal(created.status,200,await created.clone().text());const {id}=await created.json();
+ return {...f,route,id,emails,token:()=>emails.at(-1).text.match(/aceitar#([a-f0-9]{64})/)[1]};
+}
+
+test('corporate onboarding confirms email, preserves existing accounts, enforces seats and scopes leaders',async t=>{
+ const f=await corporateFixture(t);
+ const invite=async(email,name='Employee',extra={})=>f.route.POST(request({action:'invite',organisation:f.id,email,name,role:'member',team:'Field',...extra}));
+ let r=await invite('other@example.test');assert.equal(r.status,200,await r.clone().text());const token=f.token();
+ const inspected=await f.route.POST(request({action:'inspect-invite',token}));assert.equal(inspected.status,200);assert.deepEqual(await inspected.json(),{organisation:'Fictional organisation',role:'member',team:'Field',newAccount:false});assert.notEqual(f.sql.prepare('SELECT token_hash FROM corporate_invites').get().token_hash,token);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};assert.equal((await f.route.POST(request({action:'accept',token,confirmed:true}))).status,401);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};r=await f.route.POST(request({action:'accept',token,confirmed:true,password:'MustNotReplaceExisting'}));assert.equal(r.status,200,await r.clone().text());
+ assert.equal(f.sql.prepare("SELECT password_hash FROM auth_accounts WHERE id='other'").get().password_hash,'!');
+ assert.equal((await f.route.POST(request({action:'accept',token,confirmed:true}))).status,422);
+ assert.equal((await f.route.POST(request({action:'campaign',organisation:f.id,name:'Forbidden'}))).status,422);
+ const memberView=await (await f.route.GET(new Request('https://framyconnect.co.mz/api/corporate?organisation='+f.id))).json();assert.equal(memberView.members.length,1);assert.deepEqual(memberView.invites,[]);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};
+ r=await invite('new-worker@example.invalid','New Employee');assert.equal(r.status,200,await r.clone().text());const oldToken=f.token();
+ const pending=f.sql.prepare("SELECT * FROM auth_accounts WHERE email='new-worker@example.invalid'").get();assert.equal(pending.active,0);assert.equal(pending.role,'customer');
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM corporate_members').get().n,2);
+ assert.equal((await invite('third-worker@example.invalid')).status,422);assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM auth_accounts WHERE email='third-worker@example.invalid'").get().n,0,'capacity failure rolls back pending account');
+ r=await invite('new-worker@example.invalid');assert.equal(r.status,200,await r.clone().text());const newToken=f.token();assert.notEqual(newToken,oldToken);
+ assert.equal((await f.route.POST(request({action:'accept',token:oldToken,confirmed:true,password:'VeryStrongPassword123'}))).status,422);
+ globalThis.__paysuite.user=null;
+ assert.equal((await f.route.POST(request({action:'accept',token:newToken,confirmed:false,password:'VeryStrongPassword123'}))).status,422);
+ r=await f.route.POST(request({action:'accept',token:newToken,confirmed:true,password:'VeryStrongPassword123'}));assert.equal(r.status,200,await r.clone().text());
+ assert.equal(f.sql.prepare('SELECT active FROM auth_accounts WHERE id=?').get(pending.id).active,1);
+ assert.ok(f.sql.prepare('SELECT password_hash FROM auth_accounts WHERE id=?').get(pending.id).password_hash.startsWith('$2'));
+ assert.equal(f.sql.prepare('SELECT plan_id FROM sandbox_memberships WHERE owner_id=?').get(pending.id).plan_id,'personal');
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM corporate_members').get().n,3);
+ assert.ok(!JSON.stringify(await (await f.route.GET(new Request('https://framyconnect.co.mz/api/corporate'))).json()).includes(newToken));
+});
+
+test('corporate campaigns isolate metrics and contacts, require consent and revoke access on suspension',async t=>{
+ const f=await corporateFixture(t);const publicApi=await api('app/api/corporate-public/route.ts');
+ await f.route.POST(request({action:'invite',organisation:f.id,email:'other@example.test',name:'Employee',team:'Field',role:'member'}));const token=f.token();globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await f.route.POST(request({action:'accept',token,confirmed:true}))).status,200);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};
+ assert.equal((await f.route.POST(request({action:'campaign',organisation:f.id,name:'Event'}))).status,200);
+ const campaign=f.sql.prepare('SELECT id FROM corporate_campaigns').get().id;
+ assert.equal((await f.route.POST(request({action:'assign',organisation:f.id,id:campaign,accountId:'other'}))).status,200);
+ const assignment=f.sql.prepare('SELECT id FROM corporate_assignments').get().id;
+ f.sql.prepare("INSERT INTO profiles(owner_id,username,draft_json,published_json,updated_at) VALUES('other','worker_profile','{}','{}',?)").run(new Date().toISOString());
+ globalThis.__paysuite.user=null;
+ assert.equal((await publicApi.GET(new Request('https://framyconnect.co.mz/api/corporate-public?assignment='+assignment))).status,200);
+ const metric=()=>publicApi.POST(request({action:'metric',assignment,target:'profile_open'}));assert.equal((await (await metric()).json()).recorded,true);
+ assert.equal((await (await publicApi.POST(request({action:'metric',assignment,target:'contact',username:'worker_profile'}))).json()).recorded,true);
+ assert.equal((await publicApi.POST(request({action:'metric',assignment,target:'phone',username:'worker_profile'}))).status,422);
+ assert.equal((await publicApi.POST(request({action:'metric',assignment,target:'contact',username:'wrong_profile'}))).status,422);
+ f.sql.exec("UPDATE sandbox_memberships SET terms_json=json_set(terms_json,'$.features.analytics',json('false')) WHERE owner_id='buyer'");assert.equal((await (await metric()).json()).recorded,false);f.sql.exec("UPDATE sandbox_memberships SET terms_json=json_set(terms_json,'$.features.analytics',json('true')) WHERE owner_id='buyer'");
+ f.sql.prepare('INSERT INTO profile_click_totals VALUES(?,?,?,?,?)').run('other',Date.now(),'contact','Personal history',999);
+ const lead={action:'lead',assignment,requestId:crypto.randomUUID(),name:'Visitor',email:'visitor@example.invalid',phone:'',interest:'Product',consent:false};assert.equal((await publicApi.POST(request(lead))).status,422);
+ lead.consent=true;assert.equal((await publicApi.POST(request(lead))).status,200);assert.equal((await publicApi.POST(request(lead))).status,200);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM corporate_leads').get().n,1);
+ globalThis.__paysuite.user={userId:'manager',role:'manager'};assert.equal((await f.route.GET(new Request('https://framyconnect.co.mz/api/corporate?organisation='+f.id))).status,403,'global manager is not an organisation leader');
+ globalThis.__paysuite.user={userId:'other',role:'customer'};const view=await (await f.route.GET(new Request('https://framyconnect.co.mz/api/corporate?organisation='+f.id))).json();assert.equal(view.leads.length,1);assert.equal(view.metrics[0].count,1);assert.equal(view.metrics.reduce((sum,m)=>sum+m.count,0),2,'personal click history is not shared');assert.equal((await (await metric()).json()).recorded,false,'staff clicks are excluded');
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};
+ const suspend={action:'member',organisation:f.id,id:'other',version:1,active:false,role:'member',team:'Field'};assert.equal((await f.route.POST(request(suspend))).status,200);assert.equal((await f.route.POST(request(suspend))).status,409);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await f.route.GET(new Request('https://framyconnect.co.mz/api/corporate?organisation='+f.id))).status,403);
+ globalThis.__paysuite.user=null;assert.equal((await publicApi.GET(new Request('https://framyconnect.co.mz/api/corporate-public?assignment='+assignment))).status,404);assert.equal((await publicApi.POST(request({...lead,requestId:crypto.randomUUID()}))).status,404);
+});
+
+test('corporate invitations fail after cancellation, account changes or paid contract expiry',async t=>{
+ const f=await corporateFixture(t);const send=()=>f.route.POST(request({action:'invite',organisation:f.id,email:'other@example.test',name:'Worker',role:'member',team:''}));
+ assert.equal((await send()).status,200);const token=f.token();const invite=f.sql.prepare('SELECT id FROM corporate_invites').get().id;
+ assert.equal((await f.route.POST(request({action:'revoke',organisation:f.id,id:invite}))).status,200);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await f.route.POST(request({action:'accept',token,confirmed:true}))).status,422);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};assert.equal((await send()).status,200);const changed=f.token();f.sql.exec("UPDATE auth_accounts SET version=version+1 WHERE id='other'");
+ globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await f.route.POST(request({action:'accept',token:changed,confirmed:true}))).status,422);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};assert.equal((await send()).status,200);const expired=f.token();f.sql.prepare("UPDATE sandbox_memberships SET paid_started_at=?,paid_expires_at=? WHERE owner_id='buyer'").run(new Date(Date.now()-60*86400000).toISOString(),new Date(Date.now()-8*86400000).toISOString());
+ globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await f.route.POST(request({action:'accept',token:expired,confirmed:true}))).status,422);
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM corporate_members').get().n,1);
+});
+
+test('corporate delegated leaders cannot promote others or read another company; members can leave',async t=>{
+ const f=await corporateFixture(t,3);
+ assert.equal((await f.route.POST(request({action:'invite',organisation:f.id,name:'Leader',email:'other@example.test',role:'leader',team:''}))).status,200);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};
+ assert.equal((await f.route.POST(request({action:'accept',token:f.token(),confirmed:true}))).status,200);
+ assert.equal((await f.route.POST(request({action:'invite',organisation:f.id,name:'Other leader',email:'manager@example.test',role:'leader',team:''}))).status,422);
+ assert.equal((await f.route.POST(request({action:'member',organisation:f.id,id:'buyer',version:1,active:false,role:'member',team:''}))).status,422,'owner cannot be suspended');
+ const plan=f.sql.prepare("SELECT terms_json,paid_started_at,paid_expires_at FROM sandbox_memberships WHERE owner_id='buyer'").get();
+ f.sql.prepare("UPDATE sandbox_memberships SET plan_id='corporate',terms_json=?,paid_started_at=?,paid_expires_at=? WHERE owner_id='other'").run(plan.terms_json,plan.paid_started_at,plan.paid_expires_at);
+ const created=await f.route.POST(request({action:'create',name:'Second company'}));assert.equal(created.status,200,await created.clone().text());const second=(await created.json()).id;
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};assert.equal((await f.route.GET(new Request('https://framyconnect.co.mz/api/corporate?organisation='+second))).status,403);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await f.route.POST(request({action:'leave',organisation:f.id}))).status,200);assert.equal((await f.route.GET(new Request('https://framyconnect.co.mz/api/corporate?organisation='+f.id))).status,403);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};assert.equal((await f.route.POST(request({action:'member',organisation:f.id,id:'other',role:'member',active:true,team:'',version:2}))).status,422,'a leader cannot override withdrawal');
+ assert.equal((await f.route.POST(request({action:'invite',organisation:f.id,name:'Rejoining employee',email:'other@example.test',role:'member',team:''}))).status,200);globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await f.route.POST(request({action:'accept',token:f.token(),confirmed:true}))).status,200);assert.equal(f.sql.prepare('SELECT left_at FROM corporate_members WHERE organisation_id=? AND account_id=?').get(f.id,'other').left_at,null);
+});
+
+test('corporate contract seat reductions stop excess campaign access without disabling personal accounts',async t=>{
+ const f=await corporateFixture(t,3),publicApi=await api('app/api/corporate-public/route.ts');
+ for(const id of ['other','manager']){
+  globalThis.__paysuite.user={userId:'buyer',role:'customer'};
+  assert.equal((await f.route.POST(request({action:'invite',organisation:f.id,email:id+'@example.test',name:id,role:'member',team:''}))).status,200);
+  globalThis.__paysuite.user={userId:id,role:id==='manager'?'manager':'customer'};
+  assert.equal((await f.route.POST(request({action:'accept',token:f.token(),confirmed:true}))).status,200);
+ }
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};await f.route.POST(request({action:'campaign',organisation:f.id,name:'Event'}));const campaign=f.sql.prepare('SELECT id FROM corporate_campaigns').get().id;
+ for(const id of ['other','manager'])assert.equal((await f.route.POST(request({action:'assign',organisation:f.id,id:campaign,accountId:id}))).status,200);
+ f.sql.exec("UPDATE sandbox_memberships SET terms_json=json_set(terms_json,'$.memberLimit',1) WHERE owner_id='buyer'");
+ const effective=f.sql.prepare("SELECT account_id FROM corporate_effective_members WHERE account_id<>'buyer'").all();assert.equal(effective.length,1);const outside=effective[0].account_id==='other'?'manager':'other';
+ const assignment=f.sql.prepare('SELECT id FROM corporate_assignments WHERE account_id=?').get(outside).id;globalThis.__paysuite.user=null;
+ assert.equal((await publicApi.GET(new Request('https://framyconnect.co.mz/api/corporate-public?assignment='+assignment))).status,404);
+ assert.equal(f.sql.prepare('SELECT active FROM auth_accounts WHERE id=?').get(outside).active,1);
+ globalThis.__paysuite.user={userId:outside,role:'customer'};assert.equal((await f.route.GET(new Request('https://framyconnect.co.mz/api/corporate?organisation='+f.id))).status,403);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};assert.equal((await f.route.POST(request({action:'member',organisation:f.id,id:outside,active:false,role:'member',team:'',version:1}))).status,200);
+ f.sql.exec("UPDATE sandbox_memberships SET terms_json=json_set(terms_json,'$.memberLimit',3) WHERE owner_id='buyer'");assert.equal((await f.route.POST(request({action:'member',organisation:f.id,id:outside,active:true,role:'member',team:'',version:2}))).status,200);
+ assert.equal((await publicApi.GET(new Request('https://framyconnect.co.mz/api/corporate-public?assignment='+assignment))).status,200);
+ f.sql.exec("UPDATE sandbox_memberships SET plan_id='personal',terms_json=json_set(terms_json,'$.id','personal','$.corporateEnabled',json('true')) WHERE owner_id='buyer'");
+ assert.equal((await f.route.GET(new Request('https://framyconnect.co.mz/api/corporate?organisation='+f.id))).status,403,'free plans cannot acquire company access through copied flags');
+ assert.equal((await publicApi.GET(new Request('https://framyconnect.co.mz/api/corporate-public?assignment='+assignment))).status,404);
+});
 function fixture(t) {
   const sql = new DatabaseSync(':memory:');
   sql.exec('PRAGMA foreign_keys=ON');
@@ -383,7 +535,7 @@ test('failed PaySuite payments release stock once; late success is held for revi
     'review',
   );
 });
-test('annual and monthly subscription checkout waits for trial end and extends access exactly once', async (t) => {
+test('annual and monthly subscription checkout allows an immediate paid upgrade from free Individual and extends access exactly once', async (t) => {
   const f = fixture(t);
   const route = await api('app/api/paysuite/checkout/route.ts');
   f.sql
@@ -396,24 +548,16 @@ test('annual and monthly subscription checkout waits for trial end and extends a
     );
   const body = {
     kind: 'subscription',
-    planId: 'personal',
+    planId: 'professional-v2',
     planVersion: 0,
     cycle: 'annual',
-    expectedAmount: 100000,
+    expectedAmount: 250000,
     accepted: true,
     method: 'credit_card',
     requestId: crypto.randomUUID().replaceAll('-', ''),
   };
-  assert.equal((await route.POST(request(body))).status, 422);
-  assert.equal(f.creates(), 0);
-  f.sql
-    .prepare(
-      'UPDATE sandbox_memberships SET trial_started_at=?,trial_expires_at=?',
-    )
-    .run(
-      new Date(Date.now() - 31 * 86400000).toISOString(),
-      new Date(Date.now() - 86400000).toISOString(),
-    );
+  assert.equal((await route.POST(request({...body,planId:'personal'}))).status,422);
+  assert.equal(f.creates(),0);
   const created = await route.POST(request(body));
   assert.equal(created.status, 200, await created.clone().text());
   const [id, record] = [...f.records][0];
@@ -437,7 +581,7 @@ test('annual and monthly subscription checkout waits for trial end and extends a
     ...body,
     requestId: crypto.randomUUID().replaceAll('-', ''),
     cycle: 'monthly',
-    expectedAmount: 10000,
+    expectedAmount: 25000,
   };
   assert.equal((await route.POST(request(next))).status, 200);
   const [nextId, nextRecord] = [...f.records][1];
@@ -864,4 +1008,64 @@ test('checkout still rejects an unknown method', async (t) => {
   const res = await route.POST(request(product({ method: 'bogus' })));
   assert.equal(res.ok, false);
   assert.equal(f.creates(), 0);
+});
+
+
+test('ambassadors enrol with unique name/four-digit codes, retain agent roles and restrict manager changes', async(t)=>{
+ const f=fixture(t),route=await api('app/api/ambassadors/route.ts');
+ f.sql.prepare("UPDATE auth_accounts SET name='Ana Influencer' WHERE id='other'").run();
+ globalThis.__paysuite.user={userId:'other',role:'customer'};
+ const joined=await route.POST(request({action:'join',code:'FORGED9999',commissionBps:1500}));assert.equal(joined.status,200);
+ const {code}=await joined.json();assert.match(code,/^ANA[0-9]{4}$/);
+ assert.equal((await (await route.POST(request({action:'join'}))).json()).code,code);
+ assert.equal(f.sql.prepare("SELECT commission_bps FROM ambassadors WHERE account_id='other'").get().commission_bps,1000);
+ f.sql.prepare("INSERT INTO auth_accounts(id,email,name,password_hash,role,created_at) VALUES('encoder','encoder@example.test','Ana Encoder','!','agent',?)").run(new Date().toISOString());
+ globalThis.__paysuite.user={userId:'encoder',role:'agent'};
+ assert.equal((await route.POST(request({action:'join'}))).status,200);assert.equal(f.sql.prepare("SELECT role FROM auth_accounts WHERE id='encoder'").get().role,'agent');
+ assert.notEqual(f.sql.prepare("SELECT code FROM ambassadors WHERE account_id='encoder'").get().code,code);
+ assert.equal((await route.POST(request({action:'settings',accountId:'other',commissionBps:1500,active:true,version:1}))).status,403);
+ globalThis.__paysuite.user={userId:'manager',role:'manager'};
+ const edit={action:'settings',accountId:'other',commissionBps:1500,active:true,version:1};assert.equal((await route.POST(request(edit))).status,200);assert.equal((await route.POST(request(edit))).status,409);
+ assert.equal((await route.POST(request({...edit,commissionBps:1501,version:2}))).status,422);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};const report=await (await route.GET(new Request('https://framyconnect.co.mz/api/ambassadors'))).json();assert.equal(report.members.length,1);assert.equal(report.members[0].account_id,'other');
+ globalThis.__paysuite.user=null;assert.equal((await route.GET(new Request('https://framyconnect.co.mz/api/ambassadors'))).status,401);
+ assert.equal((await (await route.GET(new Request('https://framyconnect.co.mz/api/ambassadors?code='+code.toLowerCase()))).json()).valid,true);
+});
+
+test('referral discounts only hardware, commissions use original hardware, paid webhooks earn once, refunds hold payouts',async(t)=>{
+ const f=fixture(t),checkout=await api('app/api/paysuite/checkout/route.ts'),ambassadors=await api('app/api/ambassadors/route.ts');
+ f.sql.prepare("INSERT INTO ambassadors(account_id,code,commission_bps,created_at) VALUES('other','ANA1234',1500,?)").run(new Date().toISOString());
+ const body=product({design:'team',designInstructions:'Fictional approved team design',ambassadorCode:'ana1234',expectedAmount:191500});
+ const created=await checkout.POST(request(body));assert.equal(created.status,200,await created.clone().text());
+ const [providerId,record]=[...f.records][0];assert.equal(record.amount,'1915.00');
+ const sale=f.sql.prepare('SELECT * FROM ambassador_sales').get();assert.equal(sale.base_amount,135000);assert.equal(sale.discount_amount,13500);assert.equal(sale.commission_amount,20250);assert.equal(sale.status,'pending');
+ assert.equal(f.sql.prepare('SELECT amount FROM paysuite_payments').get().amount,191500);
+ assert.equal((await checkout.POST(request(body))).status,200);assert.equal(f.creates(),1);
+ f.sql.prepare("UPDATE ambassadors SET commission_bps=1000,version=version+1 WHERE account_id='other'").run();
+ record.status='paid';assert.equal((await notify(f,providerId)).status,204);assert.equal((await notify(f,providerId)).status,204);
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM ambassador_sales').get().n,1);assert.equal(f.sql.prepare('SELECT status,commission_amount FROM ambassador_sales').get().status,'earned');assert.equal(f.sql.prepare('SELECT commission_amount FROM ambassador_sales').get().commission_amount,20250);
+ const {receiptMessage}=await api('lib/payment-receipts.ts');const receipt=f.sql.prepare('SELECT payload_json FROM payment_email_receipts').get();assert.match(receiptMessage(JSON.parse(receipt.payload_json)),/Desconto embaixador/);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};let dashboard=await (await ambassadors.GET(new Request('https://framyconnect.co.mz/api/ambassadors'))).json();assert.equal(dashboard.balances[0].earned,20250);
+ assert.equal((await ambassadors.POST(request({action:'payout',accountId:'other',amount:1,reference:'forged',paidAt:new Date().toISOString().slice(0,10),confirmed:true}))).status,403);
+ globalThis.__paysuite.user={userId:'manager',role:'manager'};
+ const payout={action:'payout',accountId:'other',amount:10000,reference:'BANK-001',paidAt:new Date().toISOString().slice(0,10),confirmed:true};assert.equal((await ambassadors.POST(request(payout))).status,200);assert.equal((await ambassadors.POST(request({...payout,reference:'bank-001'}))).status,422);assert.equal((await ambassadors.POST(request({...payout,reference:'BANK-002',amount:10251}))).status,422);
+ assert.throws(()=>f.sql.prepare('DELETE FROM ambassador_payouts').run());
+ assert.equal((await notify(f,providerId,'refund.success',{id:'REFUND-EXAMPLE',payment_id:providerId})).status,204);
+ assert.equal(f.sql.prepare('SELECT status FROM ambassador_sales').get().status,'held');
+ assert.equal((await ambassadors.POST(request({...payout,reference:'BANK-003',amount:1}))).status,422);
+ assert.equal((await ambassadors.POST(request({action:'resolve-sale',orderId:sale.order_id,status:'void',reason:'Verified full product refund',confirmed:true}))).status,200);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};
+ const normal=await checkout.POST(request(product({design:'team',designInstructions:'Approved design',expectedAmount:205000})));assert.equal(normal.status,200,await normal.clone().text());assert.equal([...f.records].at(-1)[1].amount,'2050.00');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM ambassador_sales').get().n,1);
+});
+
+test('invalid, inactive and own referral codes never charge or reserve stock; failed referrals never earn',async(t)=>{
+ const f=fixture(t),checkout=await api('app/api/paysuite/checkout/route.ts');
+ f.sql.prepare("INSERT INTO ambassadors(account_id,code,created_at) VALUES('other','ANA0001',?)").run(new Date().toISOString());
+ for(const code of ['UNKNOWN9999'])assert.equal((await checkout.POST(request(product({ambassadorCode:code,expectedAmount:141500})))).status,422);
+ f.sql.exec("UPDATE ambassadors SET active=0");assert.equal((await checkout.POST(request(product({ambassadorCode:'ANA0001',expectedAmount:141500})))).status,422);f.sql.exec('UPDATE ambassadors SET active=1');
+ globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await checkout.POST(request(product({ambassadorCode:'ANA0001',expectedAmount:141500})))).status,422);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};assert.equal(f.creates(),0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM paysuite_stock_reservations').get().n,0);
+ assert.equal((await checkout.POST(request(product({ambassadorCode:'ANA0001',expectedAmount:155000})))).status,422,'stale undiscounted total rejected');
+ assert.equal((await checkout.POST(request(product({ambassadorCode:'ANA0001',expectedAmount:141500})))).status,200);
+ const [id,record]=[...f.records][0];record.status='failed';await notify(f,id,'payment.failed');assert.equal(f.sql.prepare('SELECT status FROM ambassador_sales').get().status,'void');
 });

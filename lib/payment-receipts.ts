@@ -30,6 +30,8 @@ type Receipt = {
     keychain: string;
     design: string;
     hardware: number;
+    discount?: number;
+    ambassadorCode?: string;
     customization: number;
     delivery: number;
   };
@@ -75,6 +77,7 @@ export function receiptMessage(r: Receipt) {
     lines.push(
       `Design: ${{ standard: 'FramyConnect', customer: 'O seu design', team: 'Criado pela equipa' }[c.design] ?? c.design}`,
       `Produtos: ${money(c.hardware)}`,
+      ...(c.discount ? [`Desconto embaixador (${c.ambassadorCode ?? ''}): -${money(c.discount)}`] : []),
       `Personalização: ${money(c.customization)}`,
       ...(c.fulfilment?.mode === 'pickup'
         ? [

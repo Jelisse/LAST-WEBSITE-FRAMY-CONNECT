@@ -241,12 +241,13 @@ export function ProfileSubscriptions({
                   {t(
                     (
                       {
+                        free: 'Individual gratuito, sem prazo',
                         inactive: 'Active o perfil para começar',
                         trial: 'Experiência gratuita',
                         launch: 'Acesso prolongado durante o lançamento',
                         paid: 'Plano pago activo',
                         grace: 'Período de tolerância de 7 dias',
-                        basic: 'Página de contacto básica',
+                        basic: 'Individual gratuito, sem prazo',
                       } as Record<string, string>
                     )[data.state] ?? data.state,
                   )}
@@ -298,7 +299,6 @@ export function ProfileSubscriptions({
                           <PaySuitePlanCheckout
                             key={p.id}
                             plan={p}
-                            trial={data.state === 'trial'}
                           />
                         ) : (
                           <form

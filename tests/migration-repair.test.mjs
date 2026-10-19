@@ -20,6 +20,32 @@ function snapshot(count) {
   db.close();
   return keys;
 }
+
+test('permanent Individual migration preserves paid contracts, profile drafts and archived trial terms', () => {
+  const db = new DatabaseSync(':memory:');
+  try {
+    for (const file of files.filter(f => f !== '0030_permanent_individual.sql')) db.exec(readFileSync(`drizzle/${file}`, 'utf8'));
+    const terms = JSON.stringify({ id: 'professional-v2', meticais: 975, links: 30, bio: 900 });
+    for (const id of ['trial-fixture','paid-fixture','new-fixture']) db.prepare("INSERT INTO auth_accounts(id,email,name,password_hash,role,created_at) VALUES(?,?,?,'unused','customer','2026-10-01')").run(id,id+'@example.invalid',id);
+    db.prepare("INSERT INTO sandbox_memberships(owner_id,plan_id,updated_at,terms_json,trial_started_at,trial_expires_at) VALUES('trial-fixture','free-30','2026-10-01',?,'2026-09-01','2026-10-01')").run(terms);
+    db.prepare("INSERT INTO sandbox_memberships(owner_id,plan_id,updated_at,terms_json,paid_started_at,paid_expires_at) VALUES('paid-fixture','professional-v2','2026-10-01',?,'2026-10-01','2027-10-01')").run(terms);
+    db.prepare("INSERT INTO profiles(owner_id,username,draft_json,updated_at) VALUES('trial-fixture','fixture-user',?,'2026-10-01')").run(JSON.stringify({name:'Fixture',bio:'Saved private biography',links:Array.from({length:20},(_,i)=>({label:String(i),url:'https://example.invalid/'+i}))}));
+    const draftBefore = db.prepare("SELECT draft_json FROM profiles WHERE owner_id='trial-fixture'").get().draft_json;
+    const paidBefore = db.prepare("SELECT * FROM sandbox_memberships WHERE owner_id='paid-fixture'").get();
+    db.exec(readFileSync('drizzle/0030_permanent_individual.sql','utf8'));
+    assert.deepEqual(db.prepare("SELECT * FROM sandbox_memberships WHERE owner_id='paid-fixture'").get(),paidBefore);
+    const former = db.prepare("SELECT * FROM sandbox_memberships WHERE owner_id='trial-fixture'").get();
+    assert.equal(former.plan_id,'personal');
+    assert.equal(db.prepare("SELECT draft_json FROM profiles WHERE owner_id='trial-fixture'").get().draft_json,draftBefore);
+    assert.equal(JSON.parse(former.terms_json).meticais,0);
+    assert.equal(db.prepare("SELECT terms_json FROM retired_trial_memberships WHERE owner_id='trial-fixture'").get().terms_json,terms);
+    const fresh = db.prepare("SELECT * FROM sandbox_memberships WHERE owner_id='new-fixture'").get();
+    assert.equal(fresh.plan_id,'personal');
+    assert.equal(fresh.trial_expires_at,null);
+    assert.equal(db.prepare('SELECT enabled FROM profile_billing_settings WHERE id=1').get().enabled,1);
+    assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);
+  } finally { db.close(); }
+});
 test('database repair identifies missing post-auth migrations without replaying historical price edits', () => {
   assert.deepEqual(migrationPlan(snapshot(7), false).apply, [
     '0007_product_personalisation.sql',
@@ -42,6 +68,9 @@ test('database repair identifies missing post-auth migrations without replaying 
     '0025_design_images.sql',
     '0026_lifetime_connections.sql',
     '0028_profile_click_totals.sql',
+    '0029_ambassadors.sql',
+    '0030_permanent_individual.sql',
+    '0031_corporate_organisations.sql',
   ]);
 });
 test('database repair is a no-op when schema and inventory migration are applied', () => {

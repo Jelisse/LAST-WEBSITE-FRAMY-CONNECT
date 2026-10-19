@@ -7,19 +7,19 @@ import {
   validateHostname,
 } from '../lib/profile-growth.ts';
 const now = Date.parse('2026-09-28T12:00:00Z');
-test('profile access transitions from trial through seven-day grace to one-contact fallback without deleting saved links', () => {
+test('Individual access remains free without expiry or deletion of saved links', () => {
   const m = {
     plan_id: 'free-30',
     trial_started_at: '2026-08-29T12:00:00Z',
     trial_expires_at: '2026-09-28T12:00:00Z',
     billing_enabled: 1,
   };
-  assert.equal(profileAccess(m, now - 1), 'trial');
-  assert.equal(profileAccess(m, now), 'grace');
-  assert.equal(profileAccess(m, now + 7 * 86400000), 'basic');
+  assert.equal(profileAccess(m, now - 1), 'free');
+  assert.equal(profileAccess(m, now), 'free');
+  assert.equal(profileAccess(m, now + 7 * 86400000), 'free');
   assert.equal(
     profileAccess({ ...m, billing_enabled: 0 }, now + 40 * 86400000),
-    'launch',
+    'free',
   );
   const p = {
     name: 'Test',
@@ -44,10 +44,10 @@ test('profile access transitions from trial through seven-day grace to one-conta
     },
   };
   const basic = profileForAccess(p, m, now + 8 * 86400000);
-  assert.equal(basic.links.length, 1);
-  assert.equal(basic.links[0].label, 'Two');
+  assert.equal(basic.links.length, 2);
+  assert.equal(basic.links[0].label, 'One');
   assert.equal(basic.email, '');
-  assert.equal(basic.title, '');
+  assert.equal(basic.title, 'Hidden');
   assert.equal(basic.extras.enquiries, false);
   assert.equal(p.links.length, 2);
   const paid = {
@@ -73,8 +73,8 @@ test('profile access transitions from trial through seven-day grace to one-conta
       { ...m, billing_opened_at: '2026-09-28T12:00:00Z' },
       now + 6 * 86400000,
     ),
-    'trial',
-    'launch customers get seven days notice before grace',
+    'free',
+    'retired trials remain free even after billing opens',
   );
 });
 test('monthly renewal clamps month end and content/domain validation rejects unsafe input', () => {

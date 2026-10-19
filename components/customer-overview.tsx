@@ -99,13 +99,13 @@ export function CustomerOverview({
           <h2 id="current-plan-title">
             {data.membership.version
               ? t(plan.name)
-              : t('Comece com 30 dias grátis')}
+              : t('Individual gratuito, sem prazo')}
           </h2>
           <p className="essential-price">
-            {plan.id === 'free-30' ? t('0 MT') : planPrice(plan, t.locale)}
+            {plan.id === 'personal' ? t('0 MT') : planPrice(plan, t.locale)}
             <span>
-              {plan.id === 'free-30'
-                ? t(' / 30 dias')
+              {plan.id === 'personal'
+                ? t(' · sem prazo')
                 : t(' / mês · por perfil')}
             </span>
           </p>

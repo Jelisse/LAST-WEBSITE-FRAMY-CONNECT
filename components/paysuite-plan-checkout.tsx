@@ -5,7 +5,6 @@ import { planAnnualMeticais, planPrice } from '@/lib/plan-pricing';
 import { PaySuiteCheckout } from './paysuite-checkout';
 export function PaySuitePlanCheckout({
   plan,
-  trial,
 }: {
   plan: {
     id: string;
@@ -16,7 +15,6 @@ export function PaySuitePlanCheckout({
     annualEnabled?: boolean;
     version: number;
   };
-  trial: boolean;
 }) {
   const { t } = useI18n();
   const [chosenCycle, setCycle] = useState(
@@ -49,12 +47,9 @@ export function PaySuitePlanCheckout({
           {t(cycle === 'annual' ? 'ano' : 'mês')}
         </strong>
       </p>
-      {trial && (
-        <p>{t('O pagamento estará disponível após os 30 dias grátis.')}</p>
-      )}
       <PaySuiteCheckout
         key={`${plan.id}-${cycle}-${amount}`}
-        disabled={trial}
+        disabled={false}
         payload={{
           kind: 'subscription',
           planId: plan.id,

@@ -13,7 +13,7 @@ export type WorkspaceData = {
     terms: ManagedPlan;
     planId: PlanId;
     version: number;
-    mode: 'trial' | 'paid';
+    mode: 'free' | 'trial' | 'paid';
     accessState?: import('./entitlement').AccessState;
     billingAvailable?: boolean;
     daysRemaining?: number | null;

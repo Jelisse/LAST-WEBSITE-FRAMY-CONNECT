@@ -1,5 +1,7 @@
 # Subscription and finance management
 
+Policy update, 18 October 2026: `PLAN_PACKAGES.md` supersedes earlier trial and Individual pricing rules. Individual is permanently free; only Professional/Corporate contracts renew through confirmed payment. The former 30-day offer is retired. `0030_permanent_individual.sql` enables paid billing while preserving paid contracts and archived trial history. Corporate checkout requires a manager-published price. Monthly/annual periods never authorize automatic debit. Ambassador commissions apply only to physical hardware; see `AMBASSADORS.md`.
+
 Implementation scope: manager subscriptions, physical products separated, operational finance and CSV export. External software remains responsible for fiscal invoice issuance. No assumed ISPC rate, fiscal certification or automatic direct debit.
 
 ## Deployment
@@ -66,3 +68,8 @@ Migration `0025_design_images.sql` stores one image and accessible description f
 Leather alone and leather within a kit now support brown/black, full FramyConnect/symbol front variants and an NFC back preview. Supplied photos remain unchanged; custom-logo and unavailable photo combinations use an explicitly illustrative SVG mockup. The confirmed dimensions are 25 mm diameter and 3 mm thickness, editable in Products on the leather catalogue entry. No engraving-area measurement is inferred.
 
 Customer logos accept PDF, PNG or JPG (8 MB maximum). PDF.js rasterises only the preview; the original remains in private design storage. Signed-out visitors can preview locally and must sign in and upload again to save the original. Authenticated uploads retain file ID, page, scale and offsets through checkout; server-side ownership and type checks reject foreign/missing assets. PDF vector content is not automatically certified. Team design requires instructions. Colour/logo choices, dimensions and artwork metadata are snapshotted in the paid order and available to managers; receipt text includes leather colour and standard logo. Existing stock and pricing remain authoritative. No deployment or real transaction was performed for this change.
+
+
+## Corporate organizations - 19 October 2026
+
+Paid Corporate access now gates organization onboarding, delegated leaders, teams, campaigns and company results. Configure corporateEnabled/memberLimit through established plan controls; existing contract snapshots and verified-payment renewal rules remain authoritative. Expiry beyond existing grace or a seat reduction restricts company tools without deleting employee personal accounts. Company membership does not replace each employee's personal profile subscription. See CORPORATE.md for implementation and external checks. Migration 0031 has not been applied live.

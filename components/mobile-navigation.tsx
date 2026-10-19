@@ -117,6 +117,7 @@ export function DashboardTools() {
         <AccountMenu />
         <MobileNavigation
           items={[
+            { label: 'Equipa corporativa', href: '/corporativo', icon: <BriefcaseBusiness size={19} /> },
             { label: 'Página inicial', href: '/', icon: <Home size={19} /> },
             {
               label: 'Produtos',

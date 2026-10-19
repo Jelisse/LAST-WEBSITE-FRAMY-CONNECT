@@ -242,6 +242,7 @@ export function PaySuiteManager() {
                       {c.hardware / 100} {t(' MT · Design:')}{' '}
                       {c.customization / 100} {t(' MT · Entrega: ')}
                       {c.delivery / 100} {t(' MT ')}
+                      {c.discount ? <> · {t('Desconto embaixador (10%)')}: −{c.discount / 100} MT ({c.ambassadorCode})</> : null}
                     </p>
                   </>
                 )}

@@ -11,6 +11,8 @@ export const featureCatalog = {
 export type FeatureKey = keyof typeof featureCatalog;
 export type PlanFeatures = Record<FeatureKey, boolean>;
 export type PlanControls = {
+  corporateEnabled?: boolean;
+  memberLimit?: number;
   entitlementVersion?: number;
   features?: Partial<PlanFeatures>;
   monthlyEnabled?: boolean;
@@ -52,7 +54,7 @@ export function validatePlanControls(
     throw Error('Periodicidade inválida.');
   if (
     body.active &&
-    body.id !== 'free-30' &&
+    body.id !== 'free-30' && body.id !== 'personal' &&
     !body.monthlyEnabled &&
     !body.annualEnabled
   )
@@ -71,7 +73,12 @@ export function validatePlanControls(
     )
   )
     throw Error('Benefícios inválidos (máximo 12).');
+  if(body.id==='personal'&&body.corporateEnabled===true)throw Error('Dados inválidos.');
+  if(body.memberLimit!==undefined&&(!Number.isInteger(body.memberLimit)||Number(body.memberLimit)<1||Number(body.memberLimit)>500))throw Error('Limite de trabalhadores inválido (1 a 500).');
+  if(body.corporateEnabled!==undefined&&typeof body.corporateEnabled!=='boolean')throw Error('Dados inválidos.');
   return {
+    corporateEnabled: body.id==='corporate'||body.corporateEnabled===true,
+    memberLimit: Number.isInteger(body.memberLimit)&&Number(body.memberLimit)>=1&&Number(body.memberLimit)<=500?Number(body.memberLimit):25,
     entitlementVersion: 1,
     features: features as PlanFeatures,
     monthlyEnabled: body.monthlyEnabled,

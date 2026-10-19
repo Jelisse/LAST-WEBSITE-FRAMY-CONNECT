@@ -16,17 +16,22 @@ export function PaySuiteCheckout({
   const { t } = useI18n();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
-  const [accepted, setAccepted] = useState(false);
+  const signature = JSON.stringify(payload);
+  const [acceptedFor, setAcceptedFor] = useState('');
+  const accepted = acceptedFor === signature;
+  const requestSignature = useRef('');
   const requestId = useRef<string | null>(null);
   const inFlight = useRef(false);
   async function pay(event: { preventDefault(): void }) {
     event.preventDefault();
     if (inFlight.current || disabled) return;
+    if (requestId.current && requestSignature.current !== signature) { setError('Já existe uma tentativa com outras condições. Consulte os seus pagamentos antes de criar outro pedido.'); return; }
     inFlight.current = true;
     setBusy(true);
     setError('');
     // PaySuite only accepts letters and numbers in the reference.
     requestId.current ??= crypto.randomUUID().replaceAll('-', '');
+    requestSignature.current = signature;
     try {
       const response = await fetch('/api/paysuite/checkout', {
         method: 'POST',
@@ -101,7 +106,7 @@ export function PaySuiteCheckout({
         <input
           type="checkbox"
           checked={accepted}
-          onChange={(e) => setAccepted(e.target.checked)}
+          onChange={(e) => setAcceptedFor(e.target.checked ? signature : '')}
           required
           disabled={busy || disabled}
         />

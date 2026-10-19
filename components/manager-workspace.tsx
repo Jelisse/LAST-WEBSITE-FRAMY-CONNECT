@@ -1,4 +1,6 @@
 'use client';
+import { focusDashboardStart } from '@/lib/dashboard-navigation';
+import { AmbassadorDashboard } from './ambassador-dashboard';
 import { PanelBrand } from '@/components/panel-brand';
 
 import { FinanceManager } from './finance-manager';
@@ -91,14 +93,15 @@ type Data = {
 };
 const sections = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
-  { id: 'analytics', label: 'Análise do website', icon: ArrowUpRight },
-  { id: 'subscriptions', label: 'Subscrições digitais', icon: Wallet },
   { id: 'operations', label: 'Operações', icon: Boxes },
-  { id: 'hero', label: 'Página inicial', icon: LayoutDashboard },
-  { id: 'catalog', label: 'Produtos', icon: ShoppingBag },
   { id: 'accounts', label: 'Contas e acessos', icon: Users },
-  { id: 'applications', label: 'Candidaturas', icon: Users },
+  { id: 'subscriptions', label: 'Subscrições digitais', icon: Wallet },
   { id: 'finance', label: 'Financeiro', icon: Wallet },
+  { id: 'ambassadors', label: 'Embaixadores', icon: Users },
+  { id: 'catalog', label: 'Produtos', icon: ShoppingBag },
+  { id: 'applications', label: 'Candidaturas', icon: Users },
+  { id: 'analytics', label: 'Análise do website', icon: ArrowUpRight },
+  { id: 'hero', label: 'Página inicial', icon: LayoutDashboard },
 ];
 export function ManagerWorkspace({ displayName }: { displayName: string }) {
   const { t } = useI18n();
@@ -172,6 +175,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
   };
   const navigate = (next: string, nextTab?: string, nextFilter = 'all') => {
     setSection(next);
+    focusDashboardStart();
     if (next === 'operations') setDays('all');
     setTab(nextTab ?? (next === 'catalog' ? 'products' : 'orders'));
     setFilter(nextFilter);
@@ -406,7 +410,6 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
           <AccountMenu />
         </header>
         <main id="main" className="manager-main">
-          <Link className="btn" href="/manager/pagamentos">{t('Checkout e pagamentos PaySuite')}</Link>
           <div className="manager-heading">
             <div>
               <span className="manager-eyebrow">{t('CENTRO DE GESTÃO')}</span>
@@ -439,7 +442,8 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                                 )}
               </p>
             </div>
-            {section !== 'analytics' && section !== 'subscriptions' && section !== 'finance' && (
+            {['overview','operations','finance'].includes(section) && <Link className="manager-secondary" href="/manager/pagamentos">{t('Checkout e pagamentos PaySuite')}</Link>}
+            {section !== 'ambassadors' && section !== 'analytics' && section !== 'subscriptions' && section !== 'finance' && (
               <button
                 className="manager-secondary"
                 disabled={busy}
@@ -467,7 +471,7 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
             </p>
           )}
           {notice && <output className="manager-notice">{t(notice)}</output>}
-          {section === 'subscriptions' ? (
+          {section === 'ambassadors' ? (<AmbassadorDashboard />) : section === 'subscriptions' ? (
             <SubscriptionManager />
           ) : section === 'analytics' ? (
             <WebsiteAnalytics />

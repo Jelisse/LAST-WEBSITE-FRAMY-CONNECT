@@ -19,6 +19,8 @@ export function AccountManager() {
   const [search, setSearch] = useState('');
   const [recovery, setRecovery] = useState<Account | null>(null);
   const [notice, setNotice] = useState('');
+  const [copiedLink, setCopiedLink] = useState('');
+  const [copyingLink, setCopyingLink] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   useEffect(() => {
     if (recovery) recoveryHeading.current?.focus();
@@ -294,14 +296,14 @@ export function AccountManager() {
                 <td>{a.active ? t('Activo') : t('Inactivo / por activar')}</td>
                 <td>
                   {a.profileUsername ? (
-                    <>
+                    <div className="account-profile-actions">
                       <span>
                         {a.profilePublished
                           ? t('Publicado')
                           : t('Por publicar')}
                       </span>
                       {a.profilePublished && (
-                        <div>
+                        <div className="account-row-actions">
                           <a
                             href={'/' + encodeURIComponent(a.profileUsername)}
                             target="_blank"
@@ -311,7 +313,13 @@ export function AccountManager() {
                           </a>
                           <button
                             type="button"
+                            className="account-copy-link"
+                            data-copied={copiedLink === a.id + ':' + a.profileUsername}
+                            disabled={copyingLink}
+                            aria-live="polite"
                             onClick={async () => {
+                              setCopyingLink(true);
+                              setCopiedLink('');
                               try {
                                 await navigator.clipboard.writeText(
                                   new URL(
@@ -320,26 +328,28 @@ export function AccountManager() {
                                     location.origin,
                                   ).href,
                                 );
-                                setNotice('Link copiado.');
+                                setCopiedLink(a.id + ':' + a.profileUsername);
                               } catch {
                                 setError(
                                   'Não foi possível copiar. Abra o perfil e copie o endereço do navegador.',
                                 );
+                              } finally {
+                                setCopyingLink(false);
                               }
                             }}
                           >
-                            {t('Copiar link')}
+                            {t(copiedLink === a.id + ':' + a.profileUsername ? 'Link copiado.' : 'Copiar link')}
                           </button>
                         </div>
                       )}
-                    </>
+                    </div>
                   ) : (
                     <span>—</span>
                   )}
                 </td>
                 <td>
                   {a.id !== data.selfId && (
-                    <>
+                    <div className="account-row-actions">
                       <button
                         disabled={busy}
                         onClick={() =>
@@ -405,7 +415,7 @@ export function AccountManager() {
                           ? t('Confirmar eliminação definitiva')
                           : t('Eliminar')}
                       </button>
-                    </>
+                    </div>
                   )}
                 </td>
               </tr>

@@ -1,3 +1,4 @@
+import { INDIVIDUAL_PLAN, isFreeProfilePlan } from './plan-policy.ts';
 import { planFeatures, type FeatureKey } from './plan-features.ts';
 import { defaultBusiness } from './profile-business.ts';
 import type { Profile } from './domain.ts';
@@ -32,6 +33,7 @@ export function hasActiveTrial(
 // Availability is a manager setting. Its default keeps launch access protected.
 export const PAID_PROFILE_PLANS_AVAILABLE = false;
 export type AccessState =
+  | 'free'
   | 'inactive'
   | 'trial'
   | 'launch'
@@ -39,7 +41,7 @@ export type AccessState =
   | 'grace'
   | 'basic';
 export function expiryDate(m: Membership | null): string | null {
-  if (!m) return null;
+  if (!m || isFreeProfilePlan(m.plan_id)) return null;
   if (m.plan_id !== 'free-30') return m.paid_expires_at ?? null;
   const end = Date.parse(m.trial_expires_at ?? '');
   const opened = Date.parse(m.billing_opened_at ?? '');
@@ -54,6 +56,7 @@ export function profileAccess(
   now = Date.now(),
 ): AccessState {
   if (!m) return 'inactive';
+  if (isFreeProfilePlan(m.plan_id)) return 'free';
   const trial = m.plan_id === 'free-30';
   if (
     !trial &&
@@ -96,6 +99,7 @@ export function validPlanTerms(m: Pick<Membership, 'plan_id' | 'terms_json'>) {
 export function membershipFeatures(
   m: Pick<Membership, 'plan_id' | 'terms_json'> | null,
 ) {
+  if (m?.plan_id === 'free-30') return INDIVIDUAL_PLAN.features;
   let terms;
   try {
     terms = JSON.parse(m?.terms_json ?? 'null');
@@ -122,7 +126,7 @@ export function hasProfessionalFeatures(
   now = Date.now(),
 ) {
   const s = profileAccess(m, now);
-  return !['inactive', 'basic'].includes(s) && m?.plan_id !== 'personal';
+  return !['inactive', 'basic', 'free'].includes(s) && m?.plan_id !== 'personal';
 }
 export function profileForAccess(
   p: Profile,
@@ -138,59 +142,8 @@ export function profilePresentation(
   state: AccessState,
   m: Pick<Membership, 'plan_id' | 'terms_json'> | null,
 ): Profile {
-  if (state === 'basic') {
-    const selected = p.extras?.primaryContact;
-    const choices = [
-      ...(p.links ?? []),
-      ...(p.showEmail && p.email
-        ? [{ label: 'Email', url: 'mailto:' + p.email }]
-        : []),
-      ...(p.showPhone && p.phone
-        ? [{ label: 'Telefone', url: 'tel:' + p.phone }]
-        : []),
-      ...(p.business?.whatsapp
-        ? [
-            {
-              label: 'WhatsApp',
-              url:
-                'https://wa.me/' + p.business.whatsapp.replace(/[^0-9]/g, ''),
-            },
-          ]
-        : []),
-    ];
-    const contact = choices.find((l) => l.url === selected) ?? choices[0];
-    return {
-      name: p.name,
-      username: p.username,
-      title: '',
-      email: '',
-      phone: '',
-      website: '',
-      showEmail: false,
-      showPhone: false,
-      photoUrl: p.photoUrl,
-      coverUrl: p.coverUrl,
-      coverPosition: p.coverPosition,
-      photoPosition: p.photoPosition,
-      photoPositionX: p.photoPositionX,
-      photoCutout: p.photoCutout,
-      photoScale: p.photoScale,
-      photoShapeColor: p.photoShapeColor,
-      photoGlowColor: p.photoGlowColor,
-      photoShape: p.photoShape,
-      photoPattern: p.photoPattern,
-      photoPatternColor: p.photoPatternColor,
-      photoPatternScale: p.photoPatternScale,
-      photoPatternStrength: p.photoPatternStrength,
-      photoHeadEscape: p.photoHeadEscape,
-      photoGlowStrength: p.photoGlowStrength,
-      photoOutlineColor: p.photoOutlineColor,
-      photoOutlineWidth: p.photoOutlineWidth,
-      bio: '',
-      links: contact ? [contact] : [],
-      extras: { ...defaultExtras },
-    };
-  }
+  if (state === 'basic' || m?.plan_id === 'free-30') return profilePresentation(p,'free',{plan_id:'personal',terms_json:JSON.stringify(INDIVIDUAL_PLAN)});
+  if (state === 'free' && m?.plan_id === 'personal' && !m.terms_json) m={...m,terms_json:JSON.stringify(INDIVIDUAL_PLAN)};
   const personal = m?.plan_id === 'personal';
   let limits = { links: personal ? 8 : 20, bio: personal ? 200 : 600 };
   try {
@@ -220,6 +173,8 @@ export function profilePresentation(
   }
   return {
     ...p,
+    email: p.showEmail ? p.email : '',
+    phone: p.showPhone ? p.phone : '',
     translations: Object.fromEntries(Object.entries(p.translations ?? {}).map(([locale, version]) => [locale, {
       ...version,
       bio: version.bio.slice(0, limits.bio),
@@ -260,4 +215,4 @@ export function profilePresentation(
   };
 }
 // Two `now` ISO bindings are retained for existing callers. Basic pages remain reachable.
-export const activeProfileSQL = `EXISTS (SELECT 1 FROM profile_membership_view m JOIN auth_accounts a ON a.id=m.owner_id AND a.active=1 WHERE m.owner_id=profiles.owner_id AND ((m.plan_id='free-30' AND m.trial_started_at<=? AND julianday(m.trial_expires_at)>julianday(m.trial_started_at) AND julianday(m.trial_expires_at)<=julianday(m.trial_started_at)+30) OR ((m.plan_id IN ('personal','professional-v2') OR (json_valid(m.terms_json) AND json_extract(m.terms_json,'$.entitlementVersion')=1 AND json_extract(m.terms_json,'$.id')=m.plan_id)) AND m.paid_started_at<=? AND julianday(m.paid_expires_at)>julianday(m.paid_started_at))))`;
+export const activeProfileSQL = `EXISTS (SELECT 1 FROM profile_membership_view m JOIN auth_accounts a ON a.id=m.owner_id AND a.active=1 WHERE m.owner_id=profiles.owner_id AND ((m.plan_id IN ('personal','free-30')) OR (m.plan_id='free-30' AND m.trial_started_at<=? AND julianday(m.trial_expires_at)>julianday(m.trial_started_at) AND julianday(m.trial_expires_at)<=julianday(m.trial_started_at)+30) OR ((m.plan_id IN ('personal','professional-v2') OR (json_valid(m.terms_json) AND json_extract(m.terms_json,'$.entitlementVersion')=1 AND json_extract(m.terms_json,'$.id')=m.plan_id)) AND m.paid_started_at<=? AND julianday(m.paid_expires_at)>julianday(m.paid_started_at))))`;

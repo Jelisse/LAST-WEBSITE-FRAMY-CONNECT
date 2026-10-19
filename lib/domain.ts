@@ -10,11 +10,12 @@ export const legacyPlans = [
     name: '30 dias grátis',
     audience: 'Todos',
     meticais: 0,
-    links: 15,
-    bio: 400,
+    links: 20,
+    bio: 600,
     description:
       'Experimente o seu perfil durante 30 dias, sem renovação automática.',
   },
+
   {
     id: 'individual',
     name: 'Individual',
@@ -64,20 +65,10 @@ export const legacyPlans = [
 // New catalogue IDs keep historical paid memberships and stored terms intact.
 export const plans = [
   {
-    id: 'free-30',
-    name: '30 dias grátis',
-    audience: 'Todos',
-    meticais: 0,
-    links: 20,
-    bio: 600,
-    description:
-      'Experimente o seu perfil durante 30 dias, sem renovação automática.',
-  },
-  {
     id: 'personal',
     name: 'Individual',
     audience: 'Uso pessoal',
-    meticais: 100,
+    meticais: 0,
     links: 8,
     bio: 200,
     description: 'Os seus contactos e redes sociais, num só lugar.',
@@ -91,6 +82,7 @@ export const plans = [
     bio: 600,
     description: 'Apresente os seus serviços, portefólio e trabalho.',
   },
+  { id:'corporate',name:'Corporativo',audience:'Empresas',meticais:0,annualMeticais:0,links:50,bio:1200,description:'Plano empresarial com preço acordado com a equipa.',active:false,monthlyEnabled:false,annualEnabled:false },
 ] as const;
 export type PlanId = string;
 export type ManagedPlan = PlanControls & {
@@ -356,6 +348,8 @@ export function validatePlanContent(
     typeof planId === 'object' && planId
       ? (planId as ManagedPlan)
       : getPlan(planId);
+  // Free Individual keeps excess content privately; public presentation applies its limits.
+  if (plan.id === 'personal' && plan.meticais === 0) return;
   if ((profile.links?.length ?? 0) > plan.links)
     throw new Error(
       `O plano ${plan.name} permite ${plan.links} links. Remova links ou escolha um plano superior.`,

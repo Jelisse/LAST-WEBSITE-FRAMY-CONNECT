@@ -1,76 +1,7 @@
 'use client';
-import Link from '@/components/hard-link';
 import type { WorkspaceData } from '@/lib/profile-types';
 import { useI18n } from './language-provider';
-export function TrialNotice({
-  membership,
-}: {
-  membership: WorkspaceData['membership'];
-}) {
-  const { t, locale } = useI18n();
-  if (
-    membership.mode === 'paid' ||
-    membership.accessState === 'basic' ||
-    membership.accessState === 'grace'
-  )
-    return (
-      <aside className="trial-notice">
-        <strong>{t('O seu plano de perfil digital')}</strong>
-        <p>
-          {t(
-            membership.accessState === 'basic'
-              ? 'A página pública mostra apenas nome, fotografia e um contacto. Os restantes dados continuam guardados.'
-              : membership.accessState === 'grace'
-                ? 'Está nos 7 dias de tolerância. Renove para manter todas as funcionalidades.'
-                : t('Plano pago até {0}. Sem renovação automática.', [
-                    membership.expiresAt
-                      ? new Intl.DateTimeFormat(locale).format(
-                          new Date(membership.expiresAt),
-                        )
-                      : '—',
-                  ]),
-          )}
-        </p>
-        <Link href="/perfil?tools=1">{t('Gerir plano e renovação →')}</Link>
-      </aside>
-    );
-  return (
-    <aside className="trial-notice">
-      <strong>{t('O seu plano de perfil digital')}</strong>
-      <p>
-        {t(
-          membership.launchExtended
-            ? t(
-                'O seu acesso foi prolongado sem cobrança enquanto os planos mensais não estão disponíveis. Os seus links e dados mantêm-se guardados.',
-              )
-            : membership.expiresAt
-              ? t('Experiência de 30 dias até {0}. Sem renovação automática.', [
-                  new Intl.DateTimeFormat(locale).format(
-                    new Date(membership.expiresAt),
-                  ),
-                ])
-              : t(
-                  'Os 30 dias começam quando activa o perfil digital. O produto físico é comprado separadamente.',
-                ),
-        )}
-      </p>
-      {membership.billingAvailable &&
-        membership.daysRemaining !== null &&
-        membership.daysRemaining !== undefined &&
-        membership.daysRemaining <= 7 && (
-          <p>
-            {t(' Faltam ')}
-            {membership.daysRemaining} {t(' dias.')}{' '}
-            <Link href="/perfil?tools=1">{t('Gerir renovação →')}</Link>
-          </p>
-        )}
-      {!membership.launchExtended && !membership.billingAvailable && (
-        <p>
-          {t(
-            'Enquanto as adesões mensais não abrirem, o acesso será prolongado sem cobrança. Não precisa de eliminar links.',
-          )}
-        </p>
-      )}
-    </aside>
-  );
+export function TrialNotice({membership}:{membership:WorkspaceData['membership']}) {
+ const {t,locale}=useI18n();const free=['personal','free-30',''].includes(membership.planId);
+ return <aside className="trial-notice"><strong>{t(free?'Individual gratuito, sem prazo':'O seu plano de perfil digital')}</strong><p>{free?t('Sem subscrição, sem expiração e sem renovação. Produtos físicos são pagos separadamente.'):membership.expiresAt?t('Período pago até {0}. A renovação exige novo pagamento confirmado.',[new Date(membership.expiresAt).toLocaleDateString(locale)]):t('Consulte as condições do seu plano.')}</p></aside>;
 }

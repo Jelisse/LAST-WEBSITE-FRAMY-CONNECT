@@ -1,3 +1,4 @@
+import { INDIVIDUAL_PLAN } from '@/lib/plan-policy';
 import { hash, compare } from 'bcryptjs';
 import { database } from '@/lib/server-db';
 import { tokenHash, SESSION_COOKIE, type Account } from '@/lib/server-auth';
@@ -105,8 +106,7 @@ export async function POST(request: Request) {
         role: 'customer',
         password_hash: await hash(b.password, 12),
       };
-      await db
-        .prepare(
+      await db.batch([db.prepare(
           'INSERT INTO auth_accounts(id,email,name,password_hash,role,created_at) VALUES(?,?,?,?,?,?)',
         )
         .bind(
@@ -117,7 +117,7 @@ export async function POST(request: Request) {
           'customer',
           new Date().toISOString(),
         )
-        .run();
+, db.prepare('INSERT INTO sandbox_memberships(owner_id,plan_id,version,updated_at,terms_json) VALUES(?,?,1,?,?)').bind(account.id,'personal',new Date().toISOString(),JSON.stringify(INDIVIDUAL_PLAN))]);
     } else {
       const valid = await compare(
         b.password,

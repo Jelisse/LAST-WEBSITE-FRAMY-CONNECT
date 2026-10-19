@@ -80,10 +80,10 @@ test('private fields never enter publication; unsafe links and reserved names re
   );
 });
 
-test('free trial and two monthly plans enforce their content allowances', () => {
+test('permanent Individual and paid plans preserve content and enforce paid allowances', () => {
   assert.deepEqual(
     plans.map((p) => p.meticais),
-    [0, 100, 250],
+    [0, 250, 0],
   );
   for (const plan of plans) {
     assert.doesNotThrow(() =>
@@ -98,6 +98,7 @@ test('free trial and two monthly plans enforce their content allowances', () => 
         plan.id,
       ),
     );
+    if (plan.id === 'personal') continue;
     assert.throws(() =>
       validatePlanContent(
         {

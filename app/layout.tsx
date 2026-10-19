@@ -21,6 +21,8 @@ import './editor-live-preview.css';
 import './panel-refinements.css';
 import './profile-portfolio.css';
 import './profile-name-fonts.css';
+import './dashboard-navigation.css';
+import './corporate.css';
 import { InternalPageChrome } from '@/components/internal-page-chrome';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
 import { SiteAnalyticsTracker } from '@/components/site-analytics-tracker';

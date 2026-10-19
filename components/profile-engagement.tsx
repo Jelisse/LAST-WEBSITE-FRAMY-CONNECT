@@ -32,6 +32,13 @@ export function useProfileEngagement(username: string, enabled: boolean) {
         keepalive: true,
         signal: AbortSignal.timeout(8000),
       }).catch(() => {});
+      const assignment = new URLSearchParams(location.search).get('corporate');
+      if (assignment && /^[a-f0-9-]{36}$/.test(assignment))
+        void fetch('/api/corporate-public', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({action:'metric',assignment,target,username}),
+          keepalive:true,signal:AbortSignal.timeout(8000),
+        }).catch(()=>{});
     },
     [username, enabled],
   );

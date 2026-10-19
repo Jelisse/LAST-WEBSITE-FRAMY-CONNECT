@@ -181,9 +181,21 @@ export async function POST(request: Request) {
           OR EXISTS(SELECT 1 FROM manager_preferences WHERE updated_by=?)
           OR EXISTS(SELECT 1 FROM profile_receipts WHERE actor=?)
           OR EXISTS(SELECT 1 FROM auth_recovery WHERE created_by=?)
-          OR EXISTS(SELECT 1 FROM auth_invitations WHERE created_by=?) AS kept`,
+          OR EXISTS(SELECT 1 FROM auth_invitations WHERE created_by=?)
+          OR EXISTS(SELECT 1 FROM ambassador_sales WHERE ambassador_id=?)
+          OR EXISTS(SELECT 1 FROM ambassador_payouts WHERE ambassador_id=? OR recorded_by=?)
+          OR EXISTS(SELECT 1 FROM corporate_members WHERE account_id=?)
+          OR EXISTS(SELECT 1 FROM corporate_invites WHERE account_id=? OR created_by=?)
+          OR EXISTS(SELECT 1 FROM corporate_audit WHERE actor=?) AS kept`,
         )
         .bind(
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
+          row.id,
           row.id,
           row.id,
           row.id,
@@ -287,6 +299,9 @@ export async function POST(request: Request) {
           .prepare(
             "DELETE FROM manager_records WHERE id=? AND kind='agent'" + gate,
           )
+          .bind(row.id, eventId),
+        db
+          .prepare('DELETE FROM ambassadors WHERE account_id=?' + gate)
           .bind(row.id, eventId),
         db
           .prepare('DELETE FROM auth_accounts WHERE id=?' + gate)

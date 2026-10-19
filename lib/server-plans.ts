@@ -1,3 +1,4 @@
+import { INDIVIDUAL_PLAN } from './plan-policy';
 import { planFeatures } from './plan-features';
 import { planMeticais } from './plan-pricing';
 import { database } from './server-db';
@@ -9,24 +10,25 @@ export async function getManagedPlans(): Promise<ManagedPlan[]> {
     )
     .all<{ id: string; data_json: string; version: number }>();
   const all = new Map<string, ManagedPlan>(
-    plans.map((p) => [p.id, { ...p, active: true, version: 0 }]),
+    plans.map((p) => [p.id, { ...p, active: 'active' in p ? p.active : true, version: 0 }]),
   );
-  for (const row of rows.results.filter(row => all.has(row.id) || JSON.parse(row.data_json).entitlementVersion === 1))
+  for (const row of rows.results.filter(row => row.id !== 'free-30' && (all.has(row.id) || JSON.parse(row.data_json).entitlementVersion === 1)))
     all.set(row.id, {
       ...JSON.parse(row.data_json),
       id: row.id,
       version: row.version,
     });
-  return [...all.values()].map(p => ({ ...p, entitlementVersion: 1, features: planFeatures(p), monthlyEnabled: p.monthlyEnabled ?? true, annualEnabled: p.annualEnabled ?? true })).sort((a,b)=>(a.sortOrder ?? 0)-(b.sortOrder ?? 0)).map((plan) => plan.id === 'free-30' ? { ...plan, meticais: 0, links: Math.max(20, plan.links), bio: Math.max(600, plan.bio) } : { ...plan, meticais: planMeticais(plan) });
+  return [...all.values()].map(p => ({ ...p, entitlementVersion: 1, features: planFeatures(p), monthlyEnabled: p.monthlyEnabled ?? true, annualEnabled: p.annualEnabled ?? true })).sort((a,b)=>(a.sortOrder ?? 0)-(b.sortOrder ?? 0)).map(plan => plan.id === 'personal' ? {...plan,meticais:0,annualMeticais:0,active:true,monthlyEnabled:false,annualEnabled:false} : {...plan,meticais:planMeticais(plan)});
 }
 export function membershipTerms(
   row: { plan_id: string; terms_json?: string | null } | null,
 ): ManagedPlan {
+  if (!row || row.plan_id === 'free-30') return {...INDIVIDUAL_PLAN};
   if (row?.terms_json) {
     const terms = JSON.parse(row.terms_json);
-    return row.plan_id === 'free-30' ? { ...terms, meticais: 0, links: Math.max(20, terms.links), bio: Math.max(600, terms.bio) } : terms;
+    return row.plan_id === 'personal' ? {...terms,meticais:0,annualMeticais:0,monthlyEnabled:false,annualEnabled:false} : terms;
   }
   const seed =
-    plans.find((p) => p.id === (row?.plan_id ?? 'free-30')) ?? legacyPlans.find(p => p.id === row?.plan_id) ?? plans[0];
+    plans.find((p) => p.id === (row?.plan_id ?? 'personal')) ?? legacyPlans.find(p => p.id === row?.plan_id) ?? plans[0];
   return { ...seed, active: true, version: 0 };
 }

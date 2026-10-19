@@ -45,7 +45,7 @@ const questions = [
   ],
   [
     'O produto inclui uma subscrição?',
-    'O produto físico é pago separadamente do perfil digital. Pode experimentar o perfil durante 30 dias, sem renovação automática. Consulte as condições do plano antes de comprar.',
+    'O produto físico é pago separadamente do perfil digital. O plano Individual é gratuito, sem prazo. Profissional e Corporativo são pagos, com renovação confirmada pelo cliente.',
   ],
   [
     'Como indico o local de entrega?',
@@ -169,16 +169,16 @@ export default async function Home() {
               <h2>{t('Planos para o seu perfil digital')}</h2>
             </div>
           </div>
-          {plans.find((p) => p.id === 'free-30') && (
+          {plans.find((p) => p.id === 'personal') && (
             <div className="home-trial-banner">
-              <strong>{t('30 dias grátis')}</strong>
+              <strong>{t('Individual gratuito, sem prazo')}</strong>
               <span>
                 {t(
-                  'Experimente o seu perfil digital durante 30 dias, sem renovação automática.',
+                  'O plano Individual é gratuito, sem prazo e sem renovação.',
                 )}
               </span>
               <Link className="home-primary" href="/perfil?plans=1">
-                {t('Começar 30 dias grátis')} <ArrowUpRight size={18} />
+                {t('Começar gratuitamente')} <ArrowUpRight size={18} />
               </Link>
             </div>
           )}

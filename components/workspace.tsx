@@ -1,4 +1,6 @@
 'use client';
+import { focusDashboardStart } from '@/lib/dashboard-navigation';
+import { AmbassadorDashboard } from './ambassador-dashboard';
 import { PanelBrand } from '@/components/panel-brand';
 
 import { membershipFeatures } from '@/lib/entitlement';
@@ -103,6 +105,7 @@ const menu = [
   { id: 'orders', label: 'O meu pedido', icon: Package },
   { id: 'analytics', label: 'Resultados do perfil', icon: ChartNoAxesCombined },
   { id: 'growth', label: 'Ferramentas do perfil', icon: BriefcaseBusiness },
+  { id: 'ambassadors', label: 'Embaixador', icon: UserRound },
   { id: 'operations', label: 'Operações · teste', icon: Settings2 },
   { id: 'agent', label: 'Agente · teste', icon: BriefcaseBusiness },
   { id: 'ceo', label: 'CEO · teste', icon: ChartNoAxesCombined },
@@ -501,7 +504,7 @@ export function Workspace({ displayName }: { displayName: string }) {
   }
   async function selectPlan(planId: PlanId) {
     if (!data) return;
-    if (planId !== 'free-30') {
+    if (planId !== 'personal') {
       setPlansOpen(false);
       setGrowthInitialTab('billing');
       setTab('growth');
@@ -664,13 +667,14 @@ export function Workspace({ displayName }: { displayName: string }) {
         </SidebarHeader>
         <SidebarContent className="px-4">
           <SidebarMenu>
-            {menu.slice(0, 5).map((m) => (
+            {menu.slice(0, 6).map((m) => (
               <SidebarMenuItem key={m.id}>
                 <SidebarMenuButton
                   className="workspace-menu-item"
                   isActive={tab === m.id}
                   onClick={() => {
                     setTab(m.id);
+                    focusDashboardStart();
                     setNotice('');
                   }}
                 >
@@ -680,6 +684,7 @@ export function Workspace({ displayName }: { displayName: string }) {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
+          <Link className="corporate-workspace-link" href="/corporativo">{t('Equipa corporativa')}</Link>
           {['operations', 'agent', 'finance', 'ceo'].includes(tab) && (
             <Collapsible
               className="workspace-test-tools"
@@ -693,13 +698,14 @@ export function Workspace({ displayName }: { displayName: string }) {
               <CollapsibleContent>
                 <p>{t('Vistas de demonstração, sem permissões reais.')}</p>
                 <SidebarMenu>
-                  {menu.slice(5).map((m) => (
+                  {menu.slice(6).map((m) => (
                     <SidebarMenuItem key={m.id}>
                       <SidebarMenuButton
                         className="workspace-menu-item"
                         isActive={tab === m.id}
                         onClick={() => {
                           setTab(m.id);
+                    focusDashboardStart();
                           setNotice('');
                         }}
                       >
@@ -837,6 +843,7 @@ export function Workspace({ displayName }: { displayName: string }) {
             </div>
           ) : (
             <>
+              {tab === 'ambassadors' && <AmbassadorDashboard />}
               {tab === 'overview' && (
                 <CustomerOverview
                   data={data}

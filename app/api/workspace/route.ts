@@ -137,9 +137,9 @@ export async function GET() {
         planId: membership?.plan_id ?? '',
         version: membership?.version ?? 0,
         mode:
-          membership?.plan_id && membership.plan_id !== 'free-30'
+          membership?.plan_id && !['personal','free-30'].includes(membership.plan_id)
             ? 'paid'
-            : 'trial',
+            : 'free',
         accessState: profileAccess(membership),
         billingAvailable: membership?.billing_enabled === 1,
         launchExtended: profileAccess(membership) === 'launch',
@@ -264,9 +264,9 @@ export async function POST(request: Request) {
       return json({ ok: true });
     }
     if (body.action === 'activate-sandbox-plan') {
-      if (body.planId !== FREE_PLAN_ID)
+      if (![FREE_PLAN_ID,'free-30'].includes(String(body.planId)))
         return json(
-          { error: 'Apenas o plano de 30 dias grátis está disponível.' },
+          { error: 'Seleccione o plano Individual gratuito.' },
           422,
         );
       const trial = await db
@@ -282,28 +282,12 @@ export async function POST(request: Request) {
           billing_enabled?: number;
           billing_opened_at?: string | null;
         }>();
-      if (
-        trial &&
-        (('plan_id' in trial && trial.plan_id !== 'free-30') ||
-          (trial.billing_enabled === 1 &&
-            trial.trial_expires_at &&
-            trial.trial_expires_at <= now))
-      )
-        return json(
-          {
-            error:
-              'O período gratuito terminou. Contacte a equipa para continuar.',
-          },
-          422,
-        );
-      const trialStart = trial?.trial_started_at ?? now;
-      const trialEnd =
-        trial?.trial_expires_at ??
-        new Date(Date.parse(trialStart) + 30 * 86400000).toISOString();
+      if (trial && 'plan_id' in trial && !['personal','free-30'].includes(String(trial.plan_id))) return json({error:'O plano pago actual mantém-se até ao fim do período. Contacte a equipa para alterar.'},409);
+      const trialStart = null, trialEnd = null;
       if (!Number.isInteger(body.version) || Number(body.version) < 0)
         return json({ error: 'Versão inválida.' }, 422);
       const plan = (await getManagedPlans()).find(
-        (p) => p.id === body.planId && p.active,
+        (p) => p.id === FREE_PLAN_ID && p.active,
       );
       if (!plan) return json({ error: 'Plano indisponível.' }, 422);
       if (body.planVersion !== plan.version)
@@ -411,7 +395,7 @@ export async function POST(request: Request) {
           .bind(user.userId)
           .first<import('@/lib/entitlement').Membership>();
         if (!trial) {
-          // A first publish starts the 30-day free period automatically, so
+          // A first publish activates permanent Individual access, so
           // the profile link appears without a separate plan-activation step.
           const plan = (await getManagedPlans()).find(
             (p) => p.id === FREE_PLAN_ID && p.active,
@@ -426,8 +410,8 @@ export async function POST(request: Request) {
                 plan.id,
                 now,
                 JSON.stringify(plan),
-                now,
-                new Date(Date.parse(now) + 30 * 86400000).toISOString(),
+                null,
+                null,
               )
               .run();
             trial = await db
@@ -820,7 +804,7 @@ export async function POST(request: Request) {
       await db.batch([
         db
           .prepare(
-            `INSERT OR IGNORE INTO sandbox_orders (id,owner_id,data_json,version,created_at) SELECT ?,?,?,1,? WHERE (? IS NULL OR EXISTS(SELECT 1 FROM product_options WHERE id=? AND quantity>0 AND enabled=1)) AND (SELECT COUNT(*) FROM sandbox_orders WHERE owner_id=? AND json_extract(data_json,'$.status')='PENDING_PAYMENT')<? AND EXISTS(SELECT 1 FROM profiles WHERE owner_id=? AND version=?) AND EXISTS(SELECT 1 FROM profile_membership_view WHERE owner_id=? AND ((plan_id='free-30' AND trial_started_at<=? AND julianday(trial_expires_at)>julianday(trial_started_at) AND julianday(trial_expires_at)<=julianday(trial_started_at)+30) OR ((plan_id IN ('personal','professional-v2') OR (json_valid(terms_json) AND json_extract(terms_json,'$.entitlementVersion')=1 AND json_extract(terms_json,'$.id')=plan_id)) AND paid_started_at<=? AND julianday(paid_expires_at)>julianday(paid_started_at))) AND version=?) AND (?<>'free-30' OR COALESCE((SELECT version FROM manager_records WHERE id=? AND kind='plan'),0)=?) AND COALESCE((SELECT version FROM product_catalog WHERE id=?),0)=? AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)>(SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('PENDING_PAYMENT','QUEUED','IN_PRODUCTION','READY'))`,
+            `INSERT OR IGNORE INTO sandbox_orders (id,owner_id,data_json,version,created_at) SELECT ?,?,?,1,? WHERE (? IS NULL OR EXISTS(SELECT 1 FROM product_options WHERE id=? AND quantity>0 AND enabled=1)) AND (SELECT COUNT(*) FROM sandbox_orders WHERE owner_id=? AND json_extract(data_json,'$.status')='PENDING_PAYMENT')<? AND EXISTS(SELECT 1 FROM profiles WHERE owner_id=? AND version=?) AND EXISTS(SELECT 1 FROM profile_membership_view WHERE owner_id=? AND ((plan_id='personal') OR (plan_id='free-30' AND trial_started_at<=? AND julianday(trial_expires_at)>julianday(trial_started_at) AND julianday(trial_expires_at)<=julianday(trial_started_at)+30) OR ((plan_id IN ('personal','professional-v2') OR (json_valid(terms_json) AND json_extract(terms_json,'$.entitlementVersion')=1 AND json_extract(terms_json,'$.id')=plan_id)) AND paid_started_at<=? AND julianday(paid_expires_at)>julianday(paid_started_at))) AND version=?) AND (?<>'free-30' OR COALESCE((SELECT version FROM manager_records WHERE id=? AND kind='plan'),0)=?) AND COALESCE((SELECT version FROM product_catalog WHERE id=?),0)=? AND COALESCE((SELECT SUM(quantity) FROM stock_movements WHERE product_id=?),0)>(SELECT COUNT(*) FROM sandbox_orders WHERE json_extract(data_json,'$.productId')=? AND json_extract(data_json,'$.status') IN ('PENDING_PAYMENT','QUEUED','IN_PRODUCTION','READY'))`,
           )
           .bind(
             o.id,

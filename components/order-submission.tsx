@@ -422,7 +422,7 @@ export function OrderSubmission({
                   data?.membership.planId &&
                     data.membership.planId !== FREE_PLAN_ID
                     ? 'O produto usa o seu plano digital actual. A compra não renova a subscrição.'
-                    : 'Comece com 30 dias grátis. Pode escolher uma subscrição mensal nas Ferramentas do perfil.',
+                    : 'O plano Individual é gratuito, sem prazo. Pode escolher Profissional ou Corporativo nas Ferramentas do perfil.',
                 )}
               </p>
               <div className="purchase-plans">
@@ -442,7 +442,7 @@ export function OrderSubmission({
                     />
                     <strong>
                       {p.id === FREE_PLAN_ID
-                        ? t('30 dias grátis · 0 MT')
+                        ? t('Individual gratuito · 0 MT')
                         : p.id === data?.membership.planId
                           ? `${t(p.name)} · ${t('plano actual')}`
                           : t('{0} · {1}/mês · Em breve', [
@@ -599,7 +599,7 @@ export function OrderSubmission({
                 {t('Produto: ')}
                 <strong>{money(product.amount, t.locale)}</strong>
                 {t(
-                  '. O pedido fica a aguardar pagamento. O plano digital é gratuito durante 30 dias, sem renovação automática. Entrega a confirmar.',
+                  '. O pedido fica a aguardar pagamento. O plano Individual é gratuito, sem prazo. Entrega a confirmar.',
                 )}
               </p>
               {supportsDesign(product) && (
@@ -668,7 +668,7 @@ export function OrderSubmission({
               )}
             </p>
           )}
-          {step > 0 && <p>{t('Plano: 30 dias grátis · 0 MT')}</p>}
+          {step > 0 && <p>{t('Plano: Individual gratuito · 0 MT')}</p>}
           <p>{t('Entrega: a confirmar')}</p>
           <hr />
           <p>{t('Preço por unidade. A entrega é confirmada separadamente.')}</p>

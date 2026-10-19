@@ -118,8 +118,10 @@ test('translated content obeys publication limits and never resurrects restricte
   assert.equal(published.translations.en.links.length, 1);
   assert.equal(published.translations.en.services.length, 0);
   const basic = profilePresentation(original, 'basic', member);
-  assert.equal(basic.translations, undefined);
-  assert.equal(profileInLanguage(basic, 'en').profile.bio, '');
+  assert.equal(basic.translations.en.bio.length, 200);
+  assert.equal(basic.translations.en.address, '');
+  assert.equal(basic.translations.en.services.length,0);
+  assert.equal(profileInLanguage(basic, 'en').profile.bio.length, 200);
 });
 function luminance(hex) {
   return [1, 3, 5]

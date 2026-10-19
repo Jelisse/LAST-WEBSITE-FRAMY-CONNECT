@@ -54,6 +54,7 @@ type Data = {
 };
 const states: Record<string, string> = {
   inactive: 'Inactivo',
+  free: 'Individual gratuito, sem prazo',
   trial: 'Experiência',
   launch: 'Lançamento',
   paid: 'Pago e activo',
@@ -134,7 +135,7 @@ export function SubscriptionManager() {
         (cycle === 'all' ||
           terms.billingCycle === cycle ||
           (cycle === 'monthly' &&
-            m.plan_id !== 'free-30' &&
+            m.plan_id !== 'personal' &&
             !terms.billingCycle)) &&
         `${m.name} ${m.email} ${m.plan_id}`
           .toLowerCase()
@@ -187,7 +188,7 @@ export function SubscriptionManager() {
             {[
               [
                 'Planos publicados',
-                data.plans.filter((p) => p.active && p.id !== 'free-30').length,
+                data.plans.filter((p) => p.active && p.id !== 'personal').length,
               ],
               [
                 'Períodos pagos activos',
@@ -198,8 +199,8 @@ export function SubscriptionManager() {
                 data.members.filter((m) => m.state === 'grace').length,
               ],
               [
-                'Experiências',
-                data.members.filter((m) => m.state === 'trial').length,
+                'Individual gratuito',
+                data.members.filter((m) => m.state === 'free').length,
               ],
             ].map(([label, value]) => (
               <article key={label}>
@@ -288,7 +289,7 @@ export function SubscriptionManager() {
                       <input
                         required
                         type="number"
-                        min={editing.id === 'free-30' ? 0 : 1}
+                        min={editing.id === 'personal' ? 0 : 1}
                         max={10000}
                         step="0.01"
                         value={planMeticais(editing)}
@@ -305,7 +306,7 @@ export function SubscriptionManager() {
                       <input
                         required
                         type="number"
-                        min={editing.id === 'free-30' ? 0 : 1}
+                        min={editing.id === 'personal' ? 0 : 1}
                         max={120000}
                         step="0.01"
                         value={planAnnualMeticais(editing)}
@@ -377,6 +378,8 @@ export function SubscriptionManager() {
                       }
                     />
                   </label>
+                  <label><input type="checkbox" checked={editing.id==='corporate'||!!editing.corporateEnabled} disabled={editing.id==='corporate'||editing.id==='personal'} onChange={e=>setEditing({...editing,corporateEnabled:e.target.checked})}/>{t('Gestão corporativa')}</label>
+                  <label>{t('Limite de trabalhadores')}<input type="number" min={1} max={500} value={editing.memberLimit??25} onChange={e=>setEditing({...editing,memberLimit:Number(e.target.value)})}/></label>
                   <div className="suite-checks">
                     {(
                       ['active', 'monthlyEnabled', 'annualEnabled'] as const
@@ -467,7 +470,7 @@ export function SubscriptionManager() {
                     <h2>{t(p.name)}</h2>
                     <p>{t(p.description)}</p>
                     <strong>
-                      {p.id === 'free-30'
+                      {p.id === 'personal'
                         ? t('Grátis')
                         : [
                             p.monthlyEnabled
@@ -563,7 +566,7 @@ export function SubscriptionManager() {
                         </td>
                         <td>{t(states[m.state])}</td>
                         <td>
-                          {when(m.paid_expires_at ?? m.trial_expires_at, locale)}
+                          {m.state === 'free' ? t('Sem prazo') : when(m.paid_expires_at ?? m.trial_expires_at, locale)}
                         </td>
                         <td>
                           {t(

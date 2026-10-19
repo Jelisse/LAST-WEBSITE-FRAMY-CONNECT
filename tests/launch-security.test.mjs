@@ -90,6 +90,8 @@ function fixture() {
       }
     },
   };
+  // Explicitly closed billing is the starting point for legacy activation/permission tests.
+  sql.exec('UPDATE profile_billing_settings SET enabled=0,opened_at=NULL,version=0');
   for (const [id, role] of [
     ['customer-a', 'customer'],
     ['customer-b', 'customer'],
@@ -610,7 +612,7 @@ const profile = {
   photoUrl: '',
   photoPosition: 35,
 };
-async function checkoutFixture(workspace) {
+async function checkoutFixture(workspace, professional = false) {
   let r = await post(workspace, {
     action: 'save-profile',
     version: 0,
@@ -620,17 +622,18 @@ async function checkoutFixture(workspace) {
   r = await post(workspace, {
     action: 'activate-sandbox-plan',
     version: 0,
-    planId: 'free-30',
+    planId: 'personal',
     planVersion: 0,
   });
   assert.equal(r.status, 200, JSON.stringify(r));
+  if (professional) await enableProfessionalFixture();
   return {
     action: 'submit-order',
     checkout: true,
     approveProfile: true,
     id: crypto.randomUUID(),
     productId: 'keychain',
-    planId: 'free-30',
+    planId: 'personal',
     planVersion: 0,
     profileVersion: 1,
     design: { optionId: 'tiktok' },
@@ -638,6 +641,11 @@ async function checkoutFixture(workspace) {
     deliveryAddress: 'Bairro Central',
     deliveryContact: '+258840000000',
   };
+}
+
+async function enableProfessionalFixture() {
+ const terms=(await (await api('lib/server-plans.ts')).getManagedPlans()).find(p=>p.id==='professional-v2');
+ await globalThis.__launch.env.DB.prepare("UPDATE sandbox_memberships SET plan_id='professional-v2',terms_json=?,paid_started_at=?,paid_expires_at=? WHERE owner_id=?").bind(JSON.stringify(terms),new Date(Date.now()-86400000).toISOString(),new Date(Date.now()+30*86400000).toISOString(),globalThis.__launch.user.userId).run();
 }
 
 test('customer data and all three keychain purchases work with the complete schema', async () => {
@@ -686,20 +694,20 @@ test('manager edits store meticais without reconverting saved plan prices', asyn
   sql
     .prepare('INSERT INTO manager_records VALUES(?,?,?,?,?)')
     .run(
-      'personal',
+      'professional-v2',
       'plan',
       JSON.stringify({ name: 'Legado', dollars: 3, active: true }),
       1,
       new Date().toISOString(),
     );
   assert.equal(
-    (await plansApi.getManagedPlans()).find((p) => p.id === 'personal')
+    (await plansApi.getManagedPlans()).find((p) => p.id === 'professional-v2')
       .meticais,
     191.73,
   );
   const result = await post(manager, {
     action: 'plan',
-    id: 'personal',
+    id: 'professional-v2',
     version: 1,
     name: 'Plano',
     audience: 'Todos',
@@ -712,13 +720,13 @@ test('manager edits store meticais without reconverting saved plan prices', asyn
   assert.equal(result.status, 200, JSON.stringify(result));
   const stored = JSON.parse(
     sql
-      .prepare("SELECT data_json FROM manager_records WHERE id='personal'")
+      .prepare("SELECT data_json FROM manager_records WHERE id='professional-v2'")
       .get().data_json,
   );
   assert.equal(stored.meticais, 200);
   assert.equal(stored.dollars, undefined);
   assert.equal(
-    (await plansApi.getManagedPlans()).find((p) => p.id === 'personal')
+    (await plansApi.getManagedPlans()).find((p) => p.id === 'professional-v2')
       .meticais,
     200,
   );
@@ -860,7 +868,7 @@ test('saving returns the reserved username so a duplicate-name customer can publ
   }
 });
 
-test('launch: a first publication auto-starts the trial, checkout is atomic, retries are safe, costs stay private', async () => {
+test('launch: a first publication activates permanent Individual, checkout is atomic, retries are safe, costs stay private', async () => {
   const sql = fixture(),
     workspace = await api('app/api/workspace/route.ts');
   // Publishing without a plan starts the 30-day free period automatically.
@@ -874,13 +882,9 @@ test('launch: a first publication auto-starts the trial, checkout is atomic, ret
       "SELECT plan_id,trial_started_at,trial_expires_at FROM sandbox_memberships WHERE owner_id='customer-a'",
     )
     .get();
-  assert.equal(autoTrial.plan_id, 'free-30');
-  assert.equal(
-    (Date.parse(autoTrial.trial_expires_at) -
-      Date.parse(autoTrial.trial_started_at)) /
-      86400000,
-    30,
-  );
+  assert.equal(autoTrial.plan_id, 'personal');
+  assert.equal(autoTrial.trial_started_at,null);
+  assert.equal(autoTrial.trial_expires_at,null);
   assert.ok(
     sql
       .prepare(
@@ -894,7 +898,7 @@ test('launch: a first publication auto-starts the trial, checkout is atomic, ret
     approveProfile: true,
     id: crypto.randomUUID(),
     productId: 'keychain',
-    planId: 'free-30',
+    planId: 'personal',
     planVersion: 0,
     profileVersion: 1,
     design: { optionId: 'tiktok' },
@@ -1339,9 +1343,9 @@ test('simplified catalogue preserves historical terms and upgrades trial allowan
   assert.deepEqual(
     current.map((p) => [p.id, p.meticais, p.links, p.bio]),
     [
-      ['free-30', 0, 20, 600],
-      ['personal', 100, 8, 200],
+      ['personal', 0, 8, 200],
       ['professional-v2', 250, 20, 600],
+      ['corporate', 0, 50, 1200],
     ],
   );
   assert.deepEqual(
@@ -1356,11 +1360,11 @@ test('simplified catalogue preserves historical terms and upgrades trial allowan
     plan_id: 'free-30',
     terms_json: JSON.stringify({ ...old, id: 'free-30', meticais: 0 }),
   });
-  assert.equal(trial.links, 20);
-  assert.equal(trial.bio, 600);
+  assert.equal(trial.links, 8);
+  assert.equal(trial.bio, 200);
   assert.equal(
-    current.some((p) => p.id === 'corporate'),
-    false,
+    current.some((p) => p.id === 'corporate' && !p.active),
+    true,
   );
   sql.close();
 });
@@ -1370,7 +1374,7 @@ test('profile engagement requires consent, published access and valid actions; r
   try {
     const workspace = await api('app/api/workspace/route.ts');
     const engagement = await api('app/api/profile-engagement/route.ts');
-    await checkoutFixture(workspace);
+    await checkoutFixture(workspace, true);
     assert.equal(
       (
         await post(workspace, {
@@ -1550,7 +1554,7 @@ test('profile engagement requires consent, published access and valid actions; r
   }
 });
 
-test('subscription payments require manager verification, deduplicate receipts and preserve scheduled downgrades', async () => {
+test('subscription payments require manager verification, deduplicate receipts and preserve scheduled paid renewals', async () => {
   const sql = fixture();
   try {
     const workspace = await api('app/api/workspace/route.ts'),
@@ -1604,7 +1608,7 @@ test('subscription payments require manager verification, deduplicate receipts a
       (
         await post(billing, {
           action: 'request',
-          planId: 'personal',
+          planId: 'professional-v2',
           planVersion: 0,
           accepted: true,
         })
@@ -1646,7 +1650,7 @@ test('subscription payments require manager verification, deduplicate receipts a
     const second = (
       await post(billing, {
         action: 'request',
-        planId: 'personal',
+        planId: 'professional-v2',
         planVersion: 0,
         accepted: true,
       })
@@ -1657,7 +1661,7 @@ test('subscription payments require manager verification, deduplicate receipts a
         await post(billing, {
           ...confirmation,
           id: second.id,
-          verifiedAmount: 10000,
+          verifiedAmount: 25000,
         })
       ).status,
       409,
@@ -1668,7 +1672,7 @@ test('subscription payments require manager verification, deduplicate receipts a
         await post(billing, {
           ...confirmation,
           id: second.id,
-          verifiedAmount: 10000,
+          verifiedAmount: 25000,
           paymentReference: 'SUBSCRIPTION-002',
         })
       ).status,
@@ -1678,7 +1682,7 @@ test('subscription payments require manager verification, deduplicate receipts a
       .prepare("SELECT * FROM sandbox_memberships WHERE owner_id='customer-a'")
       .get();
     assert.equal(scheduled.plan_id, 'professional-v2');
-    assert.equal(scheduled.next_plan_id, 'personal');
+    assert.equal(scheduled.next_plan_id, 'professional-v2');
     assert.equal(scheduled.next_starts_at, before.paid_expires_at);
     assert.equal(
       sql.prepare('SELECT COUNT(*) n FROM profile_receipts').get().n,
@@ -1696,7 +1700,7 @@ test('enquiry forms enforce published consent, owner isolation and deduplicate v
   try {
     const workspace = await api('app/api/workspace/route.ts'),
       inbox = await api('app/api/profile-enquiries/route.ts');
-    await checkoutFixture(workspace);
+    await checkoutFixture(workspace, true);
     const p = {
       ...profile,
       extras: {
@@ -1770,7 +1774,7 @@ test('teams require matching-email acceptance and lose edit permission immediate
   try {
     const workspace = await api('app/api/workspace/route.ts'),
       teams = await api('app/api/profile-teams/route.ts');
-    await checkoutFixture(workspace);
+    await checkoutFixture(workspace, true);
     assert.equal(
       (await post(teams, { action: 'create', name: 'Maputo Studio' })).status,
       200,
@@ -1870,14 +1874,18 @@ test('expiry reminders are durable and idempotent without an email provider; lau
       start = new Date(now - 29 * 86400000).toISOString();
     sql
       .prepare(
-        "UPDATE sandbox_memberships SET trial_started_at=?,trial_expires_at=? WHERE owner_id='customer-a'",
+        "UPDATE sandbox_memberships SET plan_id='professional-v2',paid_started_at=?,paid_expires_at=? WHERE owner_id='customer-a'",
       )
       .run(start, end);
     await profileReminders(globalThis.__launch.env, now);
     assert.equal(
       sql.prepare('SELECT COUNT(*) n FROM profile_notices').get().n,
-      0,
+      1,
     );
+    sql.exec("UPDATE sandbox_memberships SET plan_id='free-30'");
+    await profileReminders(globalThis.__launch.env, now);
+    assert.equal(sql.prepare('SELECT COUNT(*) n FROM profile_notices').get().n,1);
+    sql.exec("UPDATE sandbox_memberships SET plan_id='professional-v2'");
     sql.exec('UPDATE profile_billing_settings SET enabled=1');
     await profileReminders(globalThis.__launch.env, now);
     await profileReminders(globalThis.__launch.env, now);
@@ -1910,7 +1918,7 @@ test('custom domains require DNS ownership, correct CNAME and active TLS; owner-
   try {
     const workspace = await api('app/api/workspace/route.ts'),
       domains = await api('app/api/profile-domains/route.ts');
-    await checkoutFixture(workspace);
+    await checkoutFixture(workspace, true);
     assert.equal(
       (await post(domains, { action: 'add', hostname: '127.0.0.1' })).status,
       422,
@@ -1986,7 +1994,7 @@ test('custom hostname routing exposes only the assigned public profile and remov
   const sql = fixture();
   try {
     const workspace = await api('app/api/workspace/route.ts');
-    await checkoutFixture(workspace);
+    await checkoutFixture(workspace, true);
     await post(workspace, { action: 'publish-profile', profile, version: 1 });
     const { customDomainRequest } = await api('lib/custom-domain-request.ts');
     const env = { ...globalThis.__launch.env, PUBLIC_SITE_URL: origin };
@@ -2124,7 +2132,7 @@ test('paid profiles can buy physical products without restarting a trial or dele
           version: 1,
         })
       ).status,
-      422,
+      200,
     );
     const order = await post(workspace, {
       ...checkout,
@@ -2156,7 +2164,7 @@ test('email reminders send only the current phase and do not resend confirmed de
       expiry = new Date(now - 60000).toISOString();
     sql
       .prepare(
-        "UPDATE sandbox_memberships SET trial_started_at=?,trial_expires_at=? WHERE owner_id='customer-a'",
+        "UPDATE sandbox_memberships SET plan_id='professional-v2',paid_started_at=?,paid_expires_at=? WHERE owner_id='customer-a'",
       )
       .run(new Date(now - 29 * 86400000).toISOString(), expiry);
     sql.exec('UPDATE profile_billing_settings SET enabled=1');
@@ -2258,7 +2266,7 @@ test('self-service recovery uses the registered address, conceals account existe
 test('manual renewal reminders validate recipients, exclude prepaid periods and include plan links', async () => {
   const { manualRenewal, whatsappReminderURL } = await api('lib/manual-renewal.ts');
   const now = Date.parse('2026-10-02T12:00:00Z');
-  const m = { name: 'Cliente & exemplo', plan_id: 'personal', paid_started_at: '2026-09-05T12:00:00Z', paid_expires_at: '2026-10-05T12:00:00Z', terms_json: JSON.stringify({name:'Individual'}) };
+  const m = { name: 'Cliente & exemplo', plan_id: 'professional-v2', paid_started_at: '2026-09-05T12:00:00Z', paid_expires_at: '2026-10-05T12:00:00Z', terms_json: JSON.stringify({name:'Profissional'}) };
   const reminder = manualRenewal(m,7,now);
   assert.equal(reminder.expired,false);
   const url = new URL(whatsappReminderURL('+258 (84) 000-0000',reminder.message));

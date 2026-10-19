@@ -72,15 +72,15 @@ export function PlanPicker({
               <span>
                 {t(choice.name)}
                 <small>
-                  {choice.id === 'free-30'
-                    ? t('30 dias · sem renovação automática')
+                  {choice.id === 'personal'
+                    ? t('Gratuito, sem prazo')
                     : t('Mensal · por perfil')}
                 </small>
               </span>
               <strong>
                 {planPrice(choice, t.locale)}
                 <small>
-                  {choice.id === 'free-30' ? t('/ 30 dias') : t('/mês')}
+                  {choice.id === 'personal' ? t('Gratuito') : t('/mês')}
                 </small>
               </strong>
             </div>
@@ -111,7 +111,7 @@ export function PlanPicker({
             </ul>
             <p className="plan-disclosure">
               {t(
-                'O período gratuito dura 30 dias e não renova automaticamente. Produtos NFC e entrega são pagos separadamente.',
+                'O plano Individual é gratuito, sem prazo e sem renovação. Produtos NFC e entrega são pagos separadamente.',
               )}
             </p>
             {error && (
@@ -124,7 +124,7 @@ export function PlanPicker({
               disabled={busy}
               onClick={() => onSelect(choice.id)}
             >
-              {busy ? t('A activar…') : t('Activar 30 dias gratuitos')}{' '}
+              {busy ? t('A activar…') : t('Activar Individual gratuito')}{' '}
               <ArrowRight size={18} />
             </Button>
           </>
@@ -139,9 +139,9 @@ export function PlanPicker({
               )}
             </DialogDescription>
             <div className="plans-grid">
-              {plans.map((plan) => (
+              {plans.filter(p=>p.id!=='corporate'||p.active).map((plan) => (
                 <article
-                  className={`plan-card ${plan.id === 'free-30' ? 'plan-trial-banner' : ''} ${plan.id === 'professional-v2' ? 'plan-featured' : ''}`}
+                  className={`plan-card ${plan.id === 'personal' ? 'plan-trial-banner' : ''} ${plan.id === 'professional-v2' ? 'plan-featured' : ''}`}
                   key={plan.id}
                 >
                   <span className="plan-recommendation">
@@ -156,12 +156,12 @@ export function PlanPicker({
                   <div className="plan-price">
                     <strong>{planPrice(plan.monthlyEnabled === false ? {meticais:planAnnualMeticais(plan)} : plan, t.locale)}</strong>
                     <span>
-                      {plan.id === 'free-30' ? t('/ 30 dias') : plan.monthlyEnabled === false ? t(' / ano') : t('/mês')}
+                      {plan.id === 'personal' ? t('Gratuito') : plan.monthlyEnabled === false ? t(' / ano') : t('/mês')}
                     </span>
                   </div>
                   <p className="plan-per-profile">
-                    {plan.id !== 'free-30' && plan.annualEnabled !== false && plan.monthlyEnabled !== false && <>{planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')} · {t('Sem renovação automática')}<br /></>}
-                    {plan.id === 'free-30'
+                    {plan.id !== 'personal' && plan.annualEnabled !== false && plan.monthlyEnabled !== false && <>{planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')} · {t('Sem renovação automática')}<br /></>}
+                    {plan.id === 'personal'
                       ? t('Sem renovação automática')
                       : t('Por perfil')}
                   </p>
@@ -173,20 +173,20 @@ export function PlanPicker({
                     }
                     variant="outline"
                     disabled={
-                      (!paidAvailable && plan.id !== 'free-30') ||
+                      (!paidAvailable && plan.id !== 'personal') ||
                       plan.id === current ||
                       busy
                     }
                     onClick={() =>
-                      plan.id === 'free-30'
+                      plan.id === 'personal'
                         ? setSelected(plan.id)
                         : onSelect(plan.id)
                     }
                   >
                     {plan.id === current
                       ? t('Plano actual')
-                      : plan.id === 'free-30'
-                        ? t('Começar 30 dias grátis')
+                      : plan.id === 'personal'
+                        ? t('Começar gratuitamente')
                         : paidAvailable
                           ? t('Ver opções de pagamento')
                           : t('Em breve')}
@@ -219,7 +219,7 @@ export function PlanPicker({
                   </ul>
                 </article>
               ))}
-              <CorporatePlan />
+              {!plans.some(p=>p.id==='corporate'&&p.active)&&<CorporatePlan />}
             </div>
             <p className="plan-disclosure">
               {t(

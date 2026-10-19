@@ -15,6 +15,7 @@ export function manualRenewal(
   daysBefore = 7,
   now = Date.now(),
 ) {
+  if (['personal','free-30'].includes(member.plan_id)) return null;
   const expiry = expiryDate(member);
   const state = profileAccess(member, now);
   if (!expiry || state === 'inactive' || state === 'launch' ||

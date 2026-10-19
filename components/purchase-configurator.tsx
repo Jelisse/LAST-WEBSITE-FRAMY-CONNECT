@@ -1,6 +1,6 @@
 'use client';
 import { ProductArtworkPreview } from './product-artwork-preview';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Layers,
   Palette,
@@ -32,6 +32,7 @@ import {
 } from '@/lib/purchase-structure';
 import { money } from '@/lib/catalog';
 import { hardwareEstimate, type HardwarePrice } from '@/lib/hardware-pricing';
+import { AmbassadorCodeInput } from './ambassador-dashboard';
 import { PaySuiteCheckout } from './paysuite-checkout';
 import type { CheckoutPricing } from '@/lib/checkout-pricing';
 import { CardMaterialImage, cardArtwork } from './card-material-image';
@@ -79,6 +80,10 @@ export function PurchaseConfigurator({
   }, []);
   const selection = purchaseSelection(initial);
   const format = selection.format;
+  const [ambassadorCode,setAmbassadorCode] = useState('');
+  const [referralReady,setReferralReady] = useState(true);
+  const [restoredCode,setRestoredCode] = useState('');
+  const changeReferral=useCallback((code:string,ready:boolean)=>{setAmbassadorCode(code);setReferralReady(ready);},[]);
   const [card, setCard] = useState<string>(selection.card);
   const [keychain, setKeychain] = useState<string>(selection.keychain);
   const [design, setDesign] = useState('standard');
@@ -136,6 +141,7 @@ export function PurchaseConfigurator({
     }
     queueMicrotask(() => {
       if (draft) {
+        if(draft.ambassadorCode){setRestoredCode(draft.ambassadorCode);setReferralReady(false);}
         setCard(draft.card);
         setKeychain(draft.keychain);
         setDesign(draft.design);
@@ -162,6 +168,7 @@ export function PurchaseConfigurator({
         'framy-checkout:configuration:' + initial,
         JSON.stringify({
           version: 2,
+          ambassadorCode: ambassadorCode || (!referralReady ? restoredCode : ''),
           pvcModel: pvc,
 
           leather,
@@ -187,6 +194,11 @@ export function PurchaseConfigurator({
     }
   }, [
     draftReady,
+    cardArtworkValue,
+    pvcArtworkValue,
+    ambassadorCode,
+    referralReady,
+    restoredCode,
     pvc,
 
     leather,
@@ -229,7 +241,7 @@ export function PurchaseConfigurator({
   }
   const total =
     estimate && designAmount !== null && fulfilment
-      ? estimate.amount + designAmount + fulfilment.fee
+      ? estimate.amount - (ambassadorCode ? Math.round(estimate.amount / 10) : 0) + designAmount + fulfilment.fee
       : null;
   const deliveryReady =
     !!fulfilment &&
@@ -832,8 +844,10 @@ export function PurchaseConfigurator({
               {design === 'customer' ? ` · ${t(method)}` : ''}
             </p>
           </div>
+          <AmbassadorCodeInput initialCode={restoredCode} onChange={changeReferral} />
           <dl className="purchase-price-breakdown">
             <div><dt>{t('Produtos')}</dt><dd>{estimate ? money(estimate.amount, t.locale) : t('Preço a confirmar')}</dd></div>
+            {ambassadorCode && estimate && <div><dt>{t('Desconto embaixador (10%)')}</dt><dd>−{money(Math.round(estimate.amount / 10),t.locale)}</dd></div>}
             <div><dt>{t('Design')}</dt><dd>{designAmount === null ? t('Sob consulta') : money(designAmount, t.locale)}</dd></div>
             <div><dt>{t(delivery === 'pickup' ? 'Levantamento' : 'Entrega')}</dt><dd>{fulfilment ? money(fulfilment.fee, t.locale) : t('Sob cotação')}</dd></div>
           </dl>
@@ -893,6 +907,7 @@ export function PurchaseConfigurator({
                 (leatherBusy ||
                   (design === 'customer' && !leather.assetId) ||
                   (design === 'team' && !designInstructions.trim()))) ||
+              !referralReady ||
               !draftReady ||
               !signedIn ||
               !paymentAvailable ||
@@ -901,6 +916,7 @@ export function PurchaseConfigurator({
             }
             payload={{
               kind: 'product',
+              ambassadorCode,
               format,
               card,
               keychain,

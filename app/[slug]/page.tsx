@@ -134,7 +134,7 @@ const pages: Record<
     blocks: [
       {
         title: 'Perfil digital e produto físico',
-        text: 'O perfil digital começa com 30 dias gratuitos, sem renovação automática. Enquanto as adesões mensais não abrirem, prolongamos o acesso sem cobrança. Cada pagamento mensal confirmado activa um mês de calendário. Ao terminar, há 7 dias de tolerância; depois permanece uma página com nome, fotografia e um contacto. Os restantes dados ficam guardados. O produto físico é pago separadamente. Um pedido de pagamento não constitui comprovativo de pagamento.',
+        text: 'O plano Individual é gratuito, sem prazo e sem renovação. Profissional e Corporativo são planos pagos, com períodos mensais ou anuais disponibilizados pelo gestor. Cada renovação exige pagamento confirmado; não há débito automático. Após o período pago e 7 dias de tolerância, o perfil usa os limites do Individual gratuito. O conteúdo excedente permanece guardado em privado. Produtos físicos, design e entrega são pagos separadamente. Um pedido de pagamento não é comprovativo de pagamento.',
       },
       {
         title: 'Entrega, cancelamento e apoio',

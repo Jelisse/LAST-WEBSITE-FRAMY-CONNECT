@@ -1,4 +1,4 @@
-export const FREE_PLAN_ID = 'free-30';
+export const FREE_PLAN_ID = 'personal';
 export const keychainChoices = [
   { id: 'tiktok', name: 'TikTok', index: 0 },
   { id: 'pattern', name: 'Padrão artístico', index: 1 },

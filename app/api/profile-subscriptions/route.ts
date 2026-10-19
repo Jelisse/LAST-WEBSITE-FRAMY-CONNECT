@@ -1,3 +1,4 @@
+import { isPaidProfilePlan } from '@/lib/plan-policy';
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
@@ -51,7 +52,7 @@ export async function GET() {
       state: profileAccess(membership),
       expiresAt: expiryDate(membership),
       plans: (await getManagedPlans()).filter(
-        (p) => p.id !== 'free-30' && p.active,
+        (p) => isPaidProfilePlan(p.id) && p.active,
       ),
       notices: notices.results,
     });
@@ -125,7 +126,7 @@ export async function POST(request: Request) {
         (p) =>
           p.active &&
           p.id === b.planId &&
-          p.id !== 'free-30',
+          isPaidProfilePlan(p.id),
       );
       if (!plan || plan.monthlyEnabled === false || plan.version !== b.planVersion)
         throw Error('O plano mudou. Actualize antes de continuar.');

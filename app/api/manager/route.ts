@@ -140,6 +140,8 @@ export async function POST(request: Request) {
           active: b.active,
         };
       else {
+        if (id === 'free-30') throw Error('O plano de 30 dias foi retirado.');
+        if (id === 'personal' && !b.active) throw Error('O plano Individual gratuito mantém-se activo.');
         const previousRow = await db
           .prepare(
             "SELECT data_json FROM manager_records WHERE id=? AND kind='plan'",
@@ -152,8 +154,8 @@ export async function POST(request: Request) {
         const meticais = Number(b.meticais);
         if (
           !Number.isFinite(meticais) ||
-          meticais < (id === 'free-30' ? 0 : 1) ||
-          (id === 'free-30' && meticais !== 0) ||
+          meticais < (id === 'personal' ? 0 : 1) ||
+          (id === 'personal' && meticais !== 0) ||
           meticais > 10000 ||
           Math.abs(meticais * 100 - Math.round(meticais * 100)) > 0.0001
         )
@@ -174,8 +176,8 @@ export async function POST(request: Request) {
         if (
           typeof annualMeticais !== 'number' ||
           !Number.isFinite(annualMeticais) ||
-          annualMeticais < (id === 'free-30' ? 0 : 1) ||
-          (id === 'free-30' && annualMeticais !== 0) ||
+          annualMeticais < (id === 'personal' ? 0 : 1) ||
+          (id === 'personal' && annualMeticais !== 0) ||
           annualMeticais > 120000 ||
           Math.abs(annualMeticais * 100 - Math.round(annualMeticais * 100)) >
             0.0001
@@ -190,6 +192,8 @@ export async function POST(request: Request) {
           annualMeticais,
           ...validatePlanControls({
             ...b,
+            corporateEnabled: b.corporateEnabled ?? previousControls.corporateEnabled ?? (id==='corporate'),
+            memberLimit: b.memberLimit ?? previousControls.memberLimit ?? 25,
             features:
               b.features ?? previousControls.features ?? planFeatures({ id }),
             monthlyEnabled:

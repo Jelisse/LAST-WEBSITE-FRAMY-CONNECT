@@ -1,5 +1,7 @@
 'use client';
 
+import { focusDashboardStart } from '@/lib/dashboard-navigation';
+import { AmbassadorDashboard } from './ambassador-dashboard';
 import { useI18n } from '@/components/language-provider';
 
 import { useCallback, useEffect, useState } from 'react';
@@ -146,12 +148,13 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
             ['orders', 'Pedidos'],
             ['stock', 'O meu stock'],
             ['reports', 'Relatórios e alertas'],
+            ['ambassadors', 'Embaixador'],
           ].map(([id, label]) => (
             <button
               type="button"
               key={id}
               aria-pressed={tab === id}
-              onClick={() => setTab(id)}
+              onClick={() => {setTab(id);focusDashboardStart();}}
             >
               {id === 'orders' ? (
                 <Package size={18} aria-hidden="true" />
@@ -184,6 +187,7 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
       )}
       {notice && <output className="agent-notice">{t(notice)}</output>}
       {!data && !error && <output>{t('A carregar as suas operações…')}</output>}
+      {tab === 'ambassadors' && <AmbassadorDashboard />}
       {tab === 'orders' && (
         <section className="agent-panel">
           <div className="agent-section-heading">

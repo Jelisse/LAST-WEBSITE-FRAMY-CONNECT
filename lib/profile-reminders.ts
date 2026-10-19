@@ -19,7 +19,7 @@ export async function profileReminders(env: ReminderEnv, now = Date.now()) {
     ? JSON.parse(config.data_json)
     : reminderDefaults;
   const rows = await env.DB.prepare(
-    "SELECT m.*,a.email,a.name FROM profile_membership_view m JOIN auth_accounts a ON a.id=m.owner_id AND a.active=1 WHERE (m.billing_enabled=1 OR m.plan_id<>'free-30') AND COALESCE(m.paid_expires_at,m.trial_expires_at) IS NOT NULL",
+    "SELECT m.*,a.email,a.name FROM profile_membership_view m JOIN auth_accounts a ON a.id=m.owner_id AND a.active=1 WHERE m.plan_id NOT IN ('personal','free-30') AND (m.billing_enabled=1 OR m.plan_id<>'free-30') AND COALESCE(m.paid_expires_at,m.trial_expires_at) IS NOT NULL",
   ).all<Membership & { owner_id: string; email: string; name: string }>();
   const candidates: {
     id: string;
@@ -52,8 +52,8 @@ export async function profileReminders(env: ReminderEnv, now = Date.now()) {
           : `O seu perfil termina em ${Math.max(1, Math.ceil(remaining / 86400000))} dia(s)`;
     let message =
       phase === 'basic'
-        ? 'Os seus dados continuam guardados. O perfil público mostra o nome, a fotografia e um contacto. Renove na sua conta para recuperar as funcionalidades.'
-        : `O período termina em ${expiry.slice(0, 10)}. Não existe renovação automática. Depois tem 7 dias de tolerância; a seguir o perfil mostra apenas o contacto básico. Renove na sua conta Framy Connect.`;
+        ? 'Os seus dados continuam guardados. O perfil público usa os limites do plano Individual gratuito. Renove na sua conta para recuperar as funcionalidades.'
+        : `O período termina em ${expiry.slice(0, 10)}. Não existe renovação automática. Depois tem 7 dias de tolerância; a seguir o perfil regressa ao plano Individual gratuito. Renove na sua conta Framy Connect.`;
     message += ` Consulte os pacotes e renove: ${renewalLink(env.PUBLIC_SITE_URL)}`;
     if (phase === '7' || phase === '1') {
       let terms: { name?: string; billingCycle?: string } = {};

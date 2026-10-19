@@ -17,6 +17,7 @@ const worker = {
     env: Cloudflare.Env,
     ctx: ExecutionContext,
   ) {
+    ctx.waitUntil(env.DB.prepare('DELETE FROM corporate_leads WHERE id IN (SELECT id FROM corporate_leads WHERE created_at<? LIMIT 1000)').bind(Date.now()-90*86400000).run());
     ctx.waitUntil(cleanupReservations(env.DB));
     ctx.waitUntil(expireStaleProductPayments(env.DB));
     if (env.PAYSUITE_API_TOKEN)

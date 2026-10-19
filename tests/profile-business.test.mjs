@@ -46,18 +46,18 @@ void test('launch protection preserves access without rewriting or restarting tr
   assert.equal(hasProfileAccess(member), true);
   assert.equal(JSON.stringify(member), snapshot);
   assert.equal(hasProfileAccess(null), false);
-  assert.equal(hasProfileAccess({ ...member, plan_id: 'personal' }), false);
+  assert.equal(hasProfileAccess({ ...member, plan_id: 'personal' }), true);
   assert.equal(
     hasProfileAccess({ ...member, trial_expires_at: 'invalid' }),
-    false,
+    true,
   );
   assert.equal(
     hasProfileAccess({ ...member, trial_expires_at: '2019-01-01' }),
-    false,
+    true,
   );
   assert.equal(
     hasProfileAccess({ ...member, trial_expires_at: '2021-01-01' }),
-    false,
+    true,
   );
   assert.equal(
     hasProfileAccess({
@@ -65,7 +65,7 @@ void test('launch protection preserves access without rewriting or restarting tr
       trial_started_at: '2090-01-01',
       trial_expires_at: '2090-01-31',
     }),
-    false,
+    true,
   );
 });
 

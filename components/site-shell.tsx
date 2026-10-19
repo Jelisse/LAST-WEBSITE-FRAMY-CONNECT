@@ -93,6 +93,7 @@ export async function SiteFooter({
             <Link href="/produtos">{t('Produtos')}</Link>
             <Link href="/contacto">{t('Contacto')}</Link>
             <Link href="/aplicar">{t('Torne-se agente')}</Link>
+              <Link href="/embaixadores">{t('Embaixadores Framy')}</Link>
           </nav>
           <div className="brand-footer-contact">
             <h2>{t('Fale connosco')}</h2>

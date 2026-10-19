@@ -1,0 +1,90 @@
+/* Dashboard shells own their height; only their navigation lists scroll. */
+/* Account actions stay in one compact row; small screens scroll the table. */
+body .account-management .manager-table-scroll { max-width: 100%; overflow-x: auto; }
+body .account-management table { width: 100%; }
+body .account-management td { padding-block: 12px; vertical-align: middle; }
+body .account-management .account-row-actions { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+body .account-management .account-row-actions > :is(button,a) { flex-shrink: 0; white-space: nowrap; }
+body .account-management td button { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; margin: 0; padding: 8px 10px; }
+body .account-management .account-profile-actions { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+body .account-management td .account-copy-link { background: var(--framy-orange-text); color: #fff; border-color: var(--framy-orange-text); }
+body .account-management td .account-copy-link[data-copied="true"] { background: #f5f3f1; color: #62574f; border-color: #d5dae1; }
+body .account-management td .account-copy-link:hover:not(:disabled) { filter: brightness(.94); }
+@media (pointer: coarse) { body .account-management td button { min-height: 44px; } }
+body .manager-shell { align-items: flex-start; min-height: 100dvh; }
+body .manager-sidebar {
+  height: 100dvh;
+  max-height: 100dvh;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding-block: 22px 16px;
+  flex-shrink: 0;
+}
+body .manager-sidebar > a, body .manager-sidebar > .manager-eyebrow,
+body .manager-sidebar-bottom { flex-shrink: 0; }
+body .manager-sidebar > a img { margin-bottom: 22px; }
+body .manager-sidebar nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  align-content: start;
+  padding: 4px;
+}
+body .manager-sidebar nav button { min-height: 46px; padding: 12px 10px; }
+body .manager-sidebar nav button svg { flex-shrink: 0; }
+body .manager-sidebar-bottom { margin-top: 12px; padding-top: 14px; }
+body .manager-sidebar-bottom a { margin-top: 6px; }
+body .manager-body { min-height: 100dvh; }
+body .manager-heading { flex-wrap: wrap; align-items: center; }
+body .manager-heading > div:first-child { flex: 1 1 280px; min-width: 0; }
+body .manager-heading > a { display: inline-flex; align-items: center; justify-content: center; }
+body :is(.manager-main,.workspace-main,.agent-workspace,.staff-page) { min-width: 0; }
+body :is(.manager-main,.workspace-main,.agent-workspace,.staff-page) h1 { scroll-margin-top: 110px; }
+body .compact-mobile-panel { overscroll-behavior-y: contain; max-height: calc(100dvh - 112px); }
+body .manager-top .compact-mobile-panel { left: auto; right: 0; }
+body .agent-toolbar { flex-wrap: wrap; gap: 12px; }
+body .agent-toolbar nav { flex-wrap: wrap; min-width: 0; }
+body .agent-toolbar nav button { min-height: 44px; }
+
+/* Keep the customer sidebar inside its shell so it ends before the site footer. */
+@media (min-width: 768px) {
+  body .refined-workspace [data-slot="sidebar"] {
+    position: sticky; top: 0; align-self: flex-start; height: 100dvh; flex-shrink: 0;
+  }
+  body .refined-workspace [data-slot="sidebar-gap"] { display: none; }
+  body .refined-workspace [data-slot="sidebar-container"] {
+    position: relative; inset: auto; height: 100%; max-height: 100dvh;
+  }
+  body .refined-workspace [data-collapsible="offcanvas"] [data-slot="sidebar-container"] { display: none; }
+}
+body .refined-workspace [data-slot="sidebar-content"] {
+  min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin;
+}
+body .refined-workspace [data-slot="sidebar-footer"] { padding: 16px; }
+
+@media (max-width: 767px) {
+  body .manager-sidebar { display: none; }
+  body .manager-shell { display: block; }
+  body .manager-top .compact-mobile-menu { display: block; }
+  body .manager-top .desktop-language { display: none; }
+  body .manager-top { padding-inline: 14px; gap: 10px; }
+  body .manager-top > .panel-brand { margin-right: auto; }
+  body .manager-top > span:not(.desktop-language) { flex: 0 1 auto; }
+  body .manager-heading { gap: 12px; }
+  body .manager-heading > a { width: 100%; order: 3; }
+  body .agent-toolbar nav { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); width: 100%; gap: 8px; }
+  body .agent-toolbar nav button { min-width: 0; padding: 10px; white-space: normal; }
+  body .workspace-header > div { min-width: 0; }
+  body .workspace-header > .language-selector select { max-width: 116px; }
+}
+@media (max-height: 600px) and (min-width: 768px) {
+  body .manager-sidebar { padding-block: 12px; }
+  body .manager-sidebar > a img { width: 120px; margin-bottom: 10px; }
+  body .manager-sidebar-bottom { padding-top: 8px; }
+  body .manager-sidebar-bottom small { display: none; }
+  body .refined-workspace [data-slot="sidebar-header"],
+  body .refined-workspace [data-slot="sidebar-footer"] { padding: 12px; }
+}

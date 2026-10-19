@@ -35,6 +35,7 @@ function fixture() {
   sql.exec(
     'CREATE TABLE profile_enquiries(id TEXT PRIMARY KEY,created_at INTEGER)',
   );
+  sql.exec('CREATE TABLE corporate_leads(id TEXT PRIMARY KEY,created_at INTEGER)');
   sql.exec(
     'CREATE TABLE sandbox_orders(id TEXT,created_at TEXT,data_json TEXT)',
   );
@@ -297,6 +298,8 @@ test('scheduled retention removes old analytics without touching recent events o
   try {
     const now = Date.now(),
       old = now - 91 * 86400000;
+    f.sql.prepare('INSERT INTO corporate_leads VALUES(?,?)').run('old-corporate',old);
+    f.sql.prepare('INSERT INTO corporate_leads VALUES(?,?)').run('new-corporate',now);
     f.sql.exec("INSERT INTO auth_accounts VALUES('profile-owner')");
     f.sql.prepare('INSERT INTO profile_click_totals VALUES(?,?,?,?,?)').run('profile-owner', old, 'contact', 'Contact', 2);
     f.sql.prepare('INSERT INTO profile_click_totals VALUES(?,?,?,?,?)').run('profile-owner', now, 'contact', 'Contact', 3);
@@ -357,6 +360,7 @@ test('scheduled retention removes old analytics without touching recent events o
       },
     );
     await Promise.all(pending);
+    assert.deepEqual(f.sql.prepare('SELECT id FROM corporate_leads').all().map(r=>r.id),['new-corporate']);
     assert.equal(f.sql.prepare('SELECT SUM(count) n FROM profile_click_totals').get().n, 3);
     assert.equal(f.sql.prepare('SELECT count FROM profile_click_lifetime').get().count, 5);
     assert.equal(
