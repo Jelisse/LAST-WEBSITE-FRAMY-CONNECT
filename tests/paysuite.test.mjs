@@ -1,3 +1,4 @@
+import {corporateInvitationEmail} from '../lib/corporate-invitation.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
@@ -101,7 +102,7 @@ test('corporate onboarding confirms email, preserves existing accounts, enforces
  const f=await corporateFixture(t);
  const invite=async(email,name='Employee',extra={})=>f.route.POST(request({action:'invite',organisation:f.id,email,name,role:'member',team:'Field',...extra}));
  let r=await invite('other@example.test');assert.equal(r.status,200,await r.clone().text());const token=f.token();
- const inspected=await f.route.POST(request({action:'inspect-invite',token}));assert.equal(inspected.status,200);assert.deepEqual(await inspected.json(),{organisation:'Fictional organisation',role:'member',team:'Field',newAccount:false});assert.notEqual(f.sql.prepare('SELECT token_hash FROM corporate_invites').get().token_hash,token);
+ const inspected=await f.route.POST(request({action:'inspect-invite',token}));assert.equal(inspected.status,200);assert.deepEqual(await inspected.json(),{organisation:'Fictional organisation',role:'member',team:'Field',newAccount:false,mode:'invite',inviterName:'buyer',name:'other'});assert.notEqual(f.sql.prepare('SELECT token_hash FROM corporate_invites').get().token_hash,token);
  globalThis.__paysuite.user={userId:'buyer',role:'customer'};assert.equal((await f.route.POST(request({action:'accept',token,confirmed:true}))).status,401);
  globalThis.__paysuite.user={userId:'other',role:'customer'};r=await f.route.POST(request({action:'accept',token,confirmed:true,password:'MustNotReplaceExisting'}));assert.equal(r.status,200,await r.clone().text());
  assert.equal(f.sql.prepare("SELECT password_hash FROM auth_accounts WHERE id='other'").get().password_hash,'!');
@@ -1068,4 +1069,118 @@ test('invalid, inactive and own referral codes never charge or reserve stock; fa
  assert.equal((await checkout.POST(request(product({ambassadorCode:'ANA0001',expectedAmount:155000})))).status,422,'stale undiscounted total rejected');
  assert.equal((await checkout.POST(request(product({ambassadorCode:'ANA0001',expectedAmount:141500})))).status,200);
  const [id,record]=[...f.records][0];record.status='failed';await notify(f,id,'payment.failed');assert.equal(f.sql.prepare('SELECT status FROM ambassador_sales').get().status,'void');
+});
+
+
+test('Corporate request saves without payment, sends once, and manager approval creates a bounded organization without changing billing',async t=>{
+ const f=fixture(t),route=await api('app/api/corporate-request/route.ts'),accounts=await api('app/api/accounts/route.ts');
+ f.env.RESEND_API_KEY='fake';f.env.PROFILE_EMAIL_FROM='Framy <info@example.invalid>';
+ const emails=[];globalThis.fetch=async(url,options)=>{assert.equal(url,'https://api.resend.com/emails');emails.push(JSON.parse(options.body));return Response.json({id:'fake'});};
+ const details={company:'Example Company',people:3,phone:'+258840000000',location:'Maputo',teams:'Sales, Editorial',goals:'Events',products:'Cards'};
+ const billing=f.sql.prepare("SELECT * FROM sandbox_memberships WHERE owner_id='buyer'").get();
+ assert.equal((await route.POST(request({...details,company:'',phone:'',location:'',action:'save',version:0}))).status,200);
+ assert.equal((await route.POST(request({...details,company:'Old',action:'save',version:0}))).status,409);
+ assert.equal((await route.POST(request({...details,action:'submit',version:1,confirmed:false}))).status,422);
+ const submitted=await route.POST(request({...details,action:'submit',version:1,confirmed:true}));assert.equal(submitted.status,200,await submitted.clone().text());
+ assert.equal(emails.length,1);assert.deepEqual(emails[0].to,['info@framyconnect.co.mz']);assert.equal(emails[0].reply_to,'buyer@example.test');assert.match(emails[0].text,/Sales, Editorial/);
+ assert.equal((await route.POST(request({...details,action:'submit',version:1,confirmed:true}))).status,200);assert.equal(emails.length,1);
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM corporate_organisations').get().n,0);
+ assert.equal((await accounts.POST(request({action:'corporate-approve',id:'buyer',version:2,seats:3}))).status,403);
+ globalThis.__paysuite.user={userId:'manager',role:'manager'};
+ assert.equal((await accounts.POST(request({action:'corporate-approve',id:'buyer',version:2,seats:501}))).status,409);
+ const approved=await accounts.POST(request({action:'corporate-approve',id:'buyer',version:2,seats:3}));assert.equal(approved.status,200,await approved.clone().text());
+ assert.equal((await accounts.POST(request({action:'corporate-approve',id:'buyer',version:2,seats:3}))).status,409);
+ const org=f.sql.prepare("SELECT * FROM corporate_active_organisations WHERE owner_id='buyer'").get();assert.equal(org.seats,3);
+ const listed=await accounts.GET(new Request('https://framyconnect.co.mz/api/accounts'));assert.equal(listed.status,200);assert.equal((await listed.clone().json()).accounts.find(a=>a.id==='buyer').corporateDetails,undefined);
+ const company=await route.GET(new Request('https://framyconnect.co.mz/api/corporate-request?owner=buyer'));assert.equal(company.status,200);assert.match((await company.json()).request.details_json,/Sales, Editorial/);assert.equal((await listed.json()).accounts.find(a=>a.id==='buyer').corporateStatus,'approved');
+ assert.deepEqual(f.sql.prepare("SELECT * FROM sandbox_memberships WHERE owner_id='buyer'").get(),billing);
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM paysuite_payments').get().n,0);
+ assert.equal((await accounts.POST(request({action:'delete',id:'buyer',version:1}))).status,422);
+ assert.equal((await accounts.POST(request({action:'corporate-suspend',id:'buyer',version:3}))).status,200);
+ assert.equal(f.sql.prepare("SELECT * FROM corporate_active_organisations WHERE owner_id='buyer'").get(),undefined);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await route.GET(new Request('https://framyconnect.co.mz/api/corporate-request?owner=buyer'))).status,403);assert.equal((await route.GET()).status,200);assert.equal((await (await route.GET()).json()).request,null);
+ assert.deepEqual(f.sql.prepare('PRAGMA foreign_key_check').all(),[]);
+});
+
+test('Corporate authorization requires worker consent before leader provisions credentials and revokes credential rights on departure',async t=>{
+ const f=await corporateFixture(t),credentials=await api('app/api/corporate-employees/route.ts');
+ const invited=await f.route.POST(request({action:'invite',organisation:f.id,name:'New Worker',email:'worker@example.invalid',role:'member',team:'Field',mode:'authorization'}));assert.equal(invited.status,200,await invited.clone().text());
+ const token=f.token(),worker=f.sql.prepare("SELECT * FROM auth_accounts WHERE email='worker@example.invalid'").get();
+ assert.match(f.emails.at(-1).html,/Autorizar cria/);
+ const action={action:'provision',organisation:f.id,accountId:worker.id,version:1,name:'New Worker',password:'Test-only-password-123'};
+ assert.equal((await credentials.POST(request(action))).status,403);
+ globalThis.__paysuite.user=null;
+ const inspected=await f.route.POST(request({action:'inspect-invite',token}));assert.equal((await inspected.json()).mode,'authorization');
+ assert.equal((await f.route.POST(request({action:'accept',token,confirmed:false}))).status,422);
+ const consent=await f.route.POST(request({action:'accept',token,confirmed:true}));assert.equal(consent.status,200,await consent.clone().text());assert.equal((await consent.json()).authorized,true);
+ assert.equal(f.sql.prepare('SELECT active FROM auth_accounts WHERE id=?').get(worker.id).active,0);
+ assert.equal((await f.route.POST(request({action:'accept',token,confirmed:true}))).status,422);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await credentials.POST(request(action))).status,422);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};
+ const created=await credentials.POST(request(action));assert.equal(created.status,200,await created.clone().text());
+ const account=f.sql.prepare('SELECT * FROM auth_accounts WHERE id=?').get(worker.id);assert.equal(account.active,1);assert.match(account.password_hash,/^\$2/);assert.equal(account.version,2);
+ assert.equal((await credentials.POST(request(action))).status,403);
+ const issued='a'.repeat(64);f.sql.prepare('INSERT INTO auth_sessions(token_hash,account_id,expires_at) VALUES(?,?,?)').run(issued,worker.id,Date.now()+10000);
+ const security=await api('app/api/security/route.ts');globalThis.__paysuite.user={userId:worker.id,role:'customer'};
+ assert.equal((await security.POST(request({action:'password',currentPassword:action.password,password:'Employee-changed-password-123'}))).status,200);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};
+ assert.equal((await credentials.POST(request({...action,action:'reset',version:3,password:'Another-test-password-123'}))).status,200);
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM auth_sessions WHERE account_id=?').get(worker.id).n,0);
+ globalThis.__paysuite.user={userId:worker.id,role:'customer'};
+ assert.equal((await f.route.POST(request({action:'leave',organisation:f.id}))).status,200);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};
+ assert.equal((await credentials.POST(request({...action,action:'reset',version:4}))).status,403);
+ assert.ok(f.sql.prepare('SELECT revoked_at FROM corporate_employee_access WHERE account_id=?').get(worker.id).revoked_at);
+ assert.equal(f.sql.prepare('SELECT active FROM auth_accounts WHERE id=?').get(worker.id).active,1);
+ assert.deepEqual(f.sql.prepare('PRAGMA foreign_key_check').all(),[]);
+});
+
+test('Corporate authorization cannot take over an existing account and invitation preserves its password',async t=>{
+ const f=await corporateFixture(t);
+ const invite={action:'invite',organisation:f.id,name:'Existing',email:'other@example.test',team:'Editorial',role:'member'};
+ assert.equal((await f.route.POST(request({...invite,mode:'authorization'}))).status,422);
+ assert.equal((await f.route.POST(request({...invite,mode:'invite'}))).status,200);
+ const token=f.token();globalThis.__paysuite.user={userId:'buyer',role:'customer'};assert.equal((await f.route.POST(request({action:'accept',token,confirmed:true}))).status,401);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};assert.equal((await f.route.POST(request({action:'accept',token,confirmed:true,password:'Ignored-new-password'}))).status,200);
+ assert.equal(f.sql.prepare("SELECT password_hash FROM auth_accounts WHERE id='other'").get().password_hash,'!');
+ assert.equal(f.sql.prepare("SELECT * FROM corporate_employee_access WHERE account_id='other'").get(),undefined);
+});
+
+test('Corporate request remains visible to management if email acceptance is uncertain',async t=>{
+ const f=fixture(t),route=await api('app/api/corporate-request/route.ts');f.env.RESEND_API_KEY='fake';f.env.PROFILE_EMAIL_FROM='Framy <info@example.invalid>';
+ globalThis.fetch=async()=>{throw Error('timeout');};
+ const response=await route.POST(request({action:'submit',version:0,confirmed:true,company:'Fictional',people:2,phone:'123',location:'Maputo'}));assert.equal(response.status,200);assert.equal((await response.json()).delivery,'uncertain');
+ assert.equal(f.sql.prepare("SELECT status FROM corporate_requests WHERE owner_id='buyer'").get().status,'submitted');
+});
+
+
+test('Corporate provisioning rechecks withdrawn authorization atomically and never changes credentials on a race',async t=>{
+ const f=await corporateFixture(t),credentials=await api('app/api/corporate-employees/route.ts');
+ assert.equal((await f.route.POST(request({action:'invite',organisation:f.id,name:'Race Worker',email:'race@example.invalid',mode:'authorization'}))).status,200);
+ const token=f.token();globalThis.__paysuite.user=null;assert.equal((await f.route.POST(request({action:'accept',token,confirmed:true}))).status,200);
+ const worker=f.sql.prepare("SELECT * FROM auth_accounts WHERE email='race@example.invalid'").get();
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};const batch=f.db.batch.bind(f.db);
+ f.db.batch=async statements=>{f.sql.prepare('UPDATE corporate_employee_access SET revoked_at=? WHERE account_id=?').run(Date.now(),worker.id);return batch(statements);};
+ const response=await credentials.POST(request({action:'provision',organisation:f.id,accountId:worker.id,version:worker.version,name:'Race Worker',password:'Test-only-password-123'}));assert.equal(response.status,409);
+ assert.equal(f.sql.prepare('SELECT password_hash FROM auth_accounts WHERE id=?').get(worker.id).password_hash,'!corporate-pending');
+ assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM corporate_audit WHERE action='provision'").get().n,0);
+});
+
+
+test('email-only Corporate invitations identify company and leader and create access with the employee chosen name',async t=>{
+ const f=await corporateFixture(t);
+ const response=await f.route.POST(request({action:'invite',organisation:f.id,email:'only-email@example.invalid'}));assert.equal(response.status,200,await response.clone().text());
+ const email=f.emails.at(-1);assert.match(email.text,/buyer, da empresa Fictional organisation/);assert.match(email.html,/Aceitar convite/);assert.match(email.html,/Fictional organisation/);
+ const token=f.token();globalThis.__paysuite.user=null;
+ const info=await f.route.POST(request({action:'inspect-invite',token}));const b=await info.json();assert.equal(b.inviterName,'buyer');assert.equal(b.newAccount,true);
+ const accepted=await f.route.POST(request({action:'accept',token,name:'Employee chosen name',password:'Test-only-password-123',confirmed:true}));assert.equal(accepted.status,200,await accepted.clone().text());
+ assert.equal(f.sql.prepare("SELECT name FROM auth_accounts WHERE email='only-email@example.invalid'").get().name,'Employee chosen name');
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM corporate_members WHERE organisation_id=?').get(f.id).n,2);
+});
+
+
+test('Corporate emails escape company and leader HTML and keep a single explicit acceptance button',()=>{
+ const mail=corporateInvitationEmail('<img src=x onerror=alert(1)>','Leader <script>test</script>','https://example.invalid/corporativo/aceitar#'+'a'.repeat(64),false);
+ assert.doesNotMatch(mail.html,/<img|<script/);assert.match(mail.html,/&lt;img/);assert.match(mail.html,/Leader &lt;script/);assert.equal((mail.html.match(/<a /g)||[]).length,1);assert.match(mail.html,/Aceitar convite/);
+ const authorization=corporateInvitationEmail('Company','Leader','https://example.invalid/corporativo/aceitar#'+'a'.repeat(64),true);assert.match(authorization.text,/possa redefinir/);assert.match(authorization.html,/Autorizar cria/);
 });

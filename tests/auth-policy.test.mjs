@@ -27,3 +27,5 @@ test('customer purchase resumes but privileged and external paths do not', () =>
   ])
     assert.equal(loginDestination('customer', path), '/dashboard');
 });
+
+test('Corporate setup is an exact safe return path for customers and agents',()=>{for(const role of ['customer','agent']){assert.equal(loginDestination(role,'/corporativo/configurar'),'/corporativo/configurar');assert.notEqual(loginDestination(role,'/corporativo/configurar?redirect=https://evil.test'),'/corporativo/configurar?redirect=https://evil.test');}});

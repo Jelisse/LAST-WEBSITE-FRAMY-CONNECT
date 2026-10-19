@@ -3,11 +3,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from './hard-link';
 import { focusDashboardStart } from '@/lib/dashboard-navigation';
 import { parseCorporateBatch, processCorporateBatch } from '@/lib/corporate';
+import { CorporateEmailInvites } from './corporate-email-invites';
+import { CorporateCredentials } from './corporate-credentials';
 import { SourceImage } from './source-image';
 import { csvCell } from '@/lib/site-analytics';
 import { DashboardTools } from './mobile-navigation';
 import { useI18n } from './language-provider';
 type Member = {
+  managed_access?: number;
+  credential_version?: number;
+  provisioned_at?: number | null;
   account_id: string;
   name: string;
   email: string;
@@ -69,6 +74,7 @@ type Detail = {
     team: string;
     expires_at: number;
     delivery: string;
+    mode?: string;
   }[];
   truncated: boolean;
 };
@@ -85,6 +91,9 @@ export function CorporateDashboard() {
     [copied, setCopied] = useState('');
   const [qr, setQr] = useState<{ id: string; image: string } | null>(null);
   const [teamFilter, setTeamFilter] = useState('');
+  const [inviteMode, setInviteMode] = useState<'invite' | 'authorization'>(
+    'invite',
+  );
   const revision = useRef(0);
   const [batch, setBatch] = useState('');
   const [batchProgress, setBatchProgress] = useState<{
@@ -107,6 +116,7 @@ export function CorporateDashboard() {
               action: 'invite',
               organisation,
               role: 'member',
+              mode: inviteMode,
               ...row,
             }),
             signal: AbortSignal.timeout(20000),
@@ -172,7 +182,6 @@ export function CorporateDashboard() {
       if (
         document.visibilityState === 'visible' &&
         !busy &&
-        !document.activeElement?.closest('form') &&
         !document.activeElement?.closest('form')
       )
         void load().catch((e) => setError(e.message));
@@ -299,6 +308,12 @@ export function CorporateDashboard() {
         <DashboardTools />
       </header>
       <h1>{t('Equipa corporativa')}</h1>
+      <div className="corporate-toolbar">
+        <Link href="/perfil">{t('O meu perfil')}</Link>
+        <Link href="/corporativo/configurar">
+          {t('Configurar a minha empresa')}
+        </Link>
+      </div>
       <p>
         {t(
           'Organize trabalhadores e campanhas. Acompanhe apenas a actividade recolhida para a organização.',
@@ -382,7 +397,7 @@ export function CorporateDashboard() {
           {!data.canCreate && !data.organisations.length && (
             <p>
               {t(
-                'Active um contrato Corporativo para criar uma organização, ou aceite o convite recebido por email.',
+                'Configure a empresa e envie o pedido de aprovação. Se é trabalhador, aceite o convite recebido por email.',
               )}
             </p>
           )}
@@ -458,11 +473,61 @@ export function CorporateDashboard() {
                 )}
               </p>
               {leader && (
-                <details className="corporate-panel">
-                  <summary>{t('Criar conta e enviar convite')}</summary>
+                <section className="corporate-panel">
+                  <h2>{t('Como adicionar trabalhadores')}</h2>
+                  <label>
+                    {t('Método de entrada')}
+                    <select
+                      value={inviteMode}
+                      disabled={busy}
+                      onChange={(e) =>
+                        setInviteMode(
+                          e.target.value as 'invite' | 'authorization',
+                        )
+                      }
+                    >
+                      <option value="invite">
+                        {t('Convite: o trabalhador define o acesso')}
+                      </option>
+                      <option value="authorization">
+                        {t('Autorização: o líder cria o acesso')}
+                      </option>
+                    </select>
+                  </label>
                   <p>
                     {t(
-                      'A conta fica pendente. O trabalhador confirma o email e define a sua palavra-passe. Uma conta existente mantém o perfil e os acessos pessoais.',
+                      inviteMode === 'authorization'
+                        ? 'O trabalhador autoriza por email. Só depois pode criar o acesso e definir a palavra-passe. Para contas existentes, use Convite.'
+                        : 'O trabalhador confirma o email e define a palavra-passe. Se já tem conta, entra com o mesmo email e aceita a associação.',
+                    )}
+                  </p>
+                </section>
+              )}
+              {leader && (
+                <CorporateEmailInvites
+                  key={organisation}
+                  organisation={organisation}
+                  mode={inviteMode}
+                  emailReady={data.emailReady}
+                  busy={busy}
+                  setBusy={setBusy}
+                  reload={load}
+                />
+              )}
+              {leader && (
+                <CorporateCredentials
+                  organisation={organisation}
+                  members={detail.members}
+                  owner={owner}
+                  reload={load}
+                />
+              )}
+              {leader && (
+                <details className="corporate-panel">
+                  <summary>{t('Adicionar um trabalhador')}</summary>
+                  <p>
+                    {t(
+                      'Os acessos só são activados após a confirmação enviada ao email indicado.',
                     )}
                   </p>
                   {!data.emailReady && (
@@ -480,6 +545,7 @@ export function CorporateDashboard() {
                         email: f.get('email'),
                         team: f.get('team'),
                         role: f.get('role'),
+                        mode: inviteMode,
                       });
                     }}
                   >
@@ -510,7 +576,11 @@ export function CorporateDashboard() {
                       </select>
                     </label>
                     <button disabled={busy || !data.emailReady}>
-                      {t('Enviar convite')}
+                      {t(
+                        inviteMode === 'authorization'
+                          ? 'Enviar autorização'
+                          : 'Enviar convite',
+                      )}
                     </button>
                   </form>
                 </details>
@@ -541,7 +611,11 @@ export function CorporateDashboard() {
                       />
                     </label>
                     <button disabled={busy || !data.emailReady}>
-                      {t('Enviar convites')}
+                      {t(
+                        inviteMode === 'authorization'
+                          ? 'Enviar autorizações'
+                          : 'Enviar convites',
+                      )}
                     </button>
                   </form>
                 </details>
@@ -580,9 +654,11 @@ export function CorporateDashboard() {
                           <td>
                             {t(
                               m.active
-                                ? m.within_limit === 0
-                                  ? 'Fora do limite'
-                                  : 'Activo'
+                                ? m.managed_access && !m.provisioned_at
+                                  ? 'Autorização confirmada'
+                                  : m.within_limit === 0
+                                    ? 'Fora do limite'
+                                    : 'Activo'
                                 : 'Suspenso',
                             )}
                           </td>
@@ -610,6 +686,7 @@ export function CorporateDashboard() {
                                       id: m.account_id,
                                       version: m.version,
                                       role: f.get('role'),
+                                      mode: inviteMode,
                                       team: f.get('team'),
                                       active: f.get('active') === 'on',
                                     });
@@ -689,6 +766,7 @@ export function CorporateDashboard() {
                             email: i.email,
                             team: i.team,
                             role: i.role,
+                            mode: i.mode,
                           })
                         }
                       >
@@ -766,7 +844,7 @@ export function CorporateDashboard() {
                           {t('Trabalhador')}
                           <select required name="member">
                             {detail.members
-                              .filter((m) => m.active)
+                              .filter((m) => m.active && m.within_limit !== 0)
                               .map((m) => (
                                 <option value={m.account_id} key={m.account_id}>
                                   {m.name}

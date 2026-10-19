@@ -1,5 +1,6 @@
 'use client';
 import { useI18n } from './language-provider';
+import Link from './hard-link';
 import { ArrowUpRight } from 'lucide-react';
 
 export function CorporatePlan() {
@@ -13,6 +14,6 @@ export function CorporatePlan() {
       <li>{t('Preço e limites definidos na proposta')}</li>
       <li>{t('Produtos, personalização e apoio a combinar')}</li>
     </ul>
-    <a className="home-text-link" href="/contacto">{t('Solicitar proposta')} <ArrowUpRight size={18} aria-hidden="true" /></a>
+    <Link className="home-text-link" href="/corporativo/configurar">{t('Configurar a minha empresa')} <ArrowUpRight size={18} aria-hidden="true" /></Link>
   </article>;
 }

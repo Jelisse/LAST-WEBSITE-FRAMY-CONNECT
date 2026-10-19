@@ -1,3 +1,4 @@
+import { approveCorporate } from '@/lib/server-corporate-approval';
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { database } from '@/lib/server-db';
@@ -29,7 +30,7 @@ export async function GET(request?: Request) {
     const pattern = '%' + search.replace(/[\\%_]/g, '\\$&') + '%';
     const rows = await db
       .prepare(
-        "SELECT a.id,a.name,a.email,a.role,a.active,a.version,p.username AS profileUsername,CASE WHEN p.published_json IS NOT NULL THEN 1 ELSE 0 END AS profilePublished FROM auth_accounts a LEFT JOIN profiles p ON p.owner_id=a.id WHERE (a.name LIKE ? ESCAPE '\\' OR a.email LIKE ? ESCAPE '\\') ORDER BY a.name LIMIT 500",
+        "SELECT a.id,a.name,a.email,a.role,a.active,a.version,r.status AS corporateStatus,r.company AS corporateCompany,r.people AS corporatePeople,r.version AS corporateVersion,r.seats AS corporateSeats,p.username AS profileUsername,CASE WHEN p.published_json IS NOT NULL THEN 1 ELSE 0 END AS profilePublished FROM auth_accounts a LEFT JOIN profiles p ON p.owner_id=a.id LEFT JOIN corporate_requests r ON r.owner_id=a.id WHERE (a.name LIKE ? ESCAPE '\\' OR a.email LIKE ? ESCAPE '\\') ORDER BY a.name LIMIT 500",
       )
       .bind(pattern, pattern)
       .all<Row>();
@@ -70,6 +71,12 @@ export async function POST(request: Request) {
       now = new Date().toISOString();
     if (!b || typeof b !== 'object')
       return json({ error: 'Pedido inválido.' }, 422);
+    if (['corporate-approve', 'corporate-suspend'].includes(b.action)) {
+      const changed = await approveCorporate(user, b);
+      return changed
+        ? json({ ok: true })
+        : json({ error: 'Os dados mudaram. Actualize.' }, 409);
+    }
     if (b.action === 'create') {
       const name = typeof b.name === 'string' ? b.name.trim() : '';
       const email =
@@ -158,11 +165,12 @@ export async function POST(request: Request) {
         .bind(b.id)
         .first<Row>();
       if (!row) return json({ error: 'Conta não encontrada.' }, 404);
-      if (!mayChangeAccount({ id: user.userId, role: user.role }, row, row.role))
+      if (
+        !mayChangeAccount({ id: user.userId, role: user.role }, row, row.role)
+      )
         return json(
           {
-            error:
-              'Não pode eliminar a sua conta ou este nível de acesso.',
+            error: 'Não pode eliminar a sua conta ou este nível de acesso.',
           },
           403,
         );
@@ -186,9 +194,12 @@ export async function POST(request: Request) {
           OR EXISTS(SELECT 1 FROM ambassador_payouts WHERE ambassador_id=? OR recorded_by=?)
           OR EXISTS(SELECT 1 FROM corporate_members WHERE account_id=?)
           OR EXISTS(SELECT 1 FROM corporate_invites WHERE account_id=? OR created_by=?)
-          OR EXISTS(SELECT 1 FROM corporate_audit WHERE actor=?) AS kept`,
+          OR EXISTS(SELECT 1 FROM corporate_audit WHERE actor=?)
+          OR EXISTS(SELECT 1 FROM corporate_requests WHERE owner_id=? OR approved_by=?) AS kept`,
         )
         .bind(
+          row.id,
+          row.id,
           row.id,
           row.id,
           row.id,

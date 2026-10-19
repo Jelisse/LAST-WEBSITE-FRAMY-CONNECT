@@ -13,7 +13,7 @@ export function HomeProfilePlans({ plans, billingAvailable, annualAvailable = fa
 }) {
   const { t } = useI18n();
   const [cycle, setCycle] = useState<'monthly' | 'annual'>('monthly');
-  const individual = plans.filter(p => p.id !== 'free-30' && p.active && (p.id!=='corporate'||p.meticais)).sort((a,b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  const individual = plans.filter(p => p.id !== 'free-30' && p.id !== 'corporate' && p.active).sort((a,b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   return <section data-cycle={cycle} className="home-plan-comparison" aria-label={t('Planos para o seu perfil digital')}>
     <fieldset className="home-plan-cycle" aria-label={t('Periodicidade')}>
       <button type="button" aria-pressed={cycle === 'monthly'} onClick={() => setCycle('monthly')}>{t('Mensal')}</button>
@@ -67,7 +67,7 @@ export function HomeProfilePlans({ plans, billingAvailable, annualAvailable = fa
           <div className="compact-plan-title"><Building2 size={28} aria-hidden="true"/><h3>{t('Corporativo')}</h3></div>
           <p className="home-plan-description">{t('Perfis e ferramentas à medida da sua organização.')}</p>
           <div className="home-solution-price"><strong>{t('Sob consulta')}</strong><span>{t('Uma solução à medida da sua equipa')}</span></div>
-          <Link className="home-secondary" href="/contacto">{t('Pedir proposta')}<ArrowUpRight size={18} aria-hidden="true"/></Link>
+          <Link className="home-secondary" href="/corporativo/configurar">{t('Configurar a minha empresa')}<ArrowUpRight size={18} aria-hidden="true"/></Link>
           <ul className="home-plan-inclusions home-plan-highlights">{['Número de perfis e limites definidos na proposta','Funcionalidades digitais acordadas na proposta','Cartões, porta-chaves e materiais a escolher','Design e apoio à configuração a combinar','Preço e condições de renovação sob consulta'].map((f,i) => <li key={f}><BasePlanIcon index={i} corporate/><span>{t(f)}</span></li>)}</ul>
         </div>
       </article>}

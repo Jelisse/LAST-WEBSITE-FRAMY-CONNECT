@@ -73,3 +73,7 @@ Customer logos accept PDF, PNG or JPG (8 MB maximum). PDF.js rasterises only the
 ## Corporate organizations - 19 October 2026
 
 Paid Corporate access now gates organization onboarding, delegated leaders, teams, campaigns and company results. Configure corporateEnabled/memberLimit through established plan controls; existing contract snapshots and verified-payment renewal rules remain authoritative. Expiry beyond existing grace or a seat reduction restricts company tools without deleting employee personal accounts. Company membership does not replace each employee's personal profile subscription. See CORPORATE.md for implementation and external checks. Migration 0031 has not been applied live.
+
+## Corporate onboarding approval - 19 October 2026 (local)
+
+Accounts now expose versioned Corporate approval/suspension for submitted company requests, with a configurable employee limit. Manual operational approval unlocks organization tools without fabricating payment evidence or changing personal membership. It has no automatic expiry or debit; management can suspend it. Normal paid-plan renewal and verified settlement remain unchanged. Existing paid Corporate eligibility is retained unless an explicit manual approval/suspension overrides it. See CORPORATE.md and migration 0032.

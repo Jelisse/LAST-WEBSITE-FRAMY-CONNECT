@@ -1,3 +1,4 @@
+import { corporateInvitationEmail } from '@/lib/corporate-invitation';
 import { env } from 'cloudflare:workers';
 import { hash } from 'bcryptjs';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
@@ -52,7 +53,7 @@ export async function GET(request: Request) {
     const leader = org.role === 'leader';
     const members = await db
       .prepare(
-        `SELECT m.*,a.name,a.email,CASE WHEN EXISTS(SELECT 1 FROM corporate_effective_members e WHERE e.organisation_id=m.organisation_id AND e.account_id=m.account_id) THEN 1 ELSE 0 END AS within_limit FROM corporate_members m JOIN auth_accounts a ON a.id=m.account_id WHERE m.organisation_id=? ${leader ? '' : 'AND m.account_id=?'} ORDER BY m.active DESC,a.name LIMIT 502`,
+        `SELECT m.*,a.name,a.email,a.version AS credential_version,CASE WHEN g.account_id IS NOT NULL AND g.revoked_at IS NULL THEN 1 ELSE 0 END AS managed_access,g.provisioned_at,CASE WHEN EXISTS(SELECT 1 FROM corporate_effective_members e WHERE e.organisation_id=m.organisation_id AND e.account_id=m.account_id) THEN 1 ELSE 0 END AS within_limit FROM corporate_members m JOIN auth_accounts a ON a.id=m.account_id LEFT JOIN corporate_employee_access g ON g.organisation_id=m.organisation_id AND g.account_id=m.account_id WHERE m.organisation_id=? ${leader ? '' : 'AND m.account_id=?'} ORDER BY m.active DESC,a.name LIMIT 502`,
       )
       .bind(id, ...(leader ? [] : [u.userId]))
       .all();
@@ -95,7 +96,7 @@ export async function GET(request: Request) {
     const invites = leader
       ? await db
           .prepare(
-            'SELECT id,email,name,role,team,expires_at,delivery FROM corporate_invites WHERE organisation_id=? AND used_at IS NULL AND revoked_at IS NULL ORDER BY created_at DESC LIMIT 501',
+            'SELECT id,email,name,role,team,expires_at,delivery,mode FROM corporate_invites WHERE organisation_id=? AND used_at IS NULL AND revoked_at IS NULL ORDER BY created_at DESC LIMIT 501',
           )
           .bind(id)
           .all()
@@ -135,7 +136,7 @@ export async function POST(request: Request) {
       const key = await tokenHash(b.token);
       const invite = await db
         .prepare(
-          "SELECT i.*,o.name AS organisation_name,a.password_hash,a.active FROM corporate_invites i JOIN auth_accounts a ON a.id=i.account_id JOIN corporate_active_organisations o ON o.id=i.organisation_id JOIN corporate_effective_members issuer ON issuer.organisation_id=o.id AND issuer.account_id=i.created_by AND issuer.active=1 AND issuer.role='leader' JOIN auth_accounts ia ON ia.id=issuer.account_id AND ia.active=1 WHERE a.version=i.account_version AND i.token_hash=? AND i.used_at IS NULL AND i.revoked_at IS NULL AND i.expires_at>? AND (i.role='member' OR i.created_by=o.owner_id)",
+          "SELECT i.*,o.name AS organisation_name,ia.name AS inviter_name,a.name AS account_name,a.password_hash,a.active FROM corporate_invites i JOIN auth_accounts a ON a.id=i.account_id JOIN corporate_active_organisations o ON o.id=i.organisation_id JOIN corporate_effective_members issuer ON issuer.organisation_id=o.id AND issuer.account_id=i.created_by AND issuer.active=1 AND issuer.role='leader' JOIN auth_accounts ia ON ia.id=issuer.account_id AND ia.active=1 WHERE a.version=i.account_version AND i.token_hash=? AND i.used_at IS NULL AND i.revoked_at IS NULL AND i.expires_at>? AND (i.role='member' OR i.created_by=o.owner_id)",
         )
         .bind(key, now)
         .first<{
@@ -147,6 +148,9 @@ export async function POST(request: Request) {
           active: number;
           role: string;
           team: string;
+          mode: string;
+          inviter_name: string;
+          account_name: string;
         }>();
       if (!invite) throw Error('Convite inválido ou expirado.');
       const pending = invite.password_hash === '!corporate-pending';
@@ -158,11 +162,62 @@ export async function POST(request: Request) {
           role: invite.role,
           team: invite.team,
           newAccount: pending,
+          mode: invite.mode,
+          inviterName: invite.inviter_name,
+          name: invite.account_name,
         });
       if (b.confirmed !== true)
         throw Error(
           'Confirme a associação e a partilha dos resultados da organização.',
         );
+      if (invite.mode === 'authorization') {
+        if (!pending || invite.active)
+          throw Error('Use um convite para uma conta existente.');
+        const event = crypto.randomUUID();
+        const accepted = await db.batch([
+          db
+            .prepare(
+              "UPDATE corporate_invites SET used_at=? WHERE id=? AND used_at IS NULL AND revoked_at IS NULL AND expires_at>? AND EXISTS(SELECT 1 FROM corporate_active_organisations o JOIN corporate_effective_members m ON m.organisation_id=o.id AND m.account_id=corporate_invites.created_by AND m.role='leader' WHERE o.id=corporate_invites.organisation_id) AND EXISTS(SELECT 1 FROM auth_accounts a WHERE a.id=corporate_invites.account_id AND a.version=corporate_invites.account_version AND a.active=0 AND a.password_hash='!corporate-pending')",
+            )
+            .bind(now, invite.id, now),
+          db
+            .prepare(
+              'INSERT INTO corporate_audit SELECT ?,?,?,?,?,? WHERE changes()=1',
+            )
+            .bind(
+              event,
+              invite.organisation_id,
+              invite.account_id,
+              'authorized-managed-account',
+              invite.id,
+              now,
+            ),
+          db
+            .prepare(
+              'INSERT INTO corporate_employee_access(organisation_id,account_id,authorized_at) SELECT ?,?,? WHERE EXISTS(SELECT 1 FROM corporate_audit WHERE id=?)',
+            )
+            .bind(invite.organisation_id, invite.account_id, now, event),
+          db
+            .prepare(
+              'INSERT INTO corporate_members(organisation_id,account_id,role,team,accepted_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM corporate_audit WHERE id=?)',
+            )
+            .bind(
+              invite.organisation_id,
+              invite.account_id,
+              invite.role,
+              invite.team,
+              now,
+              event,
+            ),
+        ]);
+        if (!accepted[0].meta.changes)
+          throw Error('Convite inválido ou expirado.');
+        return json({ ok: true, authorized: true });
+      }
+      const name =
+        pending && b.name !== undefined
+          ? corporateText(b.name, 100)
+          : invite.account_name;
       let password = invite.password_hash;
       if (pending) {
         if (
@@ -203,9 +258,9 @@ export async function POST(request: Request) {
           ),
         db
           .prepare(
-            "UPDATE auth_accounts SET active=1,password_hash=?,version=version+1 WHERE id=? AND password_hash='!corporate-pending' AND EXISTS(SELECT 1 FROM corporate_audit WHERE id=?)",
+            "UPDATE auth_accounts SET active=1,password_hash=?,name=?,version=version+1 WHERE id=? AND password_hash='!corporate-pending' AND EXISTS(SELECT 1 FROM corporate_audit WHERE id=?)",
           )
-          .bind(password, invite.account_id, event),
+          .bind(password, name, invite.account_id, event),
         db
           .prepare(
             'INSERT OR IGNORE INTO sandbox_memberships(owner_id,plan_id,updated_at,terms_json) SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM corporate_audit WHERE id=?)',
@@ -282,11 +337,25 @@ export async function POST(request: Request) {
       if (!(env.RESEND_API_KEY && env.PROFILE_EMAIL_FROM && siteURL()))
         throw Error('O envio de convites por email não está configurado.');
       const email = corporateEmail(b.email),
-        name = corporateText(b.name, 100),
+        name = corporateText(b.name ?? email.split('@')[0].slice(0, 100), 100),
         team = corporateText(b.team ?? '', 80, false);
       const role = b.role === 'leader' ? 'leader' : 'member';
       if (role === 'leader' && org.owner_id !== u.userId)
         throw Error('Só o titular pode atribuir a função de líder.');
+      const mode = b.mode === 'authorization' ? 'authorization' : 'invite';
+      if (mode === 'authorization') {
+        const account = await db
+          .prepare(
+            'SELECT password_hash,active FROM auth_accounts WHERE lower(email)=?',
+          )
+          .bind(email)
+          .first<{ password_hash: string; active: number }>();
+        if (
+          account &&
+          (account.password_hash !== '!corporate-pending' || account.active)
+        )
+          throw Error('Use um convite para uma conta existente.');
+      }
       const existing = await db
         .prepare(
           'SELECT a.id FROM auth_accounts a JOIN corporate_members m ON m.account_id=a.id AND m.organisation_id=? AND m.active=1 WHERE lower(a.email)=?',
@@ -313,7 +382,7 @@ export async function POST(request: Request) {
           .bind(now, org.id, email),
         db
           .prepare(
-            'INSERT INTO corporate_invites(id,organisation_id,account_id,created_by,email,name,team,role,token_hash,expires_at,created_at,account_version) SELECT ?,?,a.id,?,?,?,?,?,?,?,?,a.version FROM auth_accounts a WHERE lower(a.email)=?',
+            'INSERT INTO corporate_invites(id,organisation_id,account_id,created_by,email,name,team,role,token_hash,expires_at,created_at,account_version,mode) SELECT ?,?,a.id,?,?,?,?,?,?,?,?,a.version,? FROM auth_accounts a WHERE lower(a.email)=?',
           )
           .bind(
             id,
@@ -326,9 +395,20 @@ export async function POST(request: Request) {
             await tokenHash(token),
             now + 7 * 86400000,
             now,
+            mode,
             email,
           ),
       ]);
+      const sender = await db
+        .prepare('SELECT name FROM auth_accounts WHERE id=? AND active=1')
+        .bind(u.userId)
+        .first<{ name: string }>();
+      const message = corporateInvitationEmail(
+        org.name,
+        sender?.name || 'Framy Connect',
+        `${siteURL()!.origin}/corporativo/aceitar#${token}`,
+        mode === 'authorization',
+      );
       let accepted = false;
       try {
         const r = await fetch('https://api.resend.com/emails', {
@@ -341,8 +421,7 @@ export async function POST(request: Request) {
           body: JSON.stringify({
             from: env.PROFILE_EMAIL_FROM,
             to: [email],
-            subject: 'Convite para a equipa ' + org.name + ' — Framy Connect',
-            text: `${name}, recebeu um convite para ${org.name}.\nConfirme o seu email e a associação: ${siteURL()!.origin}/corporativo/aceitar#${token}\nValidade: 7 dias. O líder verá apenas os resultados e contactos recolhidos nos links de campanha da organização, após aceitar. O perfil e os resultados pessoais anteriores permanecem privados. Se já tem conta, entre nessa conta. Nunca partilhe este link.`,
+            ...message,
           }),
           signal: AbortSignal.timeout(10000),
         });

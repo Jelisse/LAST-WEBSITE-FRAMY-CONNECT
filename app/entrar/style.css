@@ -43,7 +43,7 @@
 .auth-card form {
   gap: 16px;
 }
-.auth-card input {
+.auth-card input,.auth-card select {
   border: 1px solid #d8cfc8;
   border-radius: 10px;
   padding: 13px;

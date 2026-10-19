@@ -139,7 +139,7 @@ export function PlanPicker({
               )}
             </DialogDescription>
             <div className="plans-grid">
-              {plans.filter(p=>p.id!=='corporate'||p.active).map((plan) => (
+              {plans.filter(p=>p.id!=='corporate').map((plan) => (
                 <article
                   className={`plan-card ${plan.id === 'personal' ? 'plan-trial-banner' : ''} ${plan.id === 'professional-v2' ? 'plan-featured' : ''}`}
                   key={plan.id}
@@ -219,7 +219,7 @@ export function PlanPicker({
                   </ul>
                 </article>
               ))}
-              {!plans.some(p=>p.id==='corporate'&&p.active)&&<CorporatePlan />}
+              <CorporatePlan />
             </div>
             <p className="plan-disclosure">
               {t(

@@ -2,8 +2,9 @@
 import { useI18n } from '@/components/language-provider';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { CorporateApproval, type CorporateAccountRequest } from './corporate-approval';
 import { roleLabels } from '@/lib/staff-policy';
-type Account = {
+type Account = CorporateAccountRequest & {
   id: string;
   name: string;
   email: string;
@@ -292,7 +293,7 @@ export function AccountManager() {
               <tr key={a.id}>
                 <td>{a.name}</td>
                 <td>{a.email}</td>
-                <td>{t(roleLabels[a.role])}</td>
+                <td>{t(roleLabels[a.role])}{a.corporateStatus && <CorporateApproval account={a} busy={busy} save={save}/>}</td>
                 <td>{a.active ? t('Activo') : t('Inactivo / por activar')}</td>
                 <td>
                   {a.profileUsername ? (

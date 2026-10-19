@@ -35,7 +35,7 @@ export async function requireChatGPTUser(
   if (
     user.role === 'agent' &&
     role === 'customer' &&
-    ['/dashboard', '/perfil'].includes(returnTo)
+    ['/dashboard', '/perfil','/corporativo','/corporativo/configurar','/corporativo/aceitar'].includes(returnTo)
   )
     return user;
   if (user.role !== role) redirect(dashboardFor(user.role));

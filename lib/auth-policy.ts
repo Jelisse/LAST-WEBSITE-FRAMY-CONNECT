@@ -8,6 +8,7 @@ export function dashboardFor(role: AccountRole) {
   }[role];
 }
 export function loginDestination(role: AccountRole, requested: string) {
+  if (['customer','agent'].includes(role) && requested==='/corporativo/configurar') return requested;
   if (['customer','agent'].includes(role) && ['/embaixadores','/corporativo','/corporativo/aceitar'].includes(requested)) return requested;
   if (
     role === 'customer' &&

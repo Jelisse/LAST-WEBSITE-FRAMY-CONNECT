@@ -17,6 +17,7 @@ export default async function Page({
     <LoginForm
       initialRegister={params.mode === 'register'}
       purchaseReturn={purchaseReturn}
+      corporateReturn={params.return_to==='/corporativo/configurar'}
     />
   );
 }

@@ -3,6 +3,26 @@ import { profileMembership } from './server-profile-access';
 import { hasPlanFeature, profileAccess } from './entitlement';
 import { corporateTerms } from './corporate';
 export async function corporatePlan(owner: string) {
+  const approval = await database()
+    .prepare(
+      'SELECT status,seats,version FROM corporate_requests WHERE owner_id=? AND status IN (?,?)',
+    )
+    .bind(owner, 'approved', 'suspended')
+    .first<{ status: string; seats: number; version: number }>();
+  if (approval) {
+    const active = await database()
+      .prepare('SELECT id FROM auth_accounts WHERE id=? AND active=1')
+      .bind(owner)
+      .first();
+    if (approval.status !== 'approved' || !active)
+      throw Error('É necessária aprovação Corporativa activa.');
+    return {
+      enabled: true,
+      seats: approval.seats,
+      version: approval.version,
+      analytics: true,
+    };
+  }
   const m = await profileMembership(owner);
   const terms = corporateTerms(m);
   if (

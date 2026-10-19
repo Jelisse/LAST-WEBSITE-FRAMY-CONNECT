@@ -22,3 +22,7 @@ Deployed 19 October 2026 through the guarded `CLOUDFLARE.md` workflow after a pr
 ## Corporate organization configuration - 19 October 2026
 
 Corporate organization tools are implemented locally; see CORPORATE.md. The canonical Corporate plan or a versioned paid contract with corporateEnabled=true and teams enabled qualifies the owner. memberLimit accepts 1-500 employees (default 25), excluding the owner and counting valid pending invitations. Prices and renewal periods remain manager-controlled; there is no automatic per-seat billing. Existing paid contract snapshots are preserved. Migration 0031 and deployment are still pending.
+
+## Corporate approval flow - 19 October 2026 (local)
+
+Corporate selection now opens company setup before payment. A Framy manager reviews the submitted request in Accounts and explicitly approves a 1-500 employee operational limit. This manual grant is independent of billing and remains until manager suspension; it never records a payment, changes prices or modifies paid plan snapshots. Existing paid Corporate eligibility still works without a manual override. Individual remains free while the request is pending. Migration 0032 is required. See CORPORATE.md.

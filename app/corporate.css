@@ -29,5 +29,27 @@
 .corporate-public form,.corporate-invite form { flex-direction:column; align-items:stretch; }
 .corporate-public form > label,.corporate-invite form > label { flex:initial; }
 .corporate-invite { max-width:680px; }
+.corporate-setup { max-width:1000px; }
+.corporate-email-invites form { flex-direction:column; align-items:stretch; }
+.corporate-email-invites .corporate-email-row { display:flex; align-items:end; gap:12px; width:100%; }
+.corporate-email-row label { flex:1; min-width:0; }
+.corporate-email-invites form > label { flex:initial; }
+.corporate-email-invites button { display:inline-flex; gap:8px; align-items:center; justify-content:center; }
+.corporate-steps { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; padding:0; list-style-position:inside; margin:24px 0; }
+.corporate-steps li { border-radius:10px; padding:14px; background:#f4eee9; font-size:14px; }
+.corporate-steps [aria-current=step] { background:#fff0e3; box-shadow:inset 0 0 0 1px #edb38b; font-weight:600; }
+.corporate-setup-form > label { flex:1 1 320px; }
+.corporate-setup-form > :is(p,div,label:has(input[type=checkbox])) { flex-basis:100%; }
+.corporate-setup-form .corporate-toolbar button:last-child { background:var(--framy-orange-text); color:#fff; }
+.corporate-dashboard .password-field { display:block; position:relative; }
+.corporate-dashboard .password-field input { width:100%; padding-right:52px; }
+.corporate-dashboard .password-toggle { position:absolute; right:2px; top:2px; bottom:2px; min-height:40px; width:44px; padding:8px; display:grid; place-items:center; border:0; background:transparent; color:inherit; }
+.corporate-approval { min-width:170px; max-width:360px; white-space:normal; }
+.corporate-approval summary { cursor:pointer; color:var(--framy-orange-text); padding-block:8px; }
+.corporate-approval :is(input,button) { min-height:44px; max-width:100%; }
+.corporate-approval form,.corporate-approval label { display:flex; flex-wrap:wrap; gap:8px; }
+.corporate-approval input { width:90px; border:1px solid #d9cfc6; padding:8px; border-radius:8px; }
+.corporate-approval dt { font-weight:600; }.corporate-approval dd { margin:0 0 8px; overflow-wrap:anywhere; }
+@media(max-width:600px) { .corporate-steps { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 .corporate-workspace-link { display:flex; padding:12px; gap:8px; border-radius:10px; font-size:14px; }
 @media(max-width:760px) { .corporate-dashboard { padding:16px; } .corporate-dashboard > header { margin:-16px -16px 20px; padding:10px 16px; } .corporate-dashboard form > label { flex:1 1 220px; } .corporate-public form > label,.corporate-invite form > label { flex:initial; } .corporate-panel { padding:16px; } .corporate-dashboard :is(input,select,textarea) { font-size:16px; } }

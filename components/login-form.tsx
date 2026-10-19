@@ -7,9 +7,11 @@ import { PasswordInput } from './password-input';
 export function LoginForm({
   initialRegister = false,
   purchaseReturn,
+  corporateReturn = false,
 }: {
   initialRegister?: boolean;
   purchaseReturn?: string;
+  corporateReturn?: boolean;
 }) {
   const { t } = useI18n();
   const emailInput = useRef<HTMLInputElement>(null);
@@ -30,6 +32,9 @@ export function LoginForm({
       /* Prefilling is optional. */
     }
   }, []);
+  const [plan, setPlan] = useState<'personal' | 'corporate'>(
+    corporateReturn ? 'corporate' : 'personal',
+  );
   const [register, setRegister] = useState(initialRegister),
     [busy, setBusy] = useState(false),
     [error, setError] = useState('');
@@ -62,9 +67,12 @@ export function LoginForm({
                   email: data.get('email'),
                   password: data.get('password'),
                   name: data.get('name'),
-                  returnTo: new URLSearchParams(location.search).get(
-                    'return_to',
-                  ),
+                  returnTo:
+                    register && plan === 'corporate'
+                      ? '/corporativo/configurar'
+                      : register && corporateReturn && plan === 'personal'
+                        ? '/dashboard'
+                        : new URLSearchParams(location.search).get('return_to'),
                 }),
                 signal: AbortSignal.timeout(15000),
               });
@@ -120,6 +128,28 @@ export function LoginForm({
             <Link className="auth-forgot" href="/recuperar">
               {t('Esqueci-me da palavra-passe')}
             </Link>
+          )}
+          {register && !purchaseReturn && (
+            <label>
+              {t('Tipo de conta')}
+              <select
+                value={plan}
+                disabled={busy}
+                onChange={(e) =>
+                  setPlan(e.target.value as 'personal' | 'corporate')
+                }
+              >
+                <option value="personal">{t('Individual')}</option>
+                <option value="corporate">{t('Corporativo')}</option>
+              </select>
+            </label>
+          )}
+          {(corporateReturn || (register && plan === 'corporate')) && (
+            <p>
+              {t(
+                'Depois de entrar, configure a empresa e envie o pedido. O perfil Individual continua disponível.',
+              )}
+            </p>
           )}
           {register && <small>{t('Use pelo menos 12 caracteres.')}</small>}
           {error && <p role="alert">{t(error)}</p>}
