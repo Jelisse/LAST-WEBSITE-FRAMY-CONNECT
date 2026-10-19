@@ -1,4 +1,5 @@
 'use client';
+import { PhoneInput } from './phone-input';
 import { useI18n } from '@/components/language-provider';
 
 import { useEffect, useState } from 'react';
@@ -59,11 +60,18 @@ export function AgentApplicationForm({
     if (b.application) setData(b.application.data);
   }
   useEffect(() => {
-    void load()
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+    let stopped = false;
+    queueMicrotask(() => {
+      if (!stopped)
+        void load()
+          .catch((e) => setError(e.message))
+          .finally(() => setLoading(false));
+    });
+    return () => {
+      stopped = true;
+    };
   }, []);
-  async function action(action: string) {
+  async function sendApplication(action: string) {
     setBusy(true);
     setError('');
     setNotice('');
@@ -153,7 +161,7 @@ export function AgentApplicationForm({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              void action('save');
+              void sendApplication('save');
             }}
           >
             <fieldset disabled={busy} className="application-fields">
@@ -199,27 +207,25 @@ export function AgentApplicationForm({
               </label>
               <label>
                 {t('Contacto telefónico')}
-                <input
+                <PhoneInput
                   required
-                  type="tel"
+
                   maxLength={25}
                   placeholder={t('+258 …')}
                   autoComplete="tel"
                   value={data.phone}
-                  onChange={(e) => setData({ ...data, phone: e.target.value })}
+                  onValueChange={(phone) => setData({ ...data, phone })}
                 />
               </label>
               <label>
                 {t('WhatsApp')}
-                <input
+                <PhoneInput
                   required
-                  type="tel"
+
                   maxLength={25}
                   placeholder={t('+258 …')}
                   value={data.whatsapp}
-                  onChange={(e) =>
-                    setData({ ...data, whatsapp: e.target.value })
-                  }
+                  onValueChange={(whatsapp) => setData({ ...data, whatsapp })}
                 />
               </label>
               <label className="application-wide">
@@ -324,7 +330,7 @@ export function AgentApplicationForm({
                   app.files.length !== 3 ||
                   JSON.stringify(data) !== JSON.stringify(app.data)
                 }
-                onClick={() => void action('submit')}
+                onClick={() => void sendApplication('submit')}
               >
                 {t('Submeter candidatura')}
               </button>

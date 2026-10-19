@@ -1,4 +1,5 @@
 'use client';
+import { PhoneInput } from './phone-input';
 import { useI18n } from '@/components/language-provider';
 
 import { CorporatePlan } from './corporate-plan';
@@ -536,9 +537,11 @@ export function OrderSubmission({
                   onUpgrade={() => setStep(1)}
                 />
               </div>
-              <aside className="purchase-profile-preview"><EditorLivePreview>
-                <MobileProfile profile={profile} preview />
-              </EditorLivePreview></aside>
+              <aside className="purchase-profile-preview">
+                <EditorLivePreview>
+                  <MobileProfile profile={profile} preview />
+                </EditorLivePreview>
+              </aside>
             </div>
           )}
           {step === 4 && (
@@ -566,11 +569,10 @@ export function OrderSubmission({
               </label>
               <label>
                 {t('Telefone de contacto para entrega *')}
-                <input
-                  type="tel"
+                <PhoneInput
                   maxLength={40}
                   value={contact}
-                  onChange={(e) => setContact(e.target.value)}
+                  onValueChange={setContact}
                   autoComplete="tel"
                 />
               </label>
@@ -641,9 +643,7 @@ export function OrderSubmission({
                 disabled={busy || uploading || (step === 2 && !account)}
                 onClick={next}
               >
-                {busy
-                  ? t('A guardar…')
-                  : t('Seguinte')}
+                {busy ? t('A guardar…') : t('Seguinte')}
               </button>
             ) : (
               <button

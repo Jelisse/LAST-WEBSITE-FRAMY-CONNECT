@@ -1,4 +1,5 @@
 'use client';
+import { Building2, Users, ArrowRight } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from './hard-link';
 import { focusDashboardStart } from '@/lib/dashboard-navigation';
@@ -90,6 +91,7 @@ export function CorporateDashboard() {
     [busy, setBusy] = useState(false),
     [copied, setCopied] = useState('');
   const [qr, setQr] = useState<{ id: string; image: string } | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const [teamFilter, setTeamFilter] = useState('');
   const [inviteMode, setInviteMode] = useState<'invite' | 'authorization'>(
     'invite',
@@ -307,13 +309,24 @@ export function CorporateDashboard() {
       <header>
         <DashboardTools />
       </header>
-      <h1>{t('Equipa corporativa')}</h1>
-      <div className="corporate-toolbar">
-        <Link href="/perfil">{t('O meu perfil')}</Link>
-        <Link href="/corporativo/configurar">
-          {t('Configurar a minha empresa')}
-        </Link>
+      <div className="corporate-hero">
+        <span className="corporate-eyebrow">
+          <Building2 size={18} aria-hidden="true" /> FRAMY CONNECT ·{' '}
+          {t('Corporativo')}
+        </span>
+        <h1>{t('Equipa corporativa')}</h1>
+        <p>{t('Uma equipa. Mais conexões.')}</p>
       </div>
+      <nav
+        className="corporate-toolbar corporate-tabs"
+        aria-label={t('Navegação corporativa')}
+      >
+        <Link href="/corporativo" aria-current="page">
+          {t('Equipa')}
+        </Link>
+        <Link href="/perfil">{t('Perfil')}</Link>
+        <Link href="/corporativo/configurar">{t('Empresa')}</Link>
+      </nav>
       <p>
         {t(
           'Organize trabalhadores e campanhas. Acompanhe apenas a actividade recolhida para a organização.',
@@ -333,49 +346,65 @@ export function CorporateDashboard() {
         <p>{t('A carregar…')}</p>
       ) : (
         <>
-          <div className="corporate-toolbar">
-            <label>
-              {t('Organização')}
-              <select
-                value={organisation}
-                disabled={busy}
-                onChange={(e) => {
-                  setOrganisation(e.target.value);
-                  focusDashboardStart();
-                  setDetail(null);
-                  setCampaign('');
-                  setTeamFilter('');
-                  setTeamFilter('');
+          {!!data.organisations.length && (
+            <div className="corporate-toolbar corporate-organisation">
+              <label>
+                {t('Organização')}
+                <select
+                  value={organisation}
+                  disabled={busy}
+                  onChange={(e) => {
+                    setOrganisation(e.target.value);
+                    focusDashboardStart();
+                    setDetail(null);
+                    setCampaign('');
+                    setTeamFilter('');
+                    setError('');
+                  }}
+                >
+                  <option value="">{t('Seleccionar')}</option>
+                  {data.organisations.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                disabled={busy || refreshing}
+                onClick={async () => {
+                  setRefreshing(true);
                   setError('');
+                  try {
+                    await load();
+                    setNotice('Dados actualizados.');
+                  } catch (e) {
+                    setError(
+                      e instanceof Error
+                        ? e.message
+                        : 'Não foi possível carregar.',
+                    );
+                  } finally {
+                    setRefreshing(false);
+                  }
                 }}
               >
-                <option value="">{t('Seleccionar')}</option>
-                {data.organisations.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              disabled={busy}
-              onClick={() => void load().catch((e) => setError(e.message))}
-            >
-              {t('Actualizar')}
-            </button>
-            {organisation &&
-              data.actorId &&
-              data.organisations.some(
-                (o) => o.id === organisation && o.owner_id !== data.actorId,
-              ) && (
-                <button
-                  disabled={busy}
-                  onClick={() => void act({ action: 'leave' })}
-                >
-                  {t('Sair da organização')}
-                </button>
-              )}
-          </div>
+                {t(refreshing ? 'A actualizar…' : 'Actualizar')}
+              </button>
+              {organisation &&
+                data.actorId &&
+                data.organisations.some(
+                  (o) => o.id === organisation && o.owner_id !== data.actorId,
+                ) && (
+                  <button
+                    disabled={busy}
+                    onClick={() => void act({ action: 'leave' })}
+                  >
+                    {t('Sair da organização')}
+                  </button>
+                )}
+            </div>
+          )}
           {data.canCreate && (
             <form
               onSubmit={(e) => {
@@ -395,11 +424,29 @@ export function CorporateDashboard() {
             </form>
           )}
           {!data.canCreate && !data.organisations.length && (
-            <p>
-              {t(
-                'Configure a empresa e envie o pedido de aprovação. Se é trabalhador, aceite o convite recebido por email.',
-              )}
-            </p>
+            <section className="corporate-empty corporate-panel">
+              <span className="corporate-empty-icon">
+                <Users size={36} aria-hidden="true" />
+              </span>
+              <h2>{t('Comece pela sua empresa')}</h2>
+              <p>
+                {t(
+                  'Configure a empresa e envie o pedido de aprovação. Se é trabalhador, aceite o convite recebido por email.',
+                )}
+              </p>
+              <Link
+                className="corporate-primary"
+                href="/corporativo/configurar"
+              >
+                {t('Configurar a minha empresa')}
+                <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+              <small>
+                {t(
+                  'Após aprovação, adicione a equipa e acompanhe as campanhas num só lugar.',
+                )}
+              </small>
+            </section>
           )}
           {detail && (
             <>

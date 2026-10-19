@@ -1,4 +1,5 @@
 'use client';
+import { PhoneInput } from './phone-input';
 import type { Profile } from '@/lib/domain';
 import {
   defaultBusiness,
@@ -37,13 +38,13 @@ export function ProfileBusinessEditor({
       <div className="profile-business-fields">
         <label>
           {t('WhatsApp público')}
-          <input
+          <PhoneInput
             disabled={features?.whatsapp === false}
-            type="tel"
+
             value={business.whatsapp}
             maxLength={24}
             placeholder="+258840000000"
-            onChange={(e) => update('whatsapp', e.target.value)}
+            onValueChange={(value) => update('whatsapp', value)}
           />
         </label>
         <label>

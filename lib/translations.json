@@ -7607,5 +7607,22 @@
   "Escreva as instruções para a equipa antes de pagar.": ["Write the instructions for the team before paying.", "付款前請填寫給團隊的設計說明。"],
   "O preço deste produto precisa de confirmação. Escolha outro material ou contacte a Framy Connect.": ["This product price needs confirmation. Choose another material or contact Framy Connect.", "此產品價格待確認。請選擇其他材質或聯絡 Framy Connect。"],
   "Completar design": ["Complete design", "完成設計"],
-  "O plano Individual é gratuito. A compra do produto não inclui uma subscrição Profissional ou Corporativa.": ["The Individual plan is free. Product purchases do not include a Professional or Corporate subscription.", "個人方案免費。購買產品不包含專業或企業訂閱。"]
+  "O plano Individual é gratuito. A compra do produto não inclui uma subscrição Profissional ou Corporativa.": ["The Individual plan is free. Product purchases do not include a Professional or Corporate subscription.", "個人方案免費。購買產品不包含專業或企業訂閱。"],
+  "País e indicativo": ["Country and calling code", "國家及電話區碼"],
+  "Outro indicativo": ["Other calling code", "其他電話區碼"],
+  "Número de telefone": ["Phone number", "電話號碼"],
+  "Uma equipa. Mais conexões.": ["One team. More connections.", "一個團隊，更多連結。"],
+  "Navegação corporativa": ["Corporate navigation", "企業導覽"],
+  "Comece pela sua empresa": ["Start with your company", "從您的公司開始"],
+  "Após aprovação, adicione a equipa e acompanhe as campanhas num só lugar.": ["Once approved, add your team and track campaigns in one place.", "核准後，即可在同一處新增團隊並追蹤活動。"],
+  "Preencha os campos obrigatórios para enviar o pedido.": ["Complete the required fields to submit your request.", "請填寫必填欄位以提交申請。"],
+  "Seleccione os produtos para a sua equipa. Pode escolher mais de um.": ["Choose products for your team. You can select more than one.", "為團隊選擇產品，可複選。"],
+  "O catálogo está a ser actualizado. Pode indicar os produtos nas observações.": ["The catalogue is being updated. You can specify products in the notes.", "產品目錄更新中，您可以在備註中填寫所需產品。"],
+  "Observações sobre os produtos": ["Product notes", "產品備註"],
+  "Ex.: Vendas, Eventos, Atendimento": ["E.g. Sales, Events, Customer service", "例如：銷售、活動、客戶服務"],
+  "Ex.: Recolher contactos no evento": ["E.g. Collect contacts at an event", "例如：在活動中收集聯絡資料"],
+  "Escolha o país ou pesquise pelo nome ou indicativo.": ["Choose a country or search by name or calling code.", "選擇國家，或依名稱或電話區碼搜尋。"],
+  "Pesquisar país ou indicativo": ["Search country or calling code", "搜尋國家或電話區碼"],
+  "Empresa": ["Company", "公司"],
+  "A actualizar…": ["Refreshing…", "更新中…"]
 }

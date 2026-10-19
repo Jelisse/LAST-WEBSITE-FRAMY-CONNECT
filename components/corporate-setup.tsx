@@ -1,4 +1,13 @@
 'use client';
+import {
+  Building2,
+  Check,
+  CreditCard,
+  KeyRound,
+  Save,
+  Send,
+} from 'lucide-react';
+import { PhoneInput } from './phone-input';
 import { useEffect, useState } from 'react';
 import Link from './hard-link';
 import { DashboardTools } from './mobile-navigation';
@@ -39,7 +48,11 @@ const empty: Details = {
   goals: '',
   products: '',
 };
-export function CorporateSetup() {
+export function CorporateSetup({
+  products = [],
+}: {
+  products?: { id: string; name: string }[];
+}) {
   const { t } = useI18n();
   const [details, setDetails] = useState(empty),
     [version, setVersion] = useState(0),
@@ -152,7 +165,14 @@ export function CorporateSetup() {
       <header>
         <DashboardTools />
       </header>
-      <h1>{t('Configurar a minha empresa')}</h1>
+      <div className="corporate-hero">
+        <span className="corporate-eyebrow">
+          <Building2 size={18} aria-hidden="true" /> FRAMY CONNECT ·{' '}
+          {t('Corporativo')}
+        </span>
+        <h1>{t('Configurar a minha empresa')}</h1>
+        <p>{t('Uma equipa. Mais conexões.')}</p>
+      </div>
       <p>
         {t(
           'Use o seu perfil Individual enquanto prepara a equipa. Não é necessário pagar para enviar este pedido.',
@@ -170,10 +190,16 @@ export function CorporateSetup() {
           {t('Adicionar trabalhadores')}
         </li>
       </ol>
-      <div className="corporate-toolbar">
-        <Link href="/perfil">{t('O meu perfil')}</Link>
-        <Link href="/corporativo">{t('A minha equipa')}</Link>
-      </div>
+      <nav
+        className="corporate-toolbar corporate-tabs"
+        aria-label={t('Navegação corporativa')}
+      >
+        <Link href="/corporativo/configurar" aria-current="page">
+          {t('Empresa')}
+        </Link>
+        <Link href="/perfil">{t('Perfil')}</Link>
+        <Link href="/corporativo">{t('Equipa')}</Link>
+      </nav>
       {error && <p role="alert">{t(error)}</p>}
       {error && !ready && (
         <button type="button" onClick={() => location.reload()}>
@@ -228,52 +254,76 @@ export function CorporateSetup() {
             );
           }}
         >
-          {(
-            [
-              'company',
-              'phone',
-              'location',
-              'sector',
-              'teams',
-              'goals',
-              'products',
-            ] as const
-          ).map((key) => (
-            <label key={key}>
-              {t(
-                (
-                  {
-                    company: 'Nome da empresa',
-                    phone: 'Telefone de contacto',
-                    location: 'Localização da empresa',
-                    sector: 'Sector de actividade',
-                    teams: 'Equipas',
-                    goals: 'Objectivos e campanhas',
-                    products: 'Produtos NFC pretendidos',
-                  } as const
-                )[key],
-              )}
-              <input
-                value={details[key]}
-                required={['company', 'phone', 'location'].includes(key)}
-                maxLength={
-                  {
-                    company: 100,
-                    phone: 40,
-                    location: 150,
-                    sector: 100,
-                    teams: 500,
-                    goals: 1000,
-                    products: 300,
-                  }[key]
-                }
-                onChange={(e) =>
-                  setDetails({ ...details, [key]: e.target.value })
-                }
-                disabled={busy}
-              />
-            </label>
-          ))}
+          <div className="corporate-form-heading">
+            <Building2 size={24} aria-hidden="true" />
+            <div>
+              <h2>{t('Dados da empresa')}</h2>
+              <p>
+                {t('Preencha os campos obrigatórios para enviar o pedido.')}
+              </p>
+            </div>
+          </div>
+          {(['company', 'location', 'sector', 'teams', 'goals'] as const).map(
+            (key) => (
+              <label key={key}>
+                {t(
+                  (
+                    {
+                      company: 'Nome da empresa',
+                      phone: 'Telefone de contacto',
+                      location: 'Localização da empresa',
+                      sector: 'Sector de actividade',
+                      teams: 'Equipas',
+                      goals: 'Objectivos e campanhas',
+                      products: 'Produtos NFC pretendidos',
+                    } as const
+                  )[key],
+                )}
+                <input
+                  placeholder={
+                    key === 'teams'
+                      ? t('Ex.: Vendas, Eventos, Atendimento')
+                      : key === 'goals'
+                        ? t('Ex.: Recolher contactos no evento')
+                        : undefined
+                  }
+                  value={details[key]}
+                  required={['company', 'phone', 'location'].includes(key)}
+                  maxLength={
+                    {
+                      company: 100,
+                      phone: 40,
+                      location: 150,
+                      sector: 100,
+                      teams: 500,
+                      goals: 1000,
+                      products: 300,
+                    }[key]
+                  }
+                  onChange={(e) =>
+                    setDetails({ ...details, [key]: e.target.value })
+                  }
+                  disabled={busy}
+                />
+                {key === 'teams' && (
+                  <small>
+                    {t(
+                      'Indique os nomes das equipas, separados por vírgulas. Os emails dos trabalhadores serão pedidos após aprovação.',
+                    )}
+                  </small>
+                )}
+              </label>
+            ),
+          )}
+          <label>
+            {t('Telefone de contacto')} *
+            <PhoneInput
+              value={details.phone}
+              onValueChange={(phone) => setDetails({ ...details, phone })}
+              required
+              disabled={busy}
+            />
+          </label>
           <label>
             {t('Número de trabalhadores')}
             <input
@@ -288,11 +338,67 @@ export function CorporateSetup() {
               }
             />
           </label>
-          <p>
-            {t(
-              'Indique os nomes das equipas, separados por vírgulas. Os emails dos trabalhadores serão pedidos após aprovação.',
+          <fieldset className="corporate-product-picker" disabled={busy}>
+            <legend>{t('Produtos NFC pretendidos')}</legend>
+            <p>
+              {t(
+                'Seleccione os produtos para a sua equipa. Pode escolher mais de um.',
+              )}
+            </p>
+            <div className="corporate-product-grid">
+              {products.map((product) => {
+                const chosen = details.products
+                  .split('; ')
+                  .includes(product.name);
+                const Icon = product.id.includes('keychain')
+                  ? KeyRound
+                  : CreditCard;
+                return (
+                  <label
+                    key={product.id}
+                    className={chosen ? 'is-selected' : ''}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={chosen}
+                      onChange={() => {
+                        const values = details.products
+                          ? details.products.split('; ')
+                          : [];
+                        const next = chosen
+                          ? values.filter((name) => name !== product.name)
+                          : [...values, product.name];
+                        if (next.join('; ').length <= 300)
+                          setDetails({ ...details, products: next.join('; ') });
+                      }}
+                    />
+                    <Icon size={28} aria-hidden="true" />
+                    <strong>{t(product.name)}</strong>
+                    <span className="corporate-product-check">
+                      <Check size={16} aria-hidden="true" />
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+            {!products.length && (
+              <p>
+                {t(
+                  'O catálogo está a ser actualizado. Pode indicar os produtos nas observações.',
+                )}
+              </p>
             )}
-          </p>
+            <label>
+              {t('Observações sobre os produtos')}
+              <input
+                value={details.products}
+                maxLength={300}
+                onChange={(e) =>
+                  setDetails({ ...details, products: e.target.value })
+                }
+              />
+            </label>
+          </fieldset>
           <label>
             <input name="confirmed" type="checkbox" required disabled={busy} />
             {t(
@@ -312,9 +418,11 @@ export function CorporateSetup() {
               disabled={busy}
               onClick={() => void save('save', false)}
             >
+              <Save size={18} aria-hidden="true" />
               {t('Guardar rascunho')}
             </button>
             <button type="submit" disabled={busy || !emailReady}>
+              <Send size={18} aria-hidden="true" />
               {t(busy ? 'A enviar…' : 'Enviar pedido de aprovação')}
             </button>
           </div>

@@ -1,4 +1,5 @@
 'use client';
+import { PhoneInput } from './phone-input';
 import { useEffect, useRef, useState } from 'react';
 import Link from './hard-link';
 import { useI18n } from './language-provider';
@@ -103,7 +104,7 @@ export function CorporateCampaign({ id }: { id: string }) {
               }}
             >
               <h2>{t('Deixar o meu contacto')}</h2>
-            <p>{t('Indique email ou telefone.')}</p>
+              <p>{t('Indique email ou telefone.')}</p>
               <label>
                 {t('Nome')}
                 <input
@@ -124,9 +125,9 @@ export function CorporateCampaign({ id }: { id: string }) {
               </label>
               <label>
                 {t('Telefone')}
-                <input
+                <PhoneInput
                   name="phone"
-                  type="tel"
+
                   maxLength={40}
                   autoComplete="tel"
                 />

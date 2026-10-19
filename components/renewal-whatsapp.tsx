@@ -1,4 +1,5 @@
 'use client';
+import { PhoneInput } from './phone-input';
 import { useI18n } from '@/components/language-provider';
 import { useState } from 'react';
 import { MessageCircle } from 'lucide-react';
@@ -33,13 +34,13 @@ function ContactReminder({ member }: { member: RenewalContact }) {
       <label htmlFor={inputId}>
         {t('WhatsApp com indicativo internacional')}
       </label>
-      <input
+      <PhoneInput
         id={inputId}
-        type="tel"
+
         value={phone}
         placeholder={t('+258 84 000 0000')}
-        onChange={(e) => {
-          setPhone(e.target.value);
+        onValueChange={(value) => {
+          setPhone(value);
           setOpened(false);
         }}
         aria-describedby={`${inputId}-help`}

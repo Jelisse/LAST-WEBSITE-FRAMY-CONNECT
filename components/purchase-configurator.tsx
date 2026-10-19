@@ -1,4 +1,5 @@
 'use client';
+import { PhoneInput } from './phone-input';
 import { ProductArtworkPreview } from './product-artwork-preview';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -822,10 +823,9 @@ export function PurchaseConfigurator({
                 {delivery === 'pickup'
                   ? t('Contacto para o aviso de levantamento')
                   : t('Contacto do destinatário')}
-                <input
-                  type="tel"
+                <PhoneInput
                   value={contact}
-                  onChange={(e) => setContact(e.target.value)}
+                  onValueChange={setContact}
                   maxLength={50}
                   autoComplete="tel"
                   placeholder="+258"
