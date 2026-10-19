@@ -3,6 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Link from '@/components/hard-link';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from './ui/dialog';
 
 import { useI18n } from './language-provider';
 
@@ -60,6 +66,12 @@ export function AmbassadorCodeInput({
   onChange: (code: string, ready: boolean) => void;
 }) {
   const { t } = useI18n();
+  const [open, setOpen] = useState(false),
+    [search, setSearch] = useState(''),
+    [loading, setLoading] = useState(false),
+    [listError, setListError] = useState('');
+  const [choices, setChoices] = useState<{ name: string; code: string }[]>([]);
+  const [truncated, setTruncated] = useState(false);
   const [input, setInput] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -69,6 +81,7 @@ export function AmbassadorCodeInput({
     async (value: string) => {
       const current = ++revision.current;
       if (!value.trim()) {
+        setInput('');
         onChange('', true);
         setMessage('');
         setBusy(false);
@@ -86,15 +99,20 @@ export function AmbassadorCodeInput({
         if (!r.ok || !b.valid)
           throw Error('Código de embaixador inválido ou inactivo.');
         setInput(b.code);
+        setOpen(false);
         onChange(b.code, true);
         setMessage('Desconto de 10% aplicado apenas aos produtos físicos.');
       } catch (e) {
-        if (current === revision.current)
-          setMessage(
+        if (current === revision.current) {
+          const error =
             e instanceof Error
               ? e.message
-              : 'Não foi possível verificar o código.',
-          );
+              : 'Não foi possível verificar o código.';
+          setMessage(error);
+          setListError(error);
+          setInput('');
+          onChange('', true);
+        }
       } finally {
         if (current === revision.current) setBusy(false);
       }
@@ -115,28 +133,111 @@ export function AmbassadorCodeInput({
     };
   }, [initialCode, apply]);
 
+  useEffect(() => {
+    if (!open) return;
+    let stopped = false;
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      setLoading(true);
+      setListError('');
+      void fetch(
+        '/api/ambassadors?' + new URLSearchParams({ choices: '1', q: search }),
+        { cache: 'no-store', signal: controller.signal },
+      )
+        .then(async (r) => {
+          const b = (await r.json()) as {
+            error?: string;
+            items: { name: string; code: string }[];
+            truncated: boolean;
+          };
+          if (!r.ok) throw Error(b.error);
+          if (!stopped) {
+            setChoices(b.items);
+            setTruncated(b.truncated);
+          }
+        })
+        .catch(() => {
+          if (!stopped)
+            setListError('Não foi possível carregar os embaixadores.');
+        })
+        .finally(() => {
+          if (!stopped) setLoading(false);
+        });
+    }, 250);
+    return () => {
+      stopped = true;
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [open, search]);
   return (
     <div className="ambassador-code">
-      <label>
-        {t('Código de embaixador (opcional)')}
-        <input
-          value={input}
-          maxLength={100}
-          autoCapitalize="characters"
-          spellCheck={false}
-          onChange={(e) => {
-            revision.current++;
-            setBusy(false);
-            setInput(e.target.value);
-            setMessage('');
-            onChange('', !e.target.value.trim());
-          }}
-        />
-      </label>
-      <button type="button" disabled={busy} onClick={() => void apply(input)}>
-        {t(busy ? 'A verificar…' : 'Aplicar código')}
+      <span>{t('Código de embaixador (opcional)')}</span>
+      <button
+        type="button"
+        disabled={busy}
+        aria-haspopup="dialog"
+        onClick={() => setOpen(true)}
+      >
+        {busy ? t('A verificar…') : input || t('Escolher embaixador')}
       </button>
-      {message && <output>{t(message)}</output>}
+      {input && (
+        <button type="button" disabled={busy} onClick={() => void apply('')}>
+          {t('Remover código')}
+        </button>
+      )}
+      {message && <output aria-live="polite">{t(message)}</output>}
+      <Dialog
+        open={open}
+        onOpenChange={(value) => {
+          if (!busy) setOpen(value);
+        }}
+      >
+        <DialogContent className="ambassador-picker">
+          <DialogTitle>{t('Escolher embaixador')}</DialogTitle>
+          <DialogDescription>
+            {t(
+              'Seleccione um código para obter 10% de desconto nos produtos físicos. Design e entrega não têm desconto.',
+            )}
+          </DialogDescription>
+          <label>
+            {t('Pesquisar embaixador ou código')}
+            <input
+              value={search}
+              maxLength={100}
+              onChange={(e) => setSearch(e.target.value)}
+              disabled={busy}
+            />
+          </label>
+          {loading && <p>{t('A carregar…')}</p>}
+          {listError && <p role="alert">{t(listError)}</p>}
+          {!loading && !listError && choices.length === 0 && (
+            <p>
+              {t('Não existem embaixadores disponíveis para esta pesquisa.')}
+            </p>
+          )}
+          <div className="ambassador-picker-list">
+            {choices.map((choice) => (
+              <button
+                type="button"
+                key={choice.code}
+                disabled={busy || loading}
+                onClick={() => void apply(choice.code)}
+              >
+                <strong>{choice.name}</strong>
+                <span>{choice.code}</span>
+              </button>
+            ))}
+          </div>
+          {truncated && (
+            <small>
+              {t(
+                'Pesquise pelo nome ou código para encontrar outros embaixadores.',
+              )}
+            </small>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

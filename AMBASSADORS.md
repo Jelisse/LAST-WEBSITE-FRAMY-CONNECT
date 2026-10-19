@@ -13,3 +13,13 @@ Pending checkout does not earn commission. Existing validated payment confirmati
 Required migrations: `0029_ambassadors.sql` and `0030_permanent_individual.sql`. Do not replay migrations or modify live financial records manually. Follow `CLOUDFLARE.md` backup and inventory checks before deployment. Live deployment, a real PaySuite discount purchase, actual transfers and email inbox delivery remain external validation tasks.
 
 Deployment update, 19 October 2026: migrations 0029/0030 applied after private backup; Worker version `794f454a-5caa-45da-808e-a7fceaf04435` is live. Public endpoints and anonymous access controls passed on both configured origins. Real payments, transfers and inbox delivery remain unverified.
+
+## Discount subtotal and selection correction - 19 October 2026
+
+The configurator previously displayed the original hardware amount when delivery was still incomplete, despite displaying a valid discount line. Shared purchaseAmounts now computes the discounted hardware subtotal independently of delivery and computes the payable total only when all fees are known; the product checkout server uses the same helper. A 500 MT product with a valid code and free pickup sends exactly 450.00 MZN to PaySuite. Design/delivery are not discounted; commission stays based on original hardware.
+
+The code input is now a button opening a searchable list of active ambassador names/codes. Public choices expose no account IDs, email, commissions or balances. Signed-in buyers cannot select their own code; checkout still revalidates status/ownership/version atomically. Removal restores the full original price. Saved codes continue to be revalidated on restore. A clear Complete delivery to pay action explains incomplete fulfilment; unknown delivery fees, missing contact/address, incomplete artwork and total confirmation remain required.
+
+## Discount correction deployed - 19 October 2026
+
+The requested checkout correction is live as Worker 3b2ce6fa-f092-496e-843b-f8f2896a3280. Guarded deployment passed schema/relationship checks and rebuilt successfully; no migration or billing-setting/price writes required. Existing D1/R2, sender/canonical URL, PaySuite enabled flag and schedule preserved. Both canonical/workers.dev purchase pages returned200, public ambassador choices returned2 eligible entries with name/code fields only, listed-code validation passed, and configurator/ambassador bundle SHA-256 matched the final build. Real merchant payment/settlement was not performed. Browser visual verification remained partial due test-browser timeout. Source changes remain uncommitted/unpushed for this task; do not confuse the deployed build with the older Git HEAD.

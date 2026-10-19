@@ -1,3 +1,4 @@
+import { purchaseAmounts } from '@/lib/purchase-amounts';
 import { referralQuote } from '@/lib/server-ambassador';
 import { pvcModel } from '@/lib/pvc-models';
 import { validateLeather } from '@/lib/leather-design';
@@ -137,8 +138,11 @@ export async function POST(request: Request) {
     let cycle: 'once' | 'monthly' | 'annual';
     const kind = b.kind;
     if (kind === 'product') {
-      const pending = await env.DB.prepare("SELECT COUNT(*) AS total FROM paysuite_product_orders WHERE owner_id=? AND status='pending'")
-        .bind(user.userId).first<{ total: number }>();
+      const pending = await env.DB.prepare(
+        "SELECT COUNT(*) AS total FROM paysuite_product_orders WHERE owner_id=? AND status='pending'",
+      )
+        .bind(user.userId)
+        .first<{ total: number }>();
       if ((pending?.total ?? 0) >= 3) {
         // Offer the newest resumable checkout so a retry continues the
         // existing order instead of hitting a dead end.
@@ -147,11 +151,15 @@ export async function POST(request: Request) {
         )
           .bind(user.userId)
           .first<{ id: string; checkout_url: string }>();
-        return json({
-          error: 'Tem três encomendas pendentes. Consulte os seus pagamentos antes de criar outra encomenda.',
-          resumePaymentId: resumable?.id ?? null,
-          resumeUrl: resumable?.checkout_url ?? null,
-        }, 409);
+        return json(
+          {
+            error:
+              'Tem três encomendas pendentes. Consulte os seus pagamentos antes de criar outra encomenda.',
+            resumePaymentId: resumable?.id ?? null,
+            resumeUrl: resumable?.checkout_url ?? null,
+          },
+          409,
+        );
       }
       const settings = await env.DB.prepare(
         'SELECT * FROM checkout_pricing WHERE id=1',
@@ -160,8 +168,20 @@ export async function POST(request: Request) {
         throw Error('Compras de produtos ainda indisponíveis.');
       const products = await getProducts();
       const baseQuote = configurationQuote(products, settings, b);
-      const referral = await referralQuote(b.ambassadorCode, baseQuote.hardware, user.userId);
-      const quote = { ...baseQuote, discount: referral?.discount ?? 0, total: baseQuote.total - (referral?.discount ?? 0) };
+      const referral = await referralQuote(
+        b.ambassadorCode,
+        baseQuote.hardware,
+        user.userId,
+      );
+      const discount = referral?.discount ?? 0;
+      const amounts = purchaseAmounts(
+        baseQuote.hardware,
+        discount,
+        baseQuote.customization,
+        baseQuote.delivery,
+      );
+      if (amounts.total === null) throw Error('Preço inválido.');
+      const quote = { ...baseQuote, discount, total: amounts.total };
       if (
         b.expectedAmount !== quote.total ||
         b.pricingVersion !== settings.version
@@ -185,8 +205,16 @@ export async function POST(request: Request) {
           ? validateLeather(b.leather, String(quote.design))
           : null;
 
-      const cardArtwork = quote.design === 'customer' && quote.format !== 'keychain' ? validateLeather(b.cardArtwork, 'customer') : null;
-      const pvcArtwork = quote.design === 'customer' && quote.format !== 'card' && quote.keychain === 'PVC + epóxi' ? validateLeather(b.pvcArtwork, 'customer') : null;
+      const cardArtwork =
+        quote.design === 'customer' && quote.format !== 'keychain'
+          ? validateLeather(b.cardArtwork, 'customer')
+          : null;
+      const pvcArtwork =
+        quote.design === 'customer' &&
+        quote.format !== 'card' &&
+        quote.keychain === 'PVC + epóxi'
+          ? validateLeather(b.pvcArtwork, 'customer')
+          : null;
       for (const artwork of [leather, cardArtwork, pvcArtwork]) {
         if (!artwork?.assetId) continue;
         const asset = await env.PROFILE_PHOTOS?.head(
@@ -266,7 +294,21 @@ export async function POST(request: Request) {
           user.userId,
         ),
       );
-      if (referral) statements.push(env.DB.prepare('INSERT INTO ambassador_sales(order_id,ambassador_id,code,base_amount,discount_amount,commission_bps,commission_amount,created_at) VALUES(?,?,?,?,?,?,?,?)').bind(id,referral.account_id,referral.code,referral.base,referral.discount,referral.commission_bps,referral.commission,now));
+      if (referral)
+        statements.push(
+          env.DB.prepare(
+            'INSERT INTO ambassador_sales(order_id,ambassador_id,code,base_amount,discount_amount,commission_bps,commission_amount,created_at) VALUES(?,?,?,?,?,?,?,?)',
+          ).bind(
+            id,
+            referral.account_id,
+            referral.code,
+            referral.base,
+            referral.discount,
+            referral.commission_bps,
+            referral.commission,
+            now,
+          ),
+        );
       for (const pid of quote.ids)
         statements.push(
           env.DB.prepare(
@@ -347,11 +389,18 @@ export async function POST(request: Request) {
     } catch (error) {
       // Never log provider bodies, credentials, payer details or request payloads.
       const diagnostic = paymentDiagnostic(error);
-      console.warn(JSON.stringify({ event: 'paysuite_checkout_failed', paymentReference: id, timestamp: new Date().toISOString(), ...diagnostic }));
+      console.warn(
+        JSON.stringify({
+          event: 'paysuite_checkout_failed',
+          paymentReference: id,
+          timestamp: new Date().toISOString(),
+          ...diagnostic,
+        }),
+      );
       // Persist the sanitized category so failures stay visible after the fact.
       try {
         await env.DB.prepare(
-          "INSERT OR IGNORE INTO paysuite_events(fingerprint,payment_id,event,received_at) VALUES(?,?,?,?)",
+          'INSERT OR IGNORE INTO paysuite_events(fingerprint,payment_id,event,received_at) VALUES(?,?,?,?)',
         )
           .bind(
             'launch-failed:' + id,

@@ -8,7 +8,17 @@
 .purchase-price-breakdown { margin:18px 0 12px; display:grid; gap:10px; padding-top:16px; border-top:1px solid #e8ded5; }
 .purchase-price-breakdown > div { display:flex; justify-content:space-between; align-items:baseline; gap:16px; }
 .purchase-price-breakdown dt { color:#655c55; }
-.purchase-price-breakdown dd { margin:0; text-align:right; font-weight:600; }
+.purchase-price-breakdown dd { margin:0; text-align:right; font-weight:600; white-space:nowrap; flex-shrink:0; }
+.ambassador-code > :is(span,output) { width:100%; font-size:13px; line-height:1.6; }
+.ambassador-code > button { min-height:44px; }
+.ambassador-picker { max-height:85dvh; overflow:auto; }
+.ambassador-picker label { display:grid; gap:8px; }
+.ambassador-picker input { min-height:44px; border:1px solid #d8cfc5; border-radius:8px; padding:10px; font:inherit; width:100%; }
+.ambassador-picker-list { display:grid; gap:8px; }
+.ambassador-picker-list button { display:flex; flex-wrap:wrap; justify-content:space-between; text-align:left; gap:8px; min-height:48px; padding:12px; border:1px solid #dfcfc3; border-radius:10px; background:#fffaf6; cursor:pointer; }
+.ambassador-picker-list button:hover { border-color:var(--framy-orange-text); }
+.ambassador-picker-list span { color:#95400d; font-variant-numeric:tabular-nums; }
+.ambassador-picker-list button:disabled { opacity:.55; cursor:wait; }
 .purchase-configurator .configuration-summary .purchase-total { font-size:20px; padding:14px; margin:16px 0; }
 .purchase-configurator .configuration-summary .purchase-next-step { padding:12px; font-size:12px; margin-bottom:16px; }
 .purchase-next-step summary { cursor:pointer; font-weight:600; }

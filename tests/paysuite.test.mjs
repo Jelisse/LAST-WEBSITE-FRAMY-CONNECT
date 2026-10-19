@@ -1219,3 +1219,52 @@ test('publication alert failures preserve published data and use stable idempote
  await profilePublicationAlerts(f.env,now+16*60000);assert.equal(keys.length,2);assert.equal(keys[0],keys[1]);
  await profilePublicationAlerts(f.env,now+24*3600000);assert.equal(keys.length,2);assert.equal(f.sql.prepare("SELECT status FROM profile_publication_alerts WHERE owner_id='buyer'").get().status,'review');
 });
+
+
+test('discounted product subtotal stays correct before delivery is selected and final total excludes design and delivery from discount',async()=>{
+ const {purchaseAmounts}=await api('lib/purchase-amounts.ts');
+ assert.deepEqual(purchaseAmounts(50000,5000,0,null),{subtotal:45000,total:null});
+ assert.deepEqual(purchaseAmounts(50000,5000,0,0),{subtotal:45000,total:45000});
+ assert.deepEqual(purchaseAmounts(50000,5000,15000,20000),{subtotal:45000,total:80000});
+ assert.deepEqual(purchaseAmounts(50000,0,0,0),{subtotal:50000,total:50000});
+ assert.deepEqual(purchaseAmounts(null,0,null,null),{subtotal:null,total:null});
+ assert.throws(()=>purchaseAmounts(50000,50001,0,0));
+});
+
+test('ambassador picker exposes only active public names and codes and excludes the buyer own code',async t=>{
+ const f=fixture(t),route=await api('app/api/ambassadors/route.ts');const now=new Date().toISOString();
+ f.sql.prepare("INSERT INTO ambassadors(account_id,code,created_at) VALUES('other','OTHER1234',?)").run(now);f.sql.prepare("INSERT INTO ambassadors(account_id,code,created_at) VALUES('buyer','BUYER5678',?)").run(now);
+ globalThis.__paysuite.user=null;
+ const publicChoices=await route.GET(new Request('https://framyconnect.co.mz/api/ambassadors?choices=1'));assert.equal(publicChoices.status,200);const result=await publicChoices.json();assert.equal(result.items.length,2);assert.deepEqual(Object.keys(result.items[0]).sort(),['code','name']);assert.doesNotMatch(JSON.stringify(result),/email|commission|account_id|password/);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};
+ const signed=await (await route.GET(new Request('https://framyconnect.co.mz/api/ambassadors?choices=1'))).json();assert.deepEqual(signed.items,[{name:'other',code:'OTHER1234'}]);
+ assert.equal((await (await route.GET(new Request('https://framyconnect.co.mz/api/ambassadors?code=BUYER5678'))).json()).valid,false);
+ f.sql.exec("UPDATE auth_accounts SET active=0 WHERE id='other'");assert.equal((await (await route.GET(new Request('https://framyconnect.co.mz/api/ambassadors?choices=1'))).json()).items.length,0);
+});
+
+test('500 MT keychain with selected ambassador sends exactly 450 MT to PaySuite and commissions use original 500 MT',async t=>{
+ const f=fixture(t),route=await api('app/api/paysuite/checkout/route.ts');f.sql.prepare("INSERT INTO ambassadors(account_id,code,commission_bps,created_at) VALUES('other','OTHER1234',1500,?)").run(new Date().toISOString());
+ const body=product({format:'keychain',delivery:'pickup',pickupPoint:'mahota',address:'',ambassadorCode:'OTHER1234',expectedAmount:45000});
+ const result=await route.POST(request(body));assert.equal(result.status,200,await result.clone().text());assert.equal([...f.records.values()][0].amount,'450.00');
+ const sale=f.sql.prepare('SELECT base_amount,discount_amount,commission_amount FROM ambassador_sales').get();assert.deepEqual({...sale},{base_amount:50000,discount_amount:5000,commission_amount:7500});
+ assert.equal(f.sql.prepare('SELECT amount FROM paysuite_payments').get().amount,45000);
+});
+
+test('all physical materials and kits retain the same discounted quote across design and delivery choices', async()=>{
+ const {products}=await api('lib/catalog.ts');
+ const {configurationQuote}=await api('lib/checkout-pricing.ts');
+ const {purchaseAmounts}=await api('lib/purchase-amounts.ts');
+ const {fulfilmentDefaults}=await api('lib/fulfilment.ts');
+ const catalogue=products.map(p=>({...p,available:true,published:true}));
+ const settings={customer_design:15000,team_design:40000,maputo_delivery:20000,fulfilment_json:JSON.stringify(fulfilmentDefaults)};
+ const cards=['PVC','Madeira','Metal'],keys=['PVC + epóxi','Couro'];
+ for(const format of ['card','keychain','kit']) for(const card of cards) for(const keychain of keys) for(const design of ['standard','customer','team']) for(const delivery of ['pickup','standard']) {
+  const quote=configurationQuote(catalogue,settings,{format,card,keychain,design,delivery,city:'maputo',pickupPoint:'mahota'});
+  const discount=Math.round(quote.hardware/10);
+  const amounts=purchaseAmounts(quote.hardware,discount,quote.customization,quote.delivery);
+  assert.equal(amounts.total,quote.total-discount,`${format}/${card}/${keychain}/${design}/${delivery}`);
+  assert.equal(purchaseAmounts(quote.hardware,0,quote.customization,quote.delivery).total,quote.total);
+  assert.equal(quote.delivery,delivery==='pickup'?0:20000);
+ }
+ assert.throws(()=>purchaseAmounts(Number.MAX_SAFE_INTEGER,0,1,0));
+});

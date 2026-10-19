@@ -24,8 +24,13 @@ export function PaySuiteCheckout({
   const inFlight = useRef(false);
   async function pay(event: { preventDefault(): void }) {
     event.preventDefault();
-    if (inFlight.current || disabled) return;
-    if (requestId.current && requestSignature.current !== signature) { setError('Já existe uma tentativa com outras condições. Consulte os seus pagamentos antes de criar outro pedido.'); return; }
+    if (inFlight.current || disabled || !accepted) return;
+    if (requestId.current && requestSignature.current !== signature) {
+      setError(
+        'Já existe uma tentativa com outras condições. Consulte os seus pagamentos antes de criar outro pedido.',
+      );
+      return;
+    }
     inFlight.current = true;
     setBusy(true);
     setError('');
@@ -73,7 +78,8 @@ export function PaySuiteCheckout({
         return;
       }
       if (!response.ok) {
-        requestId.current = null;
+        // Server failures can follow a committed order: retry the same reference.
+        if (response.status < 500) requestId.current = null;
         throw Error(data.error || 'Não foi possível iniciar o pagamento.');
       }
       if (data.status === 'pending' && data.url) {
@@ -99,7 +105,9 @@ export function PaySuiteCheckout({
     <form onSubmit={pay} className="paysuite-checkout">
       <p>
         {t(
-          compact ? 'Pagamento seguro na PaySuite. Não guardamos PINs nem dados do cartão.' : ' O pagamento é concluído na página segura da PaySuite. Não guardamos dados do cartão nem PINs. ',
+          compact
+            ? 'Pagamento seguro na PaySuite. Não guardamos PINs nem dados do cartão.'
+            : ' O pagamento é concluído na página segura da PaySuite. Não guardamos dados do cartão nem PINs. ',
         )}
       </p>
       <label className="growth-check">
@@ -111,7 +119,9 @@ export function PaySuiteCheckout({
           disabled={busy || disabled}
         />
         {t(
-          compact ? 'Confirmo o total. Sem débitos automáticos.' : ' Confirmo o total apresentado. Este pagamento não autoriza débitos automáticos. ',
+          compact
+            ? 'Confirmo o total. Sem débitos automáticos.'
+            : ' Confirmo o total apresentado. Este pagamento não autoriza débitos automáticos. ',
         )}
       </label>
       {error && <p role="alert">{t(error)}</p>}
@@ -119,7 +129,13 @@ export function PaySuiteCheckout({
         className="btn btn-primary"
         disabled={busy || disabled || !accepted}
       >
-        {t(busy ? 'A preparar pagamento…' : compact ? 'Pagar' : 'Continuar para pagamento')}
+        {t(
+          busy
+            ? 'A preparar pagamento…'
+            : compact
+              ? 'Pagar'
+              : 'Continuar para pagamento',
+        )}
       </button>
       <p>
         <Link href="/checkout/retorno">

@@ -6,16 +6,34 @@ import { rateLimit } from '@/lib/request-limits';
 export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   try {
-    const code = new URL(request.url).searchParams.get('code');
+    const url = new URL(request.url);
+    const code = url.searchParams.get('code');
     const db = database();
+    if (url.searchParams.get('choices') === '1') {
+      if (!(await rateLimit(request, 'ambassador-choices', 120)))
+        return json({ error: 'Aguarde antes de tentar novamente.' }, 429);
+      const user = await getChatGPTUser();
+      const q = (url.searchParams.get('q') || '').trim().slice(0, 100);
+      const rows = await db
+        .prepare(
+          "SELECT a.name,b.code FROM ambassadors b JOIN auth_accounts a ON a.id=b.account_id AND a.active=1 WHERE b.active=1 AND a.id<>? AND instr(lower(a.name||' '||b.code),lower(?))>0 ORDER BY a.name,b.code LIMIT 101",
+        )
+        .bind(user?.userId || '', q)
+        .all<{ name: string; code: string }>();
+      return json({
+        items: rows.results.slice(0, 100),
+        truncated: rows.results.length > 100,
+      });
+    }
     if (code !== null) {
       if (!(await rateLimit(request, 'ambassador-code', 60)))
         return json({ error: 'Aguarde antes de tentar novamente.' }, 429);
+      const viewer = await getChatGPTUser();
       const row = await db
         .prepare(
-          'SELECT b.code FROM ambassadors b JOIN auth_accounts a ON a.id=b.account_id AND a.active=1 WHERE b.code=? AND b.active=1',
+          'SELECT b.code FROM ambassadors b JOIN auth_accounts a ON a.id=b.account_id AND a.active=1 WHERE b.code=? AND b.active=1 AND a.id<>?',
         )
-        .bind(normalizeAmbassadorCode(code))
+        .bind(normalizeAmbassadorCode(code), viewer?.userId || '')
         .first();
       return json({
         valid: !!row,
