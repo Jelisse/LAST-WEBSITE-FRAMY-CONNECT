@@ -1,3 +1,4 @@
+import {profilePublicationAlerts} from './lib/profile-publication-alerts';
 import { paymentReceipts } from './lib/payment-receipts';
 import { profileReminders } from './lib/profile-reminders';
 import { refreshProfileDomains } from './lib/profile-domains';
@@ -49,6 +50,7 @@ const worker = {
     );
     ctx.waitUntil(profileReminders(env));
     ctx.waitUntil(paymentReceipts(env));
+    ctx.waitUntil(profilePublicationAlerts(env));
     ctx.waitUntil(refreshProfileDomains(env));
     ctx.waitUntil(
       env.DB.prepare(
@@ -92,6 +94,8 @@ const worker = {
       routed instanceof Response
         ? routed
         : await handler.fetch(routed, env, ctx);
+    if(request.method==='POST' && new URL(request.url).pathname==='/api/workspace' && response.ok)
+      ctx.waitUntil(profilePublicationAlerts(env).catch(()=>{}));
     // Preserve development websocket upgrades and streams.
     if (response.status === 101) return response;
     const localized = await localizedResponse(request, response);

@@ -2,7 +2,10 @@
 import { useI18n } from '@/components/language-provider';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { CorporateApproval, type CorporateAccountRequest } from './corporate-approval';
+import {
+  CorporateApproval,
+  type CorporateAccountRequest,
+} from './corporate-approval';
 import { roleLabels } from '@/lib/staff-policy';
 type Account = CorporateAccountRequest & {
   id: string;
@@ -28,6 +31,12 @@ export function AccountManager() {
   }, [recovery]);
   const [data, setData] = useState<{
       accounts: Account[];
+      totals?: {
+        total: number;
+        published: number;
+        unpublished: number;
+        matching: number;
+      };
       agents: { id: string; name: string }[];
       selfId: string;
       canCreateDirector: boolean;
@@ -57,7 +66,12 @@ export function AccountManager() {
     // Refresh published links while management stays open, without interrupting
     // account changes or an open confirmation/recovery flow.
     const refresh = () => {
-      if (document.visibilityState !== 'visible' || busy || recovery || confirmDelete)
+      if (
+        document.visibilityState !== 'visible' ||
+        busy ||
+        recovery ||
+        confirmDelete
+      )
         return;
       void load().catch((e) => setError(e.message));
     };
@@ -100,6 +114,22 @@ export function AccountManager() {
       </p>
       {error && <p role="alert">{t(error)}</p>}
       {notice && <output>{t(notice)}</output>}
+      {data?.totals && (
+        <div className="account-totals" aria-live="polite">
+          <p>
+            <strong>{data.totals.total}</strong>
+            {t('Contas registadas')}
+          </p>
+          <p>
+            <strong>{data.totals.published}</strong>
+            {t('Com perfil publicado')}
+          </p>
+          <p>
+            <strong>{data.totals.unpublished}</strong>
+            {t('Sem perfil publicado')}
+          </p>
+        </div>
+      )}
       <label>
         {t('Pesquisar por nome ou email')}
         <input
@@ -276,10 +306,19 @@ export function AccountManager() {
           </button>
         </form>
       </details>
+      {search && data?.totals && (
+        <p>
+          {t('Resultados: {0}. Contas apresentadas: {1}.', [
+            data.totals.matching,
+            data.accounts.length,
+          ])}
+        </p>
+      )}
       <div className="manager-table-scroll">
         <table>
           <thead>
             <tr>
+              <th scope="col">{t('N.º')}</th>
               <th>{t('Nome')}</th>
               <th>{t('Email')}</th>
               <th>{t('Acesso')}</th>
@@ -289,11 +328,17 @@ export function AccountManager() {
             </tr>
           </thead>
           <tbody>
-            {data?.accounts.map((a) => (
+            {data?.accounts.map((a, index) => (
               <tr key={a.id}>
+                <td className="account-row-number">{index + 1}</td>
                 <td>{a.name}</td>
                 <td>{a.email}</td>
-                <td>{t(roleLabels[a.role])}{a.corporateStatus && <CorporateApproval account={a} busy={busy} save={save}/>}</td>
+                <td>
+                  {t(roleLabels[a.role])}
+                  {a.corporateStatus && (
+                    <CorporateApproval account={a} busy={busy} save={save} />
+                  )}
+                </td>
                 <td>{a.active ? t('Activo') : t('Inactivo / por activar')}</td>
                 <td>
                   {a.profileUsername ? (
@@ -315,7 +360,9 @@ export function AccountManager() {
                           <button
                             type="button"
                             className="account-copy-link"
-                            data-copied={copiedLink === a.id + ':' + a.profileUsername}
+                            data-copied={
+                              copiedLink === a.id + ':' + a.profileUsername
+                            }
                             disabled={copyingLink}
                             aria-live="polite"
                             onClick={async () => {
@@ -339,7 +386,11 @@ export function AccountManager() {
                               }
                             }}
                           >
-                            {t(copiedLink === a.id + ':' + a.profileUsername ? 'Link copiado.' : 'Copiar link')}
+                            {t(
+                              copiedLink === a.id + ':' + a.profileUsername
+                                ? 'Link copiado.'
+                                : 'Copiar link',
+                            )}
                           </button>
                         </div>
                       )}

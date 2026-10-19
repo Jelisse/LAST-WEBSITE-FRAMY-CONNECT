@@ -1184,3 +1184,38 @@ test('Corporate emails escape company and leader HTML and keep a single explicit
  assert.doesNotMatch(mail.html,/<img|<script/);assert.match(mail.html,/&lt;img/);assert.match(mail.html,/Leader &lt;script/);assert.equal((mail.html.match(/<a /g)||[]).length,1);assert.match(mail.html,/Aceitar convite/);
  const authorization=corporateInvitationEmail('Company','Leader','https://example.invalid/corporativo/aceitar#'+'a'.repeat(64),true);assert.match(authorization.text,/possa redefinir/);assert.match(authorization.html,/Autorizar cria/);
 });
+
+
+test('account totals count all permitted accounts beyond the 500 row limit and retain global totals during search',async t=>{
+ const f=fixture(t),accounts=await api('app/api/accounts/route.ts');globalThis.__paysuite.user={userId:'manager',role:'manager'};
+ const insert=f.sql.prepare("INSERT INTO auth_accounts(id,name,email,password_hash,role,created_at) VALUES(?,?,?,'unused',?,'2026-10-19')");
+ insert.run('hidden-director','Hidden Director','director@example.invalid','director');
+ for(let i=0;i<501;i++)insert.run('count-'+i,'Count '+i,'count'+i+'@example.invalid','customer');
+ const response=await accounts.GET(new Request('https://framyconnect.co.mz/api/accounts'));assert.equal(response.status,200);const b=await response.json();
+ assert.equal(b.accounts.length,500);assert.equal(b.totals.total,504);assert.equal(b.totals.published,1);assert.equal(b.totals.unpublished,503);assert.equal(b.totals.matching,504);
+ const searched=await (await accounts.GET(new Request('https://framyconnect.co.mz/api/accounts?q=other@example.test'))).json();assert.equal(searched.accounts.length,1);assert.equal(searched.totals.matching,1);assert.equal(searched.totals.total,504);
+ const hidden=await (await accounts.GET(new Request('https://framyconnect.co.mz/api/accounts?q=Hidden'))).json();assert.equal(hidden.accounts.length,0);assert.equal(hidden.totals.matching,0);
+ globalThis.__paysuite.user={userId:'hidden-director',role:'director'};const director=await (await accounts.GET()).json();assert.equal(director.totals.total,505);
+});
+
+test('first publication queues atomically and alerts the fixed manager once despite edits or republishing',async t=>{
+ const f=fixture(t),{profilePublicationAlerts}=await api('lib/profile-publication-alerts.ts');
+ f.sql.exec("UPDATE profile_publication_alerts SET status='baseline'");
+ f.sql.prepare("INSERT INTO profiles(owner_id,username,draft_json,updated_at) VALUES('other','new_worker','{}','2026-10-19')").run();
+ f.sql.exec("BEGIN; UPDATE profiles SET published_json='{}' WHERE owner_id='other'");assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM profile_publication_alerts WHERE owner_id='other'").get().n,1);f.sql.exec('ROLLBACK');assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM profile_publication_alerts WHERE owner_id='other'").get().n,0);
+ f.sql.exec("UPDATE profiles SET published_json='{}' WHERE owner_id='other'");
+ f.env.RESEND_API_KEY='fake';f.env.PROFILE_EMAIL_FROM='Framy <info@example.invalid>';
+ const sent=[];globalThis.fetch=async(url,options)=>{assert.equal(url,'https://api.resend.com/emails');sent.push(JSON.parse(options.body));return Response.json({id:'fake-message'});};
+ await Promise.all([profilePublicationAlerts(f.env),profilePublicationAlerts(f.env)]);assert.equal(sent.length,1);assert.deepEqual(sent[0].to,['firminochambale@framyconnect.co.mz']);assert.match(sent[0].text,/https:\/\/framyconnect.co.mz\/new_worker/);assert.doesNotMatch(sent[0].text,/other@example/);
+ f.sql.exec("UPDATE profiles SET published_json='{}' WHERE owner_id='other'; UPDATE profiles SET published_json=NULL WHERE owner_id='other'; UPDATE profiles SET published_json='{}' WHERE owner_id='other'");
+ await profilePublicationAlerts(f.env);assert.equal(sent.length,1);assert.equal(f.sql.prepare("SELECT status FROM profile_publication_alerts WHERE owner_id='other'").get().status,'sent');
+});
+
+test('publication alert failures preserve published data and use stable idempotency until retry expiry',async t=>{
+ const f=fixture(t),{profilePublicationAlerts}=await api('lib/profile-publication-alerts.ts');f.env.RESEND_API_KEY='fake';f.env.PROFILE_EMAIL_FROM='Framy <info@example.invalid>';
+ const keys=[];globalThis.fetch=async(url,options)=>{keys.push(options.headers['Idempotency-Key']);throw Error('ambiguous timeout');};const now=Date.now()+1000;
+ await profilePublicationAlerts(f.env,now);assert.equal(keys.length,1);assert.equal(f.sql.prepare("SELECT published_json FROM profiles WHERE owner_id='buyer'").get().published_json,'{}');
+ await profilePublicationAlerts(f.env,now+1000);assert.equal(keys.length,1);
+ await profilePublicationAlerts(f.env,now+16*60000);assert.equal(keys.length,2);assert.equal(keys[0],keys[1]);
+ await profilePublicationAlerts(f.env,now+24*3600000);assert.equal(keys.length,2);assert.equal(f.sql.prepare("SELECT status FROM profile_publication_alerts WHERE owner_id='buyer'").get().status,'review');
+});

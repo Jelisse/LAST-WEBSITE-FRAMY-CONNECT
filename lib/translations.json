@@ -1,4 +1,9 @@
 {
+  "Contas registadas": ["Registered accounts", "已註冊帳戶"],
+  "Com perfil publicado": ["With a published profile", "已發佈個人檔案"],
+  "Sem perfil publicado": ["Without a published profile", "未發佈個人檔案"],
+  "N.º": ["No.", "編號"],
+  "Resultados: {0}. Contas apresentadas: {1}.": ["Results: {0}. Accounts displayed: {1}.", "結果：{0}。顯示帳戶：{1}。"],
   "Adicionar trabalhadores por email": ["Add employees by email", "透過電子郵件新增員工"],
   "Escreva os emails e use + para adicionar mais. A mensagem com a empresa e o líder é preparada automaticamente; não precisa escrever um email.": ["Enter email addresses and use + to add more. The message with your company and leader is prepared automatically; you do not need to write an email.", "輸入電子郵件地址，並使用 + 新增更多欄位。系統會自動準備包含公司及主管姓名的訊息，您無需撰寫郵件。"],
   "Email do trabalhador {0}": ["Employee email {0}", "員工電子郵件 {0}"],

@@ -338,11 +338,13 @@ test('scheduled retention removes old analytics without touching recent events o
       'profileReminders',
       'refreshProfileDomains',
       'paymentReceipts',
+      'profilePublicationAlerts',
       code,
     )(
       exports,
       {},
       () => {},
+      async () => {},
       async () => {},
       async () => {},
       async () => {},

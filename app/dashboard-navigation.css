@@ -88,3 +88,8 @@ body .refined-workspace [data-slot="sidebar-footer"] { padding: 16px; }
   body .refined-workspace [data-slot="sidebar-header"],
   body .refined-workspace [data-slot="sidebar-footer"] { padding: 12px; }
 }
+.account-totals { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:18px 0; }
+.account-totals p { margin:0; padding:16px; border:1px solid #eee1d7; border-radius:12px; background:#fffaf6; }
+.account-totals strong { display:block; font-size:26px; color:var(--framy-orange-text); }
+.account-row-number { width:52px; color:#77695f; font-variant-numeric:tabular-nums; }
+@media(max-width:600px) { .account-totals { grid-template-columns:1fr; } .account-totals p { display:flex; align-items:center; gap:12px; padding:12px; } }

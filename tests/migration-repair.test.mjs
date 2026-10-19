@@ -72,6 +72,7 @@ test('database repair identifies missing post-auth migrations without replaying 
     '0030_permanent_individual.sql',
     '0031_corporate_organisations.sql',
     '0032_corporate_onboarding.sql',
+    '0033_profile_publication_alerts.sql',
   ]);
 });
 test('database repair is a no-op when schema and inventory migration are applied', () => {
@@ -169,4 +170,14 @@ test('paysuite method-optional rebuild preserves rows, relaxes the check and sta
     1,
   );
   db.close();
+});
+
+
+test('publication alert migration baselines existing published profiles without historical email flood',()=>{
+ const db=new DatabaseSync(':memory:');try{
+  for(const file of files.filter(f=>f!=='0033_profile_publication_alerts.sql'))db.exec(readFileSync('drizzle/'+file,'utf8'));
+  db.exec("INSERT INTO auth_accounts(id,email,name,password_hash,role,created_at) VALUES('old','old@example.invalid','Old','unused','customer','2026-10-19'); INSERT INTO profiles(owner_id,username,draft_json,published_json,updated_at) VALUES('old','old-profile','{}','{}','2026-10-19')");
+  db.exec(readFileSync('drizzle/0033_profile_publication_alerts.sql','utf8'));assert.equal(db.prepare("SELECT status FROM profile_publication_alerts WHERE owner_id='old'").get().status,'baseline');
+  db.exec("UPDATE profiles SET published_json=NULL WHERE owner_id='old';UPDATE profiles SET published_json='{}' WHERE owner_id='old'");assert.equal(db.prepare("SELECT status FROM profile_publication_alerts WHERE owner_id='old'").get().status,'baseline');
+ }finally{db.close();}
 });

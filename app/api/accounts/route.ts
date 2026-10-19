@@ -30,16 +30,28 @@ export async function GET(request?: Request) {
     const pattern = '%' + search.replace(/[\\%_]/g, '\\$&') + '%';
     const rows = await db
       .prepare(
-        "SELECT a.id,a.name,a.email,a.role,a.active,a.version,r.status AS corporateStatus,r.company AS corporateCompany,r.people AS corporatePeople,r.version AS corporateVersion,r.seats AS corporateSeats,p.username AS profileUsername,CASE WHEN p.published_json IS NOT NULL THEN 1 ELSE 0 END AS profilePublished FROM auth_accounts a LEFT JOIN profiles p ON p.owner_id=a.id LEFT JOIN corporate_requests r ON r.owner_id=a.id WHERE (a.name LIKE ? ESCAPE '\\' OR a.email LIKE ? ESCAPE '\\') ORDER BY a.name LIMIT 500",
+        "SELECT a.id,a.name,a.email,a.role,a.active,a.version,r.status AS corporateStatus,r.company AS corporateCompany,r.people AS corporatePeople,r.version AS corporateVersion,r.seats AS corporateSeats,p.username AS profileUsername,CASE WHEN p.published_json IS NOT NULL THEN 1 ELSE 0 END AS profilePublished FROM auth_accounts a LEFT JOIN profiles p ON p.owner_id=a.id LEFT JOIN corporate_requests r ON r.owner_id=a.id WHERE (a.name LIKE ? ESCAPE '\\' OR a.email LIKE ? ESCAPE '\\') AND (?='director' OR a.role<>'director') ORDER BY a.name,a.id LIMIT 500",
       )
-      .bind(pattern, pattern)
+      .bind(pattern, pattern, user.role)
       .all<Row>();
+    const totals = await db
+      .prepare(
+        "SELECT COUNT(*) AS total,COALESCE(SUM(p.published_json IS NOT NULL),0) AS published,COALESCE(SUM(p.published_json IS NULL),0) AS unpublished,COALESCE(SUM(a.name LIKE ? ESCAPE '\\' OR a.email LIKE ? ESCAPE '\\'),0) AS matching FROM auth_accounts a LEFT JOIN profiles p ON p.owner_id=a.id WHERE (?='director' OR a.role<>'director')",
+      )
+      .bind(pattern, pattern, user.role)
+      .first<{
+        total: number;
+        published: number;
+        unpublished: number;
+        matching: number;
+      }>();
     const agents = await db
       .prepare(
         "SELECT id,json_extract(data_json,'$.name') AS name FROM manager_records WHERE kind='agent' AND NOT EXISTS(SELECT 1 FROM auth_accounts WHERE auth_accounts.id=manager_records.id)",
       )
       .all();
     return json({
+      totals,
       recoveryEmailReady: !!(
         env.RESEND_API_KEY &&
         env.PROFILE_EMAIL_FROM &&
