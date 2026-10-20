@@ -1,8 +1,15 @@
 'use client';
+import { CorporateSidebar } from './corporate-sidebar';
 import { Building2, Users, ArrowRight } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from './hard-link';
 import { focusDashboardStart } from '@/lib/dashboard-navigation';
+import { CorporateReports } from './corporate-reports';
+import { CorporateGuide } from './corporate-guide';
+import {
+  corporateSections,
+  type CorporateSection,
+} from '@/lib/corporate-navigation';
 import { CorporateEmailInvites } from './corporate-email-invites';
 import { CorporateCredentials } from './corporate-credentials';
 import { SourceImage } from './source-image';
@@ -78,11 +85,19 @@ type Detail = {
   }[];
   truncated: boolean;
 };
-export function CorporateDashboard() {
+export function CorporateDashboard({
+  view = 'reports',
+  initialOrganisation = '',
+  initialCampaign = '',
+}: {
+  view?: CorporateSection;
+  initialOrganisation?: string;
+  initialCampaign?: string;
+}) {
   const { t, locale } = useI18n();
   const [data, setData] = useState<Data | null>(null),
     [detail, setDetail] = useState<Detail | null>(null),
-    [organisation, setOrganisation] = useState(''),
+    [organisation, setOrganisation] = useState(initialOrganisation),
     [days, setDays] = useState('30'),
     [campaign, setCampaign] = useState(''),
     [error, setError] = useState(''),
@@ -107,7 +122,7 @@ export function CorporateDashboard() {
     setNow(Date.now());
     if (!organisation && body.organisations.length)
       setOrganisation(body.organisations[0].id);
-    if (organisation) {
+    if (organisation && view !== 'reports' && view !== 'guide') {
       const r = await fetch(
         '/api/corporate?' + new URLSearchParams({ organisation, days }),
         { cache: 'no-store' },
@@ -120,7 +135,7 @@ export function CorporateDashboard() {
       }
       setDetail(b);
     }
-  }, [organisation, days]);
+  }, [organisation, days, view]);
   useEffect(() => {
     let cancelled = false;
     queueMicrotask(() => {
@@ -195,15 +210,6 @@ export function CorporateDashboard() {
   }
   const leader = detail?.organisation.role === 'leader';
   const owner = detail?.organisation.owner_id === detail?.organisation.actor_id;
-  const metrics = (account: string, target?: string) =>
-    detail?.metrics
-      .filter(
-        (m) =>
-          m.account_id === account &&
-          (!campaign || m.campaign_id === campaign) &&
-          (target ? m.target === target : m.target !== 'profile_open'),
-      )
-      .reduce((sum, m) => sum + m.count, 0) ?? 0;
   const leads =
     detail?.leads.filter(
       (l) =>
@@ -215,32 +221,15 @@ export function CorporateDashboard() {
   function exportResults() {
     if (!detail) return;
     const rows = [
-      [
-        'Trabalhador',
-        'Equipa',
-        'Campanha',
-        'Aberturas do perfil',
-        'Cliques',
-        'Contactos recebidos',
-      ],
-      ...detail.members
-        .filter((m) => !teamFilter || m.team === teamFilter)
-        .map((m) => [
-          m.name,
-          m.team,
-          campaign
-            ? detail.campaigns.find((c) => c.id === campaign)?.name
-            : 'Todas',
-          metrics(m.account_id, 'profile_open'),
-          metrics(m.account_id),
-          detail.leadCounts
-            .filter(
-              (l) =>
-                l.account_id === m.account_id &&
-                (!campaign || l.campaign_id === campaign),
-            )
-            .reduce((sum, l) => sum + l.count, 0),
-        ]),
+      ['Nome', 'Email', 'Telefone', 'Interesse', 'Trabalhador', 'Data'],
+      ...leads.map((l) => [
+        l.name,
+        l.email,
+        l.phone,
+        l.interest,
+        detail.members.find((m) => m.account_id === l.account_id)?.name ?? '',
+        new Date(l.created_at).toISOString(),
+      ]),
     ];
     const url = URL.createObjectURL(
       new Blob(
@@ -250,666 +239,745 @@ export function CorporateDashboard() {
     );
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'framy-corporativo.csv';
+    a.download = 'framy-contactos.csv';
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   return (
-    <main id="main" className="staff-page corporate-dashboard">
+    <main
+      id="main"
+      className={
+        'staff-page corporate-dashboard corporate-shell corporate-view-' + view
+      }
+    >
       <header>
         <DashboardTools />
       </header>
-      <div className="corporate-hero">
-        <span className="corporate-eyebrow">
-          <Building2 size={18} aria-hidden="true" /> FRAMY CONNECT ·{' '}
-          {t('Corporativo')}
-        </span>
-        <h1>{t('Equipa corporativa')}</h1>
-        <p>{t('Uma equipa. Mais conexões.')}</p>
-      </div>
-      <nav
-        className="corporate-toolbar corporate-tabs"
-        aria-label={t('Navegação corporativa')}
-      >
-        <Link href="/corporativo" aria-current="page">
-          {t('Equipa')}
-        </Link>
-        <Link href="/perfil">{t('Perfil')}</Link>
-        <Link href="/corporativo/configurar">{t('Empresa')}</Link>
-      </nav>
-      <p>
-        {t(
-          'Organize trabalhadores e campanhas. Acompanhe apenas a actividade recolhida para a organização.',
+      <CorporateSidebar current={view} organisation={organisation} />
+      <div className="corporate-content">
+        <div className="corporate-hero">
+          <span className="corporate-eyebrow">
+            <Building2 size={18} aria-hidden="true" /> FRAMY CONNECT ·{' '}
+            {t('Corporativo')}
+          </span>
+          <h1>
+            {t(corporateSections.find((section) => section.id === view)!.title)}
+          </h1>
+          <p>{t('Uma equipa. Mais conexões.')}</p>
+        </div>
+
+        {view !== 'reports' && (
+          <>
+            {' '}
+            <p>
+              {t(
+                'Organize trabalhadores e campanhas. Acompanhe apenas a actividade recolhida para a organização.',
+              )}
+            </p>
+          </>
         )}
-      </p>
-      {error && <p role="alert">{t(error)}</p>}
-      {notice && <output>{t(notice)}</output>}
-      {!data ? (
-        <p>{t('A carregar…')}</p>
-      ) : (
-        <>
-          {!!data.organisations.length && (
-            <div className="corporate-toolbar corporate-organisation">
-              <label>
-                {t('Organização')}
-                <select
-                  value={organisation}
-                  disabled={busy}
-                  onChange={(e) => {
-                    setOrganisation(e.target.value);
-                    focusDashboardStart();
-                    setDetail(null);
-                    setCampaign('');
-                    setTeamFilter('');
-                    setError('');
-                  }}
-                >
-                  <option value="">{t('Seleccionar')}</option>
-                  {data.organisations.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                disabled={busy || refreshing}
-                onClick={async () => {
-                  setRefreshing(true);
-                  setError('');
-                  try {
-                    await load();
-                    setNotice('Dados actualizados.');
-                  } catch (e) {
-                    setError(
-                      e instanceof Error
-                        ? e.message
-                        : 'Não foi possível carregar.',
-                    );
-                  } finally {
-                    setRefreshing(false);
-                  }
-                }}
-              >
-                {t(refreshing ? 'A actualizar…' : 'Actualizar')}
-              </button>
-              {organisation &&
-                data.actorId &&
-                data.organisations.some(
-                  (o) => o.id === organisation && o.owner_id !== data.actorId,
-                ) && (
-                  <button
+        {error && <p role="alert">{t(error)}</p>}
+        {notice && <output>{t(notice)}</output>}
+        {!data ? (
+          <p>{t('A carregar…')}</p>
+        ) : (
+          <>
+            {!!data.organisations.length && (
+              <div className="corporate-toolbar corporate-organisation">
+                <label>
+                  {t('Organização')}
+                  <select
+                    value={organisation}
                     disabled={busy}
-                    onClick={() => void act({ action: 'leave' })}
-                  >
-                    {t('Sair da organização')}
-                  </button>
-                )}
-            </div>
-          )}
-          {data.canCreate && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                void act({
-                  action: 'create',
-                  name: new FormData(e.currentTarget).get('name'),
-                });
-              }}
-            >
-              <h2>{t('Criar organização')}</h2>
-              <label>
-                {t('Nome')}
-                <input name="name" required maxLength={100} />
-              </label>
-              <button disabled={busy}>{t('Criar')}</button>
-            </form>
-          )}
-          {!data.canCreate && !data.organisations.length && (
-            <section className="corporate-empty corporate-panel">
-              <span className="corporate-empty-icon">
-                <Users size={36} aria-hidden="true" />
-              </span>
-              <h2>{t('Comece pela sua empresa')}</h2>
-              <p>
-                {t(
-                  'Configure a empresa e envie o pedido de aprovação. Se é trabalhador, aceite o convite recebido por email.',
-                )}
-              </p>
-              <Link
-                className="corporate-primary"
-                href="/corporativo/configurar"
-              >
-                {t('Configurar a minha empresa')}
-                <ArrowRight size={18} aria-hidden="true" />
-              </Link>
-              <small>
-                {t(
-                  'Após aprovação, adicione a equipa e acompanhe as campanhas num só lugar.',
-                )}
-              </small>
-            </section>
-          )}
-          {detail && (
-            <>
-              <h2>{detail.organisation.name}</h2>
-              {detail.organisation.analytics === false && (
-                <p>
-                  {t('Este contrato não inclui estatísticas corporativas.')}
-                </p>
-              )}
-              {detail.truncated && (
-                <p>
-                  {t('A lista foi limitada. Refine o período e a campanha.')}
-                </p>
-              )}
-              <div
-                className="corporate-state-counts"
-                aria-label={t('Estado da equipa')}
-              >
-                <div>
-                  <strong>
-                    {
-                      detail.members.filter(
-                        (m) =>
-                          m.active &&
-                          !m.left_at &&
-                          m.within_limit !== 0 &&
-                          (!m.managed_access || m.provisioned_at),
-                      ).length
-                    }
-                  </strong>
-                  <span>{t('Acessos activos')}</span>
-                </div>
-                <div>
-                  <strong>{detail.invites.length}</strong>
-                  <span>{t('Pedidos pendentes')}</span>
-                </div>
-                <div>
-                  <strong>
-                    {
-                      detail.members.filter(
-                        (m) =>
-                          m.active &&
-                          !m.left_at &&
-                          m.managed_access &&
-                          m.within_limit !== 0 &&
-                          !m.provisioned_at,
-                      ).length
-                    }
-                  </strong>
-                  <span>{t('Prontos para criar acesso')}</span>
-                </div>
-              </div>
-              <p>
-                {t('Limite de trabalhadores')}: {detail.organisation.seats}
-              </p>
-              <div className="corporate-toolbar">
-                <label>
-                  {t('Período')}
-                  <select
-                    value={days}
-                    onChange={(e) => setDays(e.target.value)}
-                  >
-                    {[7, 30, 90].map((d) => (
-                      <option key={d} value={d}>
-                        {d} {t('dias')}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  {t('Campanha')}
-                  <select
-                    value={campaign}
-                    onChange={(e) => setCampaign(e.target.value)}
-                  >
-                    <option value="">{t('Todas')}</option>
-                    {detail.campaigns.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  {t('Equipa')}
-                  <select
-                    value={teamFilter}
-                    onChange={(e) => setTeamFilter(e.target.value)}
-                  >
-                    <option value="">{t('Todas')}</option>
-                    {[
-                      ...new Set(
-                        detail.members.map((m) => m.team).filter(Boolean),
-                      ),
-                    ].map((team) => (
-                      <option key={team} value={team}>
-                        {team}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <button onClick={exportResults}>
-                  {t('Exportar resultados CSV')}
-                </button>
-              </div>
-              <p>
-                {t(
-                  'Aberturas e cliques são acções, não pessoas únicas, contactos guardados ou seguidores confirmados.',
-                )}
-              </p>
-              {leader && (
-                <CorporateEmailInvites
-                  key={organisation}
-                  organisation={organisation}
-                  mode={inviteMode}
-                  onModeChange={setInviteMode}
-                  teams={[
-                    ...new Set(
-                      [
-                        ...detail.members.map((m) => m.team),
-                        ...detail.invites.map((i) => i.team),
-                      ].filter(Boolean),
-                    ),
-                  ]}
-                  owner={owner}
-                  emailReady={data.emailReady}
-                  busy={busy}
-                  setBusy={setBusy}
-                  reload={load}
-                />
-              )}
-              {leader && (
-                <section
-                  className="corporate-panel corporate-pending"
-                  id="pending-employees"
-                >
-                  <h2>
-                    {t('Pedidos pendentes')} ({detail.invites.length})
-                  </h2>
-                  {!detail.invites.length && (
-                    <p>{t('Não existem pedidos pendentes.')}</p>
-                  )}
-                  {detail.invites.map((i) => (
-                    <div className="corporate-toolbar" key={i.id}>
-                      <div className="corporate-pending-info">
-                        <strong>{i.name || i.email}</strong>
-                        {i.name && <small>{i.email}</small>}
-                        <span className="corporate-status-pill">
-                          {t(
-                            i.expires_at <= now
-                              ? 'Expirado — reenviar pedido'
-                              : i.delivery !== 'accepted'
-                                ? 'Pedido de envio por confirmar'
-                                : i.mode === 'authorization'
-                                  ? 'A aguardar consentimento'
-                                  : 'A aguardar aceitação do convite',
-                          )}
-                        </span>
-                        <small>
-                          {t(
-                            i.mode === 'authorization'
-                              ? 'Autorização: o líder cria o acesso'
-                              : 'Convite: o trabalhador define o acesso',
-                          )}{' '}
-                          · {t('Válido até')}{' '}
-                          {new Date(i.expires_at).toLocaleDateString(locale, {
-                            timeZone: 'Africa/Maputo',
-                          })}
-                          {i.team ? ' · ' + i.team : ''}
-                        </small>
-                      </div>
-                      <button
-                        disabled={busy}
-                        onClick={() =>
-                          void act({
-                            action: 'invite',
-                            name: i.name,
-                            email: i.email,
-                            team: i.team,
-                            role: i.role,
-                            mode: i.mode,
-                          })
-                        }
-                      >
-                        {t('Reenviar')}
-                      </button>
-                      <button
-                        disabled={busy}
-                        onClick={() => void act({ action: 'revoke', id: i.id })}
-                      >
-                        {t('Cancelar convite')}
-                      </button>
-                    </div>
-                  ))}
-                </section>
-              )}
-              {leader && (
-                <CorporateCredentials
-                  organisation={organisation}
-                  members={detail.members}
-                  owner={owner}
-                  reload={load}
-                />
-              )}
-              <h2 id="team-members">
-                {t('Trabalhadores')} ({detail.members.length})
-              </h2>
-              <div className="corporate-table" aria-label={t('Trabalhadores')}>
-                <table>
-                  <thead>
-                    <tr>
-                      {[
-                        'Trabalhador',
-                        'Equipa',
-                        'Função',
-                        'Estado',
-                        'Aberturas do perfil',
-                        'Cliques',
-                        'Contactos recebidos',
-                        'Acções',
-                      ].map((k) => (
-                        <th key={k}>{t(k)}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {detail.members
-                      .filter((m) => !teamFilter || m.team === teamFilter)
-                      .map((m) => (
-                        <tr key={m.account_id}>
-                          <td>
-                            {m.name}
-                            <small>{m.email}</small>
-                          </td>
-                          <td>{m.team || '—'}</td>
-                          <td>
-                            {t(m.role === 'leader' ? 'Líder' : 'Trabalhador')}
-                          </td>
-                          <td>
-                            {t(
-                              m.active
-                                ? m.within_limit === 0
-                                  ? 'Fora do limite'
-                                  : m.managed_access && !m.provisioned_at
-                                    ? 'Pronto para criar acesso'
-                                    : 'Activo'
-                                : 'Suspenso',
-                            )}
-                          </td>
-                          <td>{metrics(m.account_id, 'profile_open')}</td>
-                          <td>{metrics(m.account_id)}</td>
-                          <td>
-                            {detail.leadCounts
-                              .filter(
-                                (l) =>
-                                  l.account_id === m.account_id &&
-                                  (!campaign || l.campaign_id === campaign),
-                              )
-                              .reduce((sum, l) => sum + l.count, 0)}
-                          </td>
-                          <td>
-                            {leader &&
-                              m.account_id !== detail.organisation.owner_id &&
-                              (owner || m.role === 'member') && (
-                                <form
-                                  onSubmit={(e) => {
-                                    e.preventDefault();
-                                    const f = new FormData(e.currentTarget);
-                                    void act({
-                                      action: 'member',
-                                      id: m.account_id,
-                                      version: m.version,
-                                      role: f.get('role'),
-                                      mode: inviteMode,
-                                      team: f.get('team'),
-                                      active: f.get('active') === 'on',
-                                    });
-                                  }}
-                                >
-                                  <input
-                                    name="team"
-                                    aria-label={t('Equipa')}
-                                    defaultValue={m.team}
-                                    key={'team' + m.version}
-                                    maxLength={80}
-                                  />
-                                  <select
-                                    name="role"
-                                    aria-label={t('Função')}
-                                    defaultValue={m.role}
-                                    key={'role' + m.version}
-                                  >
-                                    <option value="member">
-                                      {t('Trabalhador')}
-                                    </option>
-                                    <option value="leader" disabled={!owner}>
-                                      {t('Líder')}
-                                    </option>
-                                  </select>
-                                  <label>
-                                    <input
-                                      type="checkbox"
-                                      name="active"
-                                      disabled={!!m.left_at}
-                                      title={
-                                        m.left_at
-                                          ? t(
-                                              'Envie um novo convite para voltar a associar este trabalhador.',
-                                            )
-                                          : undefined
-                                      }
-                                      defaultChecked={!!m.active}
-                                      key={'active' + m.version}
-                                    />
-                                    {t('Activo')}
-                                  </label>
-                                  <button disabled={busy}>
-                                    {t('Guardar')}
-                                  </button>
-                                </form>
-                              )}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-              <section className="corporate-panel">
-                <h2>{t('Campanhas e eventos')}</h2>
-                <p>
-                  {t(
-                    'Use o link ou QR da campanha para atribuir resultados à equipa. Os links pessoais e NFC já gravados não são alterados.',
-                  )}
-                </p>
-                {leader && (
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      void act({
-                        action: 'campaign',
-                        name: new FormData(e.currentTarget).get('name'),
-                      });
+                    onChange={(e) => {
+                      setOrganisation(e.target.value);
+                      focusDashboardStart();
+                      setDetail(null);
+                      setCampaign('');
+                      setTeamFilter('');
+                      setError('');
                     }}
                   >
-                    <label>
-                      {t('Nome da campanha')}
-                      <input name="name" maxLength={100} required />
-                    </label>
-                    <button disabled={busy}>{t('Criar campanha')}</button>
-                  </form>
+                    <option value="">{t('Seleccionar')}</option>
+                    {data.organisations.map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {view !== 'reports' && (
+                  <>
+                    {' '}
+                    <button
+                      disabled={busy || refreshing}
+                      onClick={async () => {
+                        setRefreshing(true);
+                        setError('');
+                        try {
+                          await load();
+                          setNotice('Dados actualizados.');
+                        } catch (e) {
+                          setError(
+                            e instanceof Error
+                              ? e.message
+                              : 'Não foi possível carregar.',
+                          );
+                        } finally {
+                          setRefreshing(false);
+                        }
+                      }}
+                    >
+                      {t(refreshing ? 'A actualizar…' : 'Actualizar')}
+                    </button>
+                  </>
                 )}
-                {detail.campaigns.map((c) => (
-                  <article key={c.id}>
-                    <div className="corporate-toolbar">
-                      <h3>{c.name}</h3>
-                      {leader && (
-                        <button
-                          disabled={busy}
-                          onClick={() =>
-                            void act({
-                              action: 'campaign-state',
-                              id: c.id,
-                              active: !c.active,
-                            })
-                          }
-                        >
-                          {t(
-                            c.active ? 'Encerrar campanha' : 'Reabrir campanha',
-                          )}
-                        </button>
-                      )}
-                    </div>
-                    {leader && !!c.active && (
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          void act({
-                            action: 'assign',
-                            id: c.id,
-                            accountId: new FormData(e.currentTarget).get(
-                              'member',
-                            ),
-                          });
-                        }}
-                      >
-                        <label>
-                          {t('Trabalhador')}
-                          <select required name="member">
-                            {detail.members
-                              .filter((m) => m.active && m.within_limit !== 0)
-                              .map((m) => (
-                                <option value={m.account_id} key={m.account_id}>
-                                  {m.name}
-                                </option>
-                              ))}
-                          </select>
-                        </label>
-                        <button disabled={busy}>
-                          {t('Gerar link de campanha')}
-                        </button>
-                      </form>
+                {organisation &&
+                  data.actorId &&
+                  data.organisations.some(
+                    (o) => o.id === organisation && o.owner_id !== data.actorId,
+                  ) && (
+                    <button
+                      disabled={busy}
+                      onClick={() => void act({ action: 'leave' })}
+                    >
+                      {t('Sair da organização')}
+                    </button>
+                  )}
+              </div>
+            )}
+            {data.canCreate && view === 'team' && (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void act({
+                    action: 'create',
+                    name: new FormData(e.currentTarget).get('name'),
+                  });
+                }}
+              >
+                <h2>{t('Criar organização')}</h2>
+                <label>
+                  {t('Nome')}
+                  <input name="name" required maxLength={100} />
+                </label>
+                <button disabled={busy}>{t('Criar')}</button>
+              </form>
+            )}
+            {(!data.canCreate || view !== 'team') &&
+              !data.organisations.length &&
+              view !== 'guide' && (
+                <section className="corporate-empty corporate-panel">
+                  <span className="corporate-empty-icon">
+                    <Users size={36} aria-hidden="true" />
+                  </span>
+                  <h2>{t('Comece pela sua empresa')}</h2>
+                  <p>
+                    {t(
+                      'Configure a empresa e envie o pedido de aprovação. Se é trabalhador, aceite o convite recebido por email.',
                     )}
-                    {detail.assignments
-                      .filter((a) => a.campaign_id === c.id)
-                      .map((a) => (
-                        <div key={a.id} className="corporate-toolbar">
-                          <span>
-                            {
-                              detail.members.find(
-                                (m) => m.account_id === a.account_id,
-                              )?.name
-                            }
-                          </span>
-                          <Link href={'/campanha/' + a.id}>
-                            {t('Abrir link da campanha')}
-                          </Link>
-                          <button
-                            onClick={async () => {
-                              try {
-                                await navigator.clipboard.writeText(
-                                  new URL('/campanha/' + a.id, location.origin)
-                                    .href,
-                                );
-                                setCopied(a.id);
-                              } catch {
-                                setError('Não foi possível copiar.');
+                  </p>
+                  <Link
+                    className="corporate-primary"
+                    href={
+                      data.canCreate
+                        ? '/corporativo/equipa'
+                        : '/corporativo/configurar'
+                    }
+                  >
+                    {t('Configurar a minha empresa')}
+                    <ArrowRight size={18} aria-hidden="true" />
+                  </Link>
+                  <small>
+                    {t(
+                      'Após aprovação, adicione a equipa e acompanhe as campanhas num só lugar.',
+                    )}
+                  </small>
+                </section>
+              )}
+            {view === 'reports' && organisation && (
+              <CorporateReports
+                key={organisation}
+                organisation={organisation}
+                initialCampaign={initialCampaign}
+              />
+            )}
+            {view === 'guide' && <CorporateGuide organisation={organisation} />}
+            {detail && view !== 'reports' && view !== 'guide' && (
+              <>
+                <h2>{detail.organisation.name}</h2>
+                {detail.organisation.analytics === false && (
+                  <p>
+                    {t('Este contrato não inclui estatísticas corporativas.')}
+                  </p>
+                )}
+                {detail.truncated && (
+                  <p>
+                    {t('A lista foi limitada. Refine o período e a campanha.')}
+                  </p>
+                )}
+                {view === 'team' && (
+                  <>
+                    <div
+                      className="corporate-state-counts"
+                      aria-label={t('Estado da equipa')}
+                    >
+                      <div>
+                        <strong>
+                          {
+                            detail.members.filter(
+                              (m) =>
+                                m.active &&
+                                !m.left_at &&
+                                m.within_limit !== 0 &&
+                                (!m.managed_access || m.provisioned_at),
+                            ).length
+                          }
+                        </strong>
+                        <span>{t('Acessos activos')}</span>
+                      </div>
+                      <div>
+                        <strong>{detail.invites.length}</strong>
+                        <span>{t('Pedidos pendentes')}</span>
+                      </div>
+                      <div>
+                        <strong>
+                          {
+                            detail.members.filter(
+                              (m) =>
+                                m.active &&
+                                !m.left_at &&
+                                m.managed_access &&
+                                m.within_limit !== 0 &&
+                                !m.provisioned_at,
+                            ).length
+                          }
+                        </strong>
+                        <span>{t('Prontos para criar acesso')}</span>
+                      </div>
+                    </div>
+                    <p>
+                      {t('Limite de trabalhadores')}:{' '}
+                      {detail.organisation.seats}
+                    </p>
+                  </>
+                )}
+                {view === 'contacts' && (
+                  <>
+                    <div className="corporate-toolbar">
+                      <label>
+                        {t('Período')}
+                        <select
+                          value={days}
+                          onChange={(e) => setDays(e.target.value)}
+                        >
+                          {[7, 30, 90].map((d) => (
+                            <option key={d} value={d}>
+                              {d} {t('dias')}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        {t('Campanha')}
+                        <select
+                          value={campaign}
+                          onChange={(e) => setCampaign(e.target.value)}
+                        >
+                          <option value="">{t('Todas')}</option>
+                          {detail.campaigns.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        {t('Equipa')}
+                        <select
+                          value={teamFilter}
+                          onChange={(e) => setTeamFilter(e.target.value)}
+                        >
+                          <option value="">{t('Todas')}</option>
+                          {[
+                            ...new Set(
+                              detail.members.map((m) => m.team).filter(Boolean),
+                            ),
+                          ].map((team) => (
+                            <option key={team} value={team}>
+                              {team}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <button onClick={exportResults}>
+                        {t('Exportar contactos CSV')}
+                      </button>
+                    </div>
+                  </>
+                )}
+                {view === 'team' && (
+                  <>
+                    {leader && (
+                      <CorporateEmailInvites
+                        key={organisation}
+                        organisation={organisation}
+                        mode={inviteMode}
+                        onModeChange={setInviteMode}
+                        teams={[
+                          ...new Set(
+                            [
+                              ...detail.members.map((m) => m.team),
+                              ...detail.invites.map((i) => i.team),
+                            ].filter(Boolean),
+                          ),
+                        ]}
+                        owner={owner}
+                        emailReady={data.emailReady}
+                        busy={busy}
+                        setBusy={setBusy}
+                        reload={load}
+                      />
+                    )}
+                    {leader && (
+                      <section
+                        className="corporate-panel corporate-pending"
+                        id="pending-employees"
+                      >
+                        <h2>
+                          {t('Pedidos pendentes')} ({detail.invites.length})
+                        </h2>
+                        {!detail.invites.length && (
+                          <p>{t('Não existem pedidos pendentes.')}</p>
+                        )}
+                        {detail.invites.map((i) => (
+                          <div className="corporate-toolbar" key={i.id}>
+                            <div className="corporate-pending-info">
+                              <strong>{i.name || i.email}</strong>
+                              {i.name && <small>{i.email}</small>}
+                              <span className="corporate-status-pill">
+                                {t(
+                                  i.expires_at <= now
+                                    ? 'Expirado — reenviar pedido'
+                                    : i.delivery !== 'accepted'
+                                      ? 'Pedido de envio por confirmar'
+                                      : i.mode === 'authorization'
+                                        ? 'A aguardar consentimento'
+                                        : 'A aguardar aceitação do convite',
+                                )}
+                              </span>
+                              <small>
+                                {t(
+                                  i.mode === 'authorization'
+                                    ? 'Autorização: o líder cria o acesso'
+                                    : 'Convite: o trabalhador define o acesso',
+                                )}{' '}
+                                · {t('Válido até')}{' '}
+                                {new Date(i.expires_at).toLocaleDateString(
+                                  locale,
+                                  {
+                                    timeZone: 'Africa/Maputo',
+                                  },
+                                )}
+                                {i.team ? ' · ' + i.team : ''}
+                              </small>
+                            </div>
+                            <button
+                              disabled={busy}
+                              onClick={() =>
+                                void act({
+                                  action: 'invite',
+                                  name: i.name,
+                                  email: i.email,
+                                  team: i.team,
+                                  role: i.role,
+                                  mode: i.mode,
+                                })
                               }
-                            }}
-                          >
-                            {t(
-                              copied === a.id ? 'Link copiado.' : 'Copiar link',
+                            >
+                              {t('Reenviar')}
+                            </button>
+                            <button
+                              disabled={busy}
+                              onClick={() =>
+                                void act({ action: 'revoke', id: i.id })
+                              }
+                            >
+                              {t('Cancelar convite')}
+                            </button>
+                          </div>
+                        ))}
+                      </section>
+                    )}
+                    {leader && (
+                      <CorporateCredentials
+                        organisation={organisation}
+                        members={detail.members}
+                        owner={owner}
+                        reload={load}
+                      />
+                    )}
+                    <h2 id="team-members">
+                      {t('Trabalhadores')} ({detail.members.length})
+                    </h2>
+                    <div
+                      className="corporate-table"
+                      aria-label={t('Trabalhadores')}
+                    >
+                      <table>
+                        <thead>
+                          <tr>
+                            {[
+                              'Trabalhador',
+                              'Equipa',
+                              'Função',
+                              'Estado',
+                              'Acções',
+                            ].map((k) => (
+                              <th key={k}>{t(k)}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {detail.members
+                            .filter((m) => !teamFilter || m.team === teamFilter)
+                            .map((m) => (
+                              <tr key={m.account_id}>
+                                <td>
+                                  {m.name}
+                                  <small>{m.email}</small>
+                                </td>
+                                <td>{m.team || '—'}</td>
+                                <td>
+                                  {t(
+                                    m.role === 'leader'
+                                      ? 'Líder'
+                                      : 'Trabalhador',
+                                  )}
+                                </td>
+                                <td>
+                                  {t(
+                                    m.active
+                                      ? m.within_limit === 0
+                                        ? 'Fora do limite'
+                                        : m.managed_access && !m.provisioned_at
+                                          ? 'Pronto para criar acesso'
+                                          : 'Activo'
+                                      : 'Suspenso',
+                                  )}
+                                </td>
+                                <td>
+                                  {leader &&
+                                    m.account_id !==
+                                      detail.organisation.owner_id &&
+                                    (owner || m.role === 'member') && (
+                                      <form
+                                        onSubmit={(e) => {
+                                          e.preventDefault();
+                                          const f = new FormData(
+                                            e.currentTarget,
+                                          );
+                                          void act({
+                                            action: 'member',
+                                            id: m.account_id,
+                                            version: m.version,
+                                            role: f.get('role'),
+                                            mode: inviteMode,
+                                            team: f.get('team'),
+                                            active: f.get('active') === 'on',
+                                          });
+                                        }}
+                                      >
+                                        <input
+                                          name="team"
+                                          aria-label={t('Equipa')}
+                                          defaultValue={m.team}
+                                          key={'team' + m.version}
+                                          maxLength={80}
+                                        />
+                                        <select
+                                          name="role"
+                                          aria-label={t('Função')}
+                                          defaultValue={m.role}
+                                          key={'role' + m.version}
+                                        >
+                                          <option value="member">
+                                            {t('Trabalhador')}
+                                          </option>
+                                          <option
+                                            value="leader"
+                                            disabled={!owner}
+                                          >
+                                            {t('Líder')}
+                                          </option>
+                                        </select>
+                                        <label>
+                                          <input
+                                            type="checkbox"
+                                            name="active"
+                                            disabled={!!m.left_at}
+                                            title={
+                                              m.left_at
+                                                ? t(
+                                                    'Envie um novo convite para voltar a associar este trabalhador.',
+                                                  )
+                                                : undefined
+                                            }
+                                            defaultChecked={!!m.active}
+                                            key={'active' + m.version}
+                                          />
+                                          {t('Activo')}
+                                        </label>
+                                        <button disabled={busy}>
+                                          {t('Guardar')}
+                                        </button>
+                                      </form>
+                                    )}
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
+                {view === 'campaigns' && (
+                  <>
+                    <section className="corporate-panel">
+                      <h2>{t('Campanhas e eventos')}</h2>
+                      <p>
+                        {t(
+                          'Use o link ou QR da campanha para atribuir resultados à equipa. Os links pessoais e NFC já gravados não são alterados.',
+                        )}
+                      </p>
+                      {leader && (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            void act({
+                              action: 'campaign',
+                              name: new FormData(e.currentTarget).get('name'),
+                            });
+                          }}
+                        >
+                          <label>
+                            {t('Nome da campanha')}
+                            <input name="name" maxLength={100} required />
+                          </label>
+                          <button disabled={busy}>{t('Criar campanha')}</button>
+                        </form>
+                      )}
+                      {detail.campaigns.map((c) => (
+                        <article key={c.id}>
+                          <div className="corporate-toolbar">
+                            <h3>{c.name}</h3>
+                            <Link
+                              className="corporate-report-link"
+                              href={
+                                '/corporativo?' +
+                                new URLSearchParams({
+                                  organisation,
+                                  campaign: c.id,
+                                }).toString()
+                              }
+                            >
+                              {t('Ver resultados')}
+                            </Link>
+                            {leader && (
+                              <button
+                                disabled={busy}
+                                onClick={() =>
+                                  void act({
+                                    action: 'campaign-state',
+                                    id: c.id,
+                                    active: !c.active,
+                                  })
+                                }
+                              >
+                                {t(
+                                  c.active
+                                    ? 'Encerrar campanha'
+                                    : 'Reabrir campanha',
+                                )}
+                              </button>
                             )}
-                          </button>
-                          <button
-                            onClick={async () => {
-                              try {
-                                const { default: QRCode } =
-                                  await import('qrcode');
-                                setQr({
-                                  id: a.id,
-                                  image: await QRCode.toDataURL(
-                                    new URL(
-                                      '/campanha/' + a.id,
-                                      location.origin,
-                                    ).href,
-                                    { width: 240, margin: 2 },
+                          </div>
+                          {leader && !!c.active && (
+                            <form
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                void act({
+                                  action: 'assign',
+                                  id: c.id,
+                                  accountId: new FormData(e.currentTarget).get(
+                                    'member',
                                   ),
                                 });
-                              } catch {
-                                setError('Não foi possível gerar o código QR.');
-                              }
-                            }}
-                          >
-                            {t('Código QR')}
-                          </button>
-                          {qr?.id === a.id && (
-                            <SourceImage
-                              src={qr.image}
-                              alt={t('Código QR')}
-                              width={240}
-                              height={240}
-                            />
+                              }}
+                            >
+                              <label>
+                                {t('Trabalhador')}
+                                <select required name="member">
+                                  {detail.members
+                                    .filter(
+                                      (m) => m.active && m.within_limit !== 0,
+                                    )
+                                    .map((m) => (
+                                      <option
+                                        value={m.account_id}
+                                        key={m.account_id}
+                                      >
+                                        {m.name}
+                                      </option>
+                                    ))}
+                                </select>
+                              </label>
+                              <button disabled={busy}>
+                                {t('Gerar link de campanha')}
+                              </button>
+                            </form>
                           )}
-                        </div>
+                          {detail.assignments
+                            .filter((a) => a.campaign_id === c.id)
+                            .map((a) => (
+                              <div key={a.id} className="corporate-toolbar">
+                                <span>
+                                  {
+                                    detail.members.find(
+                                      (m) => m.account_id === a.account_id,
+                                    )?.name
+                                  }
+                                </span>
+                                <Link href={'/campanha/' + a.id}>
+                                  {t('Abrir link da campanha')}
+                                </Link>
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      await navigator.clipboard.writeText(
+                                        new URL(
+                                          '/campanha/' + a.id,
+                                          location.origin,
+                                        ).href,
+                                      );
+                                      setCopied(a.id);
+                                    } catch {
+                                      setError('Não foi possível copiar.');
+                                    }
+                                  }}
+                                >
+                                  {t(
+                                    copied === a.id
+                                      ? 'Link copiado.'
+                                      : 'Copiar link',
+                                  )}
+                                </button>
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      const { default: QRCode } =
+                                        await import('qrcode');
+                                      setQr({
+                                        id: a.id,
+                                        image: await QRCode.toDataURL(
+                                          new URL(
+                                            '/campanha/' + a.id,
+                                            location.origin,
+                                          ).href,
+                                          { width: 240, margin: 2 },
+                                        ),
+                                      });
+                                    } catch {
+                                      setError(
+                                        'Não foi possível gerar o código QR.',
+                                      );
+                                    }
+                                  }}
+                                >
+                                  {t('Código QR')}
+                                </button>
+                                {qr?.id === a.id && (
+                                  <SourceImage
+                                    src={qr.image}
+                                    alt={t('Código QR')}
+                                    width={240}
+                                    height={240}
+                                  />
+                                )}
+                              </div>
+                            ))}
+                        </article>
                       ))}
-                  </article>
-                ))}
-              </section>
-              <section className="corporate-panel">
-                <h2>{t('Contactos recebidos')}</h2>
-                <p>
-                  {t(
-                    'Dados enviados voluntariamente para esta organização. Disponíveis durante 90 dias.',
-                  )}
-                </p>
-                <div className="corporate-table">
-                  <table>
-                    <thead>
-                      <tr>
-                        {[
-                          'Nome',
-                          'Email',
-                          'Telefone',
-                          'Interesse',
-                          'Trabalhador',
-                          'Data',
-                        ].map((k) => (
-                          <th key={k}>{t(k)}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {leads.map((l) => (
-                        <tr key={l.id}>
-                          <td>{l.name}</td>
-                          <td>{l.email}</td>
-                          <td>{l.phone}</td>
-                          <td>{l.interest}</td>
-                          <td>
-                            {
-                              detail.members.find(
-                                (m) => m.account_id === l.account_id,
-                              )?.name
-                            }
-                          </td>
-                          <td>
-                            {new Date(l.created_at).toLocaleDateString(locale, {
-                              timeZone: 'Africa/Maputo',
-                            })}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            </>
-          )}
-        </>
-      )}
+                    </section>
+                  </>
+                )}
+                {view === 'contacts' && (
+                  <>
+                    <section className="corporate-panel">
+                      <h2>{t('Contactos recebidos')}</h2>
+                      <p>
+                        {t(
+                          'Dados enviados voluntariamente para esta organização. Disponíveis durante 90 dias.',
+                        )}
+                      </p>
+                      <p>
+                        {t('Contactos apresentados: {0}.', [leads.length])}{' '}
+                        {t(
+                          'O CSV contém os contactos apresentados, com os filtros activos.',
+                        )}
+                      </p>
+                      <div className="corporate-table">
+                        <table>
+                          <thead>
+                            <tr>
+                              {[
+                                'Nome',
+                                'Email',
+                                'Telefone',
+                                'Interesse',
+                                'Trabalhador',
+                                'Data',
+                              ].map((k) => (
+                                <th key={k}>{t(k)}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {leads.map((l) => (
+                              <tr key={l.id}>
+                                <td>{l.name}</td>
+                                <td>{l.email}</td>
+                                <td>{l.phone}</td>
+                                <td>{l.interest}</td>
+                                <td>
+                                  {
+                                    detail.members.find(
+                                      (m) => m.account_id === l.account_id,
+                                    )?.name
+                                  }
+                                </td>
+                                <td>
+                                  {new Date(l.created_at).toLocaleDateString(
+                                    locale,
+                                    {
+                                      timeZone: 'Africa/Maputo',
+                                    },
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </div>
     </main>
   );
 }

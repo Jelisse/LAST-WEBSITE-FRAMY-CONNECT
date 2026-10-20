@@ -8,8 +8,24 @@ export function dashboardFor(role: AccountRole) {
   }[role];
 }
 export function loginDestination(role: AccountRole, requested: string) {
-  if (['customer','agent'].includes(role) && requested==='/corporativo/configurar') return requested;
-  if (['customer','agent'].includes(role) && ['/embaixadores','/corporativo','/corporativo/aceitar'].includes(requested)) return requested;
+  if (
+    ['customer', 'agent'].includes(role) &&
+    requested === '/corporativo/configurar'
+  )
+    return requested;
+  if (
+    ['customer', 'agent'].includes(role) &&
+    [
+      '/embaixadores',
+      '/corporativo',
+      '/corporativo/aceitar',
+      '/corporativo/equipa',
+      '/corporativo/campanhas',
+      '/corporativo/contactos',
+      '/corporativo/guia',
+    ].includes(requested)
+  )
+    return requested;
   if (
     role === 'customer' &&
     (/^\/comprar(?:\?formato=(?:card|pvc|wood|metal|keychain|keychain-leather|kit))?$/.test(

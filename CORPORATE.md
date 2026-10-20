@@ -75,3 +75,12 @@ Pending requests have a separate section with consent/invitation, uncertain-send
 ## Unified employee entry release - 20 October 2026
 
 Source339c519 is published as Worker fd03a3fc-7bbb-4487-964e-9d6408a89d67 after guarded schema/relationship checks and a fresh build; no migration needed. This supersedes the local-only statement above. Both domains serve matching final onboarding assets, protect corporate pages/API from anonymous access and return404 for the removed fictional preview.212 tests passed. No real invitations were sent by publication checks; actual inbox delivery and employee acceptance remain external verification.
+
+
+## Separate administration and reporting - 20 October 2026
+
+Local implementation: `/corporativo` now opens reports, with independent Team, Campaigns, Contacts and How it works pages. Company approval opens Team for onboarding. Reports load only organization metadata and aggregated data; personal contact details and employee credentials remain on their authorized administration pages.
+
+The read-only report API returns daily Maputo-time aggregates and team rankings for7/30/90 days. Filter by company, campaign, team and metric. Rank by totals or average per employee with recorded activity in the selected period. Current team membership determines grouping; historical team assignments are not snapshotted. Contact totals are independent of the latest500 displayed forms. Owners/delegated leaders see company results; employees see only their own. Analytics-disabled companies retain submitted-contact counts without interaction metrics. Daily value tables and formula-safe aggregate CSV accompany the charts. No migration or new visitor identifiers are introduced.
+
+See CORPORATE_USAGE_GUIDE.md and the in-app guide for workflows, business examples and metric limitations. This task is local until explicitly committed and deployed.

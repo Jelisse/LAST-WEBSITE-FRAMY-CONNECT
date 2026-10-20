@@ -226,6 +226,9 @@ function fixture(t) {
           return { results: sql.prepare(query).all(...args) };
         },
         exec() {
+          // D1 batch returns rows for read statements, including report CTEs.
+          if (/^\s*(?:WITH|SELECT|PRAGMA)\b/i.test(query))
+            return { results: sql.prepare(query).all(...args), meta: { changes: 0 } };
           return {
             meta: { changes: Number(sql.prepare(query).run(...args).changes) },
           };
@@ -1267,4 +1270,53 @@ test('all physical materials and kits retain the same discounted quote across de
   assert.equal(quote.delivery,delivery==='pickup'?0:20000);
  }
  assert.throws(()=>purchaseAmounts(Number.MAX_SAFE_INTEGER,0,1,0));
+});
+
+async function corporateReportFixture(t) {
+ const f=await corporateFixture(t,3),now=Date.now();
+ f.sql.exec("UPDATE sandbox_memberships SET terms_json=json_set(terms_json,'$.features.analytics',json('true')) WHERE owner_id='buyer'");
+ f.sql.prepare("UPDATE corporate_members SET team='Alpha' WHERE organisation_id=? AND account_id='buyer'").run(f.id);
+ for(const id of ['other','manager'])f.sql.prepare("INSERT INTO corporate_members(organisation_id,account_id,role,team,accepted_at) VALUES(?,?,'member','Beta',?)").run(f.id,id,now);
+ f.sql.prepare("INSERT INTO corporate_campaigns(id,organisation_id,name,created_at) VALUES('report-campaign',?,'Report campaign',?)").run(f.id,now);
+ const day=Math.floor((now+7200000)/86400000)*86400000-7200000;
+ for(const [id,opens,clicks,contacts] of [['buyer',10,4,2],['other',20,3,3],['manager',5,0,1]]){
+  f.sql.prepare("INSERT INTO corporate_assignments(id,campaign_id,account_id,created_at) VALUES(?,'report-campaign',?,?)").run('report-'+id,id,now);
+  f.sql.prepare("INSERT INTO corporate_metrics(assignment_id,day,target,count) VALUES(?,?,'profile_open',?)").run('report-'+id,day,opens);
+  f.sql.prepare("INSERT INTO corporate_metrics(assignment_id,day,target,count) VALUES(?,?,'whatsapp',?)").run('report-'+id,day,clicks);
+  for(let i=0;i<contacts;i++)f.sql.prepare("INSERT INTO corporate_leads(id,assignment_id,name,email,consent_version,created_at) VALUES(?,?,'Private contact','private@example.invalid','test',?)").run('report-lead-'+id+i,'report-'+id,now-i);
+ }
+ const route=await api('app/api/corporate-reports/route.ts');
+ const get=(params={})=>route.GET(new Request('https://framyconnect.co.mz/api/corporate-reports?'+new URLSearchParams({organisation:f.id,days:'7',campaign:'report-campaign',...params})));
+ return {...f,report:route,get,now,day};
+}
+test('corporate reports aggregate teams and complete daily series without multiplying opens or revealing contacts',async t=>{
+ const f=await corporateReportFixture(t);
+ const r=await f.get();assert.equal(r.status,200,await r.clone().text());const b=await r.json();
+ assert.equal(b.analytics,true);assert.deepEqual(b.totals,{opens:35,clicks:7,contacts:6});assert.equal(b.daily.length,7);
+ assert.equal((await(await f.get({unit:'participant'})).json()).teams[0].team,'Alpha','normalised ranking is recomputed by the server');
+ assert.equal((await(await f.get({metric:'clicks'})).json()).teams[0].team,'Alpha');
+ assert.deepEqual(b.teams.map(row=>[row.team,row.contacts,row.contributors]),[['Beta',4,2],['Alpha',2,1]]);assert.equal(b.daily.at(-1).opens,35);
+ assert.doesNotMatch(JSON.stringify(b),/private@example|Private contact|password|credential|phone/);
+ assert.deepEqual((await(await f.get({team:'Alpha'})).json()).totals,{opens:10,clicks:4,contacts:2});
+ assert.deepEqual((await(await f.get({team:''})).json()).totals,{opens:0,clicks:0,contacts:0},'explicit blank team filters ungrouped members');
+ assert.deepEqual((await(await f.get({campaign:'not-owned'})).json()).totals,{opens:0,clicks:0,contacts:0});
+ assert.equal((await f.get({days:'365'})).status,422);assert.equal((await f.get({metric:'bad-field'})).status,422);
+});
+test('corporate report access scopes members to themselves, rejects outsiders and suspended members and respects analytics entitlement',async t=>{
+ const f=await corporateReportFixture(t);
+ globalThis.__paysuite.user={userId:'other',role:'customer'};
+ const own=await(await f.get()).json();assert.deepEqual(own.totals,{opens:20,clicks:3,contacts:3});assert.deepEqual(own.teamOptions,[{team:'Beta'}]);assert.equal(own.role,'member');
+ f.sql.prepare("UPDATE corporate_members SET active=0 WHERE organisation_id=? AND account_id='other'").run(f.id);assert.equal((await f.get()).status,403);
+ globalThis.__paysuite.user=null;assert.equal((await f.get()).status,401);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer'};assert.equal((await f.get({organisation:'another-company'})).status,403);
+ f.sql.exec("UPDATE sandbox_memberships SET terms_json=json_set(terms_json,'$.features.analytics',json('false')) WHERE owner_id='buyer'");
+ const limited=await(await f.get()).json();assert.equal(limited.analytics,false);assert.deepEqual(limited.totals,{opens:0,clicks:0,contacts:6});
+});
+test('corporate report totals include more than the contact-table limit and exclude records outside the requested period',async t=>{
+ const f=await corporateReportFixture(t);
+ const insert=f.sql.prepare("INSERT INTO corporate_leads(id,assignment_id,name,consent_version,created_at) VALUES(?,'report-buyer','Hidden contact','test',?)");
+ for(let i=0;i<550;i++)insert.run('extra-report-'+i,f.now-i);
+ insert.run('old-report',f.day-7*86400000);insert.run('future-report',f.now+86400000);
+ f.sql.prepare("INSERT INTO corporate_metrics(assignment_id,day,target,count) VALUES('report-buyer',?,'profile_open',10000)").run(f.day-7*86400000);
+ const b=await(await f.get()).json();assert.equal(b.totals.contacts,556);assert.equal(b.totals.opens,35);assert.equal(b.daily.reduce((sum,row)=>sum+row.contacts,0),556);
 });
