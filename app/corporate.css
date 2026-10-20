@@ -138,3 +138,61 @@
 .phone-country-list button small { font-size:14px; color:#736258; }
 .phone-country-list button:hover,.phone-country-list button[aria-pressed=true] { background:#fff0e3; border-color:#edb28a; color:#9c360c; }
 .phone-country-list button:focus-visible { outline:2px solid #d96b2c; outline-offset:-2px; }
+/* One employee onboarding path, with actions weighted by importance. */
+.staff-page.corporate-dashboard:not(.corporate-setup):not(.corporate-public):not(.corporate-invite) { width:100%; max-width:1520px; padding-inline:clamp(18px,3vw,48px); }
+.corporate-onboarding { max-width:1080px; }
+.corporate-section-heading h2 { margin:0; }
+.corporate-section-heading p { color:#75665b; max-width:760px; }
+.corporate-dashboard .corporate-entry-modes { display:grid; grid-template-columns:1fr 1fr; gap:12px; border:0; margin:22px 0 12px; padding:0; }
+.corporate-entry-modes legend { font-weight:600; padding-bottom:10px; }
+.corporate-dashboard .corporate-entry-modes label { position:relative; display:flex; flex-direction:row; flex-wrap:nowrap; align-items:start; gap:12px; padding:20px; border:1px solid #e2d6cc; border-radius:14px; cursor:pointer; }
+.corporate-entry-modes input { position:absolute; width:1px; height:1px; opacity:0; }
+.corporate-entry-modes label > svg { flex-shrink:0; color:#a63b0b; }
+.corporate-entry-modes label strong,.corporate-entry-modes label small { display:block; }
+.corporate-entry-modes label small { color:#75665b; margin-top:6px; line-height:1.6; font-size:13px; }
+.corporate-entry-modes label.is-selected { background:#fff0e2; border-color:#b9420c; box-shadow:inset 0 0 0 1px #b9420c; }
+.corporate-entry-modes label:focus-within { outline:2px solid #b9420c; outline-offset:3px; }
+.corporate-onboarding .corporate-inline-help { font-size:13px; color:#766457; margin-block:6px 14px; }
+.corporate-dashboard .corporate-entry-tabs { display:flex; gap:6px; flex-wrap:wrap; margin:20px 0; }
+.corporate-dashboard .corporate-entry-tabs button { background:#f5efe9; border-color:transparent; color:#776255; }
+.corporate-dashboard .corporate-entry-tabs button[aria-pressed=true] { background:#fff1e5; color:#9e350a; border-color:#d99a72; font-weight:600; }
+.corporate-onboarding .corporate-email-fields { display:flex; flex-direction:column; align-items:stretch; gap:14px; width:100%; }
+.corporate-onboarding .corporate-email-row { gap:12px; }
+.corporate-onboarding .corporate-email-row .corporate-email-field { flex:2 1 320px; }
+.corporate-onboarding .corporate-email-row .corporate-name-field { flex:1 1 180px; }
+.corporate-onboarding .corporate-name-toggle { align-self:start; flex-direction:row; align-items:center; font-size:13px; color:#766457; }
+.corporate-dashboard .corporate-onboarding .corporate-add-email { align-self:flex-start; width:auto; border:1px dashed #d5b8a2; background:#fffaf5; color:#9d370d; }
+.corporate-onboarding .corporate-invite-settings { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); width:100%; gap:16px; padding-top:18px; border-top:1px solid #eee2d8; }
+.corporate-onboarding .corporate-bulk-field { width:100%; }
+.corporate-onboarding .corporate-bulk-field textarea { width:100%; resize:vertical; }
+.corporate-onboarding .corporate-send-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; width:100%; gap:16px; padding-top:20px; border-top:1px solid #eee2d8; }
+.corporate-send-footer small { color:#75665b; max-width:440px; line-height:1.6; }
+.corporate-dashboard .corporate-onboarding .corporate-send-button { background:#b43c08; color:#fff; border-color:#b43c08; padding-inline:24px; width:auto; }
+.corporate-send-result { display:flex; flex-direction:column; gap:6px; }
+.corporate-send-result span,.corporate-send-result small { display:block; margin-top:6px; }
+.corporate-state-counts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:18px 0; }
+.corporate-state-counts > div { padding:20px; background:white; border:1px solid #e9ddd2; border-radius:14px; }
+.corporate-state-counts strong { display:block; font-size:28px; color:#a63a0b; }
+.corporate-state-counts span { font-size:14px; color:#766457; }
+.corporate-pending-info { flex:1; min-width:220px; display:flex; flex-direction:column; align-items:start; gap:6px; overflow-wrap:anywhere; }
+.corporate-pending .corporate-toolbar { padding:16px 0; border-top:1px solid #eee4da; }
+.corporate-pending-info small { color:#766457; }
+.corporate-status-pill { display:inline-block; border-radius:20px; padding:5px 10px; font-size:12px; font-weight:500; color:#984008; background:#fff0dc; }
+.corporate-dashboard :is(input,select,textarea):focus-visible { outline:2px solid #c65618; outline-offset:2px; box-shadow:none; }
+.corporate-dashboard .corporate-table :is(th,td) { padding:14px; font-size:14px; }
+@media(max-width:650px) {
+ .corporate-dashboard .corporate-entry-modes { grid-template-columns:1fr; }
+ .corporate-dashboard .corporate-entry-modes label { padding:16px; }
+ .corporate-onboarding .corporate-email-row { flex-wrap:wrap; align-items:end; }
+ .corporate-onboarding .corporate-email-row .corporate-name-field { flex-basis:100%; }
+ .corporate-onboarding .corporate-email-row .corporate-email-field { flex:1 1 0; }
+ .corporate-onboarding .corporate-invite-settings { grid-template-columns:1fr; }
+ .corporate-onboarding .corporate-send-footer { flex-direction:column; align-items:stretch; }
+ .corporate-dashboard .corporate-onboarding .corporate-send-button { width:100%; }
+ .corporate-state-counts { gap:8px; }
+ .corporate-state-counts > div { padding:12px; }
+ .corporate-state-counts strong { font-size:23px; }
+ .corporate-state-counts span { font-size:12px; }
+}
+/* The global brand rule also outlines parent labels; keep one ring on text controls. */
+.corporate-dashboard .corporate-onboarding form label:has(input:not([type=checkbox]):not([type=radio]):focus-visible) { outline:none; }

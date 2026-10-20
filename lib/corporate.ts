@@ -79,3 +79,30 @@ export async function processCorporateBatch(
   }
   return { completed, uncertain, remaining: rows.slice(completed), error };
 }
+
+// Validate the entire unified entry form before sending its first invitation.
+export function prepareCorporateInvites(input: {
+  entry: 'emails' | 'bulk';
+  rows: { name: string; email: string }[];
+  batch: string;
+  team: string;
+  requireTeam?: boolean;
+}) {
+  const team = corporateText(input.team, 80, !!input.requireTeam);
+  const rows =
+    input.entry === 'bulk'
+      ? parseCorporateBatch(input.batch).map((row) => ({
+          ...row,
+          team: row.team || team,
+        }))
+      : input.rows.map((row) => ({
+          name: corporateText(row.name, 100, false),
+          email: corporateEmail(row.email),
+          team,
+        }));
+  if (!rows.length || rows.length > 25)
+    throw Error('Use um máximo de 25 trabalhadores por lote.');
+  if (new Set(rows.map((row) => row.email)).size !== rows.length)
+    throw Error('Existem emails repetidos no lote.');
+  return rows;
+}

@@ -3,7 +3,6 @@ import { Building2, Users, ArrowRight } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from './hard-link';
 import { focusDashboardStart } from '@/lib/dashboard-navigation';
-import { parseCorporateBatch, processCorporateBatch } from '@/lib/corporate';
 import { CorporateEmailInvites } from './corporate-email-invites';
 import { CorporateCredentials } from './corporate-credentials';
 import { SourceImage } from './source-image';
@@ -97,56 +96,7 @@ export function CorporateDashboard() {
     'invite',
   );
   const revision = useRef(0);
-  const [batch, setBatch] = useState('');
-  const [batchProgress, setBatchProgress] = useState<{
-    completed: number;
-    uncertain: number;
-  } | null>(null);
-  async function inviteBatch() {
-    setBusy(true);
-    setError('');
-    setBatchProgress(null);
-    try {
-      const rows = parseCorporateBatch(batch);
-      const result = await processCorporateBatch(
-        rows,
-        async (row) => {
-          const r = await fetch('/api/corporate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'invite',
-              organisation,
-              role: 'member',
-              mode: inviteMode,
-              ...row,
-            }),
-            signal: AbortSignal.timeout(20000),
-          });
-          const b = (await r.json()) as { error?: string; delivery?: string };
-          if (!r.ok || !['accepted', 'uncertain'].includes(b.delivery || ''))
-            throw Error(b.error || 'Não foi possível enviar.');
-          return b.delivery === 'accepted' ? 'accepted' : 'uncertain';
-        },
-        (completed, uncertain) => setBatchProgress({ completed, uncertain }),
-      );
-      setBatchProgress({
-        completed: result.completed,
-        uncertain: result.uncertain,
-      });
-      setBatch(
-        result.remaining
-          .map((row) => [row.name, row.email, row.team].join(';'))
-          .join('\n'),
-      );
-      if (result.error) setError(result.error);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Não foi possível enviar.');
-    } finally {
-      setBusy(false);
-      await load().catch((e) => setError(e.message));
-    }
-  }
+  const [now, setNow] = useState(() => Date.now());
   const load = useCallback(async () => {
     const current = ++revision.current;
     const response = await fetch('/api/corporate', { cache: 'no-store' });
@@ -154,6 +104,7 @@ export function CorporateDashboard() {
     if (current !== revision.current) return;
     if (!response.ok) throw Error(body.error);
     setData(body);
+    setNow(Date.now());
     if (!organisation && body.organisations.length)
       setOrganisation(body.organisations[0].id);
     if (organisation) {
@@ -334,14 +285,6 @@ export function CorporateDashboard() {
       </p>
       {error && <p role="alert">{t(error)}</p>}
       {notice && <output>{t(notice)}</output>}
-      {batchProgress && (
-        <output>
-          {t('Convites processados: {0}. Envios por confirmar: {1}.', [
-            batchProgress.completed,
-            batchProgress.uncertain,
-          ])}
-        </output>
-      )}
       {!data ? (
         <p>{t('A carregar…')}</p>
       ) : (
@@ -461,6 +404,44 @@ export function CorporateDashboard() {
                   {t('A lista foi limitada. Refine o período e a campanha.')}
                 </p>
               )}
+              <div
+                className="corporate-state-counts"
+                aria-label={t('Estado da equipa')}
+              >
+                <div>
+                  <strong>
+                    {
+                      detail.members.filter(
+                        (m) =>
+                          m.active &&
+                          !m.left_at &&
+                          m.within_limit !== 0 &&
+                          (!m.managed_access || m.provisioned_at),
+                      ).length
+                    }
+                  </strong>
+                  <span>{t('Acessos activos')}</span>
+                </div>
+                <div>
+                  <strong>{detail.invites.length}</strong>
+                  <span>{t('Pedidos pendentes')}</span>
+                </div>
+                <div>
+                  <strong>
+                    {
+                      detail.members.filter(
+                        (m) =>
+                          m.active &&
+                          !m.left_at &&
+                          m.managed_access &&
+                          m.within_limit !== 0 &&
+                          !m.provisioned_at,
+                      ).length
+                    }
+                  </strong>
+                  <span>{t('Prontos para criar acesso')}</span>
+                </div>
+              </div>
               <p>
                 {t('Limite de trabalhadores')}: {detail.organisation.seats}
               </p>
@@ -520,46 +501,90 @@ export function CorporateDashboard() {
                 )}
               </p>
               {leader && (
-                <section className="corporate-panel">
-                  <h2>{t('Como adicionar trabalhadores')}</h2>
-                  <label>
-                    {t('Método de entrada')}
-                    <select
-                      value={inviteMode}
-                      disabled={busy}
-                      onChange={(e) =>
-                        setInviteMode(
-                          e.target.value as 'invite' | 'authorization',
-                        )
-                      }
-                    >
-                      <option value="invite">
-                        {t('Convite: o trabalhador define o acesso')}
-                      </option>
-                      <option value="authorization">
-                        {t('Autorização: o líder cria o acesso')}
-                      </option>
-                    </select>
-                  </label>
-                  <p>
-                    {t(
-                      inviteMode === 'authorization'
-                        ? 'O trabalhador autoriza por email. Só depois pode criar o acesso e definir a palavra-passe. Para contas existentes, use Convite.'
-                        : 'O trabalhador confirma o email e define a palavra-passe. Se já tem conta, entra com o mesmo email e aceita a associação.',
-                    )}
-                  </p>
-                </section>
-              )}
-              {leader && (
                 <CorporateEmailInvites
                   key={organisation}
                   organisation={organisation}
                   mode={inviteMode}
+                  onModeChange={setInviteMode}
+                  teams={[
+                    ...new Set(
+                      [
+                        ...detail.members.map((m) => m.team),
+                        ...detail.invites.map((i) => i.team),
+                      ].filter(Boolean),
+                    ),
+                  ]}
+                  owner={owner}
                   emailReady={data.emailReady}
                   busy={busy}
                   setBusy={setBusy}
                   reload={load}
                 />
+              )}
+              {leader && (
+                <section
+                  className="corporate-panel corporate-pending"
+                  id="pending-employees"
+                >
+                  <h2>
+                    {t('Pedidos pendentes')} ({detail.invites.length})
+                  </h2>
+                  {!detail.invites.length && (
+                    <p>{t('Não existem pedidos pendentes.')}</p>
+                  )}
+                  {detail.invites.map((i) => (
+                    <div className="corporate-toolbar" key={i.id}>
+                      <div className="corporate-pending-info">
+                        <strong>{i.name || i.email}</strong>
+                        {i.name && <small>{i.email}</small>}
+                        <span className="corporate-status-pill">
+                          {t(
+                            i.expires_at <= now
+                              ? 'Expirado — reenviar pedido'
+                              : i.delivery !== 'accepted'
+                                ? 'Pedido de envio por confirmar'
+                                : i.mode === 'authorization'
+                                  ? 'A aguardar consentimento'
+                                  : 'A aguardar aceitação do convite',
+                          )}
+                        </span>
+                        <small>
+                          {t(
+                            i.mode === 'authorization'
+                              ? 'Autorização: o líder cria o acesso'
+                              : 'Convite: o trabalhador define o acesso',
+                          )}{' '}
+                          · {t('Válido até')}{' '}
+                          {new Date(i.expires_at).toLocaleDateString(locale, {
+                            timeZone: 'Africa/Maputo',
+                          })}
+                          {i.team ? ' · ' + i.team : ''}
+                        </small>
+                      </div>
+                      <button
+                        disabled={busy}
+                        onClick={() =>
+                          void act({
+                            action: 'invite',
+                            name: i.name,
+                            email: i.email,
+                            team: i.team,
+                            role: i.role,
+                            mode: i.mode,
+                          })
+                        }
+                      >
+                        {t('Reenviar')}
+                      </button>
+                      <button
+                        disabled={busy}
+                        onClick={() => void act({ action: 'revoke', id: i.id })}
+                      >
+                        {t('Cancelar convite')}
+                      </button>
+                    </div>
+                  ))}
+                </section>
               )}
               {leader && (
                 <CorporateCredentials
@@ -569,104 +594,9 @@ export function CorporateDashboard() {
                   reload={load}
                 />
               )}
-              {leader && (
-                <details className="corporate-panel">
-                  <summary>{t('Adicionar um trabalhador')}</summary>
-                  <p>
-                    {t(
-                      'Os acessos só são activados após a confirmação enviada ao email indicado.',
-                    )}
-                  </p>
-                  {!data.emailReady && (
-                    <p>
-                      {t('O envio de convites por email não está configurado.')}
-                    </p>
-                  )}
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const f = new FormData(e.currentTarget);
-                      void act({
-                        action: 'invite',
-                        name: f.get('name'),
-                        email: f.get('email'),
-                        team: f.get('team'),
-                        role: f.get('role'),
-                        mode: inviteMode,
-                      });
-                    }}
-                  >
-                    <label>
-                      {t('Nome')}
-                      <input name="name" required maxLength={100} />
-                    </label>
-                    <label>
-                      {t('Email')}
-                      <input
-                        name="email"
-                        type="email"
-                        required
-                        maxLength={254}
-                      />
-                    </label>
-                    <label>
-                      {t('Equipa')}
-                      <input name="team" maxLength={80} />
-                    </label>
-                    <label>
-                      {t('Função')}
-                      <select name="role">
-                        <option value="member">{t('Trabalhador')}</option>
-                        <option value="leader" disabled={!owner}>
-                          {t('Líder')}
-                        </option>
-                      </select>
-                    </label>
-                    <button disabled={busy || !data.emailReady}>
-                      {t(
-                        inviteMode === 'authorization'
-                          ? 'Enviar autorização'
-                          : 'Enviar convite',
-                      )}
-                    </button>
-                  </form>
-                </details>
-              )}
-              {leader && (
-                <details className="corporate-panel">
-                  <summary>{t('Adicionar trabalhadores em lote')}</summary>
-                  <p>
-                    {t(
-                      'Um trabalhador por linha: Nome;email;equipa, sem cabeçalho. Até 25 por envio. Se houver uma falha, as linhas restantes ficam guardadas neste formulário.',
-                    )}
-                  </p>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      void inviteBatch();
-                    }}
-                  >
-                    <label>
-                      {t('Trabalhadores')}
-                      <textarea
-                        disabled={busy}
-                        value={batch}
-                        onChange={(e) => setBatch(e.target.value)}
-                        maxLength={12000}
-                        rows={6}
-                        required
-                      />
-                    </label>
-                    <button disabled={busy || !data.emailReady}>
-                      {t(
-                        inviteMode === 'authorization'
-                          ? 'Enviar autorizações'
-                          : 'Enviar convites',
-                      )}
-                    </button>
-                  </form>
-                </details>
-              )}
+              <h2 id="team-members">
+                {t('Trabalhadores')} ({detail.members.length})
+              </h2>
               <div className="corporate-table" aria-label={t('Trabalhadores')}>
                 <table>
                   <thead>
@@ -701,10 +631,10 @@ export function CorporateDashboard() {
                           <td>
                             {t(
                               m.active
-                                ? m.managed_access && !m.provisioned_at
-                                  ? 'Autorização confirmada'
-                                  : m.within_limit === 0
-                                    ? 'Fora do limite'
+                                ? m.within_limit === 0
+                                  ? 'Fora do limite'
+                                  : m.managed_access && !m.provisioned_at
+                                    ? 'Pronto para criar acesso'
                                     : 'Activo'
                                 : 'Suspenso',
                             )}
@@ -787,48 +717,6 @@ export function CorporateDashboard() {
                   </tbody>
                 </table>
               </div>
-              {leader && (
-                <section className="corporate-panel">
-                  <h2>{t('Convites pendentes')}</h2>
-                  {detail.invites.map((i) => (
-                    <div className="corporate-toolbar" key={i.id}>
-                      <span>
-                        {i.name} · {i.email} ·{' '}
-                        {new Date(i.expires_at).toLocaleDateString(locale, {
-                          timeZone: 'Africa/Maputo',
-                        })}{' '}
-                        ·{' '}
-                        {t(
-                          i.delivery === 'accepted'
-                            ? 'Aceite pelo serviço de email'
-                            : 'Envio por confirmar',
-                        )}
-                      </span>
-                      <button
-                        disabled={busy}
-                        onClick={() =>
-                          void act({
-                            action: 'invite',
-                            name: i.name,
-                            email: i.email,
-                            team: i.team,
-                            role: i.role,
-                            mode: i.mode,
-                          })
-                        }
-                      >
-                        {t('Reenviar')}
-                      </button>
-                      <button
-                        disabled={busy}
-                        onClick={() => void act({ action: 'revoke', id: i.id })}
-                      >
-                        {t('Cancelar convite')}
-                      </button>
-                    </div>
-                  ))}
-                </section>
-              )}
               <section className="corporate-panel">
                 <h2>{t('Campanhas e eventos')}</h2>
                 <p>

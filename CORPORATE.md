@@ -65,3 +65,9 @@ No additional migration beyond the pending 0032 is needed for these refinements.
 ## Corporate onboarding release - 19 October 2026
 
 The guided setup, manual manager approval, authorization/password administration and email-only invitations are now published. Migration 0032 applied after private backup; Worker 83e67de9-cbed-4fa3-9abe-31812d6da5df, source d1bb074. This supersedes local-only/pending release statements above. Production public access and anonymous access protection verified on canonical/workers.dev domains; real email delivery and employee acceptance still require external confirmation. See ACCOUNT_HANDOFF.md for exact verification.
+
+## Unified employee entry - 20 October 2026 (local)
+
+The corporate dashboard now uses one Add employees section instead of separate email-only, named and bulk forms. Invitation and authorization are explicit choices inside it. Email rows allow optional names; paste-list input retains Name;email;team and a25-person bound. Owners can choose role; delegated leaders submit member invitations. Team selection uses existing member/invitation team names, with a Create a team name option. Bulk row teams override the shared fallback. The entire list is validated and deduplicated before sending; failed/unprocessed rows remain available and processed rows are not resent automatically.
+
+Pending requests have a separate section with consent/invitation, uncertain-send and expired states. Accepted-by-provider notices are not presented as inbox delivery or employee acceptance. Active and ready-for-access counts are distinct, and the existing protected credential workflow remains available. Desktop form hierarchy and mobile stacking were reviewed using local fictional data. These refinements do not change the database, corporate approval rules or consent requirements and are not deployed yet.

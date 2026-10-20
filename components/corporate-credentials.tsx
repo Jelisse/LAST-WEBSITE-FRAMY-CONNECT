@@ -37,9 +37,13 @@ export function CorporateCredentials({
   );
   if (!eligible.length) return null;
   return (
-    <details className="corporate-panel">
+    <details
+      className="corporate-panel corporate-authorized-access"
+      id="employee-access"
+    >
       <summary>
-        {t('Acessos autorizados: criar ou redefinir palavra-passe')}
+        {t('Acessos autorizados: criar ou redefinir palavra-passe')} (
+        {eligible.length})
       </summary>
       <p>
         {t(
