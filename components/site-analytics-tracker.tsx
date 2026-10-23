@@ -40,6 +40,13 @@ export function SiteAnalyticsTracker() {
   const [consent, setConsent] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [blocked, setBlocked] = useState(false);
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
+  useEffect(() => {
+    const open = () => setPreferencesOpen(true);
+    window.addEventListener('framy-analytics-preferences', open);
+    return () =>
+      window.removeEventListener('framy-analytics-preferences', open);
+  }, []);
   const publicPath = analyticsPath(path);
   useEffect(() => {
     const disabled = measurementBlocked();
@@ -186,6 +193,7 @@ export function SiteAnalyticsTracker() {
     };
   }, [publicPath, consent, blocked]);
   function choose(value: string) {
+    setPreferencesOpen(false);
     try {
       setConsent(writeConsent(value));
       if (value !== 'yes') pendingSteps.length = 0;
@@ -193,15 +201,28 @@ export function SiteAnalyticsTracker() {
       setConsent('no');
     }
   }
-  if (!publicPath || !loaded || blocked) return null;
-  if (consent)
-    return (
-      <div className="analytics-preferences">
-        <button type="button" onClick={() => choose('')}>
-          {t('Preferências de estatísticas')}
+  if (!loaded || (!publicPath && !preferencesOpen)) return null;
+  if (blocked)
+    return preferencesOpen ? (
+      <aside
+        className="analytics-consent"
+        aria-label={t('Preferências de estatísticas')}
+      >
+        <strong>{t('A sua preferência de privacidade é respeitada.')}</strong>
+        <p>
+          {t(
+            'As definições do seu navegador bloqueiam a medição opcional. Não recolhemos estas estatísticas.',
+          )}
+        </p>
+        <Link href="/privacidade#cookies">
+          {t('Cookies e armazenamento no dispositivo')}
+        </Link>
+        <button type="button" onClick={() => setPreferencesOpen(false)}>
+          {t('Fechar')}
         </button>
-      </div>
-    );
+      </aside>
+    ) : null;
+  if (consent && !preferencesOpen) return null;
   return (
     <aside
       className="analytics-consent"
@@ -210,7 +231,7 @@ export function SiteAnalyticsTracker() {
       <strong>{t('Ajude-nos a melhorar a experiência')}</strong>
       <p>
         {t(
-          'Podemos medir visitas, carregamento e etapas da compra? Não recolhemos nomes, formulários ou dados de pagamento. Pode alterar a escolha no rodapé.',
+          'Podemos medir visitas, carregamento e etapas da compra? Não recolhemos nomes, formulários ou dados de pagamento. Pode rever a escolha em Preferências de estatísticas, no rodapé das páginas públicas.',
         )}
       </p>
       <p>

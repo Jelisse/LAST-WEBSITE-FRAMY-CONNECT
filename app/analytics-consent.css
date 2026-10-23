@@ -37,17 +37,3 @@
   color: white;
   border-color: var(--action-orange);
 }
-.analytics-preferences {
-  text-align: center;
-  background: #fffaf5;
-  padding: 8px;
-}
-.analytics-preferences button {
-  font-size: 11px;
-  text-decoration: underline;
-  color: #705947;
-  background: none;
-  border: 0;
-  min-height: 36px;
-  cursor: pointer;
-}

@@ -8480,7 +8480,7 @@
     "Réseaux sociaux",
     "社交媒体"
   ],
-  "Explorar": ["Explore", "探索", "Огляд", "Odkrywaj", "Explorer", "探索"],
+  "Explorar": ["Explore", "探索"],
   "Ligar": ["Call", "致電", "Зателефонувати", "Zadzwoń", "Appeler", "致电"],
   "Plano da empresa": ["Company plan", "企業方案"],
   "Proposta existente": ["Existing proposal", "現有報價"],
@@ -10243,5 +10243,23 @@
   "Tipo de letra do nome inválido.": [
     "Choose a valid name font.",
     "請選擇有效的姓名字體。"
+  ],
+  "A sua identidade e as suas conexões, num só lugar.": [
+    "Your identity and connections, in one place.",
+    "您的身分與人脈，盡在一處。"
+  ],
+  "Conectar": ["Connect", "聯繫"],
+  "Acompanhar encomenda": ["Track an order", "追蹤訂單"],
+  "A sua preferência de privacidade é respeitada.": [
+    "Your privacy preference is respected.",
+    "我們尊重您的隱私偏好。"
+  ],
+  "As definições do seu navegador bloqueiam a medição opcional. Não recolhemos estas estatísticas.": [
+    "Your browser settings block optional measurement. We do not collect these statistics.",
+    "您的瀏覽器設定封鎖選用的分析。我們不會收集這些統計資料。"
+  ],
+  "Podemos medir visitas, carregamento e etapas da compra? Não recolhemos nomes, formulários ou dados de pagamento. Pode rever a escolha em Preferências de estatísticas, no rodapé das páginas públicas.": [
+    "May we measure visits, loading and purchase steps? We do not collect names, forms or payment data. You can review your choice in Analytics preferences in the footer of public pages.",
+    "我們可以衡量造訪、載入及購買步驟嗎？我們不會收集姓名、表單或付款資料。您可在公開頁面頁尾的分析偏好設定中重新選擇。"
   ]
 }
