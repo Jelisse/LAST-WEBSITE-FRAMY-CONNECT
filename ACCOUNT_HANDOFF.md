@@ -687,3 +687,9 @@ Applied the approved burnt-orange/terracotta gradient and compact spacing to the
 Removed the detached analytics strip. A footer client button opens the existing consent panel through an event; choosing yes/no still uses the existing consent storage/events and measurement guards. Browser DNT/GPC blocking remains respected and opens an explanatory panel rather than enabling tracking. Measurement route eligibility and collection are unchanged. Preferences can open on any public footer even if that page is not measured.
 
 Validation: 9 analytics/consent tests and 10 localization tests passed; TypeScript and targeted lint passed. Local browser checked desktop/mobile footer, no horizontal overflow, no detached strip, preference reopening and Decline. Saved desktop/mobile footer screenshots in the task visualization directory. Not committed or deployed.
+
+## Terracotta footer committed, pushed and deployed — 23 October 2026
+
+Implementation commit 16118f6 pushed to github/main. Cloudflare release 4adade15-7ea7-414d-bb73-1a306c667c6c publishes the compact terracotta public footer and integrated Analytics preferences. Supersedes local-only footer status. Guarded schema/integrity checks and fresh production build passed, no migration. Initial read-only schema lookup failed; confirmed Cloudflare authentication and guarded retry passed.
+
+Live Home/Contact/Help HTML returns 200 with the refined footer, order-tracking destination and integrated preference control; no detached analytics strip or duplicate account column. Tracking/login/recovery/purchase remain footer-free. Live workspace bundle SHA256 matches release; product options return 200 and anonymous workspace remains 401. Desktop/mobile layout and consent reopening/Decline were checked locally; 19 analytics/localization tests, TypeScript and targeted lint passed. Release log and verification scripts remain ignored under tmp/refinement-review.
