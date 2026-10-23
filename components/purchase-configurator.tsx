@@ -29,7 +29,6 @@ import {
   cardMaterials,
   keychainMaterials,
   designServices,
-  checkoutMaintenanceMessage,
 } from '@/lib/purchase-structure';
 import { money } from '@/lib/catalog';
 import { hardwareEstimate, type HardwarePrice } from '@/lib/hardware-pricing';
@@ -427,15 +426,14 @@ export function PurchaseConfigurator({
         )}
       </ol>
       {!paymentAvailable && (
-        <details className="purchase-maintenance">
-          <summary>{t('Checkout em manutenção')}</summary>
-          <p>{t(checkoutMaintenanceMessage)}</p>
-          <p>
-            {t(
-              'Explore a nova configuração. Os preços e a disponibilidade serão confirmados antes da reabertura.',
-            )}
-          </p>
-        </details>
+        <p className="purchase-availability-note">
+          {t(
+            'Compras temporariamente indisponíveis. Pode consultar os produtos e simular a configuração.',
+          )}{' '}
+          <Link href="/contacto?assunto=encomenda">
+            {t('Pedir ajuda para encomendar')}
+          </Link>
+        </p>
       )}
       <div className="purchase-layout">
         <div>

@@ -15,6 +15,7 @@ import {
 export function ProfileLinksEditor({
   profile,
   showBio = true,
+  hideUpgrade = false,
   planId,
   terms,
   disabled,
@@ -23,6 +24,7 @@ export function ProfileLinksEditor({
 }: {
   profile: Profile;
   showBio?: boolean;
+  hideUpgrade?: boolean;
   planId: PlanId;
   terms?: ManagedPlan;
   disabled: boolean;
@@ -51,15 +53,17 @@ export function ProfileLinksEditor({
             {t(plan.name)}
           </p>
         </div>
-        <Button
-          type="button"
-          className="plan-text-button"
-          variant="ghost"
-          disabled={disabled}
-          onClick={onUpgrade}
-        >
-          {t('Escolher plano')}
-        </Button>
+        {!hideUpgrade && (
+          <Button
+            type="button"
+            className="plan-text-button"
+            variant="ghost"
+            disabled={disabled}
+            onClick={onUpgrade}
+          >
+            {t('Escolher plano')}
+          </Button>
+        )}
       </div>
       <p className="link-editor-note">
         {t(
@@ -193,12 +197,15 @@ export function ProfileLinksEditor({
           className="add-link-box"
           variant="outline"
           disabled={disabled}
-          onClick={onUpgrade}
+          onClick={hideUpgrade ? undefined : onUpgrade}
+          aria-disabled={hideUpgrade || undefined}
         >
           <LockKeyhole size={18} />
-          {plan.links === 50
-            ? t('Todas as 50 caixas estão em uso')
-            : t('Desbloquear mais caixas')}
+          {hideUpgrade
+            ? t('Limite de links atingido')
+            : plan.links === 50
+              ? t('Todas as 50 caixas estão em uso')
+              : t('Desbloquear mais caixas')}
         </Button>
       )}
       {showBio &&

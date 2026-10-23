@@ -1,4 +1,5 @@
 'use client';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 import { AppSidebarContents } from './app-sidebar';
 import { managerSections as sections } from './manager-sections';
 import { focusDashboardStart } from '@/lib/dashboard-navigation';
@@ -400,7 +401,7 @@ export function ManagerWorkspace({
           </span>
           <AccountMenu identity />
         </header>
-        <main id="main" className="manager-main">
+        <main id="main" className="manager-main" data-guidance-panel={section}>
           <div className="manager-heading">
             <div>
               <span className="manager-eyebrow">{t('CENTRO DE GESTÃO')}</span>
@@ -448,7 +449,7 @@ export function ManagerWorkspace({
                   className="manager-secondary"
                   disabled={busy}
                   onClick={() =>
-                    void load()
+                    void refreshDashboard(load)
                       .then(() => setError(''))
                       .catch((e) => setError(e.message))
                   }

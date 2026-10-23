@@ -7,6 +7,20 @@ export function dashboardFor(role: AccountRole) {
     director: '/cofounder',
   }[role];
 }
+export function accountDestination(
+  role: AccountRole,
+  requested: string,
+  registering = false,
+) {
+  const destination = loginDestination(role, requested);
+  if (
+    registering &&
+    role === 'customer' &&
+    (destination === '/dashboard' || destination.startsWith('/perfil'))
+  )
+    return '/perfil?onboarding=1';
+  return destination;
+}
 export function loginDestination(role: AccountRole, requested: string) {
   if (
     ['customer', 'agent'].includes(role) &&

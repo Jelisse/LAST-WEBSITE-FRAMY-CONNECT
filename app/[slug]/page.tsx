@@ -181,17 +181,12 @@ export default async function Page({
               <ArrowUpRight size={20} />
             </a>
           )}
-          <Link
-            className="text-link"
-            href={
-              slug === 'contacto' ? 'https://wa.me/258846847629' : '/produtos'
-            }
-          >
-            {t(
-              slug === 'contacto' ? 'O nosso WhatsApp' : 'Descobrir produtos ',
-            )}
-            <ArrowUpRight size={19} />
-          </Link>
+          {slug === 'contacto' && (
+            <Link className="text-link" href="https://wa.me/258846847629">
+              {t('O nosso WhatsApp')}
+              <ArrowUpRight size={19} />
+            </Link>
+          )}
         </main>
         <SiteFooter />
       </>

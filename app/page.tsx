@@ -113,8 +113,12 @@ export default async function Home() {
               </Link>
               <Link
                 className="public-button public-button-outline"
-                href="/para-empresas"
+                href="#produtos"
               >
+                {t('Escolher o meu produto')}
+                <ArrowUpRight size={18} aria-hidden="true" />
+              </Link>
+              <Link className="public-company-link" href="/para-empresas">
                 {t('Para a minha empresa')}
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>

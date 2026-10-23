@@ -1,6 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loginDestination, dashboardFor } from '../lib/auth-policy.ts';
+import { loginDestination, dashboardFor, accountDestination } from '../lib/auth-policy.ts';
+
+test('only new personal account journeys enter focused onboarding, preserving purchase and company returns', () => {
+  for (const path of ['', '/dashboard', '/perfil', '/perfil?plans=1']) assert.equal(accountDestination('customer',path,true),'/perfil?onboarding=1');
+  assert.equal(accountDestination('customer','/dashboard',false),'/dashboard');
+  for (const path of ['/comprar?formato=keychain','/checkout/retorno?payment=abc123','/corporativo/configurar','/corporativo/aceitar','/aplicar']) assert.equal(accountDestination('customer',path,true),path);
+  assert.equal(accountDestination('manager','/perfil',true),'/manager');
+  assert.equal(accountDestination('customer','//evil.test',true),'/perfil?onboarding=1');
+});
 test('staff always enter their own dashboard', () => {
   for (const role of ['manager', 'agent', 'director'])
     for (const path of [

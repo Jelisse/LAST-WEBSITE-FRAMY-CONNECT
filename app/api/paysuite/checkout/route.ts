@@ -1,3 +1,4 @@
+import { purchaseProduct } from '@/lib/purchase-history';
 import { guestSession, guestOwns, buyerDetails } from '@/lib/guest-checkout';
 import { purchaseAmounts } from '@/lib/purchase-amounts';
 import { referralQuote } from '@/lib/server-ambassador';
@@ -37,11 +38,17 @@ export async function GET(request: Request) {
         available: paysuiteReady(env),
         payments: (
           await env.DB.prepare(
-            'SELECT p.public_reference AS paymentReference,o.public_reference AS orderReference,p.id,p.kind,p.amount,p.cycle,p.status,p.created_at,o.status AS orderStatus FROM paysuite_payments p LEFT JOIN paysuite_product_orders o ON o.id=p.target_id AND o.owner_id=p.owner_id WHERE p.owner_id=? ORDER BY p.created_at DESC LIMIT 30',
+            'SELECT p.public_reference AS paymentReference,o.public_reference AS orderReference,p.id,p.kind,p.amount,p.cycle,p.status,p.created_at,o.status AS orderStatus,o.configuration_json FROM paysuite_payments p LEFT JOIN paysuite_product_orders o ON o.id=p.target_id AND o.owner_id=p.owner_id WHERE p.owner_id=? ORDER BY p.created_at DESC LIMIT 30',
           )
             .bind(user!.userId)
             .all()
-        ).results,
+        ).results.map((row) => {
+          const { configuration_json, ...payment } = row;
+          return {
+            ...payment,
+            product: purchaseProduct(configuration_json as string | null),
+          };
+        }),
       });
     const row = await env.DB.prepare(
       'SELECT * FROM paysuite_payments WHERE id=? AND owner_id IS ?',
@@ -82,6 +89,7 @@ export async function GET(request: Request) {
         : null;
     return json({
       guest: row.owner_id === null,
+      product: purchaseProduct(order?.configuration_json),
       receiptStatus:
         row.status === 'paid'
           ? ((

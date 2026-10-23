@@ -1,0 +1,125 @@
+.profile-onboarding {
+  min-height: 100dvh;
+  background: #f6f5f3;
+}
+.onboarding-header .panel-brand {
+  display: flex !important;
+}
+.onboarding-header .panel-brand img {
+  width: 130px;
+  height: auto;
+}
+.profile-onboarding h1:focus {
+  outline: none;
+}
+.onboarding-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 32px;
+  min-height: 76px;
+  border-bottom: 1px solid #e7ded5;
+  background: white;
+}
+.onboarding-content {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+.onboarding-content .first-profile-welcome {
+  margin: 0;
+}
+.welcome-profile-copy h1 {
+  font-size: clamp(27px, 3vw, 38px);
+  line-height: 1.2;
+  margin: 24px 0;
+  letter-spacing: -0.03em;
+}
+.onboarding-complete {
+  max-width: 580px;
+  margin: 8vh auto;
+  padding: 40px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #a7441c, #742e17);
+  color: #fff8f1;
+  box-shadow: 0 16px 44px #48200d20;
+}
+.onboarding-complete h1 {
+  font-size: 30px;
+  line-height: 1.25;
+  margin: 20px 0 16px;
+}
+.onboarding-complete p {
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.onboarding-complete .btn {
+  color: #8b3513;
+  background: #fffaf4;
+  border: 1px solid white;
+}
+body .refined-workspace.onboarding-editor {
+  --sidebar-width: 0px;
+}
+body .onboarding-editor > [data-slot='sidebar-inset'] {
+  margin: 0;
+  width: 100%;
+}
+body .onboarding-editor .workspace-header > .panel-brand {
+  display: flex;
+}
+body .onboarding-editor .workspace-header > .workspace-account-tools {
+  margin-left: auto;
+  flex: initial;
+}
+body .onboarding-editor .workspace-main {
+  max-width: 1500px;
+  width: 100%;
+  margin: 0 auto;
+}
+.onboarding-save-exit {
+  background: transparent;
+  color: #9b3f1a;
+  border: 1px solid #d6b6a3;
+  border-radius: 9px;
+  padding: 10px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+.onboarding-save-exit:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+@media (max-width: 640px) {
+  .onboarding-header {
+    padding: 10px 16px;
+  }
+  .onboarding-header .panel-brand img {
+    width: 105px;
+  }
+  .onboarding-header .language-selector {
+    width: 132px;
+  }
+  .onboarding-content {
+    padding: 20px 12px;
+  }
+  .onboarding-complete {
+    padding: 28px 24px;
+  }
+  body .onboarding-editor .workspace-header {
+    flex-wrap: wrap;
+    height: auto;
+  }
+  body .onboarding-editor .workspace-header .language-selector {
+    width: 100px;
+  }
+  .onboarding-save-exit {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
+
+body .onboarding-editor .workspace-header .language-selector {
+  display: block !important;
+}

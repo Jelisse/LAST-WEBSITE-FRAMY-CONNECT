@@ -1,4 +1,6 @@
 'use client';
+import { SourceImage } from './source-image';
+import type { PublicProduct } from '@/lib/catalog';
 import { AgentContact } from '@/components/agent-contact';
 import { useI18n } from '@/components/language-provider';
 
@@ -85,8 +87,10 @@ export function CustomerOrders({
   orders,
   events,
   onOpen,
+  products = [],
 }: {
   orders: SandboxOrder[];
+  products?: PublicProduct[];
   events: Event[];
   onOpen: (order: SandboxOrder) => void;
 }) {
@@ -117,7 +121,18 @@ export function CustomerOrders({
             <header>
               <div className="tracking-product">
                 <span className="tracking-product-icon">
-                  <Package size={26} />
+                  {products.find((p) => p.id === order.productId)?.imageUrl ? (
+                    <SourceImage
+                      src={
+                        products.find((p) => p.id === order.productId)!.imageUrl
+                      }
+                      alt={t(order.productName)}
+                      width={76}
+                      height={76}
+                    />
+                  ) : (
+                    <Package size={26} />
+                  )}
                 </span>
                 <div>
                   <p>

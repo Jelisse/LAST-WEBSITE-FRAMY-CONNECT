@@ -1,4 +1,7 @@
 'use client';
+import { useSearchParams } from 'next/navigation';
+import { ProfileOnboarding } from './profile-onboarding';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 import { AppSidebarContents } from './app-sidebar';
 import { ProfileSetupNavigation, ProfileSetupReview } from './profile-setup';
 import {
@@ -13,6 +16,7 @@ import { PanelBrand } from '@/components/panel-brand';
 
 import { workspacePlan } from '@/lib/workspace-plan';
 import { ProfileColourPicker } from './profile-colour-picker';
+import { AutoGrowTextarea } from './auto-grow-textarea';
 import { ProfileNameFontPicker } from './profile-name-font-picker';
 import { profilePresentation } from '@/lib/entitlement';
 import { ProfileExtrasEditor } from './profile-extras-editor';
@@ -86,7 +90,8 @@ import {
 } from '@/lib/domain';
 import { validateDelivery } from '@/lib/delivery';
 import { OrderPayment } from './order-payment';
-import { CustomerOrders, OrderProgressLine } from './customer-orders';
+import { PurchaseHistory } from './purchase-history';
+import { OrderProgressLine } from './customer-orders';
 import { DeliveryEditor } from './delivery-editor';
 import { usernameFromName } from '@/lib/domain';
 import { normalizeProfileURL } from '@/lib/profile-url';
@@ -98,7 +103,7 @@ const signOutHref = '/sair';
 const menu = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
   { id: 'profile', label: 'A minha identidade', icon: UserRound },
-  { id: 'orders', label: 'O meu pedido', icon: Package },
+  { id: 'orders', label: 'As minhas compras', icon: Package },
   { id: 'analytics', label: 'Resultados do perfil', icon: ChartNoAxesCombined },
   { id: 'growth', label: 'Ferramentas do perfil', icon: BriefcaseBusiness },
   { id: 'ambassadors', label: 'Embaixador', icon: UserRound },
@@ -118,6 +123,11 @@ const payment = (o: SandboxOrder) =>
   o.refunded ? 'Reembolsado' : o.paid ? 'Pagamento registado' : 'Por pagar';
 export function Workspace({ displayName }: { displayName: string }) {
   const { t } = useI18n();
+  const query = useSearchParams();
+  const onboardingRequested = query?.get('onboarding') === '1';
+  const [onboarding, setOnboarding] = useState<string | null>(
+    onboardingRequested ? 'welcome' : null,
+  );
   const [growthInitialTab, setGrowthInitialTab] = useState<
     'overview' | 'billing'
   >('overview');
@@ -195,7 +205,13 @@ export function Workspace({ displayName }: { displayName: string }) {
           },
         );
         setEditorStep(d.published ? 0 : resumeProfileStep(d.profile));
-        if (!d.published && d.profileVersion > 0) setTab('profile');
+        if (onboardingRequested) {
+          if (d.published) setOnboarding(null);
+          else {
+            setOnboarding(d.profileVersion > 0 ? 'editing' : 'welcome');
+            setTab('profile');
+          }
+        }
         const routeTab: Record<string, string> = {
           '/perfil': 'profile',
           '/preview': 'profile',
@@ -212,6 +228,8 @@ export function Workspace({ displayName }: { displayName: string }) {
             ),
           );
         }
+        if (new URLSearchParams(window.location.search).get('tab') === 'orders')
+          setTab('orders');
         if (new URLSearchParams(window.location.search).get('tools') === '1') {
           if (workspacePlan(d.membership).hasTools) setTab('growth');
           else setPlansOpen(true);
@@ -249,7 +267,7 @@ export function Workspace({ displayName }: { displayName: string }) {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [displayName]);
+  }, [displayName, onboardingRequested]);
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
       if (dirty) {
@@ -472,7 +490,10 @@ export function Workspace({ displayName }: { displayName: string }) {
       setNotice(savedMessage(action));
       // Best-effort revalidation; the save itself already succeeded.
       await load().catch(() => {});
-      if (action === 'publish-profile') setEditorStep(3);
+      if (action === 'publish-profile') {
+        setEditorStep(3);
+        if (onboarding === 'editing') setOnboarding('published');
+      }
       return true;
     } catch (e) {
       if ((e as { status?: number }).status === 409) {
@@ -676,9 +697,25 @@ export function Workspace({ displayName }: { displayName: string }) {
       )}
     </div>
   );
+  if (onboarding && onboarding !== 'editing')
+    return (
+      <ProfileOnboarding
+        phase={onboarding}
+        name={displayName}
+        ready={!!data}
+        error={error}
+        onStart={() => {
+          setOnboarding('editing');
+          setTab('profile');
+          goToEditorStep(0);
+        }}
+      />
+    );
   return (
-    <SidebarProvider className="refined-workspace">
-      {plansOpen && data && (
+    <SidebarProvider
+      className={`refined-workspace ${onboarding === 'editing' ? 'onboarding-editor' : ''}`}
+    >
+      {!onboarding && plansOpen && data && (
         <PlanPicker
           paidAvailable={data.membership.billingAvailable}
           plans={data.plans}
@@ -689,111 +726,128 @@ export function Workspace({ displayName }: { displayName: string }) {
           onSelect={selectPlan}
         />
       )}
-      <Sidebar className="workspace-sidebar app-sidebar">
-        <CustomerSidebar
-          badge={
-            planView
-              ? planView.personal
-                ? 'Personal · Gratuito'
-                : planView.name
-              : '…'
-          }
-          groups={[
-            {
-              label: 'O seu espaço',
-              items: menu
-                .filter((m) => ['overview', 'orders'].includes(m.id))
-                .map((m) => ({
-                  id: m.id,
-                  label: m.label,
-                  icon: <m.icon size={21} />,
-                  active: tab === m.id,
-                  onSelect: () => {
-                    setTab(m.id);
-                    focusDashboardStart();
-                    setNotice('');
+      {!onboarding && (
+        <Sidebar className="workspace-sidebar app-sidebar">
+          <CustomerSidebar
+            badge={
+              planView
+                ? planView.personal
+                  ? 'Personal · Gratuito'
+                  : planView.name
+                : '…'
+            }
+            groups={[
+              {
+                label: 'O seu espaço',
+                items: menu
+                  .filter((m) => ['overview', 'orders'].includes(m.id))
+                  .map((m) => ({
+                    id: m.id,
+                    label: m.label,
+                    icon: <m.icon size={21} />,
+                    active: tab === m.id,
+                    onSelect: () => {
+                      setTab(m.id);
+                      focusDashboardStart();
+                      setNotice('');
+                    },
+                  })),
+              },
+              {
+                label: 'Criar e partilhar',
+                items: menu
+                  .filter((m) => ['profile', 'growth'].includes(m.id))
+                  .map((m) => ({
+                    id: m.id,
+                    label:
+                      m.id === 'growth'
+                        ? planView?.hasTools
+                          ? 'Ferramentas profissionais'
+                          : 'Explorar Profissional'
+                        : m.label,
+                    icon: <m.icon size={21} />,
+                    active:
+                      (tab === m.id ||
+                        (m.id === 'growth' &&
+                          tab.startsWith('professional-'))) &&
+                      (m.id !== 'growth' || growthInitialTab !== 'billing'),
+                    onSelect: () => {
+                      if (m.id === 'growth' && !planView?.hasTools) {
+                        openPlans();
+                        return;
+                      }
+                      if (m.id === 'growth') setGrowthInitialTab('overview');
+                      setTab(m.id);
+                      focusDashboardStart();
+                      setNotice('');
+                    },
+                  })),
+              },
+              {
+                label: 'Acompanhar',
+                items: menu
+                  .filter((m) => ['analytics', 'ambassadors'].includes(m.id))
+                  .map((m) => ({
+                    id: m.id,
+                    label: m.label,
+                    icon: <m.icon size={21} />,
+                    active: tab === m.id,
+                    onSelect: () => {
+                      setTab(m.id);
+                      focusDashboardStart();
+                      setNotice('');
+                    },
+                  })),
+              },
+              {
+                label: 'Para a sua equipa',
+                items: [
+                  {
+                    id: 'company',
+                    label: 'Equipa corporativa',
+                    href: '/corporativo',
+                    icon: <BriefcaseBusiness size={21} />,
                   },
-                })),
-            },
-            {
-              label: 'Criar e partilhar',
-              items: menu
-                .filter((m) => ['profile', 'growth'].includes(m.id))
-                .map((m) => ({
-                  id: m.id,
-                  label:
-                    m.id === 'growth'
-                      ? planView?.hasTools
-                        ? 'Ferramentas profissionais'
-                        : 'Explorar Profissional'
-                      : m.label,
-                  icon: <m.icon size={21} />,
-                  active:
-                    (tab === m.id ||
-                      (m.id === 'growth' && tab.startsWith('professional-'))) &&
-                    (m.id !== 'growth' || growthInitialTab !== 'billing'),
-                  onSelect: () => {
-                    if (m.id === 'growth' && !planView?.hasTools) {
-                      openPlans();
-                      return;
-                    }
-                    if (m.id === 'growth') setGrowthInitialTab('overview');
-                    setTab(m.id);
-                    focusDashboardStart();
-                    setNotice('');
-                  },
-                })),
-            },
-            {
-              label: 'Acompanhar',
-              items: menu
-                .filter((m) => ['analytics', 'ambassadors'].includes(m.id))
-                .map((m) => ({
-                  id: m.id,
-                  label: m.label,
-                  icon: <m.icon size={21} />,
-                  active: tab === m.id,
-                  onSelect: () => {
-                    setTab(m.id);
-                    focusDashboardStart();
-                    setNotice('');
-                  },
-                })),
-            },
-            {
-              label: 'Para a sua equipa',
-              items: [
-                {
-                  id: 'company',
-                  label: 'Equipa corporativa',
-                  href: '/corporativo',
-                  icon: <BriefcaseBusiness size={21} />,
-                },
-              ],
-            },
-          ]}
-          onUpgrade={openPlans}
-          footer={
-            <a className="signout" href={signOutHref} target="_top">
-              <LogOut size={20} />
-              <span>{t('Terminar sessão')}</span>
-            </a>
-          }
-        />
-      </Sidebar>
+                ],
+              },
+            ]}
+            onUpgrade={openPlans}
+            footer={
+              <a className="signout" href={signOutHref} target="_top">
+                <LogOut size={20} />
+                <span>{t('Terminar sessão')}</span>
+              </a>
+            }
+          />
+        </Sidebar>
+      )}
       <SidebarInset>
         <header className="workspace-header">
           <PanelBrand />
-          <div className="workspace-mobile-navigation">
-            <SidebarTrigger />
-          </div>
+          {!onboarding && (
+            <div className="workspace-mobile-navigation">
+              <SidebarTrigger />
+            </div>
+          )}
           <div className="workspace-account-tools">
             <LanguageSelector />
-            <AccountMenu identity />
+            {!onboarding && <AccountMenu identity />}
+            {onboarding === 'editing' && (
+              <button
+                className="onboarding-save-exit"
+                disabled={busy || uploadingPhoto}
+                onClick={async () => {
+                  if (await save('save-profile')) setOnboarding('draft');
+                }}
+              >
+                {t('Guardar e sair')}
+              </button>
+            )}
           </div>
         </header>
         <main
           id="main"
+          data-guidance-panel={data ? tab : undefined}
           className={`workspace-main ${['overview', 'profile', 'orders'].includes(tab) ? 'customer-main' : ''}`}
         >
           {tab !== 'profile' && (
@@ -826,12 +880,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                 aria-label={t('Actualizar dados')}
                 disabled={busy || loading || uploadingPhoto}
                 onClick={() =>
-                  run(
-                    () => load(false),
-                    dirty
-                      ? 'Dados actualizados. As alterações por guardar foram mantidas.'
-                      : 'Dados actualizados.',
-                  )
+                  run(() => refreshDashboard(() => load(false), dirty), '')
                 }
               >
                 <RefreshCw size={17} />
@@ -902,7 +951,11 @@ export function Workspace({ displayName }: { displayName: string }) {
                 <CustomerOverview
                   data={data}
                   displayName={displayName}
-                  onNavigate={setTab}
+                  onNavigate={(next) => {
+                    setTab(next);
+                    if (next === 'profile' && !data.published)
+                      setOnboarding('editing');
+                  }}
                   onInspect={inspect}
                   onUpgrade={openPlans}
                   onPlanDetails={() => {
@@ -913,6 +966,9 @@ export function Workspace({ displayName }: { displayName: string }) {
               )}
               {tab === 'profile' && (
                 <div
+                  data-onboarding={
+                    onboarding === 'editing' ? 'true' : undefined
+                  }
                   className="editor-grid profile-editor-layout guided-profile-editor"
                   data-editor-step={editorStep}
                 >
@@ -1149,9 +1205,10 @@ export function Workspace({ displayName }: { displayName: string }) {
                         <div className="setup-part setup-identity">
                           <label className="field" htmlFor="profile-bio">
                             {t('Sobre si (opcional)')}
-                            <textarea
+                            <AutoGrowTextarea
                               id="profile-bio"
-                              rows={4}
+                              aria-describedby="profile-bio-count"
+                              rows={2}
                               value={profile.bio || ''}
                               maxLength={Math.max(
                                 data.membership.terms.bio,
@@ -1165,7 +1222,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                                 setDirty(true);
                               }}
                             />
-                            <small>
+                            <small id="profile-bio-count">
                               {profile.bio?.length || 0} /{' '}
                               {data.membership.terms.bio} {t('caracteres')}
                             </small>
@@ -1173,6 +1230,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                         </div>
                         <div className="setup-part setup-contacts">
                           <ProfileLinksEditor
+                            hideUpgrade={!!onboarding}
                             showBio={false}
                             profile={profile}
                             planId={data.membership.planId}
@@ -1230,6 +1288,34 @@ export function Workspace({ displayName }: { displayName: string }) {
                             <Save size={17} />
                             {t(' Guardar rascunho')}
                           </Button>
+                          {onboarding === 'editing' &&
+                            editorStep > 0 &&
+                            editorStep < 3 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                disabled={busy || uploadingPhoto}
+                                onClick={async () => {
+                                  if (await save('save-profile'))
+                                    goToEditorStep(editorStep + 1);
+                                }}
+                              >
+                                {t('Saltar por agora')}
+                              </Button>
+                            )}
+                          {onboarding === 'editing' && editorStep === 3 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              disabled={busy || uploadingPhoto}
+                              onClick={async () => {
+                                if (await save('save-profile'))
+                                  setOnboarding('draft');
+                              }}
+                            >
+                              {t('Guardar para depois')}
+                            </Button>
+                          )}
                           {editorStep !== null && editorStep < 3 && (
                             <Button
                               type="button"
@@ -1414,45 +1500,47 @@ export function Workspace({ displayName }: { displayName: string }) {
               )}
               {['orders', 'operations', 'agent'].includes(tab) && (
                 <>
-                  <div className="panel order-create">
-                    <div>
-                      <h2>
-                        {tab === 'orders'
-                          ? t('Acompanhe o seu pedido.')
-                          : tab === 'operations'
-                            ? t('Cada pedido, no sítio certo.')
-                            : t('O próximo toque passa por si.')}
-                      </h2>
-                      <p className="muted">
-                        {tab === 'orders'
-                          ? t(
-                              'Veja em que etapa está cada pedido e consulte o histórico, do pagamento à entrega.',
-                            )
-                          : tab === 'operations'
+                  {(tab !== 'orders' || canEditOrders) && (
+                    <div className="panel order-create">
+                      <div>
+                        <h2>
+                          {tab === 'orders'
+                            ? t('As minhas compras')
+                            : tab === 'operations'
+                              ? t('Cada pedido, no sítio certo.')
+                              : t('O próximo toque passa por si.')}
+                        </h2>
+                        <p className="muted">
+                          {tab === 'orders'
                             ? t(
-                                'Atribua um agente e acompanhe os pedidos de teste até à entrega.',
+                                'Veja em que etapa está cada pedido e consulte o histórico, do pagamento à entrega.',
                               )
-                            : t(
-                                'Abra um pedido atribuído, inicie a produção e conclua o controlo de qualidade.',
-                              )}
-                      </p>
+                            : tab === 'operations'
+                              ? t(
+                                  'Atribua um agente e acompanhe os pedidos de teste até à entrega.',
+                                )
+                              : t(
+                                  'Abra um pedido atribuído, inicie a produção e conclua o controlo de qualidade.',
+                                )}
+                        </p>
+                      </div>
+                      {canEditOrders && (
+                        <Button
+                          className="btn btn-primary"
+                          disabled={busy}
+                          onClick={() =>
+                            run(
+                              () => create(chosenProduct),
+                              'Pedido de teste criado, sem cobrança.',
+                            )
+                          }
+                        >
+                          <Plus />
+                          {t(' Novo pedido de teste')}
+                        </Button>
+                      )}
                     </div>
-                    {canEditOrders && (
-                      <Button
-                        className="btn btn-primary"
-                        disabled={busy}
-                        onClick={() =>
-                          run(
-                            () => create(chosenProduct),
-                            'Pedido de teste criado, sem cobrança.',
-                          )
-                        }
-                      >
-                        <Plus />
-                        {t(' Novo pedido de teste')}
-                      </Button>
-                    )}
-                  </div>
+                  )}
                   {canEditOrders && (
                     <label
                       htmlFor="field-componentsworkspacetsx-0"
@@ -1501,17 +1589,10 @@ export function Workspace({ displayName }: { displayName: string }) {
                   )}
                   {tab === 'orders' ? (
                     <>
-                      <p>
-                        <Link
-                          className="btn btn-primary"
-                          href="/checkout/retorno"
-                        >
-                          {t('Consultar compras e pagamentos PaySuite')}
-                        </Link>
-                      </p>
-                      <CustomerOrders
+                      <PurchaseHistory
                         orders={orders}
                         events={data?.events ?? []}
+                        products={products}
                         onOpen={inspect}
                       />
                     </>

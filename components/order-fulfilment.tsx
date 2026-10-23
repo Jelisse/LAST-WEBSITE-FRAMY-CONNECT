@@ -1,4 +1,5 @@
 'use client';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 import { useEffect, useState } from 'react';
 import { useI18n } from './language-provider';
 import { progressLabels } from '@/lib/order-tracking';
@@ -70,7 +71,7 @@ export function OrderFulfilment() {
           disabled={busy}
           onClick={() => {
             setBusy(true);
-            void load()
+            void refreshDashboard(load)
               .catch(() => setError('Não foi possível carregar.'))
               .finally(() => setBusy(false));
           }}

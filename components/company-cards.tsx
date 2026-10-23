@@ -1,4 +1,5 @@
 'use client';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useI18n } from './language-provider';
@@ -367,7 +368,9 @@ export function CompanyCards({ organisation }: { organisation: string }) {
                 !dirty ||
                 window.confirm(t('Descartar alterações não guardadas?'))
               )
-                void load().catch((e) => setError(e.message));
+                void refreshDashboard(() => load()).catch((e) =>
+                  setError(e.message),
+                );
             }}
           >
             {t('Actualizar dados')}

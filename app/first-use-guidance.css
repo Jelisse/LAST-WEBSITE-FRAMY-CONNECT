@@ -1,0 +1,104 @@
+.first-use-tip {
+  box-sizing: border-box;
+  position: fixed;
+  z-index: 45;
+  width: min(310px, calc(100vw - 24px));
+  padding: 16px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #a7441c, #742e17);
+  color: #fff8f1;
+  box-shadow: 0 8px 28px #48200d30;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.first-use-tip .first-use-arrow {
+  position: absolute;
+  top: -6px;
+  left: 22px;
+  width: 12px;
+  height: 12px;
+  background: #a7441c;
+  transform: rotate(45deg);
+}
+.first-use-tip[data-above='true'] .first-use-arrow {
+  top: auto;
+  bottom: -6px;
+  background: #742e17;
+}
+.first-use-tip p {
+  margin: 0 0 10px;
+}
+.first-use-tip button {
+  min-height: 36px;
+  border: 1px solid #ffffff70;
+  border-radius: 7px;
+  padding: 5px 12px;
+  color: #fff;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.first-use-tip button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.first-use-target {
+  outline: 2px solid #b95832;
+  outline-offset: 3px;
+}
+body .guided-profile-editor #profile-bio-count {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #59614f;
+}
+body .guided-profile-editor #profile-bio.auto-grow-textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cdd3c8;
+  border-radius: 9px;
+  padding: 12px 14px;
+  min-height: 88px;
+  line-height: 1.7;
+  background: white;
+  resize: none;
+  overflow: hidden;
+}
+body .guided-profile-editor #profile-bio:focus-visible {
+  outline: 2px solid #b95832;
+  outline-offset: 2px;
+}
+body .guided-profile-editor .profile-setup-navigation {
+  position: sticky;
+  top: 76px;
+  z-index: 22;
+  background: #fff;
+  padding: 8px 0 0;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 12px #ffffffeb;
+}
+body .guided-profile-editor #profile-setup-start {
+  overflow: visible;
+}
+body .guided-profile-editor :is(input, textarea, select) {
+  scroll-margin-top: 190px;
+}
+@media (max-width: 950px) {
+  body .guided-profile-editor > .profile-preview-column {
+    position: relative;
+    top: auto;
+    z-index: auto;
+  }
+  body .guided-profile-editor .profile-setup-navigation {
+    top: 76px;
+  }
+  body .guided-profile-editor .profile-setup-navigation .setup-heading {
+    display: none;
+  }
+  body .guided-profile-editor .profile-setup-navigation li button {
+    padding: 8px 3px;
+    font-size: 10px;
+    gap: 5px;
+  }
+}

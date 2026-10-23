@@ -1,4 +1,5 @@
 'use client';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 import { AppSidebarContents } from './app-sidebar';
 import { AppSidebarDrawer } from './app-sidebar-drawer';
 import { OrderFulfilment } from './order-fulfilment';
@@ -153,7 +154,11 @@ export function AgentWorkspace({
     />
   );
   return (
-    <main id="main" className="agent-workspace agent-sidebar-layout">
+    <main
+      id="main"
+      className="agent-workspace agent-sidebar-layout"
+      data-guidance-panel={tab}
+    >
       <header className="agent-header">
         <DashboardTools
           navigation={<AppSidebarDrawer>{sidebar}</AppSidebarDrawer>}
@@ -225,7 +230,11 @@ export function AgentWorkspace({
         <button
           type="button"
           disabled={busy}
-          onClick={() => void load().catch((e) => setError(e.message))}
+          onClick={() => {
+            setError('');
+            setNotice('');
+            void refreshDashboard(load).catch((e) => setError(e.message));
+          }}
         >
           <RefreshCw size={17} aria-hidden="true" />
           {t('Actualizar')}

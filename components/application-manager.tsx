@@ -1,4 +1,5 @@
 'use client';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 import { useI18n } from '@/components/language-provider';
 
 import { useEffect, useState } from 'react';
@@ -25,7 +26,8 @@ export function ApplicationManager() {
     setItems(b.applications);
   }
   useEffect(() => {
-    void load()
+    void Promise.resolve()
+      .then(load)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
@@ -180,7 +182,7 @@ export function ApplicationManager() {
             type="button"
             onClick={() => {
               setLoading(true);
-              void load()
+              void refreshDashboard(load)
                 .catch((e) => setError(e.message))
                 .finally(() => setLoading(false));
             }}

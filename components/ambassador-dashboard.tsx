@@ -1,4 +1,5 @@
 'use client';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -307,7 +308,10 @@ export function AmbassadorDashboard() {
         <button
           type="button"
           disabled={busy}
-          onClick={() => void load().catch((e) => setError(e.message))}
+          onClick={() => {
+            setError('');
+            void refreshDashboard(load).catch((e) => setError(e.message));
+          }}
         >
           {t('Actualizar')}
         </button>

@@ -7788,7 +7788,7 @@
   ],
   "Equipas em destaque": ["Leading teams", "表現出色的團隊"],
   "Os meus resultados": ["My results", "我的成果"],
-  "Total": ["Total", "總數"],
+  "Total": ["Total", "總計"],
   "Por participante com actividade": [
     "Per active contributor",
     "按有活動紀錄的成員平均"
@@ -10261,5 +10261,116 @@
   "Podemos medir visitas, carregamento e etapas da compra? Não recolhemos nomes, formulários ou dados de pagamento. Pode rever a escolha em Preferências de estatísticas, no rodapé das páginas públicas.": [
     "May we measure visits, loading and purchase steps? We do not collect names, forms or payment data. You can review your choice in Analytics preferences in the footer of public pages.",
     "我們可以衡量造訪、載入及購買步驟嗎？我們不會收集姓名、表單或付款資料。您可在公開頁面頁尾的分析偏好設定中重新選擇。"
-  ]
+  ],
+  "Dica rápida": ["Quick tip", "快速提示"],
+  "Entendido": ["Got it", "知道了"],
+  "Toque em Mostrar para ver as alterações. Use Ampliar para abrir o perfil completo.": [
+    "Tap Show to see your changes. Use Expand to open the full profile.",
+    "點選「顯示」查看變更。使用「放大」開啟完整個人檔案。"
+  ],
+  "Abra a pré-visualização completa sem perder as alterações do formulário.": [
+    "Open the full preview without losing your form changes.",
+    "開啟完整預覽，同時保留表單變更。"
+  ],
+  "Use estes passos para editar uma parte de cada vez. Reveja antes de publicar.": [
+    "Use these steps to edit one part at a time. Review before publishing.",
+    "使用這些步驟逐一編輯，並在發佈前檢查。"
+  ],
+  "Escolha a empresa antes de gerir os seus cartões, contactos ou ferramentas.": [
+    "Choose the company before managing its cards, contacts or tools.",
+    "先選擇公司，再管理其卡片、聯絡人或工具。"
+  ],
+  "Estas secções organizam as ferramentas deste painel. Escolha a tarefa que pretende realizar.": [
+    "These sections organise this panel’s tools. Choose the task you want to complete.",
+    "這些分頁將面板工具分類。請選擇您要完成的任務。"
+  ],
+  "Abra este menu para encontrar as outras áreas da sua conta.": [
+    "Open this menu to find the other areas of your account.",
+    "開啟此選單以尋找帳戶的其他區域。"
+  ],
+  "Recolha o menu para ganhar espaço. Os ícones mantêm as ferramentas acessíveis.": [
+    "Collapse the menu to gain space. The icons keep your tools within reach.",
+    "收合選單以增加空間，仍可透過圖示使用工具。"
+  ],
+  "Use o menu lateral para mudar de tarefa. As acções e os resultados desta área aparecem neste painel.": [
+    "Use the sidebar to switch tasks. This panel contains the actions and results for the selected area.",
+    "使用側邊選單切換任務。此面板顯示所選區域的操作和結果。"
+  ],
+  "Dados actualizados com sucesso.": [
+    "Updated successfully.",
+    "資料更新成功。"
+  ],
+  "Não foi possível actualizar os dados.": [
+    "Could not update the data.",
+    "無法更新資料。"
+  ],
+  "As alterações por guardar foram mantidas.": [
+    "Your unsaved changes were preserved.",
+    "未儲存的變更已保留。"
+  ],
+  "Escolha como quer partilhar.": [
+    "Choose how you share.",
+    "選擇您的分享方式。"
+  ],
+  "As minhas compras": ["My purchases", "我的購買紀錄"],
+  "Pedir ajuda para encomendar": ["Get help ordering", "取得訂購協助"],
+  "Personalizar produto": ["Personalise product", "自訂產品"],
+  "Uma conexão sempre consigo": ["A connection always with you", "隨身連結"],
+  "Histórico de compras": ["Purchase history", "購買紀錄"],
+  "Plano digital": ["Digital plan", "數位方案"],
+  "Continuar pagamento": ["Continue payment", "繼續付款"],
+  "A carregar as suas compras…": [
+    "Loading your purchases…",
+    "正在載入您的購買紀錄…"
+  ],
+  "Não foi possível carregar as compras. Os seus pedidos continuam guardados.": [
+    "Could not load your purchases. Your orders are still saved.",
+    "無法載入購買紀錄。您的訂單仍已儲存。"
+  ],
+  "A sua primeira conexão começa aqui.": [
+    "Your first connection starts here.",
+    "您的第一個連結從這裡開始。"
+  ],
+  "Escolha um cartão, um porta-chaves ou o kit. Depois da compra, acompanhe aqui o pagamento e a entrega.": [
+    "Choose a card, keychain or kit. After purchase, follow payment and delivery here.",
+    "選擇卡片、鑰匙圈或套組。購買後，可在此追蹤付款與配送。"
+  ],
+  "A verificar pagamento": ["Checking payment", "正在確認付款"],
+  "O pagamento ainda não está confirmado. Continue pelo pagamento existente; se já pagou, aguarde a confirmação antes de tentar novamente.": [
+    "Payment is not confirmed yet. Continue the existing payment; if you have already paid, wait for confirmation before trying again.",
+    "付款尚未確認。請繼續現有付款；若已付款，請先等待確認再重試。"
+  ],
+  "O pagamento não foi concluído. Se houve uma cobrança, contacte a Framy com esta referência antes de voltar a pagar.": [
+    "Payment was not completed. If you were charged, contact Framy with this reference before paying again.",
+    "付款未完成。若已扣款，請先提供此編號聯絡 Framy，勿再次付款。"
+  ],
+  "Preciso de ajuda": ["I need help", "我需要協助"],
+  "Rever configuração": ["Review configuration", "檢視設定"],
+  "Não foi possível actualizar o estado. Tente novamente.": [
+    "Could not update the status. Please try again.",
+    "無法更新狀態。請重試。"
+  ],
+  "Vamos começar": ["Let’s get started", "開始設定"],
+  "Personal é gratuito. Pode editar tudo ao seu ritmo.": [
+    "Personal is free. Set everything up at your own pace.",
+    "Personal 方案免費。您可以按照自己的步調設定。"
+  ],
+  "O seu perfil está pronto!": [
+    "Your profile is ready!",
+    "您的個人檔案已準備就緒！"
+  ],
+  "Progresso guardado.": ["Progress saved.", "進度已儲存。"],
+  "O seu perfil está publicado. Agora pode explorar as ferramentas da sua conta.": [
+    "Your profile is published. You can now explore your account tools.",
+    "您的個人檔案已發布。現在可以探索帳戶工具。"
+  ],
+  "O seu perfil continua privado como rascunho. Pode continuar mais tarde no seu painel.": [
+    "Your profile remains a private draft. You can continue later from your dashboard.",
+    "您的個人檔案仍為私人草稿。稍後可從控制台繼續設定。"
+  ],
+  "Explorar o meu painel": ["Explore my dashboard", "探索我的控制台"],
+  "Guardar e sair": ["Save and leave", "儲存並離開"],
+  "Saltar por agora": ["Skip for now", "暫時略過"],
+  "Guardar para depois": ["Save for later", "儲存以稍後繼續"],
+  "Limite de links atingido": ["Link limit reached", "已達連結上限"]
 }

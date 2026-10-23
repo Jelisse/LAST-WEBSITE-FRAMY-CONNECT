@@ -1,4 +1,5 @@
 'use client';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 import { companyStepIssue } from '@/lib/form-journeys';
 import { companyQuote, usdPrice } from '@/lib/launch-offers';
 import { CorporateSidebar } from './corporate-sidebar';
@@ -247,7 +248,30 @@ export function CorporateSetup({
         ) : status !== 'draft' ? (
           <section className="corporate-panel">
             <h2>{details.company}</h2>
-            <button type="button" onClick={() => location.reload()}>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                setError('');
+                void refreshDashboard(async () => {
+                  const response = await fetch('/api/corporate-request', {
+                    cache: 'no-store',
+                    signal: AbortSignal.timeout(15000),
+                  });
+                  const result = (await response.json()) as SetupResponse;
+                  if (!response.ok) throw Error(result.error);
+                  if (result.request?.status === 'approved') {
+                    location.replace('/corporativo/equipa');
+                    return;
+                  }
+                  if (result.request) {
+                    setStatus(result.request.status);
+                    setVersion(result.request.version);
+                    setDelivery(result.request.delivery);
+                  }
+                }).catch((e) => setError(e.message));
+              }}
+            >
               {t('Actualizar')}
             </button>
             <p>

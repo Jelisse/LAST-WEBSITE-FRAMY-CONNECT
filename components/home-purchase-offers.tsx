@@ -111,6 +111,13 @@ export async function HomePurchaseOffers({
           )}
         </p>
       )}
+      {!checkoutAvailable && (
+        <p className="purchase-help-link">
+          <Link href="/contacto?assunto=encomenda">
+            {t('Pedir ajuda para encomendar')} ↗
+          </Link>
+        </p>
+      )}
       <div className="home-solutions-grid">
         {offers.map((offer) => {
           const estimate = hardwareEstimate(
@@ -124,9 +131,12 @@ export async function HomePurchaseOffers({
               className={`home-solution${offer.id === 'keychain' ? ' is-recommended' : ''}`}
               key={offer.id}
             >
-              <div className="home-solution-label" aria-hidden={offer.id !== 'keychain' ? true : undefined}>
+              <div
+                className="home-solution-label"
+                aria-hidden={offer.id !== 'keychain' ? true : undefined}
+              >
                 {offer.id === 'keychain'
-                  ? t('Recomendado · Em stock, pronto para entrega')
+                  ? t('Uma conexão sempre consigo')
                   : null}
               </div>
               <ProductMaterialGallery

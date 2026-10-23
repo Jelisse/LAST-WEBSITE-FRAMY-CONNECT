@@ -12,11 +12,14 @@ import { useI18n } from './language-provider';
 export function FirstProfileWelcome({
   name,
   onStart,
+  focused = false,
 }: {
   name: string;
   onStart: () => void;
+  focused?: boolean;
 }) {
   const { t } = useI18n();
+  const WelcomeHeading = focused ? 'h1' : 'h2';
   return (
     <section className="first-profile-welcome">
       <div className="welcome-profile-art" aria-hidden="true">
@@ -63,11 +66,11 @@ export function FirstProfileWelcome({
           <Sparkles size={17} />
           {t('O SEU PRIMEIRO PERFIL')}
         </span>
-        <h2>
+        <WelcomeHeading tabIndex={focused ? -1 : undefined}>
           {t('Bem-vindo à Framy, {0}.', [
             name.trim().split(/\s+/)[0] || t('bem-vindo'),
           ])}
-        </h2>
+        </WelcomeHeading>
         <p>
           {t(
             'Uma boa apresentação pode começar uma grande ligação. Crie o seu perfil, escolha o que quer partilhar e leve-o consigo.',
@@ -88,11 +91,11 @@ export function FirstProfileWelcome({
           </li>
         </ol>
         <button type="button" className="flow-primary" onClick={onStart}>
-          {t('Criar o meu primeiro perfil')}
+          {t(focused ? 'Vamos começar' : 'Criar o meu primeiro perfil')}
           <ArrowRight size={19} />
         </button>
         <small>
-          {t('Individual é gratuito. Pode editar tudo ao seu ritmo.')}
+          {t('Personal é gratuito. Pode editar tudo ao seu ritmo.')}
         </small>
         <Link href="/ajuda">{t('Precisa de ajuda para começar?')}</Link>
       </div>

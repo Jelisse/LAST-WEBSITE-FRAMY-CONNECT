@@ -2,7 +2,7 @@ import { INDIVIDUAL_PLAN } from '@/lib/plan-policy';
 import { hash, compare } from 'bcryptjs';
 import { database } from '@/lib/server-db';
 import { tokenHash, SESSION_COOKIE, type Account } from '@/lib/server-auth';
-import { loginDestination } from '@/lib/auth-policy';
+import { accountDestination } from '@/lib/auth-policy';
 export const dynamic = 'force-dynamic';
 const json = (
   data: unknown,
@@ -39,15 +39,14 @@ export async function POST(request: Request) {
     }
     const email =
       typeof b.email === 'string' ? b.email.trim().toLowerCase() : '';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254)
+      return json({ error: 'Indique um email válido.' }, 422);
     if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-      email.length > 254
-    ) return json({ error: 'Indique um email válido.' }, 422);
-    if (b.action !== 'resolve-account' && (
-      typeof b.password !== 'string' ||
-      b.password.length < 12 ||
-      new TextEncoder().encode(b.password).length > 72
-    ))
+      b.action !== 'resolve-account' &&
+      (typeof b.password !== 'string' ||
+        b.password.length < 12 ||
+        new TextEncoder().encode(b.password).length > 72)
+    )
       return json(
         {
           error:
@@ -82,8 +81,10 @@ export async function POST(request: Request) {
     if (b.action === 'resolve-account') {
       // Existing inactive accounts must use sign-in/support, never re-registration.
       // Share the email/IP limits above; return no account record or session.
-      const existing = await db.prepare('SELECT id FROM auth_accounts WHERE email=?')
-        .bind(email).first<{ id: string }>();
+      const existing = await db
+        .prepare('SELECT id FROM auth_accounts WHERE email=?')
+        .bind(email)
+        .first<{ id: string }>();
       return json({ mode: existing ? 'login' : 'register' });
     }
     let account = await db
@@ -106,18 +107,30 @@ export async function POST(request: Request) {
         role: 'customer',
         password_hash: await hash(b.password, 12),
       };
-      await db.batch([db.prepare(
-          'INSERT INTO auth_accounts(id,email,name,password_hash,role,created_at) VALUES(?,?,?,?,?,?)',
-        )
-        .bind(
-          account.id,
-          email,
-          name,
-          account.password_hash,
-          'customer',
-          new Date().toISOString(),
-        )
-, db.prepare('INSERT INTO sandbox_memberships(owner_id,plan_id,version,updated_at,terms_json) VALUES(?,?,1,?,?)').bind(account.id,'personal',new Date().toISOString(),JSON.stringify(INDIVIDUAL_PLAN))]);
+      await db.batch([
+        db
+          .prepare(
+            'INSERT INTO auth_accounts(id,email,name,password_hash,role,created_at) VALUES(?,?,?,?,?,?)',
+          )
+          .bind(
+            account.id,
+            email,
+            name,
+            account.password_hash,
+            'customer',
+            new Date().toISOString(),
+          ),
+        db
+          .prepare(
+            'INSERT INTO sandbox_memberships(owner_id,plan_id,version,updated_at,terms_json) VALUES(?,?,1,?,?)',
+          )
+          .bind(
+            account.id,
+            'personal',
+            new Date().toISOString(),
+            JSON.stringify(INDIVIDUAL_PLAN),
+          ),
+      ]);
     } else {
       const valid = await compare(
         b.password,
@@ -159,9 +172,10 @@ export async function POST(request: Request) {
       return json({ error: 'A conta mudou. Inicie sessão novamente.' }, 409);
     return json(
       {
-        next: loginDestination(
+        next: accountDestination(
           account.role,
           typeof b.returnTo === 'string' ? b.returnTo : '',
+          b.action === 'register',
         ),
       },
       200,

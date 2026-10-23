@@ -46,7 +46,7 @@ export function DirectorWorkspace({
           });
         }}
       />
-      <main id="main" className="staff-page">
+      <main id="main" className="staff-page" data-guidance-panel={section}>
         <DashboardTools navigation={null} />
         <h1 id="director-title" tabIndex={-1}>
           {t(labels[section])}

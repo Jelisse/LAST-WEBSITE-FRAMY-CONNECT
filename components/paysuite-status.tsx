@@ -1,10 +1,13 @@
 'use client';
+import { PurchasePaymentCards } from './purchase-history';
+import { SourceImage } from './source-image';
+import type { PurchasePayment } from '@/lib/purchase-history';
 import { useI18n } from '@/components/language-provider';
 import Link from '@/components/hard-link';
 import { useEffect, useState } from 'react';
 import { checkoutURL } from '@/lib/paysuite';
-import { CheckCircle2, ArrowRight, Clock3 } from 'lucide-react';
-type Payment = {
+import { CheckCircle2, ArrowRight, Clock3, AlertCircle } from 'lucide-react';
+type Payment = PurchasePayment & {
   guest?: boolean;
   id: string;
   paymentReference: string;
@@ -25,7 +28,7 @@ type Payment = {
   } | null;
 };
 const labels: Record<string, string> = {
-  creating: 'Não foi possível abrir o pagamento',
+  creating: 'A verificar pagamento',
   pending: 'A aguardar pagamento',
   paid: 'Pagamento feito com sucesso',
   failed: 'Pagamento não concluído',
@@ -39,11 +42,9 @@ export function PaySuiteStatus() {
     [signin, setSignin] = useState(false);
   const [returnTo, setReturnTo] = useState('/checkout/retorno');
   const [loaded, setLoaded] = useState(false);
-  const [orderReference, setOrderReference] = useState('');
   useEffect(() => {
     const controller = new AbortController();
     const id = new URLSearchParams(location.search).get('payment');
-    if (id) queueMicrotask(() => setOrderReference(id));
     if (id && /^[a-zA-Z0-9-]+$/.test(id))
       queueMicrotask(() =>
         setReturnTo('/checkout/retorno?payment=' + encodeURIComponent(id)),
@@ -92,7 +93,7 @@ export function PaySuiteStatus() {
         else setPayments(d.payments);
       } catch (e) {
         if (!controller.signal.aborted)
-          setError(e instanceof Error ? e.message : 'Erro ao consultar.');
+          setError('Não foi possível actualizar o estado. Tente novamente.');
       } finally {
         inFlight = false;
         if (!controller.signal.aborted) setLoaded(true);
@@ -115,19 +116,13 @@ export function PaySuiteStatus() {
     <section
       className={`panel payment-result ${payment?.status === 'paid' ? 'is-paid' : ''}`}
     >
-      <h1>{t('Estado do pagamento')}</h1>
-      {orderReference && payment?.kind !== 'subscription' && (
-        <p>
-          <Link
-            className="btn btn-secondary"
-            href={
-              '/acompanhar?referencia=' + encodeURIComponent(orderReference)
-            }
-          >
-            {t('Acompanhar o pedido')}
-          </Link>
-        </p>
-      )}
+      <h1>
+        {t(
+          payment
+            ? labels[payment.status] || 'Estado do pagamento'
+            : 'As minhas compras',
+        )}
+      </h1>
       {signin ? (
         <Link href={'/entrar?return_to=' + encodeURIComponent(returnTo)}>
           {t(' Entre para consultar os seus pagamentos ')}
@@ -137,19 +132,48 @@ export function PaySuiteStatus() {
           {error && <p role="alert">{t(error)}</p>}
           {!loaded && <output>{t('A consultar o estado…')}</output>}
           {loaded && !error && !payment && payments.length === 0 && (
-            <p>{t('Ainda não tem pagamentos registados.')}</p>
+            <div className="purchase-empty">
+              <SourceImage
+                src="/home/kit-gift-box-cutout.webp"
+                alt={t('Kit: cartão + porta-chaves')}
+                width={180}
+                height={140}
+              />
+              <div>
+                <p>{t('Ainda não tem pagamentos registados.')}</p>
+                <Link className="btn btn-primary" href="/produtos">
+                  {t('Escolher o meu produto')}
+                </Link>
+              </div>
+            </div>
           )}
           {payment ? (
             <>
+              {payment.product && (
+                <SourceImage
+                  className="payment-product-photo"
+                  src={payment.product.image}
+                  alt={t(payment.product.name)}
+                  width={220}
+                  height={160}
+                />
+              )}
               <div className="payment-state-icon" aria-hidden="true">
                 {payment.status === 'paid' ? (
                   <CheckCircle2 size={36} />
+                ) : payment.status === 'failed' ? (
+                  <AlertCircle size={36} />
                 ) : (
                   <Clock3 size={36} />
                 )}
               </div>
               <h2 aria-live="polite">
-                {t(labels[payment.status] ?? payment.status)}
+                {t(
+                  payment.product?.name ||
+                    (payment.kind === 'product'
+                      ? 'Produtos NFC'
+                      : 'Plano digital'),
+                )}
               </h2>
               <p>
                 {(payment.amount / 100).toLocaleString('pt-MZ', {
@@ -163,6 +187,10 @@ export function PaySuiteStatus() {
                       ? 'Perfil · um ano'
                       : 'Perfil · um mês',
                 )}
+              </p>
+              <p>
+                {t('Referência: ')}
+                {payment.orderReference || payment.paymentReference}
               </p>
               {payment.status === 'paid' && payment.kind === 'product' && (
                 <div className="payment-profile-next">
@@ -203,7 +231,7 @@ export function PaySuiteStatus() {
               )}
               {url && payment.status === 'pending' && (
                 <a className="btn btn-primary" href={url}>
-                  {t(' Pagar na PaySuite ')}
+                  {t('Continuar pagamento')}
                 </a>
               )}
               {payment.status === 'paid' && (
@@ -256,6 +284,54 @@ export function PaySuiteStatus() {
                   )}
                 </p>
               )}
+              {payment.status === 'pending' && (
+                <p>
+                  {t(
+                    'O pagamento ainda não está confirmado. Continue pelo pagamento existente; se já pagou, aguarde a confirmação antes de tentar novamente.',
+                  )}
+                </p>
+              )}
+              {payment.status === 'failed' && (
+                <div className="payment-recovery">
+                  <p>
+                    {t(
+                      'O pagamento não foi concluído. Se houve uma cobrança, contacte a Framy com esta referência antes de voltar a pagar.',
+                    )}
+                  </p>
+                  <Link
+                    className="btn btn-primary"
+                    href="/contacto?assunto=pagamento"
+                  >
+                    {t('Preciso de ajuda')}
+                  </Link>
+                  {payment.product && (
+                    <Link
+                      className="btn btn-outline"
+                      href={
+                        '/comprar?formato=' +
+                        encodeURIComponent(payment.product.selection)
+                      }
+                    >
+                      {t('Rever configuração')}
+                    </Link>
+                  )}
+                </div>
+              )}
+              {payment.status === 'paid' &&
+                payment.kind === 'product' &&
+                payment.orderReference && (
+                  <p>
+                    <Link
+                      className="btn btn-outline"
+                      href={
+                        '/acompanhar?referencia=' +
+                        encodeURIComponent(payment.orderReference)
+                      }
+                    >
+                      {t('Acompanhar o pedido')}
+                    </Link>
+                  </p>
+                )}
               {payment.status === 'creating' && (
                 <p>
                   {t(
@@ -270,31 +346,16 @@ export function PaySuiteStatus() {
                   )}
                 </p>
               )}
-              <p>
-                {t('Referência: ')}
-                {payment.orderReference || payment.paymentReference}
-              </p>
             </>
           ) : (
-            payments.map((p) => (
-              <p key={p.id}>
-                <a
-                  href={'/checkout/retorno?payment=' + encodeURIComponent(p.id)}
-                >
-                  {(p.amount / 100).toFixed(2)} {t(' MT · ')}
-                  {t(labels[p.status])} ·{' '}
-                  {t(p.orderStatus === 'fulfilled' ? 'Entregue · ' : '')}
-                  {p.orderReference || p.paymentReference}
-                </a>
-              </p>
-            ))
+            <PurchasePaymentCards payments={payments} />
           )}
           <p>
             <button className="btn" onClick={() => location.reload()}>
               {t(' Actualizar ')}
             </button>
           </p>
-          <Link href="/perfil">{t('O meu perfil')}</Link> ·{' '}
+          <Link href="/dashboard?tab=orders">{t('As minhas compras')}</Link> ·{' '}
           <Link href="/contacto">{t('Contactar a equipa')}</Link>
         </>
       )}

@@ -1,4 +1,5 @@
 'use client';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 import { CompanyTools, type CompanyToolView } from './company-tools';
 import { CompanyCards } from './company-cards';
 import { CompanyFollowups, type CompanyLead } from './company-followups';
@@ -222,6 +223,7 @@ export function CorporateDashboard({
   return (
     <main
       id="main"
+      data-guidance-panel={view}
       className={
         'staff-page corporate-dashboard corporate-shell corporate-view-' + view
       }
@@ -295,9 +297,9 @@ export function CorporateDashboard({
                         setRefreshing(true);
                         setError('');
                         try {
-                          await load();
+                          await refreshDashboard(load);
                           if (isTool) setToolsRevision((x) => x + 1);
-                          setNotice('Dados actualizados.');
+                          setNotice('');
                         } catch (e) {
                           setError(
                             e instanceof Error

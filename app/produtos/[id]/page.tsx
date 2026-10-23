@@ -4,7 +4,9 @@ import { publicPageRobots } from '@/lib/server-site';
 import { notFound } from 'next/navigation';
 import Link from '@/components/hard-link';
 import { ArrowUpRight, Check, ChevronLeft } from 'lucide-react';
-import { checkoutMaintenanceMessage } from '@/lib/purchase-structure';
+import { money } from '@/lib/catalog';
+import { env } from 'cloudflare:workers';
+import { paysuiteReady } from '@/lib/server-paysuite';
 import { getProducts } from '@/lib/server-catalog';
 export const dynamic = 'force-dynamic';
 import { SiteHeader, SiteFooter } from '@/components/site-shell';
@@ -35,6 +37,10 @@ export default async function Page({
     (p) => p.id === id && p.published !== false,
   );
   if (!p) notFound();
+  const settings = await env.DB.prepare(
+    'SELECT enabled FROM checkout_pricing WHERE id=1',
+  ).first<{ enabled: number }>();
+  const checkoutAvailable = paysuiteReady(env) && settings?.enabled === 1;
   return (
     <>
       <SiteHeader />
@@ -59,7 +65,9 @@ export default async function Page({
             <h1>{t(p.name)}</h1>
             <h2>{t(p.tagline)}</h2>
             <p className="product-detail-price">
-              {t('Checkout em manutenção')}
+              {p.configurationPriceConfirmed && p.amount > 0
+                ? money(p.amount, t.locale)
+                : t('Preço a confirmar')}
             </p>
             <p>{t(p.description)}</p>
             <ul className="benefit-list">
@@ -76,11 +84,21 @@ export default async function Page({
                 {t(' Configuração orientada ao seu uso')}
               </li>
             </ul>
-            <div className="quiet-note">
-              {t(checkoutMaintenanceMessage)}
-            </div>
-            <Link className="btn btn-primary" href={`/comprar?formato=${encodeURIComponent(p.id)}`}>
-              {t('Explorar configuração')} <ArrowUpRight size={20}/>
+            {!checkoutAvailable && (
+              <p className="quiet-note">
+                {t(
+                  'Compras temporariamente indisponíveis. Pode consultar os produtos e simular a configuração.',
+                )}{' '}
+                <Link href="/contacto?assunto=encomenda">
+                  {t('Pedir ajuda para encomendar')}
+                </Link>
+              </p>
+            )}
+            <Link
+              className="btn btn-primary"
+              href={`/comprar?formato=${encodeURIComponent(p.id)}`}
+            >
+              {t('Personalizar produto')} <ArrowUpRight size={20} />
             </Link>
           </div>
         </div>

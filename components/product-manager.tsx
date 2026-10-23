@@ -1,4 +1,5 @@
 'use client';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 import { useI18n } from '@/components/language-provider';
 
 import { SourceImage } from '@/components/source-image';
@@ -24,7 +25,7 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
   const [price, setPrice] = useState(''),
     [kitPrice, setKitPrice] = useState(''),
     [cost, setCost] = useState('');
-  async function load() {
+  async function load(reportFailure = false) {
     setLoading(true);
     setError('');
     try {
@@ -39,12 +40,13 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
       setItems(d.products);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Não foi possível carregar.');
+      if (reportFailure) throw e;
     } finally {
       setLoading(false);
     }
   }
   useEffect(() => {
-    void Promise.resolve().then(load);
+    void Promise.resolve().then(() => load());
   }, []);
   function edit(p: Product) {
     setDraft({ ...p, images: p.images?.length ? [...p.images] : [p.imageUrl] });
@@ -170,7 +172,9 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
         </div>
         <Button
           variant="outline"
-          onClick={() => void load()}
+          onClick={() =>
+            void refreshDashboard(() => load(true)).catch(() => {})
+          }
           disabled={busy || loading || !!draft}
         >
           {t('Actualizar')}
@@ -192,7 +196,9 @@ export function ProductManager({ onSaved }: { onSaved?: () => void }) {
               <Input
                 value={draft.dimensions ?? ''}
                 maxLength={300}
-                placeholder={t('Altura × largura × espessura; área de gravação')}
+                placeholder={t(
+                  'Altura × largura × espessura; área de gravação',
+                )}
                 onChange={(e) =>
                   setDraft({ ...draft, dimensions: e.target.value })
                 }

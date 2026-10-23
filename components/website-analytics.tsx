@@ -1,6 +1,7 @@
 'use client';
+import { refreshDashboard } from '@/lib/dashboard-refresh';
 /* eslint-disable jsx-a11y/prefer-tag-over-role -- Inline SVG charts use role=img and accessible labels; replacing them with img would discard vector content. */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   Activity,
   ArrowDownToLine,
@@ -65,8 +66,8 @@ export function WebsiteAnalytics() {
   const [trafficView, setTrafficView] = useState<'chart' | 'table'>('chart');
   const [data, setData] = useState<Report | null>(null),
     [error, setError] = useState(''),
-    [loading, setLoading] = useState(false),
-    [refresh, setRefresh] = useState(0);
+    [loading, setLoading] = useState(false);
+  const manualRefresh = useRef<(() => Promise<void>) | null>(null);
   const fmt = (n: number | null | undefined) =>
     Number(n || 0).toLocaleString(t.locale);
   const time = (n: number) =>
@@ -75,7 +76,7 @@ export function WebsiteAnalytics() {
     let live = true,
       inflight = false;
     const controller = new AbortController();
-    const load = async () => {
+    const load = async (manual = false) => {
       if (inflight || document.visibilityState === 'hidden') return;
       inflight = true;
       setLoading(true);
@@ -98,11 +99,13 @@ export function WebsiteAnalytics() {
         }
       } catch (e) {
         if (live && !controller.signal.aborted) setError((e as Error).message);
+        if (manual) throw e;
       } finally {
         inflight = false;
         if (live) setLoading(false);
       }
     };
+    manualRefresh.current = () => load(true);
     void load();
     const timer = setInterval(() => void load(), 30000);
     const visible = () => void load();
@@ -113,7 +116,7 @@ export function WebsiteAnalytics() {
       clearInterval(timer);
       document.removeEventListener('visibilitychange', visible);
     };
-  }, [range, refresh]);
+  }, [range]);
   function preset(days: number, yesterday = false) {
     const next = {
       from: dayAt(yesterday ? 1 : days - 1),
@@ -669,7 +672,10 @@ export function WebsiteAnalytics() {
           className="wa-refresh"
           title={t('Actualizar')}
           aria-label={t('Actualizar')}
-          onClick={() => setRefresh((v) => v + 1)}
+          onClick={() => {
+            if (manualRefresh.current)
+              void refreshDashboard(manualRefresh.current).catch(() => {});
+          }}
           disabled={loading}
         >
           <RefreshCw size={15} />

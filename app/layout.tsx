@@ -35,6 +35,12 @@ import './public-marketing.css';
 import './experience-harmony.css';
 import './ajuda/style.css';
 import './support-experience.css';
+import { DashboardRefreshFeedback } from '@/components/dashboard-refresh-feedback';
+import './dashboard-refresh.css';
+import './purchase-journey.css';
+import { FirstUseGuidance } from '@/components/first-use-guidance';
+import './first-use-guidance.css';
+import './profile-onboarding.css';
 import { SupportPanel } from '@/components/support-panel';
 import { InternalPageChrome } from '@/components/internal-page-chrome';
 import { SiteHeader } from '@/components/site-shell';
@@ -85,6 +91,8 @@ export default async function RootLayout({
             {children}
           </InternalPageChrome>
           <SupportPanel />
+          <FirstUseGuidance />
+          <DashboardRefreshFeedback />
           <SiteAnalyticsTracker />
         </LanguageProvider>
       </body>
