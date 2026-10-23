@@ -45,14 +45,17 @@ export function ProfileGrowthHub({
   onEdit,
   onAnalytics,
   initialTab = 'overview',
+  onUpgrade,
 }: {
   features: PlanFeatures;
+  onUpgrade: () => void;
   initialTab?: 'overview' | 'billing';
   onEdit: (section: 'business' | 'extras') => void;
   onAnalytics: () => void;
 }) {
   const { t } = useI18n();
   const [tab, setTab] = useState(initialTab as string);
+  const hasTools = Object.values(features).some(Boolean);
   const benefits: Partial<Record<FeatureKey, string>> = {
     whatsapp:
       'Facilite o primeiro contacto com uma mensagem pronta para enviar.',
@@ -68,7 +71,7 @@ export function ProfileGrowthHub({
     <div className="profile-growth">
       <section
         className="professional-tool-links"
-        hidden={tab !== 'overview'}
+        hidden={tab !== 'overview' || !hasTools}
         aria-label={t('Ferramentas profissionais')}
       >
         <h2>{t('Ferramentas profissionais')}</h2>
@@ -87,6 +90,7 @@ export function ProfileGrowthHub({
               'enquiries',
               'analytics',
               'teams',
+              'domain',
             ] as FeatureKey[]
           )
             .filter((key) => features[key])
@@ -96,6 +100,7 @@ export function ProfileGrowthHub({
                 key={key}
                 onClick={() => {
                   if (key === 'analytics') onAnalytics();
+                  else if (key === 'domain') setTab('domains');
                   else if (key === 'teams' || key === 'enquiries') setTab(key);
                   else
                     onEdit(
@@ -115,21 +120,45 @@ export function ProfileGrowthHub({
             ))}
         </div>
       </section>
+      {tab === 'overview' && !hasTools && (
+        <section className="professional-tool-links">
+          <h2>{t('Explorar Profissional')}</h2>
+          <p>
+            {t(
+              'Descubra mais opções para apresentar o seu trabalho com o Profissional.',
+            )}
+          </p>
+          <button type="button" onClick={onUpgrade}>
+            {t('Comparar planos')}
+          </button>
+        </section>
+      )}
       <nav aria-label={t('Ferramentas do perfil')} className="growth-tabs">
         {[
-          ['overview', 'Ferramentas profissionais'],
-          ['billing', 'Plano e renovação'],
+          [
+            'overview',
+            hasTools ? 'Ferramentas profissionais' : 'Explorar Profissional',
+          ],
+          ['billing', 'Plano e facturação'],
           ['enquiries', 'Caixa de entrada'],
           ['teams', 'A minha equipa'],
-        ].map(([id, label]) => (
-          <button key={id} aria-pressed={tab === id} onClick={() => setTab(id)}>
-            {t(label)}
-          </button>
-        ))}
+        ]
+          .filter(([id]) => id !== 'enquiries' || features.enquiries)
+          .map(([id, label]) => (
+            <button
+              key={id}
+              aria-pressed={tab === id}
+              onClick={() => setTab(id)}
+            >
+              {t(label)}
+            </button>
+          ))}
       </nav>
       {tab === 'billing' ? (
         <ProfileSubscriptions />
-      ) : tab !== 'overview' ? (
+      ) : tab === 'teams' ||
+        (tab === 'enquiries' && features.enquiries) ||
+        (tab === 'domains' && features.domain) ? (
         <GrowthTool key={tab} tool={tab} canManageTeam={features.teams} />
       ) : null}
     </div>
@@ -468,7 +497,7 @@ function GrowthTool({
                   ),
                 ].some((v) =>
                   v.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
-                ) && <p role="status">{t('Nenhum resultado encontrado.')}</p>}
+                ) && <output>{t('Nenhum resultado encontrado.')}</output>}
               {teams.pending
                 .filter((i) =>
                   i.email

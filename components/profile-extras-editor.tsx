@@ -49,125 +49,132 @@ export function ProfileExtrasEditor({
           ' As ferramentas disponíveis dependem do seu plano. Os campos desactivados ficam guardados e não aparecem no perfil público. ',
         )}
       </p>
-      <fieldset disabled={features?.showcase === false}>
-        <details>
-          <summary>
-            {t('Produtos e serviços · ')}
-            {e.services.length}/6
-          </summary>
+      {features?.showcase !== false && (
+        <fieldset>
+          <details>
+            <summary>
+              {t('Produtos e serviços · ')}
+              {e.services.length}/6
+            </summary>
+            <p>
+              {t(
+                ' Apresente o que oferece. O preço é informativo; o botão abre o endereço que escolher. ',
+              )}
+            </p>
+            {e.services.map((s, i) => (
+              <fieldset key={i}>
+                <legend>
+                  {t('Oferta ')}
+                  {i + 1}
+                </legend>
+                <label>
+                  {t(' Nome ')}
+                  <input
+                    maxLength={80}
+                    value={s.title}
+                    onChange={(ev) =>
+                      set({
+                        services: e.services.map((x, j) =>
+                          j === i ? { ...x, title: ev.target.value } : x,
+                        ),
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  {t(' Descrição ')}
+                  <textarea
+                    maxLength={300}
+                    value={s.description}
+                    onChange={(ev) =>
+                      set({
+                        services: e.services.map((x, j) =>
+                          j === i ? { ...x, description: ev.target.value } : x,
+                        ),
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  {t(' Preço ou indicação ')}
+                  <input
+                    placeholder={t('A partir de 500 MT · sob consulta')}
+                    maxLength={60}
+                    value={s.price}
+                    onChange={(ev) =>
+                      set({
+                        services: e.services.map((x, j) =>
+                          j === i ? { ...x, price: ev.target.value } : x,
+                        ),
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  {t(' Link HTTPS ')}
+                  <input
+                    type="text"
+                    inputMode="url"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    maxLength={300}
+                    value={s.url}
+                    onChange={(ev) =>
+                      set({
+                        services: e.services.map((x, j) =>
+                          j === i ? { ...x, url: ev.target.value } : x,
+                        ),
+                      })
+                    }
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    set({ services: e.services.filter((_, j) => j !== i) })
+                  }
+                >
+                  {t(' Remover oferta ')}
+                </button>
+              </fieldset>
+            ))}
+            <button
+              type="button"
+              disabled={e.services.length >= 6}
+              onClick={() =>
+                set({
+                  services: [
+                    ...e.services,
+                    { title: '', description: '', price: '', url: '' },
+                  ],
+                })
+              }
+            >
+              {t(' Adicionar produto ou serviço ')}
+            </button>
+          </details>
+        </fieldset>
+      )}
+      {features?.enquiries !== false && (
+        <>
+          {' '}
+          <label className="growth-check">
+            <input
+              type="checkbox"
+
+              checked={e.enquiries}
+              onChange={(ev) => set({ enquiries: ev.target.checked })}
+            />
+            {t(' Receber pedidos de informação no perfil ')}
+          </label>
           <p>
             {t(
-              ' Apresente o que oferece. O preço é informativo; o botão abre o endereço que escolher. ',
+              ' As mensagens ficam na sua caixa de entrada durante 90 dias. Não são enviadas automaticamente por email. ',
             )}
           </p>
-          {e.services.map((s, i) => (
-            <fieldset key={i}>
-              <legend>
-                {t('Oferta ')}
-                {i + 1}
-              </legend>
-              <label>
-                {t(' Nome ')}
-                <input
-                  maxLength={80}
-                  value={s.title}
-                  onChange={(ev) =>
-                    set({
-                      services: e.services.map((x, j) =>
-                        j === i ? { ...x, title: ev.target.value } : x,
-                      ),
-                    })
-                  }
-                />
-              </label>
-              <label>
-                {t(' Descrição ')}
-                <textarea
-                  maxLength={300}
-                  value={s.description}
-                  onChange={(ev) =>
-                    set({
-                      services: e.services.map((x, j) =>
-                        j === i ? { ...x, description: ev.target.value } : x,
-                      ),
-                    })
-                  }
-                />
-              </label>
-              <label>
-                {t(' Preço ou indicação ')}
-                <input
-                  placeholder={t('A partir de 500 MT · sob consulta')}
-                  maxLength={60}
-                  value={s.price}
-                  onChange={(ev) =>
-                    set({
-                      services: e.services.map((x, j) =>
-                        j === i ? { ...x, price: ev.target.value } : x,
-                      ),
-                    })
-                  }
-                />
-              </label>
-              <label>
-                {t(' Link HTTPS ')}
-                <input
-                  type="text"
-                  inputMode="url"
-                  autoCapitalize="none"
-                  spellCheck={false}
-                  maxLength={300}
-                  value={s.url}
-                  onChange={(ev) =>
-                    set({
-                      services: e.services.map((x, j) =>
-                        j === i ? { ...x, url: ev.target.value } : x,
-                      ),
-                    })
-                  }
-                />
-              </label>
-
-              <button
-                type="button"
-                onClick={() =>
-                  set({ services: e.services.filter((_, j) => j !== i) })
-                }
-              >
-                {t(' Remover oferta ')}
-              </button>
-            </fieldset>
-          ))}
-          <button
-            type="button"
-            disabled={e.services.length >= 6}
-            onClick={() =>
-              set({
-                services: [
-                  ...e.services,
-                  { title: '', description: '', price: '', url: '' },
-                ],
-              })
-            }
-          >
-            {t(' Adicionar produto ou serviço ')}
-          </button>
-        </details>
-      </fieldset>
-      <label className="growth-check">
-        <input
-          type="checkbox"
-          disabled={features?.enquiries === false}
-          checked={e.enquiries}
-          onChange={(ev) => set({ enquiries: ev.target.checked })}
-        />
-        {t(' Receber pedidos de informação no perfil ')}
-      </label>
-      <p>
-        {t(
-          ' As mensagens ficam na sua caixa de entrada durante 90 dias. Não são enviadas automaticamente por email. ',
-        )}
-      </p>
+        </>
+      )}
 
       <details>
         <summary>{t('Links visíveis e contacto após o período pago')}</summary>

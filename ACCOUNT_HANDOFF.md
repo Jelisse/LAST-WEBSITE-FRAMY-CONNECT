@@ -1,5 +1,29 @@
 # Framy Connect account handoff
 
+## Profile name font choices — 23 October 2026 (local)
+
+Added Classic, Modern, Elegant and Bold radio choices after profile colour in Appearance. Each displays the customer's name; only the profile heading changes. The shared MobileProfile renderer handles preview and public profiles identically, preserving existing Classic styling when no choice is stored. Existing self-hosted Allura/Poppins and serif/system fallbacks are reused; no remote font service or new dependency. Names wrap naturally using existing heading behaviour and picker wrapping.
+
+Optional nameFont is whitelisted and normalized by personal profile, company template and company-card validators; arbitrary CSS/font values are rejected. Company templates own the font by default. The existing template permissions can explicitly permit employee nameFont edits; the company API enforces this permission and the public card renderer always applies the template font when locked. JSON storage needs no migration. Both Personal and Professional can use the basic personal font picker.
+
+272 tests passed, including three new tests for legacy defaults, validation/persistence and server-enforced company font permissions. Final TypeScript and targeted lint passed. Local browser inspection confirmed all four choices use the actual accented name and update the shared preview heading with the expected family/weight. Bold uses weight 700; Classic preserves the existing Allura presentation. New company cards inherit the template font unless an allowed employee explicitly selects another option. Browser testing used unsaved synthetic data, with no customer records changed. Screenshot artifact: framy-name-font-options.png in the task visualization directory. Not committed or deployed.
+
+## Profile setup and plan clarity — 23 October 2026 (local)
+
+The editor now groups About you text with name/title/address in step 1; step 2 contains contacts, adjacent public-visibility switches and links; step 3 contains images followed immediately by the extracted ProfileColourPicker; step 4 reviews and publishes. Website guidance is error-only; URL normalization remains. Each image has its own compact adjustment disclosure. Professional configuration moved out of the basic setup to a separate workspace panel, preserving dirty profile state and existing save/review actions.
+
+The shared workspacePlan helper identifies Personal/Professional independently of historical stored names and derives usable tools from active access and actual feature flags. Sidebar badges identify Personal · Free or the current plan. Free accounts open comparison from Explore Professional, not an empty tools workspace. Plan & billing is independently accessible from account menu/current-plan card. Company navigation and matching-email team participation remain separate from personal tool ownership. Existing server presentation filters paid fields and server tool endpoints check entitlements; restricted draft data remains preserved, including across downgrades. No subscription, payment, database or public contract terms were changed.
+
+269 tests passed, including plan identity/access-state tests and proof that Personal public presentation retains colour while excluding paid fields without deleting drafts. Browser inspection confirmed Personal badge, About you placement, contact switches, Appearance colour control and comparison destination. Final TypeScript, targeted lint and Cloudflare production build passed. No outbound email, payment or customer membership changes were made. Not committed or deployed.
+
+## Profile setup and plan clarity — 23 October 2026 (local)
+
+The editor now groups About you text with name/title/address in step 1; step 2 contains contacts, adjacent public-visibility switches and links; step 3 contains images followed immediately by the extracted ProfileColourPicker; step 4 reviews and publishes. Website guidance is error-only; URL normalization remains. Each image has its own compact adjustment disclosure. Professional configuration moved out of the basic setup to a separate workspace panel, preserving dirty profile state and existing save/review actions.
+
+The shared workspacePlan helper identifies Personal/Professional independently of historical stored names and derives usable tools from active access and actual feature flags. Sidebar badges identify Personal · Free or the current plan. Free accounts open comparison from Explore Professional, not an empty tools workspace. Plan & billing is independently accessible from account menu/current-plan card. Company navigation and matching-email team participation remain separate from personal tool ownership. Existing server presentation filters paid fields and server tool endpoints check entitlements; restricted draft data remains preserved, including across downgrades. No subscription, payment, database or public contract terms were changed.
+
+269 tests passed, including plan identity/access-state tests and proof that Personal public presentation retains colour while excluding paid fields without deleting drafts. Browser inspection confirmed Personal badge, About you placement, contact switches, Appearance colour control and comparison destination. Final TypeScript, targeted lint and Cloudflare production build passed. No outbound email, payment or customer membership changes were made. Not committed or deployed.
+
 Saved 16 October 2026. This is a repository-based continuation aid, not an export of earlier chats. Only the current request and inspected files were available; prior conversation-only decisions may be missing.
 
 ## Start on the other account

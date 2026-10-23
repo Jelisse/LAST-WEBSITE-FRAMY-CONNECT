@@ -10224,5 +10224,24 @@
   "Descubra mais opções para apresentar o seu trabalho com o Profissional.": [
     "Discover more ways to present your work with Professional.",
     "透過專業方案，探索更多展示您工作的方式。"
+  ],
+  "Personal · Gratuito": ["Personal · Free", "個人 · 免費"],
+  "Contactos e links": ["Contacts & links", "聯絡方式與連結"],
+  "Fotografia e aparência": ["Photo and appearance", "照片與外觀"],
+  "Ajustar fotografia de perfil": ["Adjust profile photo", "調整個人照片"],
+  "Ajustar fotografia de capa": ["Adjust cover photo", "調整封面照片"],
+  "Plano e facturação": ["Plan & billing", "方案與帳務"],
+  "Ver detalhes do plano": ["View plan details", "查看方案詳細資料"],
+  "Voltar às ferramentas": ["Back to tools", "返回工具"],
+  "Personal": ["Personal", "個人"],
+  "Professional": ["Professional", "專業"],
+  "Tipo de letra do nome": ["Name font", "姓名字體"],
+  "Clássico": ["Classic", "經典"],
+  "Moderno": ["Modern", "現代"],
+  "Elegante": ["Elegant", "典雅"],
+  "Marcante": ["Bold", "粗體"],
+  "Tipo de letra do nome inválido.": [
+    "Choose a valid name font.",
+    "請選擇有效的姓名字體。"
   ]
 }

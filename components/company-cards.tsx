@@ -7,6 +7,7 @@ import {
   type CompanyTemplate,
   type CompanyCard,
 } from '@/lib/company-cards';
+import { ProfileNameFontPicker } from './profile-name-font-picker';
 import { profileColors } from '@/lib/profile-business';
 import { MobileProfile } from './mobile-profile';
 import { EditorLivePreview } from './editor-live-preview';
@@ -52,6 +53,7 @@ type Info = {
 };
 const fields = {
   name: 'Nome completo',
+  nameFont: 'Tipo de letra do nome',
   title: 'Título ou profissão',
   email: 'Email de contacto',
   phone: 'Telefone',
@@ -532,6 +534,13 @@ export function CompanyCards({ organisation }: { organisation: string }) {
                         </button>
                       ))}
                     </div>
+                    <ProfileNameFontPicker
+                      value={template.nameFont}
+                      name={card.name || template.company}
+                      onChange={(font) =>
+                        setTemplate({ ...template, nameFont: font })
+                      }
+                    />
                     <label>
                       {t('Cor da empresa')}
                       <select
@@ -919,12 +928,27 @@ export function CompanyCards({ organisation }: { organisation: string }) {
                       </div>
                     )}
                     {cardTab === 'appearance' && (
-                      <CompanyImage
-                        label="Fotografia do colaborador"
-                        disabled={!editable('photoUrl')}
-                        value={card.photoUrl || ''}
-                        onChange={(v) => set('photoUrl', v)}
-                      />
+                      <>
+                        <ProfileNameFontPicker
+                          value={
+                            template.editable?.includes('nameFont')
+                              ? (card.nameFont ?? template.nameFont)
+                              : template.nameFont
+                          }
+                          name={card.name}
+                          disabled={!template.editable?.includes('nameFont')}
+                          onChange={(font) => set('nameFont', font)}
+                        />
+                        {!template.editable?.includes('nameFont') && (
+                          <p>{t('Gerido pela empresa')}</p>
+                        )}
+                        <CompanyImage
+                          label="Fotografia do colaborador"
+                          disabled={!editable('photoUrl')}
+                          value={card.photoUrl || ''}
+                          onChange={(v) => set('photoUrl', v)}
+                        />
+                      </>
                     )}
                     {cardTab === 'settings' && (
                       <>

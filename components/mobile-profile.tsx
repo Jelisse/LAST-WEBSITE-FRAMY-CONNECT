@@ -1,4 +1,5 @@
 'use client';
+import { nameFontStyle } from '@/lib/profile-name-font';
 /* oxlint-disable jsx-a11y/no-noninteractive-tabindex -- The links panel must be keyboard-focusable so visitors can scroll it independently of the fixed header and footer. */
 import Image from 'next/image';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
@@ -333,7 +334,10 @@ function PortfolioProfile({
               </DropdownMenu>
             </div>
             {companyTemplate?.logoUrl && (
-              <Image unoptimized width={100} height={50}
+              <Image
+                unoptimized
+                width={100}
+                height={50}
                 className="company-public-logo"
                 src={companyTemplate.logoUrl}
                 alt={companyTemplate.company}
@@ -375,6 +379,11 @@ function PortfolioProfile({
               </div>
               <Heading
                 className="portfolio-name"
+                style={
+                  profile.nameFont && profile.nameFont !== 'classic'
+                    ? nameFontStyle(profile.nameFont)
+                    : undefined
+                }
                 title={profile.name}
                 data-long-name={profile.name.length > 32}
                 data-cjk={/\p{Script=Han}/u.test(profile.name)}

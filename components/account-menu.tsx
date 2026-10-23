@@ -108,6 +108,14 @@ export function AccountMenu({
               <BriefcaseBusiness size={18} aria-hidden="true" />
               <span>{t('A minha candidatura')}</span>
             </DropdownMenuItem>
+            <DropdownMenuItem
+              className="account-menu-option"
+              render={<Link href="/perfil?billing=1" />}
+              nativeButton={false}
+            >
+              <Package size={18} aria-hidden="true" />
+              <span>{t('Plano e facturação')}</span>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="account-menu-option"

@@ -11,7 +11,9 @@ import { AmbassadorDashboard } from './ambassador-dashboard';
 import { AccountMenu } from './account-menu';
 import { PanelBrand } from '@/components/panel-brand';
 
-import { membershipFeatures } from '@/lib/entitlement';
+import { workspacePlan } from '@/lib/workspace-plan';
+import { ProfileColourPicker } from './profile-colour-picker';
+import { ProfileNameFontPicker } from './profile-name-font-picker';
 import { profilePresentation } from '@/lib/entitlement';
 import { ProfileExtrasEditor } from './profile-extras-editor';
 import { ProfileTranslationsEditor } from './profile-translations-editor';
@@ -119,7 +121,6 @@ export function Workspace({ displayName }: { displayName: string }) {
   const [growthInitialTab, setGrowthInitialTab] = useState<
     'overview' | 'billing'
   >('overview');
-  const toolSection = useRef<'business' | 'extras' | null>(null);
   const [tab, setTab] = useState('overview'),
     [data, setData] = useState<WorkspaceData | null>(null),
     [profile, setProfile] = useState<Profile>(blankProfile),
@@ -136,6 +137,7 @@ export function Workspace({ displayName }: { displayName: string }) {
     [_testToolsOpen, setTestToolsOpen] = useState(false),
     [plansOpen, setPlansOpen] = useState(false),
     [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const planView = data ? workspacePlan(data.membership) : null;
   const [editorStep, setEditorStep] = useState<number>(0);
   function goToEditorStep(step: number) {
     setEditorStep(step);
@@ -151,23 +153,6 @@ export function Workspace({ displayName }: { displayName: string }) {
   useEffect(() => {
     dirtyRef.current = dirty;
   }, [dirty]);
-  useEffect(() => {
-    if (tab !== 'profile' || !toolSection.current) return;
-    setEditorStep(2);
-    const section = document.getElementById(
-      `professional-${toolSection.current}`,
-    );
-    if (section) {
-      const parentDetails = section.closest('details');
-      if (parentDetails) parentDetails.open = true;
-      section.querySelectorAll('details').forEach((detail) => {
-        detail.open = true;
-      });
-      section.scrollIntoView({ block: 'start' });
-      section.focus({ preventScroll: true });
-      toolSection.current = null;
-    }
-  }, [tab]);
   const products = useMemo(() => data?.products ?? [], [data?.products]);
   const pendingCreate = useRef<string | null>(null);
   const load = useCallback(async (resetProfile = false) => {
@@ -227,8 +212,16 @@ export function Workspace({ displayName }: { displayName: string }) {
             ),
           );
         }
-        if (new URLSearchParams(window.location.search).get('tools') === '1')
+        if (new URLSearchParams(window.location.search).get('tools') === '1') {
+          if (workspacePlan(d.membership).hasTools) setTab('growth');
+          else setPlansOpen(true);
+        }
+        if (
+          new URLSearchParams(window.location.search).get('billing') === '1'
+        ) {
+          setGrowthInitialTab('billing');
           setTab('growth');
+        }
         if (new URLSearchParams(window.location.search).get('plans') === '1')
           setPlansOpen(true);
         const submittedId = new URLSearchParams(window.location.search).get(
@@ -449,6 +442,7 @@ export function Workspace({ displayName }: { displayName: string }) {
       setError(issue.message);
       setErrorField(issue.field);
       setNotice('');
+      if (tab.startsWith('professional-')) setTab('profile');
       setEditorStep(issue.step);
       requestAnimationFrame(() => {
         const target = document.getElementById(
@@ -492,7 +486,10 @@ export function Workspace({ displayName }: { displayName: string }) {
         setErrorField(
           (e as { errorField?: string }).errorField || location.field,
         );
-        if (location.field || location.step !== 2) setEditorStep(location.step);
+        if (location.field || location.step !== 2) {
+          if (tab.startsWith('professional-')) setTab('profile');
+          setEditorStep(location.step);
+        }
         requestAnimationFrame(() =>
           document
             .getElementById(
@@ -695,9 +692,11 @@ export function Workspace({ displayName }: { displayName: string }) {
       <Sidebar className="workspace-sidebar app-sidebar">
         <CustomerSidebar
           badge={
-            data?.membership.planId === 'personal'
-              ? 'Individual'
-              : (data?.membership.terms.name ?? 'Individual')
+            planView
+              ? planView.personal
+                ? 'Personal · Gratuito'
+                : planView.name
+              : '…'
           }
           groups={[
             {
@@ -722,10 +721,23 @@ export function Workspace({ displayName }: { displayName: string }) {
                 .filter((m) => ['profile', 'growth'].includes(m.id))
                 .map((m) => ({
                   id: m.id,
-                  label: m.label,
+                  label:
+                    m.id === 'growth'
+                      ? planView?.hasTools
+                        ? 'Ferramentas profissionais'
+                        : 'Explorar Profissional'
+                      : m.label,
                   icon: <m.icon size={21} />,
-                  active: tab === m.id,
+                  active:
+                    (tab === m.id ||
+                      (m.id === 'growth' && tab.startsWith('professional-'))) &&
+                    (m.id !== 'growth' || growthInitialTab !== 'billing'),
                   onSelect: () => {
+                    if (m.id === 'growth' && !planView?.hasTools) {
+                      openPlans();
+                      return;
+                    }
+                    if (m.id === 'growth') setGrowthInitialTab('overview');
                     setTab(m.id);
                     focusDashboardStart();
                     setNotice('');
@@ -792,11 +804,20 @@ export function Workspace({ displayName }: { displayName: string }) {
                     ? t('Olá, {0}.', [
                         displayName.trim().split(/\s+/)[0] || t('bem-vindo'),
                       ])
-                    : t(
-                        menu
-                          .find((m) => m.id === tab)
-                          ?.label.replace(' · teste', '') ?? '',
-                      )}
+                    : tab === 'growth'
+                      ? t(
+                          growthInitialTab === 'billing'
+                            ? 'Plano e facturação'
+                            : planView?.hasTools
+                              ? 'Ferramentas profissionais'
+                              : 'Explorar Profissional',
+                        )
+                      : t(
+                          menu
+                            .find((m) => m.id === tab)
+                            ?.label.replace(' · teste', '') ??
+                            'Ferramentas profissionais',
+                        )}
                 </h1>
               </div>
               <Button
@@ -884,6 +905,10 @@ export function Workspace({ displayName }: { displayName: string }) {
                   onNavigate={setTab}
                   onInspect={inspect}
                   onUpgrade={openPlans}
+                  onPlanDetails={() => {
+                    setGrowthInitialTab('billing');
+                    setTab('growth');
+                  }}
                 />
               )}
               {tab === 'profile' && (
@@ -929,6 +954,21 @@ export function Workspace({ displayName }: { displayName: string }) {
                               setDirty(true);
                             }}
                           />
+                          <ProfileColourPicker
+                            profile={profile}
+                            onChange={(next) => {
+                              setProfile(next);
+                              setDirty(true);
+                            }}
+                          />
+                          <ProfileNameFontPicker
+                            value={profile.nameFont}
+                            name={profile.name}
+                            onChange={(font) => {
+                              setProfile({ ...profile, nameFont: font });
+                              setDirty(true);
+                            }}
+                          />
                         </div>
                         <div className="form-grid">
                           {(
@@ -965,18 +1005,20 @@ export function Workspace({ displayName }: { displayName: string }) {
                               },
                             ] as const
                           ).map((f) => (
-                            <label
+                            <div
                               className={`field setup-part ${['name', 'username', 'title'].includes(f.key) ? 'setup-identity' : 'setup-contacts'}`}
                               key={f.key}
-                              htmlFor={`profile-${f.key}`}
                             >
-                              {t(f.label)}
+                              <label htmlFor={`profile-${f.key}`}>
+                                {t(f.label)}
+                              </label>
                               <Input
                                 id={`profile-${f.key}`}
                                 value={profile[f.key]}
                                 aria-invalid={f.key === errorField || undefined}
                                 aria-describedby={
-                                  f.key === 'website'
+                                  f.key === 'website' &&
+                                  errorField === 'website'
                                     ? 'profile-website-help'
                                     : undefined
                                 }
@@ -1066,44 +1108,45 @@ export function Workspace({ displayName }: { displayName: string }) {
                                   framyconnect.co.mz/{profile.username || '…'}
                                 </small>
                               )}
-                              {f.key === 'website' && (
-                                <small id="profile-website-help">
-                                  {errorField === 'website'
-                                    ? t(error)
-                                    : t(
-                                        'Opcional. Pode escrever www.exemplo.com; adicionamos https:// automaticamente.',
-                                      )}
-                                </small>
+                              {f.key === 'website' &&
+                                errorField === 'website' && (
+                                  <small id="profile-website-help" role="alert">
+                                    {t(error)}
+                                  </small>
+                                )}
+                              {(f.key === 'email' || f.key === 'phone') && (
+                                <span className="contact-visibility-inline">
+                                  <span id={`visibility-${f.key}-label`}>
+                                    {t(
+                                      f.key === 'email'
+                                        ? 'Mostrar email ao público'
+                                        : 'Mostrar telefone ao público',
+                                    )}
+                                  </span>
+                                  <Switch
+                                    id={`show-${f.key}`}
+                                    aria-labelledby={`visibility-${f.key}-label`}
+                                    checked={
+                                      f.key === 'email'
+                                        ? profile.showEmail
+                                        : profile.showPhone
+                                    }
+                                    onCheckedChange={(value) => {
+                                      setProfile({
+                                        ...profile,
+                                        [f.key === 'email'
+                                          ? 'showEmail'
+                                          : 'showPhone']: value,
+                                      });
+                                      setDirty(true);
+                                    }}
+                                  />
+                                </span>
                               )}
-                            </label>
+                            </div>
                           ))}
                         </div>
-                        <div className="visibility setup-part setup-contacts">
-                          <h3>{t('O que aparece no seu perfil?')}</h3>
-                          <label htmlFor="show-email">
-                            <span>{t('Mostrar email ao público')}</span>
-                            <Switch
-                              id="show-email"
-                              checked={profile.showEmail}
-                              onCheckedChange={(v) => {
-                                setProfile({ ...profile, showEmail: v });
-                                setDirty(true);
-                              }}
-                            />
-                          </label>
-                          <label htmlFor="show-phone">
-                            <span>{t('Mostrar telefone ao público')}</span>
-                            <Switch
-                              id="show-phone"
-                              checked={profile.showPhone}
-                              onCheckedChange={(v) => {
-                                setProfile({ ...profile, showPhone: v });
-                                setDirty(true);
-                              }}
-                            />
-                          </label>
-                        </div>
-                        <div className="setup-part setup-presentation">
+                        <div className="setup-part setup-identity">
                           <label className="field" htmlFor="profile-bio">
                             {t('Sobre si (opcional)')}
                             <textarea
@@ -1127,61 +1170,6 @@ export function Workspace({ displayName }: { displayName: string }) {
                               {data.membership.terms.bio} {t('caracteres')}
                             </small>
                           </label>
-                          <details className="setup-advanced">
-                            <summary>
-                              {t('Ferramentas adicionais (opcional)')}
-                            </summary>
-                            <button
-                              type="button"
-                              className="btn btn-outline"
-                              onClick={() => {
-                                setGrowthInitialTab('overview');
-                                setTab('growth');
-                              }}
-                            >
-                              <BriefcaseBusiness size={18} />
-                              {t('Ferramentas profissionais')}
-                            </button>
-                            <div
-                              id="professional-business"
-                              tabIndex={-1}
-                              style={{ scrollMarginTop: 110 }}
-                            >
-                              <ProfileBusinessEditor
-                                features={membershipFeatures({
-                                  plan_id: data.membership.planId,
-                                  terms_json: JSON.stringify(
-                                    data.membership.terms,
-                                  ),
-                                })}
-                                profile={profile}
-                                onChange={(next) => {
-                                  setProfile(next);
-                                  setDirty(true);
-                                }}
-                              />
-                            </div>
-                            <div
-                              id="professional-extras"
-                              tabIndex={-1}
-                              style={{ scrollMarginTop: 110 }}
-                            >
-                              <ProfileExtrasEditor
-                                features={membershipFeatures({
-                                  plan_id: data.membership.planId,
-                                  terms_json: JSON.stringify(
-                                    data.membership.terms,
-                                  ),
-                                })}
-                                profile={profile}
-                                limit={data.membership.terms.links}
-                                onChange={(p) => {
-                                  setProfile(p);
-                                  setDirty(true);
-                                }}
-                              />
-                            </div>
-                          </details>
                         </div>
                         <div className="setup-part setup-contacts">
                           <ProfileLinksEditor
@@ -1334,17 +1322,81 @@ export function Workspace({ displayName }: { displayName: string }) {
               )}
               {tab === 'growth' && (
                 <ProfileGrowthHub
+                  key={growthInitialTab}
                   initialTab={growthInitialTab}
-                  features={membershipFeatures({
-                    plan_id: data.membership.planId,
-                    terms_json: JSON.stringify(data.membership.terms),
-                  })}
+                  features={planView!.features}
                   onEdit={(section) => {
-                    toolSection.current = section;
-                    setTab('profile');
+                    setTab('professional-' + section);
                   }}
                   onAnalytics={() => setTab('analytics')}
+                  onUpgrade={openPlans}
                 />
+              )}
+              {['professional-business', 'professional-extras'].includes(
+                tab,
+              ) && (
+                <section className="panel professional-configuration">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setGrowthInitialTab('overview');
+                      setTab('growth');
+                    }}
+                  >
+                    {t('Voltar às ferramentas')}
+                  </Button>
+                  {planView?.hasTools ? (
+                    <form
+                      noValidate
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        void save('save-profile');
+                      }}
+                    >
+                      <fieldset disabled={busy || uploadingPhoto}>
+                        {tab === 'professional-business' ? (
+                          <ProfileBusinessEditor
+                            features={planView.features}
+                            profile={profile}
+                            onChange={(next) => {
+                              setProfile(next);
+                              setDirty(true);
+                            }}
+                          />
+                        ) : (
+                          <ProfileExtrasEditor
+                            features={planView.features}
+                            profile={profile}
+                            limit={data.membership.terms.links}
+                            onChange={(next) => {
+                              setProfile(next);
+                              setDirty(true);
+                            }}
+                          />
+                        )}
+                      </fieldset>
+                      {error && <p role="alert">{t(error)}</p>}
+                      {notice && <output>{t(notice)}</output>}
+                      <div className="setup-save-actions">
+                        <Button type="submit" disabled={busy}>
+                          {t('Guardar rascunho')}
+                        </Button>
+                        <Button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => {
+                            setTab('profile');
+                            goToEditorStep(3);
+                          }}
+                        >
+                          {t('Rever e publicar')}
+                        </Button>
+                      </div>
+                    </form>
+                  ) : (
+                    <Button onClick={openPlans}>{t('Comparar planos')}</Button>
+                  )}
+                </section>
               )}
               {tab === 'operations' && data.canManageProducts && (
                 <ProductManager

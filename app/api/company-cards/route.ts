@@ -310,6 +310,7 @@ export async function POST(request: Request) {
                     .first<{ name: string }>()
                 )?.name || value.name,
               title: '',
+              nameFont: undefined,
               email: '',
               phone: '',
               photoUrl: '',
@@ -318,6 +319,7 @@ export async function POST(request: Request) {
             });
         for (const key of [
           'name',
+          'nameFont',
           'title',
           'email',
           'phone',

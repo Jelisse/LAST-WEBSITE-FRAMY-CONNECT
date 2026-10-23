@@ -2458,3 +2458,157 @@ body .app-sidebar [data-collapsed='true'] .app-sidebar-header > a {
     border-bottom: 1px solid var(--experience-line);
   }
 }
+
+/* Basic profile setup: identity, contacts, appearance, review. */
+.guided-profile-editor .contact-visibility-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #66705d;
+  margin-top: 6px;
+}
+.guided-profile-editor .profile-color-picker {
+  margin: 16px 0 0;
+  padding: 16px;
+  border: 1px solid var(--experience-line);
+  border-radius: 12px;
+}
+.guided-profile-editor .profile-color-picker > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.guided-profile-editor .profile-color-picker label {
+  min-width: 68px;
+}
+.guided-profile-editor .portfolio-photo-editor {
+  margin: 0;
+  align-items: start;
+  gap: 20px;
+}
+.guided-profile-editor .portfolio-photo-editor-controls {
+  align-items: flex-start;
+}
+.guided-profile-editor .photo-adjustments {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 0;
+}
+.guided-profile-editor .photo-adjustments summary {
+  width: fit-content;
+  min-height: 36px;
+  padding: 6px 0;
+}
+.photo-adjustment-fields {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--experience-line);
+  border-radius: 10px;
+  background: #fafaf7;
+}
+.photo-adjustment-fields label {
+  display: grid;
+  gap: 4px;
+}
+.professional-configuration {
+  max-width: 1000px;
+}
+.professional-configuration .setup-save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+.essential-plan .current-plan-details {
+  margin-top: 16px;
+  font-size: 13px;
+}
+.app-sidebar .app-sidebar-badge {
+  max-width: 110px;
+}
+
+.guided-profile-editor .photo-adjustment-fields label {
+  margin-block: 4px;
+}
+
+/* Curated name typography changes the profile heading only. */
+.profile-name-font-picker {
+  min-width: 0;
+  margin: 18px 0 0;
+  padding: 16px;
+  border: 1px solid var(--experience-line);
+  border-radius: 12px;
+}
+.profile-name-font-picker legend {
+  padding-inline: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.profile-name-font-picker > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.profile-name-font-picker label {
+  position: relative;
+  display: block !important;
+  min-width: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.profile-name-font-picker input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  padding: 0;
+}
+.profile-name-font-option {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  min-height: 100px;
+  padding: 14px;
+  border: 1px solid var(--experience-line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--experience-ink);
+  font-size: 12px;
+}
+.profile-name-font-sample {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  font-size: 25px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.profile-name-font-picker input:checked + .profile-name-font-option {
+  border-color: var(--experience-accent);
+  background: #fff7f0;
+  box-shadow: inset 0 0 0 1px var(--experience-accent);
+}
+.profile-name-font-picker input:focus-visible + .profile-name-font-option {
+  outline: 2px solid var(--experience-accent);
+  outline-offset: 3px;
+}
+.profile-name-font-picker:disabled label {
+  cursor: default;
+}
+@media (max-width: 420px) {
+  .profile-name-font-picker {
+    padding: 12px;
+  }
+  .profile-name-font-option {
+    padding: 10px;
+  }
+  .profile-name-font-sample {
+    font-size: 22px;
+  }
+}

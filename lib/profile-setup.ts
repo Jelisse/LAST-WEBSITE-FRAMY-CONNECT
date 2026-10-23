@@ -4,6 +4,7 @@ export function profileIssueLocation(message: string) {
   if (/utilizador|username/i.test(message))
     return { step: 0, field: 'username' };
   if (/seu nome|campo name/i.test(message)) return { step: 0, field: 'name' };
+  if (/biografia|bio|sobre si/i.test(message)) return { step: 0, field: 'bio' };
   if (/email/i.test(message)) return { step: 1, field: 'email' };
   if (/telefone|campo phone/i.test(message)) return { step: 1, field: 'phone' };
   if (/website/i.test(message)) return { step: 1, field: 'website' };

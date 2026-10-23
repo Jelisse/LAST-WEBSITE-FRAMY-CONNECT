@@ -4,6 +4,7 @@ import { FirstProfileWelcome } from './first-profile-welcome';
 import Image from 'next/image';
 import { useI18n } from '@/components/language-provider';
 
+import { workspacePlan } from '@/lib/workspace-plan';
 import { planPrice } from '@/lib/plan-pricing';
 
 import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
@@ -16,7 +17,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { featureCatalog, planFeatures } from '@/lib/plan-features';
+import { featureCatalog } from '@/lib/plan-features';
 import { Progress } from '@/components/ui/progress';
 import { ProfileIdentityCounters } from './customer-analytics';
 import { orderLabels } from '@/lib/domain';
@@ -28,16 +29,19 @@ export function CustomerOverview({
   onNavigate,
   onInspect,
   onUpgrade,
+  onPlanDetails,
 }: {
   data: WorkspaceData;
   displayName: string;
   onNavigate: (tab: string) => void;
   onInspect: (order: SandboxOrder) => void;
   onUpgrade: () => void;
+  onPlanDetails: () => void;
 }) {
   const { t } = useI18n();
   const plan = data.membership.terms;
-  const includedFeatures = planFeatures(plan);
+  const planView = workspacePlan(data.membership);
+  const includedFeatures = planView.features;
   const profile = data.profile;
   const links = profile?.links ?? [];
   const name = profile?.name || displayName;
@@ -210,11 +214,7 @@ export function CustomerOverview({
                 : t('Por activar / expirado')}
             </span>
           </div>
-          <h2 id="current-plan-title">
-            {data.membership.version
-              ? t(plan.name)
-              : t('Individual gratuito, sem prazo')}
-          </h2>
+          <h2 id="current-plan-title">{t(planView.name)}</h2>
           <p className="essential-price">
             {plan.id === 'personal' ? t('Gratuito') : planPrice(plan, t.locale)}
             <span>
@@ -291,7 +291,14 @@ export function CustomerOverview({
                   : t('Active o período gratuito para publicar o perfil.')}
             </p>
           )}
-          {plan.id === 'personal' && (
+          <button
+            type="button"
+            className="plan-text-button current-plan-details"
+            onClick={onPlanDetails}
+          >
+            {t('Ver detalhes do plano')} <ArrowRight size={16} />
+          </button>
+          {planView.personal && (
             <div className="essential-plan-recommendation">
               <p>
                 {t(

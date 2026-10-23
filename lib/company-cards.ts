@@ -1,3 +1,4 @@
+import { nameFont, type NameFont } from './profile-name-font.ts';
 import {
   blankProfile,
   validateProfile,
@@ -6,6 +7,7 @@ import {
 } from './domain.ts';
 import { defaultBusiness, isProfileColor } from './profile-business.ts';
 export type CompanyTemplate = {
+  nameFont?: NameFont;
   company: string;
   headline: string;
   website: string;
@@ -17,6 +19,7 @@ export type CompanyTemplate = {
   editable?: string[];
 };
 export type CompanyCard = {
+  nameFont?: NameFont;
   internalName?: string;
   name: string;
   title: string;
@@ -79,6 +82,7 @@ export function companyTemplate(input: unknown): CompanyTemplate {
       (k) =>
         ![
           'name',
+          'nameFont',
           'title',
           'email',
           'phone',
@@ -91,6 +95,7 @@ export function companyTemplate(input: unknown): CompanyTemplate {
     throw Error('Permissões inválidas.');
   return {
     company,
+    nameFont: nameFont(b.nameFont),
     headline,
     website: clean.website,
     accent,
@@ -124,6 +129,7 @@ export function companyCard(input: unknown): CompanyCard {
   });
   return {
     internalName: text(b.internalName ?? p.name, 90),
+    nameFont: b.nameFont === undefined ? undefined : nameFont(b.nameFont),
     name: p.name,
     title: p.title,
     email: p.email,
@@ -143,6 +149,9 @@ export function companyCardProfile(
   return publicProfile({
     ...blankProfile,
     name: card.name,
+    nameFont: template.editable?.includes('nameFont')
+      ? (card.nameFont ?? template.nameFont ?? 'classic')
+      : (template.nameFont ?? 'classic'),
     email: card.email,
     phone: card.phone,
     showEmail: card.showEmail,
@@ -196,7 +205,24 @@ export function companyFollowup(input: Record<string, unknown>) {
 export function companyPresentation(
   template: CompanyTemplate,
 ): CompanyTemplate {
-  const { company, headline, website, accent, design, logoUrl, coverUrl } =
-    template;
-  return { company, headline, website, accent, design, logoUrl, coverUrl };
+  const {
+    company,
+    headline,
+    website,
+    accent,
+    design,
+    logoUrl,
+    coverUrl,
+    nameFont,
+  } = template;
+  return {
+    company,
+    headline,
+    website,
+    accent,
+    design,
+    logoUrl,
+    coverUrl,
+    nameFont,
+  };
 }

@@ -1,11 +1,7 @@
 'use client';
 import { PhoneInput } from './phone-input';
 import type { Profile } from '@/lib/domain';
-import {
-  defaultBusiness,
-  profileColors,
-  profileTheme,
-} from '@/lib/profile-business';
+import { defaultBusiness } from '@/lib/profile-business';
 import { useI18n } from './language-provider';
 export function ProfileBusinessEditor({
   profile,
@@ -36,73 +32,54 @@ export function ProfileBusinessEditor({
         </p>
       )}
       <div className="profile-business-fields">
-        <label>
-          {t('WhatsApp público')}
-          <PhoneInput
-            disabled={features?.whatsapp === false}
-
-            value={business.whatsapp}
-            maxLength={24}
-            placeholder="+258840000000"
-            onValueChange={(value) => update('whatsapp', value)}
-          />
-        </label>
-        <label>
-          {t('Mensagem para iniciar a conversa')}
-          <textarea
-            disabled={features?.whatsapp === false}
-            value={business.message}
-            maxLength={300}
-            rows={2}
-            placeholder={t(
-              'Olá, gostaria de saber mais sobre os seus serviços.',
-            )}
-            onChange={(e) => update('message', e.target.value)}
-          />
-        </label>
-        <label>
-          {t('Endereço do negócio')}
-          <input
-            disabled={features?.location === false}
-            value={business.address}
-            maxLength={240}
-            placeholder={t('Rua, cidade e país')}
-            onChange={(e) => update('address', e.target.value)}
-          />
-        </label>
-        <label>
-          {t('Horário de atendimento')}
-          <textarea
-            disabled={features?.location === false}
-            value={business.hours}
-            maxLength={240}
-            rows={2}
-            placeholder={t('Segunda a sexta: 08:00–17:00')}
-            onChange={(e) => update('hours', e.target.value)}
-          />
-        </label>
-        <fieldset className="profile-color-picker">
-          <legend>{t('Cor do perfil')}</legend>
-          <div>
-            {profileColors.map((color) => (
-              <label key={color.value}>
-                <input
-                  type="radio"
-                  name={`profile-color-${profile.username}`}
-                  value={color.value}
-                  checked={profileTheme(business.accent).value === color.value}
-                  onChange={() => update('accent', color.value)}
-                />
-                <span
-                  className="profile-color-swatch"
-                  style={{ backgroundColor: color.hex }}
-                  aria-hidden="true"
-                />
-                <span>{t(color.label)}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        {features?.whatsapp !== false && (
+          <>
+            <label>
+              {t('WhatsApp público')}
+              <PhoneInput
+                value={business.whatsapp}
+                maxLength={24}
+                placeholder="+258840000000"
+                onValueChange={(value) => update('whatsapp', value)}
+              />
+            </label>
+            <label>
+              {t('Mensagem para iniciar a conversa')}
+              <textarea
+                value={business.message}
+                maxLength={300}
+                rows={2}
+                placeholder={t(
+                  'Olá, gostaria de saber mais sobre os seus serviços.',
+                )}
+                onChange={(e) => update('message', e.target.value)}
+              />
+            </label>
+          </>
+        )}
+        {features?.location !== false && (
+          <>
+            <label>
+              {t('Endereço do negócio')}
+              <input
+                value={business.address}
+                maxLength={240}
+                placeholder={t('Rua, cidade e país')}
+                onChange={(e) => update('address', e.target.value)}
+              />
+            </label>
+            <label>
+              {t('Horário de atendimento')}
+              <textarea
+                value={business.hours}
+                maxLength={240}
+                rows={2}
+                placeholder={t('Segunda a sexta: 08:00–17:00')}
+                onChange={(e) => update('hours', e.target.value)}
+              />
+            </label>
+          </>
+        )}
       </div>
       <p>
         {t(

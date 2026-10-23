@@ -1,6 +1,20 @@
-import { hasInvalidProfileURLCharacters, normalizeProfileURL, ProfileWebsiteError } from './profile-url.ts';
-import { portraitShapes, portraitPatterns, type PortraitShape, type PortraitPattern } from './portrait-design.ts';
-import { validateProfileTranslations, type ProfileTranslations, type ProfileLanguage } from './profile-locales.ts';
+import { nameFont, type NameFont } from './profile-name-font.ts';
+import {
+  hasInvalidProfileURLCharacters,
+  normalizeProfileURL,
+  ProfileWebsiteError,
+} from './profile-url.ts';
+import {
+  portraitShapes,
+  portraitPatterns,
+  type PortraitShape,
+  type PortraitPattern,
+} from './portrait-design.ts';
+import {
+  validateProfileTranslations,
+  type ProfileTranslations,
+  type ProfileLanguage,
+} from './profile-locales.ts';
 import type { PlanControls } from './plan-features';
 import { validateExtras, type ProfileExtras } from './profile-growth.ts';
 import { validateBusiness, type ProfileBusiness } from './profile-business.ts';
@@ -82,7 +96,19 @@ export const plans = [
     bio: 600,
     description: 'Apresente os seus serviços, portefólio e trabalho.',
   },
-  { id:'corporate',name:'Corporativo',audience:'Empresas',meticais:0,annualMeticais:0,links:50,bio:1200,description:'Plano empresarial com preço acordado com a equipa.',active:false,monthlyEnabled:false,annualEnabled:false },
+  {
+    id: 'corporate',
+    name: 'Corporativo',
+    audience: 'Empresas',
+    meticais: 0,
+    annualMeticais: 0,
+    links: 50,
+    bio: 1200,
+    description: 'Plano empresarial com preço acordado com a equipa.',
+    active: false,
+    monthlyEnabled: false,
+    annualEnabled: false,
+  },
 ] as const;
 export type PlanId = string;
 export type ManagedPlan = PlanControls & {
@@ -108,6 +134,7 @@ export function getPlan(id: unknown) {
 }
 export type ProfileLink = { label: string; url: string };
 export type Profile = {
+  nameFont?: NameFont;
   coverUrl?: string;
   coverPosition?: number;
   contentLanguage?: ProfileLanguage;
@@ -140,7 +167,6 @@ export type Profile = {
   photoGlowStrength?: number;
   photoOutlineColor?: string;
   photoOutlineWidth?: number;
-
 };
 export const blankProfile: Profile = {
   name: '',
@@ -236,10 +262,20 @@ export function validateProfile(input: unknown): Profile {
     try {
       url = new URL(website);
     } catch {
-      throw new ProfileWebsiteError('Website ou portefólio: use um endereço válido, como https://exemplo.com, ou deixe o campo vazio.');
+      throw new ProfileWebsiteError(
+        'Website ou portefólio: use um endereço válido, como https://exemplo.com, ou deixe o campo vazio.',
+      );
     }
-    if (url.protocol !== 'https:' || url.username || url.password || url.href.length > 300 || hasInvalidProfileURLCharacters(website))
-      throw new ProfileWebsiteError('Website ou portefólio: use um endereço válido, como https://exemplo.com, ou deixe o campo vazio.');
+    if (
+      url.protocol !== 'https:' ||
+      url.username ||
+      url.password ||
+      url.href.length > 300 ||
+      hasInvalidProfileURLCharacters(website)
+    )
+      throw new ProfileWebsiteError(
+        'Website ou portefólio: use um endereço válido, como https://exemplo.com, ou deixe o campo vazio.',
+      );
   }
   if (typeof p.showEmail !== 'boolean' || typeof p.showPhone !== 'boolean')
     throw new Error('Reveja a visibilidade dos contactos.');
@@ -263,7 +299,12 @@ export function validateProfile(input: unknown): Profile {
     } catch {
       throw new Error('Os links devem começar por https://.');
     }
-    if (url.protocol !== 'https:' || url.username || url.password || hasInvalidProfileURLCharacters(link.url.trim()))
+    if (
+      url.protocol !== 'https:' ||
+      url.username ||
+      url.password ||
+      hasInvalidProfileURLCharacters(link.url.trim())
+    )
       throw new Error('Use links https:// sem credenciais.');
     if (url.href.length > 300)
       throw new Error('O endereço do link é demasiado longo.');
@@ -273,10 +314,26 @@ export function validateProfile(input: unknown): Profile {
     throw new Error('A biografia deve ter até 1200 caracteres.');
   const photoUrl = p.photoUrl ?? '';
   const coverUrl = p.coverUrl ?? '';
-  if (typeof coverUrl !== 'string' || (coverUrl && !/^\/api\/profile-photo\/[0-9a-f-]{36}$/.test(coverUrl))) throw Error('Carregue uma fotografia válida.');
+  if (
+    typeof coverUrl !== 'string' ||
+    (coverUrl && !/^\/api\/profile-photo\/[0-9a-f-]{36}$/.test(coverUrl))
+  )
+    throw Error('Carregue uma fotografia válida.');
   const coverPosition = p.coverPosition ?? 50;
-  if (typeof coverPosition !== 'number' || !Number.isFinite(coverPosition) || coverPosition < 0 || coverPosition > 100) throw Error('Enquadramento horizontal inválido.');
-  if (p.contentLanguage !== undefined && !['en', 'pt-MZ', 'zh-Hant', 'uk', 'pl', 'fr', 'zh-Hans'].includes(p.contentLanguage as string)) throw Error('Tradução inválida.');
+  if (
+    typeof coverPosition !== 'number' ||
+    !Number.isFinite(coverPosition) ||
+    coverPosition < 0 ||
+    coverPosition > 100
+  )
+    throw Error('Enquadramento horizontal inválido.');
+  if (
+    p.contentLanguage !== undefined &&
+    !['en', 'pt-MZ', 'zh-Hant', 'uk', 'pl', 'fr', 'zh-Hans'].includes(
+      p.contentLanguage as string,
+    )
+  )
+    throw Error('Tradução inválida.');
   if (
     typeof photoUrl !== 'string' ||
     (photoUrl && !/^\/api\/profile-photo\/[0-9a-f-]{36}$/.test(photoUrl))
@@ -284,20 +341,61 @@ export function validateProfile(input: unknown): Profile {
     throw new Error('Carregue uma fotografia válida.');
   const photoPosition = p.photoPosition ?? 35;
   const photoPositionX = p.photoPositionX ?? 50;
-  if (typeof photoPositionX !== 'number' || !Number.isFinite(photoPositionX) || photoPositionX < 0 || photoPositionX > 100)
+  if (
+    typeof photoPositionX !== 'number' ||
+    !Number.isFinite(photoPositionX) ||
+    photoPositionX < 0 ||
+    photoPositionX > 100
+  )
     throw new Error('Enquadramento horizontal inválido.');
   const photoScale = p.photoScale ?? 100;
-  if (p.photoShape !== undefined && !portraitShapes.includes(p.photoShape as PortraitShape)) throw new Error('Fotografia inválida.');
-  if (p.photoPattern !== undefined && !portraitPatterns.includes(p.photoPattern as PortraitPattern)) throw new Error('Fotografia inválida.');
-  if (p.photoHeadEscape !== undefined && typeof p.photoHeadEscape !== 'boolean') throw new Error('Fotografia inválida.');
-  for (const [value, min, max] of [[p.photoPatternScale, 50, 200], [p.photoPatternStrength, 0, 100], [p.photoGlowStrength, 0, 100], [p.photoOutlineWidth, 0, 20]] as const)
-    if (value !== undefined && (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max)) throw new Error('Fotografia inválida.');
+  if (
+    p.photoShape !== undefined &&
+    !portraitShapes.includes(p.photoShape as PortraitShape)
+  )
+    throw new Error('Fotografia inválida.');
+  if (
+    p.photoPattern !== undefined &&
+    !portraitPatterns.includes(p.photoPattern as PortraitPattern)
+  )
+    throw new Error('Fotografia inválida.');
+  if (p.photoHeadEscape !== undefined && typeof p.photoHeadEscape !== 'boolean')
+    throw new Error('Fotografia inválida.');
+  for (const [value, min, max] of [
+    [p.photoPatternScale, 50, 200],
+    [p.photoPatternStrength, 0, 100],
+    [p.photoGlowStrength, 0, 100],
+    [p.photoOutlineWidth, 0, 20],
+  ] as const)
+    if (
+      value !== undefined &&
+      (typeof value !== 'number' ||
+        !Number.isFinite(value) ||
+        value < min ||
+        value > max)
+    )
+      throw new Error('Fotografia inválida.');
 
-  for (const color of [p.photoShapeColor, p.photoGlowColor, p.photoPatternColor, p.photoOutlineColor])
-    if (color !== undefined && (typeof color !== 'string' || !/^#[0-9a-f]{6}$/i.test(color)))
+  for (const color of [
+    p.photoShapeColor,
+    p.photoGlowColor,
+    p.photoPatternColor,
+    p.photoOutlineColor,
+  ])
+    if (
+      color !== undefined &&
+      (typeof color !== 'string' || !/^#[0-9a-f]{6}$/i.test(color))
+    )
       throw new Error('Cor inválida.');
-  if (p.photoCutout !== undefined && typeof p.photoCutout !== 'boolean') throw new Error('Fotografia inválida.');
-  if (typeof photoScale !== 'number' || !Number.isFinite(photoScale) || photoScale < 75 || photoScale > 150) throw new Error('Escala da fotografia inválida.');
+  if (p.photoCutout !== undefined && typeof p.photoCutout !== 'boolean')
+    throw new Error('Fotografia inválida.');
+  if (
+    typeof photoScale !== 'number' ||
+    !Number.isFinite(photoScale) ||
+    photoScale < 75 ||
+    photoScale > 150
+  )
+    throw new Error('Escala da fotografia inválida.');
   if (
     typeof photoPosition !== 'number' ||
     !Number.isFinite(photoPosition) ||
@@ -307,6 +405,7 @@ export function validateProfile(input: unknown): Profile {
     throw new Error('Posição da fotografia inválida.');
   return {
     name,
+    nameFont: nameFont(p.nameFont),
     coverUrl,
     coverPosition,
     contentLanguage: (p.contentLanguage ?? 'pt-MZ') as ProfileLanguage,
@@ -325,13 +424,16 @@ export function validateProfile(input: unknown): Profile {
     photoPositionX,
     photoCutout: p.photoCutout === true,
     photoScale,
-    photoShapeColor: typeof p.photoShapeColor === 'string' ? p.photoShapeColor : undefined,
-    photoGlowColor: typeof p.photoGlowColor === 'string' ? p.photoGlowColor : undefined,
+    photoShapeColor:
+      typeof p.photoShapeColor === 'string' ? p.photoShapeColor : undefined,
+    photoGlowColor:
+      typeof p.photoGlowColor === 'string' ? p.photoGlowColor : undefined,
     photoShape: p.photoShape as Profile['photoShape'],
     photoPattern: p.photoPattern as Profile['photoPattern'],
     photoPatternColor: p.photoPatternColor as Profile['photoPatternColor'],
     photoPatternScale: p.photoPatternScale as Profile['photoPatternScale'],
-    photoPatternStrength: p.photoPatternStrength as Profile['photoPatternStrength'],
+    photoPatternStrength:
+      p.photoPatternStrength as Profile['photoPatternStrength'],
     photoHeadEscape: p.photoHeadEscape as Profile['photoHeadEscape'],
     photoGlowStrength: p.photoGlowStrength as Profile['photoGlowStrength'],
     photoOutlineColor: p.photoOutlineColor as Profile['photoOutlineColor'],

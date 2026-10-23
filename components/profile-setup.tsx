@@ -5,8 +5,8 @@ import type { Profile } from '@/lib/domain';
 
 export const setupSteps = [
   'Quem é',
-  'Contactos',
-  'Personalização',
+  'Contactos e links',
+  'Aparência',
   'Rever e publicar',
 ];
 export function ProfileSetupNavigation({
@@ -64,7 +64,9 @@ export function ProfileSetupReview({
     {
       step: 0,
       title: 'A sua apresentação',
-      text: [profile.name, profile.title].filter(Boolean).join(' · '),
+      text: [profile.name, profile.title, profile.bio]
+        .filter(Boolean)
+        .join(' · '),
     },
     {
       step: 1,
@@ -83,7 +85,7 @@ export function ProfileSetupReview({
     },
     {
       step: 2,
-      title: 'Fotografia e apresentação',
+      title: 'Fotografia e aparência',
       text: profile.photoUrl
         ? t('Fotografia adicionada. Confirme o aspecto na pré-visualização.')
         : t('Sem fotografia. Pode publicar assim e adicioná-la mais tarde.'),
