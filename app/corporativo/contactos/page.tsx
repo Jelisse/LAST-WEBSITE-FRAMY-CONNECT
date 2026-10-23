@@ -1,10 +1,8 @@
+import { getTranslations } from '@/lib/server-i18n';
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
 import { CorporateDashboard } from '@/components/corporate-dashboard';
 export const dynamic = 'force-dynamic';
-export const metadata = {
-  title: 'Contactos recebidos | Framy Connect',
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(){const t=await getTranslations();return {title:t('Contactos recebidos'),robots:{index:false,follow:false}};}
 export default async function Page({
   searchParams,
 }: {

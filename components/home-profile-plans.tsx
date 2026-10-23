@@ -1,76 +1,317 @@
 'use client';
 import { useState } from 'react';
-import { PlanFeatureIcon, BasePlanIcon } from './plan-feature-icon';
-import { planFeatures, featureCatalog, type FeatureKey } from '@/lib/plan-features';
-import Link from '@/components/hard-link';
-import { ArrowUpRight, UserRound, BriefcaseBusiness, Building2, ChevronDown } from 'lucide-react';
+import { Check, ArrowUpRight, Users, UserRound, Building2 } from 'lucide-react';
+import Link from './hard-link';
 import { useI18n } from './language-provider';
-import { planPrice, planAnnualMeticais, planMeticais } from '@/lib/plan-pricing';
+import { launchOffers, companyQuote, usdPrice } from '@/lib/launch-offers';
+import { planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
+import { planFeatures } from '@/lib/plan-features';
 import type { ManagedPlan } from '@/lib/domain';
-
-export function HomeProfilePlans({ plans, billingAvailable, annualAvailable = false }: {
-  plans: ManagedPlan[]; billingAvailable: boolean; annualAvailable?: boolean;
+export function HomeProfilePlans({
+  plans,
+  billingAvailable,
+  annualAvailable = false,
+  onSelect,
+  current,
+  busy = false,
+}: {
+  plans: ManagedPlan[];
+  billingAvailable: boolean;
+  annualAvailable?: boolean;
+  onSelect?: (id: string) => void;
+  current?: string;
+  busy?: boolean;
 }) {
   const { t } = useI18n();
   const [cycle, setCycle] = useState<'monthly' | 'annual'>('monthly');
-  const individual = plans.filter(p => p.id !== 'free-30' && p.id !== 'corporate' && p.active).sort((a,b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
-  return <section data-cycle={cycle} className="home-plan-comparison" aria-label={t('Planos para o seu perfil digital')}>
-    <fieldset className="home-plan-cycle" aria-label={t('Periodicidade')}>
-      <button type="button" aria-pressed={cycle === 'monthly'} onClick={() => setCycle('monthly')}>{t('Mensal')}</button>
-      <button type="button" aria-pressed={cycle === 'annual'} onClick={() => setCycle('annual')}>{t('Anual')}</button>
-    </fieldset>
-    <div className="home-solutions-grid home-profile-plans">
-      {individual.map(plan => {
-        const recommended = plan.id === 'professional-v2';
-        const Icon = recommended ? BriefcaseBusiness : UserRound;
-        const enabled = planFeatures(plan);
-        const annual = cycle === 'annual' ? plan.annualEnabled !== false : plan.monthlyEnabled === false;
-        const available = plan.id==='personal' || (annual ? plan.annualEnabled !== false : plan.monthlyEnabled !== false);
-        const yearly = planAnnualMeticais(plan), monthly = planMeticais(plan);
-        const savings = Math.max(0, monthly * 12 - yearly);
-        const basic = [
-          `${t('Até ')}${plan.links}${t(' links à sua escolha')}`,
-          plan.bio > 0 ? t('Biografia até {0} caracteres', [plan.bio]) : t('Contactos essenciais, sem biografia'),
-          ...['Fotografia, nome e título no perfil','Email e telefone com controlo de visibilidade','Cores personalizadas e dois estilos de perfil','Links para redes sociais, website e portefólio','Partilha por link, NFC e código QR','Guardar contacto no telemóvel (vCard)','Actualizar os dados sem substituir o produto','Cartão e porta-chaves ligados ao mesmo perfil.'].map(f => t(f)),
-          ...(plan.benefits ?? []),
-        ];
-        const advanced = (Object.keys(featureCatalog) as FeatureKey[]).filter(k => k !== 'domain' && enabled[k]);
-        const highlights = plan.id === 'personal' ? [0,1,6,7] : [0,1];
-        const toolHighlights = plan.id === 'personal' ? [] : advanced.filter(k => ['whatsapp','location','teams'].includes(k));
-        return <article className={`home-solution home-profile-plan${recommended ? ' is-recommended' : ''}`} key={plan.id}>
-          <div className="home-solution-label">{t(recommended ? 'Recomendado para profissionais' : 'Para o seu dia a dia')}</div>
-          <div className="home-solution-copy">
-            <div className="compact-plan-title"><Icon size={28} aria-hidden="true" /><h3>{t(plan.name)}</h3></div>
-            <p className="home-plan-description">{t(plan.description)}</p>
-            <div className="home-solution-price" aria-live="polite" aria-atomic="true">
-              <strong>{plan.id==='personal'?t('Gratuito'):available ? planPrice(annual ? {meticais:yearly} : plan, t.locale) : t('Sob consulta')}<small>{plan.id!=='personal' && available && t(annual ? ' / ano' : ' / mês')}</small></strong>
-              <span>{plan.id==='personal'?t('Sem prazo'):t('Por perfil')}{annual && available && ` · ${t('Total cobrado anualmente')}`}</span>
-              {annual && available && savings > 0 && <span className="home-plan-savings">{t('Poupe {0} por ano', [planPrice({meticais:savings}, t.locale)])}{monthly > 0 && Math.abs(savings - monthly * 2) < 0.01 && <> · {t('Equivalente a 2 meses')}</>}</span>}
-              <small>{plan.id==='personal'?t('Sem prazo'):!billingAvailable || (annual && !annualAvailable) ? t('Adesões em breve') : t('Sem renovação automática')}</small>
-            </div>
-            <Link className={recommended ? 'home-primary' : 'home-secondary'} href="/perfil?plans=1">{t(recommended ? 'Escolher Profissional' : plan.id === 'personal' ? 'Escolher Individual' : 'Explorar plano')}<ArrowUpRight size={18} aria-hidden="true" /></Link>
-            <ul className="home-plan-inclusions home-plan-highlights">
-              {highlights.map(i => <li key={i}><BasePlanIcon index={i}/><span>{basic[i]}</span></li>)}
-              {toolHighlights.map(k => <li key={k}><PlanFeatureIcon feature={k}/><span>{t(featureCatalog[k])}</span></li>)}
-            </ul>
-            <details className="home-plan-details">
-              <summary>{t('Ver todas as funcionalidades')}<ChevronDown size={16} aria-hidden="true" /></summary>
-              <ul className="home-plan-inclusions">{basic.map((feature,index) => <li key={feature}><BasePlanIcon index={index}/><span>{feature}</span></li>)}</ul>
-              {plan.id !== 'personal' && <><p className="home-plan-feature-heading">{t('Ferramentas profissionais')}</p><ul className="home-plan-inclusions home-plan-advanced">{advanced.map(k => <li key={k}><PlanFeatureIcon feature={k}/><span>{t(featureCatalog[k])}</span></li>)}</ul></>}
-            </details>
-          </div>
-        </article>;
-      })}
-      {!individual.some(p=>p.id==='corporate') && <article className="home-solution home-profile-plan">
-        <div className="home-solution-label">{t('Para empresas e equipas')}</div>
-        <div className="home-solution-copy">
-          <div className="compact-plan-title"><Building2 size={28} aria-hidden="true"/><h3>{t('Corporativo')}</h3></div>
-          <p className="home-plan-description">{t('Perfis e ferramentas à medida da sua organização.')}</p>
-          <div className="home-solution-price"><strong>{t('Sob consulta')}</strong><span>{t('Uma solução à medida da sua equipa')}</span></div>
-          <Link className="home-secondary" href="/corporativo/configurar">{t('Configurar a minha empresa')}<ArrowUpRight size={18} aria-hidden="true"/></Link>
-          <ul className="home-plan-inclusions home-plan-highlights">{['Número de perfis e limites definidos na proposta','Funcionalidades digitais acordadas na proposta','Cartões, porta-chaves e materiais a escolher','Design e apoio à configuração a combinar','Preço e condições de renovação sob consulta'].map((f,i) => <li key={f}><BasePlanIcon index={i} corporate/><span>{t(f)}</span></li>)}</ul>
+  const [seats, setSeats] = useState(5);
+  const professional = plans.find(
+    (p) => p.id === 'professional-v2' && p.active,
+  );
+  const personal = plans.find((p) => p.id === 'personal');
+  const annual = cycle === 'annual';
+  const quote = companyQuote(
+    seats <= 50 ? 'business' : 'enterprise',
+    seats,
+    cycle,
+  );
+  const benefits: Record<string, { title: string; items: string[] }[]> = {
+    personal: [
+      {
+        title: 'Perfil e partilha',
+        items: [
+          `${personal?.links ?? 8} links à sua escolha`,
+          `${personal?.bio ?? 200} caracteres de biografia`,
+          'Email, telefone, WhatsApp e redes sociais',
+          'Partilha por link, NFC e código QR',
+          'Guardar contacto no telemóvel (vCard)',
+        ],
+      },
+    ],
+    'professional-v2': [
+      {
+        title: 'Tudo no Personal, mais',
+        items: [
+          `${professional?.links ?? 20} links à sua escolha`,
+          `${professional?.bio ?? 600} caracteres de biografia`,
+          ...(professional && planFeatures(professional).showcase
+            ? ['Vitrine com até 6 produtos ou serviços']
+            : []),
+          ...(professional && planFeatures(professional).whatsapp
+            ? ['WhatsApp com mensagem personalizada']
+            : []),
+          ...(professional && planFeatures(professional).location
+            ? ['Morada, direcções e horário']
+            : []),
+        ],
+      },
+      {
+        title: 'Contactos e resultados',
+        items: [
+          ...(professional && planFeatures(professional).enquiries
+            ? ['Formulário de contacto e caixa de entrada']
+            : []),
+          ...(professional && planFeatures(professional).analytics
+            ? ['Estatísticas de visitas e cliques']
+            : []),
+        ],
+      },
+    ],
+    business: [
+      {
+        title: 'Perfis e equipa',
+        items: [
+          'Perfis Professional incluídos na proposta',
+          'Convites e permissões de colaboradores',
+          'Organização por equipas',
+        ],
+      },
+      {
+        title: 'Campanhas e contactos',
+        items: [
+          'Campanhas e contactos com consentimento',
+          'Relatórios da equipa e exportação CSV',
+          'Configuração inicial incluída',
+        ],
+      },
+    ],
+    enterprise: [
+      {
+        title: 'Tudo no Business, mais',
+        items: [
+          'Capacidade e condições acordadas em contrato',
+          'Apoio à entrada e ao lançamento da equipa',
+          'Contacto Framy designado',
+          'Integrações e formação sob orçamento',
+        ],
+      },
+    ],
+  };
+  return (
+    <section
+      className="launch-pricing"
+      aria-label={t('Planos para o seu perfil digital')}
+    >
+      <fieldset className="launch-cycle" aria-label={t('Periodicidade')}>
+        <button
+          type="button"
+          aria-pressed={!annual}
+          onClick={() => setCycle('monthly')}
+        >
+          {t('Mensal')}
+        </button>
+        <button
+          type="button"
+          aria-pressed={annual}
+          onClick={() => setCycle('annual')}
+        >
+          {t('Anual')} <span>{t('2 meses grátis')}</span>
+        </button>
+      </fieldset>
+      <div className="launch-audiences">
+        <div>
+          <h3>{t('Para indivíduos')}</h3>
+          <p>{t('Uma pessoa. O seu perfil.')}</p>
         </div>
-      </article>}
-    </div>
-  </section>;
+        <div>
+          <h3>{t('Para organizações')}</h3>
+          <p>{t('Perfis e ferramentas para a sua equipa.')}</p>
+        </div>
+      </div>
+      <div className="launch-grid">
+        {launchOffers.map((offer, index) => {
+          const company = index > 1;
+          const free = index === 0;
+          const price = annual ? offer.annualCents : offer.monthlyCents;
+          const plan = free ? personal : professional;
+          const canBuy =
+            !!plan &&
+            (free ||
+              (billingAvailable &&
+                (annual
+                  ? annualAvailable && plan.annualEnabled !== false
+                  : plan.monthlyEnabled !== false)));
+          const label = free
+            ? 'Começar gratuitamente'
+            : company
+              ? 'Pedir proposta'
+              : 'Escolher Profissional';
+          return (
+            <article
+              key={offer.id}
+              className={`launch-card launch-${offer.id}${index === 2 ? ' launch-popular' : ''}`}
+            >
+              <div className="launch-card-title">
+                <h3>{offer.name}</h3>
+                {index === 2 && (
+                  <span className="launch-badge">{t('Mais popular')}</span>
+                )}
+              </div>
+              <p className="launch-users">
+                {company ? <Users size={19} /> : <UserRound size={19} />}{' '}
+                {company
+                  ? `${offer.min}–${offer.max} ${t('colaboradores')}`
+                  : t('1 pessoa')}
+              </p>
+              <div className="launch-price">
+                <strong>
+                  {free ? (
+                    t('Gratuito')
+                  ) : (
+                    <>
+                      {' '}
+                      {index === 3 && <small>{t('A partir de')} </small>}
+                      {usdPrice(price)}
+                    </>
+                  )}
+                </strong>
+                <span>
+                  {free
+                    ? t('Para sempre')
+                    : t(
+                        company
+                          ? annual
+                            ? 'por colaborador / ano'
+                            : 'por colaborador / mês'
+                          : annual
+                            ? 'por ano'
+                            : 'por mês',
+                      )}
+                </span>
+              </div>
+              <p className="launch-position">
+                {t(
+                  [
+                    'Os seus contactos e redes sociais, num só lugar.',
+                    'Apresente os seus serviços, portefólio e trabalho.',
+                    'Organize a sua equipa e acompanhe cada conexão.',
+                    'Uma implementação à medida da sua organização.',
+                  ][index],
+                )}
+              </p>
+              {onSelect && !company && canBuy ? (
+                <button
+                  type="button"
+                  className="launch-cta"
+                  disabled={busy || current === offer.id}
+                  onClick={() => onSelect(offer.id)}
+                >
+                  {t(current === offer.id ? 'Plano actual' : label)}
+                  <ArrowUpRight size={16} />
+                </button>
+              ) : (
+                <Link
+                  className="launch-cta"
+                  href={
+                    company
+                      ? `/corporativo/configurar?offer=${offer.id}`
+                      : free
+                        ? '/perfil?plans=1'
+                        : canBuy
+                          ? '/perfil?plans=1'
+                          : '/contacto'
+                  }
+                >
+                  {t(
+                    !company && !free && !canBuy ? 'Contactar a Framy' : label,
+                  )}
+                  <ArrowUpRight size={16} />
+                </Link>
+              )}
+              <p className="launch-local">
+                {free
+                  ? t('Sem cartão de crédito. Sem prazo.')
+                  : company
+                    ? t('Proposta e facturação aprovadas pela Framy.')
+                    : plan
+                      ? t('Pagamento em Moçambique: {0}', [
+                          planPrice(
+                            annual
+                              ? { meticais: planAnnualMeticais(plan) }
+                              : plan,
+                            t.locale,
+                          ),
+                        ])
+                      : t('Pagamento local sob confirmação.')}
+              </p>
+              {benefits[offer.id].map((group) => (
+                <div className="launch-features" key={group.title}>
+                  <h4>{t(group.title)}</h4>
+                  <ul>
+                    {group.items.map((item) => (
+                      <li key={item}>
+                        <Check size={15} aria-hidden="true" />
+                        <span>{t(item)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </article>
+          );
+        })}
+      </div>
+      <div className="launch-estimator">
+        <div>
+          <Building2 size={22} />
+          <h3>{t('Calcule a sua equipa')}</h3>
+        </div>
+        <label>
+          {t('Perfis de colaboradores')}
+          <input
+            type="number"
+            min={3}
+            max={500}
+            value={seats}
+            onChange={(event) => {
+              const n = Number(event.target.value);
+              setSeats(Number.isInteger(n) ? Math.min(500, Math.max(3, n)) : 3);
+            }}
+          />
+        </label>
+        <p aria-live="polite" aria-atomic="true">
+          <strong>
+            {seats <= 50 ? 'Business' : 'Enterprise'} ·{' '}
+            {seats > 50 && t('A partir de')} {usdPrice(quote.totalCents)} /{' '}
+            {t(annual ? 'ano' : 'mês')}
+          </strong>
+          <span>
+            {t(
+              'Uma conta de proprietário para administração incluída. O perfil do proprietário conta como lugar pago, se necessário.',
+            )}
+          </span>
+        </p>
+      </div>
+      <p className="launch-notes">
+        {t(
+          'Preços de referência em USD. Em Moçambique, o pagamento usa os valores em meticais publicados pela gestão. Impostos aplicáveis são indicados na proposta ou no pagamento. Produtos NFC, entrega e design personalizado são pagos separadamente.',
+        )}
+      </p>
+      <p className="launch-notes">
+        {t(
+          'Sem débito automático. Empresas: confirme o número de perfis e a proposta com a Framy. CRM, Wallet, leitura de cartões e início de sessão empresarial não estão incluídos no lançamento.',
+        )}
+      </p>
+    </section>
+  );
 }

@@ -1,4 +1,7 @@
 'use client';
+import { AppSidebarContents } from './app-sidebar';
+import { AppSidebarDrawer } from './app-sidebar-drawer';
+import { OrderFulfilment } from './order-fulfilment';
 
 import { focusDashboardStart } from '@/lib/dashboard-navigation';
 import { AmbassadorDashboard } from './ambassador-dashboard';
@@ -35,7 +38,11 @@ type Data = {
   }[];
   reports: AgentReport[];
 };
-export function AgentWorkspace({ displayName }: { displayName: string }) {
+export function AgentWorkspace({
+  displayName: _displayName,
+}: {
+  displayName: string;
+}) {
   const { t } = useI18n();
   const date = (value: string) =>
     new Date(value).toLocaleString(t.locale, { timeZone: 'Africa/Maputo' });
@@ -113,18 +120,59 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
     setReportType('incident');
     setTab('reports');
   }
+  const sidebar = (
+    <AppSidebarContents
+      badge="Agente"
+      groups={[
+        {
+          label: 'O seu trabalho',
+          items: [
+            ['orders', 'Pedidos'],
+            ['stock', 'O meu stock'],
+            ['reports', 'Relatórios e alertas'],
+            ['ambassadors', 'Embaixador'],
+          ].map(([id, label]) => ({
+            id,
+            label,
+            icon:
+              id === 'orders' ? (
+                <Package size={21} />
+              ) : id === 'stock' ? (
+                <Boxes size={21} />
+              ) : (
+                <ClipboardList size={21} />
+              ),
+            active: tab === id,
+            onSelect: () => {
+              setTab(id as typeof tab);
+              focusDashboardStart();
+            },
+          })),
+        },
+      ]}
+    />
+  );
   return (
-    <main id="main" className="agent-workspace">
+    <main id="main" className="agent-workspace agent-sidebar-layout">
       <header className="agent-header">
-        <DashboardTools />
+        <DashboardTools
+          navigation={<AppSidebarDrawer>{sidebar}</AppSidebarDrawer>}
+        />
       </header>
+      <aside className="app-sidebar agent-app-sidebar">{sidebar}</aside>
       <div className="agent-intro">
-        <p className="agent-eyebrow">{t('Operações · Agente de execução')}</p>
         <h1>
-          {t('Olá, ')}
-          {displayName}
+          {t(
+            (
+              {
+                orders: 'Pedidos',
+                stock: 'O meu stock',
+                reports: 'Relatórios e alertas',
+                ambassadors: 'Embaixador',
+              } as Record<string, string>
+            )[tab] ?? 'Pedidos',
+          )}
         </h1>
-        <p>{t('Os seus pedidos, produção, entregas e stock num só lugar.')}</p>
       </div>
       <section className="agent-metrics" aria-label={t('Resumo de trabalho')}>
         {[
@@ -154,7 +202,10 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
               type="button"
               key={id}
               aria-pressed={tab === id}
-              onClick={() => {setTab(id);focusDashboardStart();}}
+              onClick={() => {
+                setTab(id);
+                focusDashboardStart();
+              }}
             >
               {id === 'orders' ? (
                 <Package size={18} aria-hidden="true" />
@@ -188,6 +239,7 @@ export function AgentWorkspace({ displayName }: { displayName: string }) {
       {notice && <output className="agent-notice">{t(notice)}</output>}
       {!data && !error && <output>{t('A carregar as suas operações…')}</output>}
       {tab === 'ambassadors' && <AmbassadorDashboard />}
+      {tab === 'orders' && <OrderFulfilment />}
       {tab === 'orders' && (
         <section className="agent-panel">
           <div className="agent-section-heading">

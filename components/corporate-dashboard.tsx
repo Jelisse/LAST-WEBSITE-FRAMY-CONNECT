@@ -1,6 +1,9 @@
 'use client';
+import { CompanyTools, type CompanyToolView } from './company-tools';
+import { CompanyCards } from './company-cards';
+import { CompanyFollowups, type CompanyLead } from './company-followups';
 import { CorporateSidebar } from './corporate-sidebar';
-import { Building2, Users, ArrowRight } from 'lucide-react';
+import { Users, ArrowRight } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from './hard-link';
 import { focusDashboardStart } from '@/lib/dashboard-navigation';
@@ -13,7 +16,6 @@ import {
 import { CorporateEmailInvites } from './corporate-email-invites';
 import { CorporateCredentials } from './corporate-credentials';
 import { SourceImage } from './source-image';
-import { csvCell } from '@/lib/site-analytics';
 import { DashboardTools } from './mobile-navigation';
 import { useI18n } from './language-provider';
 type Member = {
@@ -63,16 +65,7 @@ type Detail = {
     target: string;
     count: number;
   }[];
-  leads: {
-    id: string;
-    account_id: string;
-    campaign_id: string;
-    name: string;
-    email: string;
-    phone: string;
-    interest: string;
-    created_at: number;
-  }[];
+  leads: CompanyLead[];
   invites: {
     id: string;
     email: string;
@@ -95,6 +88,12 @@ export function CorporateDashboard({
   initialCampaign?: string;
 }) {
   const { t, locale } = useI18n();
+  const isTool = [
+    'signatures',
+    'backgrounds',
+    'directory',
+    'integrations',
+  ].includes(view);
   const [data, setData] = useState<Data | null>(null),
     [detail, setDetail] = useState<Detail | null>(null),
     [organisation, setOrganisation] = useState(initialOrganisation),
@@ -106,6 +105,7 @@ export function CorporateDashboard({
     [copied, setCopied] = useState('');
   const [qr, setQr] = useState<{ id: string; image: string } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [toolsRevision, setToolsRevision] = useState(0);
   const [teamFilter, setTeamFilter] = useState('');
   const [inviteMode, setInviteMode] = useState<'invite' | 'authorization'>(
     'invite',
@@ -122,7 +122,7 @@ export function CorporateDashboard({
     setNow(Date.now());
     if (!organisation && body.organisations.length)
       setOrganisation(body.organisations[0].id);
-    if (organisation && view !== 'reports' && view !== 'guide') {
+    if (organisation && view !== 'reports' && view !== 'guide' && !isTool) {
       const r = await fetch(
         '/api/corporate?' + new URLSearchParams({ organisation, days }),
         { cache: 'no-store' },
@@ -135,7 +135,7 @@ export function CorporateDashboard({
       }
       setDetail(b);
     }
-  }, [organisation, days, view]);
+  }, [organisation, days, view, isTool]);
   useEffect(() => {
     let cancelled = false;
     queueMicrotask(() => {
@@ -218,31 +218,6 @@ export function CorporateDashboard({
           detail.members.find((m) => m.account_id === l.account_id)?.team ===
             teamFilter),
     ) ?? [];
-  function exportResults() {
-    if (!detail) return;
-    const rows = [
-      ['Nome', 'Email', 'Telefone', 'Interesse', 'Trabalhador', 'Data'],
-      ...leads.map((l) => [
-        l.name,
-        l.email,
-        l.phone,
-        l.interest,
-        detail.members.find((m) => m.account_id === l.account_id)?.name ?? '',
-        new Date(l.created_at).toISOString(),
-      ]),
-    ];
-    const url = URL.createObjectURL(
-      new Blob(
-        ['\ufeff' + rows.map((r) => r.map(csvCell).join(',')).join('\r\n')],
-        { type: 'text/csv;charset=utf-8' },
-      ),
-    );
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'framy-contactos.csv';
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
 
   return (
     <main
@@ -252,31 +227,16 @@ export function CorporateDashboard({
       }
     >
       <header>
-        <DashboardTools />
+        <DashboardTools navigation={null} />
       </header>
       <CorporateSidebar current={view} organisation={organisation} />
       <div className="corporate-content">
         <div className="corporate-hero">
-          <span className="corporate-eyebrow">
-            <Building2 size={18} aria-hidden="true" /> FRAMY CONNECT ·{' '}
-            {t('Corporativo')}
-          </span>
           <h1>
             {t(corporateSections.find((section) => section.id === view)!.title)}
           </h1>
-          <p>{t('Uma equipa. Mais conexões.')}</p>
         </div>
 
-        {view !== 'reports' && (
-          <>
-            {' '}
-            <p>
-              {t(
-                'Organize trabalhadores e campanhas. Acompanhe apenas a actividade recolhida para a organização.',
-              )}
-            </p>
-          </>
-        )}
         {error && <p role="alert">{t(error)}</p>}
         {notice && <output>{t(notice)}</output>}
         {!data ? (
@@ -291,6 +251,15 @@ export function CorporateDashboard({
                     value={organisation}
                     disabled={busy}
                     onChange={(e) => {
+                      if (
+                        document.querySelector(
+                          '[data-company-unsaved="true"]',
+                        ) &&
+                        !window.confirm(
+                          t('Descartar alterações não guardadas?'),
+                        )
+                      )
+                        return;
                       setOrganisation(e.target.value);
                       focusDashboardStart();
                       setDetail(null);
@@ -313,10 +282,21 @@ export function CorporateDashboard({
                     <button
                       disabled={busy || refreshing}
                       onClick={async () => {
+                        if (
+                          isTool &&
+                          document.querySelector(
+                            '[data-company-unsaved="true"]',
+                          ) &&
+                          !window.confirm(
+                            t('Descartar alterações não guardadas?'),
+                          )
+                        )
+                          return;
                         setRefreshing(true);
                         setError('');
                         try {
                           await load();
+                          if (isTool) setToolsRevision((x) => x + 1);
                           setNotice('Dados actualizados.');
                         } catch (e) {
                           setError(
@@ -404,7 +384,17 @@ export function CorporateDashboard({
               />
             )}
             {view === 'guide' && <CorporateGuide organisation={organisation} />}
-            {detail && view !== 'reports' && view !== 'guide' && (
+            {view === 'cards' && organisation && (
+              <CompanyCards key={organisation} organisation={organisation} />
+            )}
+            {isTool && organisation && (
+              <CompanyTools
+                key={organisation + view + toolsRevision}
+                organisation={organisation}
+                view={view as CompanyToolView}
+              />
+            )}
+            {detail && view !== 'reports' && view !== 'guide' && !isTool && (
               <>
                 <h2>{detail.organisation.name}</h2>
                 {detail.organisation.analytics === false && (
@@ -511,9 +501,6 @@ export function CorporateDashboard({
                           ))}
                         </select>
                       </label>
-                      <button onClick={exportResults}>
-                        {t('Exportar contactos CSV')}
-                      </button>
                     </div>
                   </>
                 )}
@@ -913,65 +900,22 @@ export function CorporateDashboard({
                   </>
                 )}
                 {view === 'contacts' && (
-                  <>
-                    <section className="corporate-panel">
-                      <h2>{t('Contactos recebidos')}</h2>
-                      <p>
-                        {t(
-                          'Dados enviados voluntariamente para esta organização. Disponíveis durante 90 dias.',
-                        )}
-                      </p>
-                      <p>
-                        {t('Contactos apresentados: {0}.', [leads.length])}{' '}
-                        {t(
-                          'O CSV contém os contactos apresentados, com os filtros activos.',
-                        )}
-                      </p>
-                      <div className="corporate-table">
-                        <table>
-                          <thead>
-                            <tr>
-                              {[
-                                'Nome',
-                                'Email',
-                                'Telefone',
-                                'Interesse',
-                                'Trabalhador',
-                                'Data',
-                              ].map((k) => (
-                                <th key={k}>{t(k)}</th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {leads.map((l) => (
-                              <tr key={l.id}>
-                                <td>{l.name}</td>
-                                <td>{l.email}</td>
-                                <td>{l.phone}</td>
-                                <td>{l.interest}</td>
-                                <td>
-                                  {
-                                    detail.members.find(
-                                      (m) => m.account_id === l.account_id,
-                                    )?.name
-                                  }
-                                </td>
-                                <td>
-                                  {new Date(l.created_at).toLocaleDateString(
-                                    locale,
-                                    {
-                                      timeZone: 'Africa/Maputo',
-                                    },
-                                  )}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </section>
-                  </>
+                  <CompanyFollowups
+                    key={organisation}
+                    organisation={organisation}
+                    leads={leads}
+                    leader={!!leader}
+                    campaignNames={Object.fromEntries(
+                      detail.campaigns.map((c) => [c.id, c.name]),
+                    )}
+                    memberNames={Object.fromEntries(
+                      detail.members.map((member) => [
+                        member.account_id,
+                        member.name,
+                      ]),
+                    )}
+                    onSaved={load}
+                  />
                 )}
               </>
             )}

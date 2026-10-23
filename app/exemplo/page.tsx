@@ -12,7 +12,7 @@ export default async function ExampleProfile() {
   const t = await getTranslations();
   return (
     <main id="main" className="standalone-mobile-profile demo-mobile-profile">
-      <MobileProfile demoConnectionLabel="12k" published measure={false} profile={demoProfile(t)} />
+      <MobileProfile  published measure={false} profile={demoProfile(t)} />
     </main>
   );
 }

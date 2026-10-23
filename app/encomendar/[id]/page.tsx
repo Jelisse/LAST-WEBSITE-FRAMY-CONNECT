@@ -5,7 +5,7 @@ import { getManagedPlans } from '@/lib/server-plans';
 import { publicProduct } from '@/lib/catalog';
 import { notFound, redirect } from 'next/navigation';
 import { productCheckoutEnabled } from '@/lib/server-checkout';
-import { SiteHeader, SiteFooter } from '@/components/site-shell';
+import { SiteHeader } from '@/components/site-shell';
 import { OrderSubmission } from '@/components/order-submission';
 import '../../purchase-progress.css';
 export const dynamic = 'force-dynamic';
@@ -43,7 +43,6 @@ export default async function Page({
           account={user ? { id: user.userId, name: user.displayName } : null}
         />
       </main>
-      <SiteFooter compact />
     </>
   );
 }

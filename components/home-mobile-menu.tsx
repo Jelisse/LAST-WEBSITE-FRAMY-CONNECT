@@ -1,5 +1,6 @@
 'use client';
 
+import { publicNavigation } from '@/lib/public-navigation';
 import { Menu } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import Link from './hard-link';
@@ -8,7 +9,9 @@ import { LanguageSelector, useI18n } from './language-provider';
 export function HomeMobileMenu() {
   const { t } = useI18n();
   const ref = useRef<HTMLDetailsElement>(null);
-  const close = () => { if (ref.current) ref.current.open = false; };
+  const close = () => {
+    if (ref.current) ref.current.open = false;
+  };
   useEffect(() => {
     const dismiss = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && ref.current?.open) {
@@ -17,7 +20,8 @@ export function HomeMobileMenu() {
       }
     };
     const outside = (event: PointerEvent) => {
-      if (event.target instanceof Node && !ref.current?.contains(event.target)) close();
+      if (event.target instanceof Node && !ref.current?.contains(event.target))
+        close();
     };
     document.addEventListener('keydown', dismiss);
     document.addEventListener('pointerdown', outside);
@@ -28,14 +32,35 @@ export function HomeMobileMenu() {
   }, []);
   return (
     <details ref={ref} className="home-mobile-menu">
-      <summary aria-label={t('Navegação principal')}><Menu size={23} aria-hidden="true" /></summary>
+      <summary aria-label={t('Navegação principal')}>
+        <Menu size={23} aria-hidden="true" />
+      </summary>
       <div className="home-mobile-panel">
         <nav aria-label={t('Navegação principal')}>
-          <a href="#como-funciona" onClick={close}>{t('Como funciona')}</a>
-          <a href="#produtos" onClick={close}>{t('Produtos')}</a>
-          <a href="#planos" onClick={close}>{t('Planos')}</a>
-          <a href="#sobre" onClick={close}>{t('Sobre nós')}</a>
-          <Link href="/aplicar" onClick={close}>{t('Tornar-se agente')}</Link>
+          <Link href="/porque-framy" onClick={close}>
+            {t('Porquê Framy Connect')}
+          </Link>
+          <Link href="/para-empresas" onClick={close}>
+            {t('Para empresas')}
+          </Link>
+          <Link href="/#planos" onClick={close}>
+            {t('Planos')}
+          </Link>
+          {publicNavigation.map((section) => (
+            <details className="mobile-nav-group" key={section.id}>
+              <summary>{t(section.label)}</summary>
+              {section.groups.map((group) => (
+                <div key={group.label}>
+                  <strong>{t(group.label)}</strong>
+                  {group.links.map((link) => (
+                    <Link key={link.label} href={link.href} onClick={close}>
+                      {t(link.label)}
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </details>
+          ))}
         </nav>
         <LanguageSelector />
       </div>

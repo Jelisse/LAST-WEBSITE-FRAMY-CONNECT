@@ -1,10 +1,14 @@
+import './order-tracking.css';
 import './profile-growth.css';
 import { getTranslations } from '@/lib/server-i18n';
 import type { Metadata } from 'next';
 import { publicPageRobots, siteURL } from '@/lib/server-site';
 import { Poppins } from 'next/font/google';
 import { getLocale } from '@/lib/server-i18n';
-import { LanguageProvider, SkipToContentLink } from '@/components/language-provider';
+import {
+  LanguageProvider,
+  SkipToContentLink,
+} from '@/components/language-provider';
 import './globals.css';
 import './footer.css';
 import './products.css';
@@ -23,8 +27,17 @@ import './profile-portfolio.css';
 import './profile-name-fonts.css';
 import './dashboard-navigation.css';
 import './corporate.css';
+import './launch-pricing.css';
+import './profile-setup.css';
+import './company-launch.css';
+import './company-tools.css';
+import './public-marketing.css';
+import './experience-harmony.css';
+import './ajuda/style.css';
+import './support-experience.css';
+import { SupportPanel } from '@/components/support-panel';
 import { InternalPageChrome } from '@/components/internal-page-chrome';
-import { SiteHeader, SiteFooter } from '@/components/site-shell';
+import { SiteHeader } from '@/components/site-shell';
 import { SiteAnalyticsTracker } from '@/components/site-analytics-tracker';
 const poppins = Poppins({
   weight: ['400', '500', '600', '700', '800'],
@@ -68,12 +81,10 @@ export default async function RootLayout({
       <body className={poppins.variable}>
         <LanguageProvider locale={locale}>
           <SkipToContentLink />
-          <InternalPageChrome
-            header={<SiteHeader focused />}
-            footer={<SiteFooter compact />}
-          >
+          <InternalPageChrome header={<SiteHeader focused />}>
             {children}
           </InternalPageChrome>
+          <SupportPanel />
           <SiteAnalyticsTracker />
         </LanguageProvider>
       </body>

@@ -6,10 +6,16 @@ export const metadata = {
   title: 'Configurar empresa | Framy Connect',
   robots: { index: false, follow: false },
 };
-export default async function Page() {
-  await requireChatGPTUser('/corporativo/configurar');
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ offer?: string }>;
+}) {
+  const requested = (await searchParams).offer;
+  const offer = requested === 'enterprise' ? 'enterprise' : 'business';
+  await requireChatGPTUser(`/corporativo/configurar?offer=${offer}`);
   const products = (await getProducts())
     .filter((p) => p.published !== false && p.available)
     .map(({ id, name }) => ({ id, name }));
-  return <CorporateSetup products={products} />;
+  return <CorporateSetup products={products} initialOffer={offer} />;
 }

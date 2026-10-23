@@ -9,6 +9,7 @@ type Info = {
   organisation: string;
   campaign: string;
   username: string | null;
+  cardUrl?: string | null;
 };
 export function CorporateCampaign({ id }: { id: string }) {
   const { t } = useI18n();
@@ -42,12 +43,12 @@ export function CorporateCampaign({ id }: { id: string }) {
         <>
           <h2>{info.name}</h2>
           <p>{info.campaign}</p>
-          {info.username && (
+          {(info.cardUrl || info.username) && (
             <Link
               className="btn btn-primary"
               href={
-                '/' +
-                encodeURIComponent(info.username) +
+                (info.cardUrl ||
+                  '/' + encodeURIComponent(info.username || '')) +
                 '?corporate=' +
                 encodeURIComponent(id)
               }

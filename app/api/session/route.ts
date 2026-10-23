@@ -4,7 +4,12 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const user = await getChatGPTUser();
   return Response.json(
-    { dashboard: user ? dashboardFor(user.role) : null },
+    {
+      dashboard: user ? dashboardFor(user.role) : null,
+      account: user
+        ? { name: user.fullName ?? user.displayName, email: user.email }
+        : null,
+    },
     { headers: { 'Cache-Control': 'no-store' } },
   );
 }

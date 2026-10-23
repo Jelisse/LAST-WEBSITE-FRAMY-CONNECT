@@ -1,7 +1,7 @@
 import { env } from 'cloudflare:workers';
 import { paysuiteReady } from '@/lib/server-paysuite';
 import type { CheckoutPricing } from '@/lib/checkout-pricing';
-import { SiteHeader, SiteFooter } from '@/components/site-shell';
+import { SiteHeader } from '@/components/site-shell';
 import { PurchaseConfigurator } from '@/components/purchase-configurator';
 import { getTranslations } from '@/lib/server-i18n';
 import { getProducts } from '@/lib/server-catalog';
@@ -73,7 +73,6 @@ export default async function Page({
           signedIn={!!user}
         />
       </main>
-      <SiteFooter compact />
     </>
   );
 }

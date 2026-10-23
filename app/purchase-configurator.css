@@ -65,7 +65,7 @@
 }
 .purchase-page h1 {
   font-size: clamp(28px, 4vw, 48px);
-  max-width: 850px;
+  max-width: none;
   line-height: 1.15;
 }
 .purchase-maintenance {
@@ -417,7 +417,7 @@ fieldset.purchase-section {
 /* A quieter, consistent product configuration surface. */
 .purchase-page { max-width:1440px; margin-inline:auto; padding-top:36px; }
 .purchase-page h1 { margin:10px 0 14px; letter-spacing:-.035em; font-size:clamp(28px,3.4vw,44px); }
-.purchase-page .page-intro { max-width:740px; color: #71655c; line-height:1.65; }
+.purchase-page .page-intro { max-width: none; color: #71655c; line-height:1.65; }
 .purchase-page > .home-text-link { display:inline-flex; margin-top:6px; font-size:14px; }
 .purchase-layout { grid-template-columns:minmax(0,1fr) 350px; gap:24px; }
 .purchase-section { box-shadow:0 6px 24px #48250c04; border-color: #e9dfd5; scroll-margin-top:112px; }

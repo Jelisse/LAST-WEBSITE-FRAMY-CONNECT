@@ -1,8 +1,14 @@
+import { rateLimit } from '@/lib/request-limits';
+import { guestSession } from '@/lib/guest-checkout';
 import { reserveUpload, releaseUpload } from '@/lib/server-upload-quota';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { env } from 'cloudflare:workers';
 export async function POST(request: Request) {
-  const user = await getChatGPTUser();
+  const account = await getChatGPTUser();
+  const session = !account ? await guestSession(request) : null;
+  const user =
+    account ??
+    (session ? { userId: 'guest:' + session.id, role: 'guest' } : null);
   if (!user)
     return Response.json(
       { error: 'Inicie sessão para guardar o design.' },
@@ -11,6 +17,11 @@ export async function POST(request: Request) {
   if (request.headers.get('origin') !== new URL(request.url).origin)
     return Response.json({ error: 'Origem inválida.' }, { status: 403 });
   try {
+    if (session && !(await rateLimit(request, 'guest-design-upload', 20)))
+      return Response.json(
+        { error: 'Aguarde antes de tentar novamente.' },
+        { status: 429 },
+      );
     if (!env.PROFILE_PHOTOS) throw Error('Armazenamento indisponível.');
     const reader = request.body?.getReader();
     if (!reader) throw Error('Ficheiro em falta.');

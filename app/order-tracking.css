@@ -1,0 +1,34 @@
+.payment-connecting { display:flex; align-items:center; gap:16px; padding:18px; background:#fff4e9; border:1px solid #f3bc91; border-radius:14px; margin:16px 0; color:#9b350b; }
+.payment-connecting p { margin:5px 0 0; font-size:13px; }
+.framy-loading-ring { display:inline-block; flex-shrink:0; width:30px; height:30px; border:3px solid #f5d4bb; border-top-color:#f35b04; border-right-color:#f35b04; border-radius:50%; animation:framy-payment-spin .85s linear infinite; }
+@keyframes framy-payment-spin { to { transform:rotate(360deg); } }
+@media(prefers-reduced-motion:reduce) { .framy-loading-ring { animation:none; border-style:dotted; } }
+.payment-reference { overflow-wrap:anywhere; font-size:13px; }
+.home-order-tracking { display:inline-flex; align-items:center; gap:8px; margin:16px 0; color:#a33b10; text-underline-offset:5px; font-weight:500; }
+.home-order-tracking:hover { color:#e65300; }
+.guest-buyer-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; width:100%; }
+.guest-buyer-fields label { display:flex; flex-direction:column; gap:8px; }
+.guest-buyer-fields input { min-width:0; width:100%; }
+.purchase-guest-note { padding:14px; border:1px solid #e8d6c7; border-radius:12px; background:#fff9f3; }
+.order-tracking-page { max-width:920px; margin:35px auto 60px; }
+.tracking-heading { margin-bottom:28px; }.tracking-heading > svg { color:#c3490d; }
+.tracking-search { display:flex; gap:12px; align-items:end; padding:24px; background:#fff; border:1px solid #eadcd0; border-radius:18px; }
+.tracking-search label { display:flex; flex-direction:column; gap:10px; flex:1; min-width:0; }
+.tracking-search input { min-width:0; width:100%; min-height:48px; border:1px solid #d4c4b7; border-radius:10px; padding:12px; font:inherit; }
+.tracking-search input:focus { outline:2px solid #e66320; outline-offset:2px; }
+.tracking-result { padding:26px; margin:24px 0; background:#fff; border:1px solid #eadcd0; border-radius:18px; }
+.tracking-result-title { display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center; gap:12px; }
+.tracking-reference { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; padding:16px 0; overflow-wrap:anywhere; }
+.tracking-reference strong { display:block; letter-spacing:.03em; }.tracking-reference .btn { color:#ad3a08; }.tracking-reference .is-copied { background:#edf4ee; color:#356342; }
+.tracking-steps { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); padding:20px 0; margin:18px 0; list-style:none; gap:10px; }
+.tracking-steps li { display:flex; flex-direction:column; gap:12px; color:#897a6d; border-top:3px solid #e9e1da; padding-top:14px; font-size:13px; }
+.tracking-steps .is-complete { border-color:#f35b04; color:#a13b0e; }
+.tracking-private { display:flex; align-items:start; gap:14px; flex-wrap:wrap; border-top:1px solid #e9e1da; padding-top:20px; margin-top:20px; }.tracking-private > p,.tracking-private > h3 { width:100%; margin:4px 0; }
+.fulfilment-card { border:1px solid #e7d9cd; border-radius:14px; padding:20px; margin:16px 0; overflow-wrap:anywhere; }.fulfilment-card label { display:flex; flex-direction:column; gap:8px; margin:12px 0; max-width:320px; }.fulfilment-card select { min-height:44px; border:1px solid #d9c6b6; border-radius:8px; padding:10px; background:#fff; font:inherit; }.fulfilment-card > a { display:inline-block; margin:12px; }
+@media(max-width:600px) { .tracking-search { flex-direction:column; align-items:stretch; padding:18px; }.tracking-result { padding:18px; }.tracking-steps { grid-template-columns:1fr; }.tracking-steps li { flex-direction:row; align-items:center; border-top:0; border-left:3px solid #e9e1da; padding:12px; }.tracking-steps .is-complete { border-left-color:#f35b04; }.guest-buyer-fields { grid-template-columns:1fr; }.order-tracking-page { margin-top:24px; } }
+
+.tracking-heading h1 { font-size:clamp(28px,4vw,40px); font-weight:600; line-height:1.2; letter-spacing:-.03em; margin:14px 0; }
+.tracking-result-title h2 { font-size:22px; font-weight:600; line-height:1.4; }
+.tracking-heading p { color:#756357; line-height:1.7; }
+
+.tracking-reference strong { overflow-wrap: anywhere; }

@@ -5,7 +5,10 @@ import { useEffect, useState } from 'react';
 import { checkoutURL } from '@/lib/paysuite';
 import { CheckCircle2, ArrowRight, Clock3 } from 'lucide-react';
 type Payment = {
+  guest?: boolean;
   id: string;
+  paymentReference: string;
+  orderReference?: string | null;
   kind: string;
   amount: number;
   status: string;
@@ -36,9 +39,11 @@ export function PaySuiteStatus() {
     [signin, setSignin] = useState(false);
   const [returnTo, setReturnTo] = useState('/checkout/retorno');
   const [loaded, setLoaded] = useState(false);
+  const [orderReference, setOrderReference] = useState('');
   useEffect(() => {
     const controller = new AbortController();
     const id = new URLSearchParams(location.search).get('payment');
+    if (id) queueMicrotask(() => setOrderReference(id));
     if (id && /^[a-zA-Z0-9-]+$/.test(id))
       queueMicrotask(() =>
         setReturnTo('/checkout/retorno?payment=' + encodeURIComponent(id)),
@@ -69,6 +74,19 @@ export function PaySuiteStatus() {
           error?: string;
         };
         if (!r.ok) throw Error(d.error);
+        if (id && d.guest) {
+          location.replace('/acompanhar?referencia=' + encodeURIComponent(id));
+          return;
+        }
+        if (id && ['paid', 'failed'].includes(d.status)) {
+          try {
+            const attempt = JSON.parse(
+              sessionStorage.getItem('framy-payment-attempt') || 'null',
+            );
+            if (attempt?.id === id)
+              sessionStorage.removeItem('framy-payment-attempt');
+          } catch {}
+        }
         setError('');
         if (id) setPayment(d);
         else setPayments(d.payments);
@@ -98,6 +116,18 @@ export function PaySuiteStatus() {
       className={`panel payment-result ${payment?.status === 'paid' ? 'is-paid' : ''}`}
     >
       <h1>{t('Estado do pagamento')}</h1>
+      {orderReference && payment?.kind !== 'subscription' && (
+        <p>
+          <Link
+            className="btn btn-secondary"
+            href={
+              '/acompanhar?referencia=' + encodeURIComponent(orderReference)
+            }
+          >
+            {t('Acompanhar o pedido')}
+          </Link>
+        </p>
+      )}
       {signin ? (
         <Link href={'/entrar?return_to=' + encodeURIComponent(returnTo)}>
           {t(' Entre para consultar os seus pagamentos ')}
@@ -242,7 +272,7 @@ export function PaySuiteStatus() {
               )}
               <p>
                 {t('Referência: ')}
-                {payment.id}
+                {payment.orderReference || payment.paymentReference}
               </p>
             </>
           ) : (
@@ -254,7 +284,7 @@ export function PaySuiteStatus() {
                   {(p.amount / 100).toFixed(2)} {t(' MT · ')}
                   {t(labels[p.status])} ·{' '}
                   {t(p.orderStatus === 'fulfilled' ? 'Entregue · ' : '')}
-                  {p.id.slice(0, 8)}
+                  {p.orderReference || p.paymentReference}
                 </a>
               </p>
             ))

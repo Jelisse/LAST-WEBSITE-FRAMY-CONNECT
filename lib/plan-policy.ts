@@ -1,7 +1,7 @@
 import { planFeatures } from './plan-features.ts';
 export const INDIVIDUAL_PLAN = {
   id: 'personal',
-  name: 'Individual',
+  name: 'Personal',
   audience: 'Uso pessoal',
   meticais: 0,
   annualMeticais: 0,

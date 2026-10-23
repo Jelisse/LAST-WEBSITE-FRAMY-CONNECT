@@ -89,9 +89,9 @@ export async function GET(request: Request) {
       .all();
     const leads = await db
       .prepare(
-        `SELECT l.*,x.account_id,x.campaign_id FROM corporate_leads l JOIN corporate_assignments x ON x.id=l.assignment_id JOIN corporate_campaigns c ON c.id=x.campaign_id WHERE c.organisation_id=? AND l.created_at>=? ${leader ? '' : 'AND x.account_id=?'} ORDER BY l.created_at DESC LIMIT 501`,
+        `SELECT l.*,x.account_id,x.campaign_id,f.status AS followup_status,f.note AS followup_note,f.due_date AS followup_due,f.version AS followup_version,f.tags AS followup_tags,f.assignee AS followup_assignee FROM corporate_leads l LEFT JOIN corporate_followups f ON f.lead_id=l.id JOIN corporate_assignments x ON x.id=l.assignment_id JOIN corporate_campaigns c ON c.id=x.campaign_id WHERE c.organisation_id=? AND (l.created_at>=? OR (f.due_date<>'' AND f.status NOT IN ('done','archived') AND f.due_date<=date('now','+2 hours'))) ${leader ? '' : 'AND (x.account_id=? OR f.assignee=?)'} ORDER BY l.created_at DESC LIMIT 501`,
       )
-      .bind(id, since, ...(leader ? [] : [u.userId]))
+      .bind(id, since, ...(leader ? [] : [u.userId,u.userId]))
       .all();
     const invites = leader
       ? await db

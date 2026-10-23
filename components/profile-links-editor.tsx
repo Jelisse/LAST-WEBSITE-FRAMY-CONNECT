@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import { useI18n } from '@/components/language-provider';
 
 import { ArrowDown, ArrowUp, LockKeyhole, Plus, Trash2 } from 'lucide-react';
@@ -13,6 +14,7 @@ import {
 
 export function ProfileLinksEditor({
   profile,
+  showBio = true,
   planId,
   terms,
   disabled,
@@ -20,6 +22,7 @@ export function ProfileLinksEditor({
   onUpgrade,
 }: {
   profile: Profile;
+  showBio?: boolean;
   planId: PlanId;
   terms?: ManagedPlan;
   disabled: boolean;
@@ -27,6 +30,7 @@ export function ProfileLinksEditor({
   onUpgrade: () => void;
 }) {
   const { t } = useI18n();
+  const [editing, setEditing] = useState<number | null>(null);
   const plan = terms ?? getPlan(planId),
     links = profile.links ?? [];
   function move(index: number, delta: number) {
@@ -64,88 +68,105 @@ export function ProfileLinksEditor({
       </p>
       <div className="link-editor-list">
         {links.map((link, index) => (
-          <fieldset className="link-edit-box" key={index} disabled={disabled}>
-            <legend>
-              {t('Link ')}
-              {index + 1}
-            </legend>
-            <label htmlFor={`link-label-${index}`}>
-              {t('Título')}
-              <Input
-                id={`link-label-${index}`}
-                value={link.label}
-                maxLength={60}
-                required
-                placeholder={t('Ex.: Instagram')}
-                onChange={(event) =>
-                  onChange({
-                    ...profile,
-                    links: links.map((item, i) =>
-                      i === index
-                        ? { ...item, label: event.target.value }
-                        : item,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <label htmlFor={`link-url-${index}`}>
-              {t('Endereço')}
-              <Input
-                id={`link-url-${index}`}
-                value={link.url}
-                type="text"
-                inputMode="url"
-                autoCapitalize="none"
-                spellCheck={false}
-                maxLength={300}
-                required
-                placeholder={t('https://…')}
-                onChange={(event) =>
-                  onChange({
-                    ...profile,
-                    links: links.map((item, i) =>
-                      i === index ? { ...item, url: event.target.value } : item,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <div className="link-edit-actions">
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={disabled || index === 0}
-                aria-label={t('Mover link {0} para cima', [index + 1])}
-                onClick={() => move(index, -1)}
-              >
-                <ArrowUp size={17} />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={disabled || index === links.length - 1}
-                aria-label={t('Mover link {0} para baixo', [index + 1])}
-                onClick={() => move(index, 1)}
-              >
-                <ArrowDown size={17} />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={disabled}
-                aria-label={t('Remover link {0}', [index + 1])}
-                onClick={() =>
-                  onChange({
-                    ...profile,
-                    links: links.filter((_, i) => i !== index),
-                  })
-                }
-              >
-                <Trash2 size={17} />
-              </Button>
-            </div>
-          </fieldset>
+          <details
+            className="link-edit-entry"
+            key={index}
+            open={editing === index}
+          >
+            <summary
+              onClick={(e) => {
+                e.preventDefault();
+                setEditing(editing === index ? null : index);
+              }}
+            >
+              <span>{link.label || t('Novo link')}</span>
+              <small>{link.url || t('Adicionar endereço')}</small>
+            </summary>
+            <fieldset className="link-edit-box" disabled={disabled}>
+              <legend>
+                {t('Link ')}
+                {index + 1}
+              </legend>
+              <label htmlFor={`link-label-${index}`}>
+                {t('Título')}
+                <Input
+                  id={`link-label-${index}`}
+                  value={link.label}
+                  maxLength={60}
+                  required
+                  placeholder={t('Ex.: Instagram')}
+                  onChange={(event) =>
+                    onChange({
+                      ...profile,
+                      links: links.map((item, i) =>
+                        i === index
+                          ? { ...item, label: event.target.value }
+                          : item,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label htmlFor={`link-url-${index}`}>
+                {t('Endereço')}
+                <Input
+                  id={`link-url-${index}`}
+                  value={link.url}
+                  type="text"
+                  inputMode="url"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  maxLength={300}
+                  required
+                  placeholder={t('https://…')}
+                  onChange={(event) =>
+                    onChange({
+                      ...profile,
+                      links: links.map((item, i) =>
+                        i === index
+                          ? { ...item, url: event.target.value }
+                          : item,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <div className="link-edit-actions">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={disabled || index === 0}
+                  aria-label={t('Mover link {0} para cima', [index + 1])}
+                  onClick={() => move(index, -1)}
+                >
+                  <ArrowUp size={17} />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={disabled || index === links.length - 1}
+                  aria-label={t('Mover link {0} para baixo', [index + 1])}
+                  onClick={() => move(index, 1)}
+                >
+                  <ArrowDown size={17} />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={disabled}
+                  aria-label={t('Remover link {0}', [index + 1])}
+                  onClick={() =>
+                    onChange({
+                      ...profile,
+                      links: links.filter((_, i) => i !== index),
+                    })
+                  }
+                >
+                  <Trash2 size={17} />
+                </Button>
+              </div>
+            </fieldset>
+          </details>
         ))}
       </div>
       {links.length < plan.links ? (
@@ -154,9 +175,10 @@ export function ProfileLinksEditor({
           className="add-link-box"
           variant="outline"
           disabled={disabled}
-          onClick={() =>
-            onChange({ ...profile, links: [...links, { label: '', url: '' }] })
-          }
+          onClick={() => {
+            setEditing(links.length);
+            onChange({ ...profile, links: [...links, { label: '', url: '' }] });
+          }}
         >
           <Plus size={20} />
           {t(' Adicionar link')}{' '}
@@ -179,32 +201,33 @@ export function ProfileLinksEditor({
             : t('Desbloquear mais caixas')}
         </Button>
       )}
-      {plan.bio > 0 ? (
-        <label className="link-bio" htmlFor="profile-bio">
-          {t('Biografia')}{' '}
-          <span>
-            {profile.bio?.length ?? 0}/{plan.bio}
-          </span>
-          <textarea
-            id="profile-bio"
-            disabled={disabled}
-            maxLength={plan.bio}
-            value={profile.bio ?? ''}
-            rows={4}
-            placeholder={t(
-              'Conte um pouco sobre si ou sobre a sua organização.',
-            )}
-            onChange={(event) =>
-              onChange({ ...profile, bio: event.target.value })
-            }
-          />
-        </label>
-      ) : (
-        <p className="link-bio-locked">
-          <LockKeyhole size={16} />
-          {t(' Biografia disponível a partir do plano Criador.')}
-        </p>
-      )}
+      {showBio &&
+        (plan.bio > 0 ? (
+          <label className="link-bio" htmlFor="profile-bio">
+            {t('Biografia')}{' '}
+            <span>
+              {profile.bio?.length ?? 0}/{plan.bio}
+            </span>
+            <textarea
+              id="profile-bio"
+              disabled={disabled}
+              maxLength={plan.bio}
+              value={profile.bio ?? ''}
+              rows={4}
+              placeholder={t(
+                'Conte um pouco sobre si ou sobre a sua organização.',
+              )}
+              onChange={(event) =>
+                onChange({ ...profile, bio: event.target.value })
+              }
+            />
+          </label>
+        ) : (
+          <p className="link-bio-locked">
+            <LockKeyhole size={16} />
+            {t(' Biografia disponível a partir do plano Criador.')}
+          </p>
+        ))}
     </section>
   );
 }

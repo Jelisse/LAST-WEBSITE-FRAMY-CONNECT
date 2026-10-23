@@ -7,18 +7,24 @@
   padding: 76px 6% 26px;
 }
 .brand-footer-inner {
-  position:relative;
-  z-index:1;
+  position: relative;
+  z-index: 1;
   max-width: 1280px;
   margin: 0 auto;
 }
-.brand-footer::before { content:''; position:absolute; inset:0; pointer-events:none; background:url('/media-optimized/brand-profile-mountains-1440-629d89b12d66.webp') center bottom / cover no-repeat; filter:invert(1); mix-blend-mode:screen; opacity:.1; mask-image:linear-gradient(180deg,transparent,#000 85%); }
-.brand-footer.brand-footer-compact { padding:20px 5%; }
-.brand-footer-compact .brand-footer-inner { display:flex; align-items:center; justify-content:space-between; gap:16px 32px; flex-wrap:wrap; font-size:12px; }
-.brand-footer-compact nav { flex-direction:row; flex-wrap:wrap; gap:8px 24px; }
-.brand-footer-compact nav a { padding:6px 0; }
-.brand-footer.brand-footer-compact::before { opacity:.06; background-size:100% auto; }
-@media(max-width:600px) { .brand-footer-compact .brand-footer-inner { justify-content:center; text-align:center; gap:8px; } .brand-footer-compact nav { justify-content:center; } }
+.brand-footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: url('/media-optimized/brand-profile-mountains-1440-629d89b12d66.webp')
+    center bottom / cover no-repeat;
+  filter: invert(1);
+  mix-blend-mode: screen;
+  opacity: 0.1;
+  mask-image: linear-gradient(180deg, transparent, #000 85%);
+}
+
 .brand-footer-grid {
   display: grid;
   grid-template-columns: 1.3fr 0.8fr 1.25fr 0.8fr;
@@ -35,7 +41,7 @@
   font-size: 14px;
   line-height: 1.85;
   color: #d2c6b9;
-  max-width: 280px;
+  max-width: none;
   margin: 0;
 }
 .brand-footer-about .brand-footer-tagline {
@@ -123,7 +129,7 @@
     gap: 42px 55px;
   }
   .brand-footer-about p {
-    max-width: 340px;
+    max-width: none;
   }
 }
 @media (max-width: 600px) {
@@ -155,7 +161,3 @@
     gap: 12px 24px;
   }
 }
-/* Compact footer overrides the full footer's column navigation. */
-.brand-footer.brand-footer-compact nav { display:flex; flex-direction:row; align-items:center; flex-wrap:wrap; gap:8px 24px; }
-.brand-footer.brand-footer-compact .brand-footer-inner { min-height:32px; }
-.brand-footer.brand-footer-compact::before { background-size:auto 100%; background-position:center bottom; opacity:.055; }

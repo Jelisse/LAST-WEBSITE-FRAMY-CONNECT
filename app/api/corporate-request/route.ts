@@ -131,7 +131,7 @@ export async function POST(request: Request) {
               to: ['info@framyconnect.co.mz'],
               reply_to: account.email,
               subject: 'Pedido Corporativo — ' + details.company,
-              text: `Pedido Corporativo\nReferência: ${u.userId}\nContacto: ${account.name} <${account.email}>\nEmpresa: ${details.company}\nTrabalhadores: ${details.people}\nTelefone: ${details.phone}\nLocalização: ${details.location}\nSector: ${details.sector}\nEquipas: ${details.teams}\nObjectivos: ${details.goals}\nProdutos: ${details.products}\nRever em Contas e acessos no painel Framy Connect. Aprovação não confirma pagamento.`,
+              text: `Pedido Corporativo\nReferência: ${u.userId}\nContacto: ${account.name} <${account.email}>\nEmpresa: ${details.company}\nPlano: ${details.offer ?? 'Proposta existente'}\nPeríodo: ${details.cycle ?? 'Sob consulta'}\nReferência USD: ${details.quotation ? (details.quotation.totalCents / 100).toFixed(2) : 'Sob consulta'}\nTrabalhadores: ${details.people}\nTelefone: ${details.phone}\nLocalização: ${details.location}\nSector: ${details.sector}\nEquipas: ${details.teams}\nObjectivos: ${details.goals}\nProdutos: ${details.products}\nRever em Contas e acessos no painel Framy Connect. Aprovação não confirma pagamento.`,
             }),
             signal: AbortSignal.timeout(10000),
           });

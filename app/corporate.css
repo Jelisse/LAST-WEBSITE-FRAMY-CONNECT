@@ -92,7 +92,7 @@
 .is-selected .corporate-product-check { background:#b53e0b; color:white; border-color:#b53e0b; }
 .corporate-empty { text-align:center; padding:48px 24px; display:flex; align-items:center; flex-direction:column; gap:12px; }
 .corporate-empty-icon { display:grid; place-items:center; width:80px; height:80px; background:#fff0e3; border-radius:24px; color:#be450d; }
-.corporate-empty h2,.corporate-empty p { margin:0; max-width:560px; }
+.corporate-empty h2,.corporate-empty p { margin:0; max-width: none; }
 .corporate-empty small { color:#78685c; max-width:420px; }
 .corporate-dashboard .corporate-primary { display:inline-flex; gap:12px; align-items:center; justify-content:center; min-height:48px; margin:8px 0; padding:12px 22px; border-radius:12px; background:#b43c08; color:white; text-decoration:none; font-weight:600; }
 .corporate-primary:hover { background:#923007; box-shadow:0 4px 14px #9a3c2026; }
@@ -142,7 +142,7 @@
 
 .corporate-onboarding { max-width:1080px; }
 .corporate-section-heading h2 { margin:0; }
-.corporate-section-heading p { color:#75665b; max-width:760px; }
+.corporate-section-heading p { color:#75665b; max-width: none; }
 .corporate-dashboard .corporate-entry-modes { display:grid; grid-template-columns:1fr 1fr; gap:12px; border:0; margin:22px 0 12px; padding:0; }
 .corporate-entry-modes legend { font-weight:600; padding-bottom:10px; }
 .corporate-dashboard .corporate-entry-modes label { position:relative; display:flex; flex-direction:row; flex-wrap:nowrap; align-items:start; gap:12px; padding:20px; border:1px solid #e2d6cc; border-radius:14px; cursor:pointer; }
@@ -202,7 +202,7 @@
 .corporate-section-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
 .corporate-report-heading { margin-bottom:20px; }
 .corporate-report-heading h2,.corporate-report-charts h3 { display:flex; align-items:center; gap:10px; }
-.corporate-report-heading p { max-width:750px; color:#75665b; }
+.corporate-report-heading p { max-width: none; color:#75665b; }
 .corporate-reports button,.corporate-report-link { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:10px 16px; border:1px solid #dacbbe; border-radius:10px; color:#97360e; background:white; cursor:pointer; font:inherit; text-decoration:none; }
 .corporate-reports button:hover,.corporate-report-link:hover { background:#fff0e2; border-color:#cb7845; }
 .corporate-report-filters { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; padding:20px; border:1px solid #e8dcd2; border-radius:16px; background:white; }

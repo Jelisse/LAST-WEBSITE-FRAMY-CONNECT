@@ -89,7 +89,17 @@ export function CorporateInvite() {
           )}
         </p>
       ) : done ? (
-        <Link href="/corporativo">{t('Abrir equipa corporativa')}</Link>
+        <div>
+          <Link href="/corporativo/cartoes">
+            {t('Preparar cartão da empresa')}
+          </Link>
+          <p>
+            {t(
+              'Reveja os seus contactos e publique quando estiver pronto. O perfil pessoal é independente.',
+            )}
+          </p>
+          <Link href="/corporativo">{t('Abrir equipa corporativa')}</Link>
+        </div>
       ) : (
         <form
           onSubmit={async (e) => {

@@ -1,3 +1,4 @@
+import { guestSession, guestOwns, buyerDetails } from '@/lib/guest-checkout';
 import { purchaseAmounts } from '@/lib/purchase-amounts';
 import { referralQuote } from '@/lib/server-ambassador';
 import { pvcModel } from '@/lib/pvc-models';
@@ -27,24 +28,25 @@ import { rateLimit } from '@/lib/request-limits';
 export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   const user = await getChatGPTUser();
-  if (!user) return json({ error: 'Inicie sessão.' }, 401);
   const id = new URL(request.url).searchParams.get('payment');
+  const guest = !user && id ? await guestOwns(request, id) : false;
+  if (!user && !guest) return json({ error: 'Inicie sessão.' }, 401);
   try {
     if (!id)
       return json({
         available: paysuiteReady(env),
         payments: (
           await env.DB.prepare(
-            'SELECT p.id,p.kind,p.amount,p.cycle,p.status,p.created_at,o.status AS orderStatus FROM paysuite_payments p LEFT JOIN paysuite_product_orders o ON o.id=p.target_id AND o.owner_id=p.owner_id WHERE p.owner_id=? ORDER BY p.created_at DESC LIMIT 30',
+            'SELECT p.public_reference AS paymentReference,o.public_reference AS orderReference,p.id,p.kind,p.amount,p.cycle,p.status,p.created_at,o.status AS orderStatus FROM paysuite_payments p LEFT JOIN paysuite_product_orders o ON o.id=p.target_id AND o.owner_id=p.owner_id WHERE p.owner_id=? ORDER BY p.created_at DESC LIMIT 30',
           )
-            .bind(user.userId)
+            .bind(user!.userId)
             .all()
         ).results,
       });
     const row = await env.DB.prepare(
-      'SELECT * FROM paysuite_payments WHERE id=? AND owner_id=?',
+      'SELECT * FROM paysuite_payments WHERE id=? AND owner_id IS ?',
     )
-      .bind(id, user.userId)
+      .bind(id, user?.userId ?? null)
       .first<GatewayPayment>();
     if (!row) return json({ error: 'Pagamento não encontrado.' }, 404);
     if (
@@ -59,7 +61,7 @@ export async function GET(request: Request) {
       }
     }
     const profile =
-      row.kind === 'product' && row.status === 'paid'
+      user && row.kind === 'product' && row.status === 'paid'
         ? await env.DB.prepare(
             'SELECT username,published_json FROM profiles WHERE owner_id=?',
           )
@@ -69,12 +71,17 @@ export async function GET(request: Request) {
     const order =
       row.kind === 'product'
         ? await env.DB.prepare(
-            'SELECT status,configuration_json FROM paysuite_product_orders WHERE id=? AND owner_id=?',
+            'SELECT public_reference,status,configuration_json FROM paysuite_product_orders WHERE id=? AND owner_id IS ?',
           )
-            .bind(row.target_id, user.userId)
-            .first<{ status: string; configuration_json: string }>()
+            .bind(row.target_id, user?.userId ?? null)
+            .first<{
+              public_reference: string;
+              status: string;
+              configuration_json: string;
+            }>()
         : null;
     return json({
+      guest: row.owner_id === null,
       receiptStatus:
         row.status === 'paid'
           ? ((
@@ -87,6 +94,8 @@ export async function GET(request: Request) {
           : null,
       profileReady: !!profile?.published_json,
       id: row.id,
+      paymentReference: row.public_reference,
+      orderReference: order?.public_reference ?? null,
       kind: row.kind,
       amount: row.amount,
       status: row.status,
@@ -104,8 +113,7 @@ export async function GET(request: Request) {
 }
 export async function POST(request: Request) {
   const user = await getChatGPTUser();
-  if (!user) return json({ error: 'Inicie sessão.' }, 401);
-  if (!['customer', 'agent'].includes(user.role))
+  if (user && !['customer', 'agent'].includes(user.role))
     return json({ error: 'Use uma conta de cliente.' }, 403);
   if (!paysuiteReady(env))
     return json({ error: 'Pagamentos temporariamente indisponíveis.' }, 503);
@@ -113,6 +121,12 @@ export async function POST(request: Request) {
     return json({ error: 'Aguarde antes de tentar novamente.' }, 429);
   try {
     const b = await profileBody(request);
+    const session = await guestSession(request);
+    if (!user && (!session || b.kind !== 'product'))
+      return json({ error: 'Prepare a compra ou entre na sua conta.' }, 401);
+    const buyer = !user ? buyerDetails(b.buyerName, b.buyerEmail) : null;
+    const ownerId = user?.userId ?? null;
+    const assetOwner = ownerId ?? 'guest:' + session!.id;
     const id = cleanText(b.requestId, 32, true);
     // PaySuite rejects references containing anything but letters and numbers.
     if (!/^[0-9a-f]{32}$/.test(id) || b.accepted !== true)
@@ -123,10 +137,14 @@ export async function POST(request: Request) {
       .bind(id)
       .first<GatewayPayment>();
     if (previous) {
-      if (previous.owner_id !== user.userId)
+      if (
+        previous.owner_id !== ownerId ||
+        (!user && !(await guestOwns(request, id)))
+      )
         return json({ error: 'Referência inválida.' }, 409);
       return json({
         paymentId: id,
+        ...(await publicReferences(id)),
         url: previous.status === 'pending' ? previous.checkout_url : null,
         status: previous.status,
       });
@@ -134,22 +152,28 @@ export async function POST(request: Request) {
     const method = optionalPaymentMethod(b.method);
     const now = new Date().toISOString();
     const statements: D1PreparedStatement[] = [];
+    if (buyer)
+      statements.push(
+        env.DB.prepare(
+          'INSERT INTO guest_purchases(id,session_id,name,email,created_at) VALUES(?,?,?,?,?)',
+        ).bind(id, session!.id, buyer.name, buyer.email, Date.now()),
+      );
     let amount: number;
     let cycle: 'once' | 'monthly' | 'annual';
     const kind = b.kind;
     if (kind === 'product') {
       const pending = await env.DB.prepare(
-        "SELECT COUNT(*) AS total FROM paysuite_product_orders WHERE owner_id=? AND status='pending'",
+        "SELECT COUNT(*) AS total FROM paysuite_product_orders WHERE ((? IS NOT NULL AND owner_id=?) OR (? IS NULL AND id IN (SELECT id FROM guest_purchases WHERE session_id=?))) AND status='pending'",
       )
-        .bind(user.userId)
+        .bind(ownerId, ownerId, ownerId, session?.id ?? null)
         .first<{ total: number }>();
       if ((pending?.total ?? 0) >= 3) {
         // Offer the newest resumable checkout so a retry continues the
         // existing order instead of hitting a dead end.
         const resumable = await env.DB.prepare(
-          "SELECT id,checkout_url FROM paysuite_payments WHERE owner_id=? AND kind='product' AND status='pending' AND checkout_url IS NOT NULL ORDER BY created_at DESC LIMIT 1",
+          "SELECT id,checkout_url FROM paysuite_payments WHERE ((? IS NOT NULL AND owner_id=?) OR (? IS NULL AND id IN (SELECT id FROM guest_purchases WHERE session_id=?))) AND kind='product' AND status='pending' AND checkout_url IS NOT NULL ORDER BY created_at DESC LIMIT 1",
         )
-          .bind(user.userId)
+          .bind(ownerId, ownerId, ownerId, session?.id ?? null)
           .first<{ id: string; checkout_url: string }>();
         return json(
           {
@@ -171,7 +195,8 @@ export async function POST(request: Request) {
       const referral = await referralQuote(
         b.ambassadorCode,
         baseQuote.hardware,
-        user.userId,
+        ownerId ?? undefined,
+        buyer?.email,
       );
       const discount = referral?.discount ?? 0;
       const amounts = purchaseAmounts(
@@ -190,7 +215,7 @@ export async function POST(request: Request) {
       const profile = await env.DB.prepare(
         'SELECT username,published_json FROM profiles WHERE owner_id=? AND published_json IS NOT NULL',
       )
-        .bind(user.userId)
+        .bind(ownerId!)
         .first<{ username: string; published_json: string }>();
       const contact = cleanText(b.contact, 50, true),
         address =
@@ -223,7 +248,9 @@ export async function POST(request: Request) {
 
         if (
           !asset ||
-          asset.customMetadata?.ownerId !== user.userId ||
+          (asset.customMetadata?.ownerId !== assetOwner &&
+            (!session ||
+              asset.customMetadata?.ownerId !== 'guest:' + session.id)) ||
           !['application/pdf', 'image/png', 'image/jpeg'].includes(
             asset.httpMetadata?.contentType ?? '',
           )
@@ -279,10 +306,10 @@ export async function POST(request: Request) {
         .join(' AND ');
       statements.push(
         env.DB.prepare(
-          `INSERT INTO paysuite_product_orders(id,owner_id,configuration_json,amount,status,created_at) SELECT ?,?,?,?,'pending',? WHERE EXISTS(SELECT 1 FROM checkout_pricing WHERE id=1 AND enabled=1 AND version=?) AND ${guards} AND (SELECT COUNT(*) FROM paysuite_product_orders WHERE owner_id=? AND status='pending')<3`,
+          `INSERT INTO paysuite_product_orders(id,owner_id,configuration_json,amount,status,created_at) SELECT ?,?,?,?,'pending',? WHERE EXISTS(SELECT 1 FROM checkout_pricing WHERE id=1 AND enabled=1 AND version=?) AND ${guards} AND (SELECT COUNT(*) FROM paysuite_product_orders WHERE ((? IS NOT NULL AND owner_id=?) OR (? IS NULL AND id IN (SELECT id FROM guest_purchases WHERE session_id=?))) AND status='pending')<3`,
         ).bind(
           id,
-          user.userId,
+          ownerId!,
           JSON.stringify(configuration),
           amount,
           now,
@@ -291,7 +318,10 @@ export async function POST(request: Request) {
             pid,
             products.find((p) => p.id === pid)!.version,
           ]),
-          user.userId,
+          ownerId,
+          ownerId,
+          ownerId,
+          session?.id ?? null,
         ),
       );
       if (referral)
@@ -322,7 +352,7 @@ export async function POST(request: Request) {
       const settings = await env.DB.prepare(
         'SELECT enabled FROM profile_billing_settings WHERE id=1',
       ).first<{ enabled: number }>();
-      const member = await profileMembership(user.userId);
+      const member = await profileMembership(ownerId!);
       if (!settings?.enabled || !member)
         throw Error('Subscrições indisponíveis.');
       if (member.next_starts_at && member.next_starts_at > now)
@@ -353,7 +383,7 @@ export async function POST(request: Request) {
           "INSERT INTO profile_invoices(id,owner_id,plan_id,terms_json,instructions,amount,status,created_at,expires_at) VALUES(?,?,?,?,'PaySuite',?,'pending',?,?)",
         ).bind(
           id,
-          user.userId,
+          ownerId!,
           plan.id,
           JSON.stringify({ ...plan, billingCycle: cycle }),
           amount,
@@ -364,7 +394,7 @@ export async function POST(request: Request) {
     } else throw Error('Pedido inválido.');
     const payment: GatewayPayment = {
       id,
-      owner_id: user.userId,
+      owner_id: ownerId!,
       kind,
       target_id: id,
       amount,
@@ -377,12 +407,19 @@ export async function POST(request: Request) {
     statements.push(
       env.DB.prepare(
         "INSERT INTO paysuite_payments(id,owner_id,kind,target_id,amount,method,cycle,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,'creating',?,?)",
-      ).bind(id, user.userId, kind, id, amount, method, cycle, now, now),
+      ).bind(id, ownerId!, kind, id, amount, method, cycle, now, now),
     );
+    if (buyer)
+      statements.push(
+        env.DB.prepare(
+          'INSERT INTO guest_order_emails(order_id) VALUES(?)',
+        ).bind(id),
+      );
     await env.DB.batch(statements);
     try {
       return json({
         paymentId: id,
+        ...(await publicReferences(id)),
         url: await launchPayment(env, payment),
         status: 'pending',
       });
@@ -417,6 +454,7 @@ export async function POST(request: Request) {
       return json(
         {
           paymentId: id,
+          ...(await publicReferences(id)),
           status: 'creating',
           message:
             'Não foi possível abrir o pagamento. O pedido está registado para verificação; ainda não foi confirmado nenhum pagamento. Não crie outro pedido.',
@@ -436,5 +474,19 @@ export async function POST(request: Request) {
       },
       422,
     );
+  }
+}
+
+async function publicReferences(id: string) {
+  try {
+    return (
+      (await env.DB.prepare(
+        "SELECT p.public_reference AS paymentReference,o.public_reference AS orderReference FROM paysuite_payments p LEFT JOIN paysuite_product_orders o ON o.id=p.target_id AND p.kind='product' WHERE p.id=?",
+      )
+        .bind(id)
+        .first()) ?? {}
+    );
+  } catch {
+    return {};
   }
 }

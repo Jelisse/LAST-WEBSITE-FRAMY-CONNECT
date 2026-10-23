@@ -19,6 +19,7 @@ export async function GET(request: Request) {
       organisation: row.organisation_name,
       campaign: row.campaign_name,
       username: row.username,
+      cardUrl: row.company_card_id ? '/equipa/'+row.company_card_id : null,
     });
   } catch {
     return json({ error: 'Campanha indisponível.' }, 503);

@@ -51,7 +51,7 @@ export function MobileNavigation({ items }: { items?: MobileNavItem[] }) {
     { label: 'Página inicial', href: '/', icon: <Home size={19} /> },
     { label: 'Produtos', href: '/produtos', icon: <ShoppingBag size={19} /> },
     { label: 'Sobre nós', href: '/sobre', icon: <Info size={19} /> },
-    { label: 'Contacto', href: '/contacto', icon: <Mail size={19} /> },
+    { label: 'Contactar a Framy', href: '/contacto', icon: <Mail size={19} /> },
     {
       label: 'Tornar-se agente',
       href: '/aplicar',
@@ -97,7 +97,7 @@ export function MobileNavigation({ items }: { items?: MobileNavItem[] }) {
     </details>
   );
 }
-export function DashboardTools() {
+export function DashboardTools({ navigation }: { navigation?: ReactNode }) {
   const { t } = useI18n();
   return (
     <div className="dashboard-tools">
@@ -114,23 +114,31 @@ export function DashboardTools() {
         <span className="desktop-language">
           <LanguageSelector />
         </span>
-        <AccountMenu />
-        <MobileNavigation
-          items={[
-            { label: 'Equipa corporativa', href: '/corporativo', icon: <BriefcaseBusiness size={19} /> },
-            { label: 'Página inicial', href: '/', icon: <Home size={19} /> },
-            {
-              label: 'Produtos',
-              href: '/produtos',
-              icon: <ShoppingBag size={19} />,
-            },
-            {
-              label: 'Segurança da conta',
-              href: '/seguranca',
-              icon: <ShieldCheck size={19} />,
-            },
-          ]}
-        />
+        <AccountMenu identity />
+        {navigation !== undefined ? (
+          navigation
+        ) : (
+          <MobileNavigation
+            items={[
+              {
+                label: 'Equipa corporativa',
+                href: '/corporativo',
+                icon: <BriefcaseBusiness size={19} />,
+              },
+              { label: 'Página inicial', href: '/', icon: <Home size={19} /> },
+              {
+                label: 'Produtos',
+                href: '/produtos',
+                icon: <ShoppingBag size={19} />,
+              },
+              {
+                label: 'Segurança da conta',
+                href: '/seguranca',
+                icon: <ShieldCheck size={19} />,
+              },
+            ]}
+          />
+        )}
       </div>
     </div>
   );

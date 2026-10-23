@@ -298,6 +298,9 @@ test('scheduled retention removes old analytics without touching recent events o
   try {
     const now = Date.now(),
       old = now - 91 * 86400000;
+    f.sql.exec('CREATE TABLE corporate_card_metrics(card_id TEXT,day INTEGER,target TEXT,count INTEGER)');
+    f.sql.prepare('INSERT INTO corporate_card_metrics VALUES(?,?,?,?)').run('card',old,'view',2);
+    f.sql.prepare('INSERT INTO corporate_card_metrics VALUES(?,?,?,?)').run('card',now,'view',3);
     f.sql.prepare('INSERT INTO corporate_leads VALUES(?,?)').run('old-corporate',old);
     f.sql.prepare('INSERT INTO corporate_leads VALUES(?,?)').run('new-corporate',now);
     f.sql.exec("INSERT INTO auth_accounts VALUES('profile-owner')");
@@ -339,11 +342,13 @@ test('scheduled retention removes old analytics without touching recent events o
       'refreshProfileDomains',
       'paymentReceipts',
       'profilePublicationAlerts',
+      'guestOrderEmails',
       code,
     )(
       exports,
       {},
       () => {},
+      async () => {},
       async () => {},
       async () => {},
       async () => {},
@@ -362,6 +367,7 @@ test('scheduled retention removes old analytics without touching recent events o
       },
     );
     await Promise.all(pending);
+    assert.equal(f.sql.prepare('SELECT SUM(count) AS n FROM corporate_card_metrics').get().n,3);
     assert.deepEqual(f.sql.prepare('SELECT id FROM corporate_leads').all().map(r=>r.id),['new-corporate']);
     assert.equal(f.sql.prepare('SELECT SUM(count) n FROM profile_click_totals').get().n, 3);
     assert.equal(f.sql.prepare('SELECT count FROM profile_click_lifetime').get().count, 5);
@@ -392,4 +398,7 @@ test('profile example and customer profiles never enter website session analytic
   assert.equal(analyticsPath('/exemplo'), null);
   assert.equal(analyticsPath('/ana_matavele'), null);
   assert.equal(analyticsPath('/produtos'), '/produtos');
+  assert.equal(analyticsPath('/para-empresas'), '/para-empresas');
+  assert.equal(analyticsPath('/corporativo'), null);
+  assert.equal(analyticsPath('/corporativo/contactos'), null);
 });

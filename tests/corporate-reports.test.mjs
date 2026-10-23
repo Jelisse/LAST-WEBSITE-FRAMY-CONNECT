@@ -12,7 +12,7 @@ test('corporate report dates use Maputo midnight, fill missing days and do not i
  const row={team:'A',opens:40,clicks:8,contacts:4,contributors:2};assert.equal(teamReportValue(row,'contacts','participant'),2);assert.equal(teamReportValue({...row,contributors:0},'contacts','participant'),0);
 });
 test('corporate sections have distinct safe authenticated destinations and preserve company selection',()=>{
- assert.equal(new Set(corporateSections.map(s=>s.path)).size,5);
+ assert.equal(new Set(corporateSections.map(s=>s.path)).size,10);
  for(const s of corporateSections){assert.equal(loginDestination('customer',s.path),s.path);assert.equal(loginDestination('agent',s.path),s.path);}
  assert.equal(corporateSectionURL('/corporativo/equipa','a&other=b'),'/corporativo/equipa?organisation=a%26other%3Db');
  assert.notEqual(loginDestination('customer','/corporativo/equipa/../../manager'),'/corporativo/equipa/../../manager');

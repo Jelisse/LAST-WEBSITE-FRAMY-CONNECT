@@ -1,4 +1,6 @@
 'use client';
+import { companyStepIssue } from '@/lib/form-journeys';
+import { companyQuote, usdPrice } from '@/lib/launch-offers';
 import { CorporateSidebar } from './corporate-sidebar';
 import {
   Building2,
@@ -14,6 +16,9 @@ import Link from './hard-link';
 import { DashboardTools } from './mobile-navigation';
 import { useI18n } from './language-provider';
 type Details = {
+  referenceUSD?: string;
+  offer?: string;
+  cycle?: string;
   company: string;
   people: number;
   phone: string;
@@ -41,7 +46,9 @@ type SavedResponse = {
 };
 const empty: Details = {
   company: '',
-  people: 1,
+  offer: 'business',
+  cycle: 'monthly',
+  people: 3,
   phone: '',
   location: '',
   sector: '',
@@ -51,11 +58,35 @@ const empty: Details = {
 };
 export function CorporateSetup({
   products = [],
+  initialOffer = 'business',
 }: {
+  initialOffer?: 'business' | 'enterprise';
   products?: { id: string; name: string }[];
 }) {
   const { t } = useI18n();
-  const [details, setDetails] = useState(empty),
+  const [companyStep, setCompanyStep] = useState(0);
+  const changeCompanyStep = (step: number) => {
+    setCompanyStep(step);
+    requestAnimationFrame(() =>
+      document
+        .querySelector<HTMLElement>('.corporate-form-heading h2')
+        ?.focus(),
+    );
+  };
+  const nextCompanyStep = () => {
+    const issue = companyStepIssue(companyStep, details);
+    if (issue) {
+      setError(issue);
+      return;
+    }
+    setError('');
+    changeCompanyStep(Math.min(3, companyStep + 1));
+  };
+  const [details, setDetails] = useState<Details>({
+      ...empty,
+      offer: initialOffer,
+      people: initialOffer === 'enterprise' ? 51 : 3,
+    }),
     [version, setVersion] = useState(0),
     [status, setStatus] = useState('draft'),
     [delivery, setDelivery] = useState('pending'),
@@ -133,6 +164,18 @@ export function CorporateSetup({
       document.removeEventListener('visibilitychange', refresh);
     };
   }, [ready, status, busy]);
+  const selectedOffer = details.offer;
+  let quotation: ReturnType<typeof companyQuote> | null = null;
+  try {
+    if (selectedOffer)
+      quotation = companyQuote(
+        selectedOffer,
+        details.people,
+        details.cycle ?? 'monthly',
+      );
+  } catch {
+    /* Render an invalid count for correction; server revalidates. */
+  }
   async function save(action: 'save' | 'submit', confirmed: boolean) {
     if (busy) return;
     setBusy(true);
@@ -167,24 +210,19 @@ export function CorporateSetup({
       className="staff-page corporate-dashboard corporate-setup corporate-shell"
     >
       <header>
-        <DashboardTools />
+        <DashboardTools navigation={null} />
       </header>
       <CorporateSidebar current="company" />
       <div className="corporate-content">
         <div className="corporate-hero">
-          <span className="corporate-eyebrow">
-            <Building2 size={18} aria-hidden="true" /> FRAMY CONNECT ·{' '}
-            {t('Corporativo')}
-          </span>
           <h1>{t('Configurar a minha empresa')}</h1>
-          <p>{t('Uma equipa. Mais conexões.')}</p>
         </div>
         <p>
           {t(
             'Use o seu perfil Individual enquanto prepara a equipa. Não é necessário pagar para enviar este pedido.',
           )}
         </p>
-        <ol className="corporate-steps">
+        <ol className="corporate-steps" hidden={status === 'draft'}>
           <li>{t('Conta criada')}</li>
           <li aria-current={status === 'draft' ? 'step' : undefined}>
             {t('Dados da empresa')}
@@ -221,6 +259,14 @@ export function CorporateSetup({
                     : 'Pedido recebido. Aguarde a aprovação da Framy Connect.',
               )}
             </p>
+            {details.offer && (
+              <p>
+                {details.offer === 'enterprise' ? 'Enterprise' : 'Business'} ·{' '}
+                {details.referenceUSD ??
+                  (quotation ? usdPrice(quotation.totalCents) : '')}{' '}
+                USD
+              </p>
+            )}
             <p>
               {t('Número de trabalhadores')}: {details.people}
             </p>
@@ -243,26 +289,88 @@ export function CorporateSetup({
         ) : (
           <form
             className="corporate-panel corporate-setup-form"
+            noValidate
             onSubmit={(e) => {
               e.preventDefault();
+              if (companyStep < 3) {
+                nextCompanyStep();
+                return;
+              }
+              for (const step of [0, 1]) {
+                const issue = companyStepIssue(step, details);
+                if (issue) {
+                  setError(issue);
+                  changeCompanyStep(step);
+                  return;
+                }
+              }
+              if (new FormData(e.currentTarget).get('confirmed') !== 'on') {
+                setError('Confirme o envio dos dados antes de continuar.');
+                return;
+              }
               void save(
                 'submit',
                 new FormData(e.currentTarget).get('confirmed') === 'on',
               );
             }}
           >
+            <ol
+              className="flow-step-nav"
+              aria-label={t('Passos de configuração')}
+            >
+              {['Empresa', 'Equipa', 'Produtos NFC', 'Rever e enviar'].map(
+                (label, index) => (
+                  <li
+                    key={label}
+                    aria-current={companyStep === index ? 'step' : undefined}
+                  >
+                    <button
+                      type="button"
+                      disabled={busy || index > companyStep}
+                      onClick={() => changeCompanyStep(index)}
+                    >
+                      <span>{index + 1}</span>
+                      {t(label)}
+                    </button>
+                  </li>
+                ),
+              )}
+            </ol>
             <div className="corporate-form-heading">
               <Building2 size={24} aria-hidden="true" />
               <div>
-                <h2>{t('Dados da empresa')}</h2>
+                <h2 tabIndex={-1}>
+                  {t(
+                    [
+                      'A sua empresa',
+                      'A sua equipa',
+                      'Produtos para a equipa',
+                      'Rever e enviar',
+                    ][companyStep],
+                  )}
+                </h2>
                 <p>
-                  {t('Preencha os campos obrigatórios para enviar o pedido.')}
+                  {t(
+                    [
+                      'Comece pelo essencial. Podemos definir os detalhes mais tarde.',
+                      'Quantas pessoas vão representar a sua empresa?',
+                      'Escolha o que faz sentido para a equipa. Este passo é opcional.',
+                      'Confirme os dados antes de nos enviar o pedido.',
+                    ][companyStep],
+                  )}
                 </p>
               </div>
             </div>
             {(['company', 'location', 'sector', 'teams', 'goals'] as const).map(
               (key) => (
-                <label key={key}>
+                <label
+                  key={key}
+                  hidden={
+                    ['company', 'location'].includes(key)
+                      ? companyStep !== 0
+                      : companyStep !== 1
+                  }
+                >
                   {t(
                     (
                       {
@@ -312,7 +420,7 @@ export function CorporateSetup({
                 </label>
               ),
             )}
-            <label>
+            <label hidden={companyStep !== 0}>
               {t('Telefone de contacto')} *
               <PhoneInput
                 value={details.phone}
@@ -321,12 +429,54 @@ export function CorporateSetup({
                 disabled={busy}
               />
             </label>
-            <label>
-              {t('Número de trabalhadores')}
+            <label hidden={companyStep !== 1}>
+              {t('Plano da empresa')}
+              <select
+                value={details.offer ?? 'legacy'}
+                disabled={busy}
+                onChange={(e) =>
+                  setDetails({
+                    ...details,
+                    offer: e.target.value,
+                    people:
+                      e.target.value === 'business'
+                        ? Math.min(50, Math.max(3, details.people))
+                        : Math.max(51, details.people),
+                  })
+                }
+              >
+                {!details.offer && (
+                  <option value="legacy">{t('Proposta existente')}</option>
+                )}
+                <option value="business">Business · 3–50</option>
+                <option value="enterprise">Enterprise · 51–500</option>
+              </select>
+            </label>
+            <label hidden={companyStep !== 1}>
+              {t('Periodicidade')}
+              <select
+                value={details.cycle ?? 'monthly'}
+                disabled={busy}
+                onChange={(e) =>
+                  setDetails({ ...details, cycle: e.target.value })
+                }
+              >
+                <option value="monthly">{t('Mensal')}</option>
+                <option value="annual">{t('Anual')}</option>
+              </select>
+            </label>
+            <label hidden={companyStep !== 1}>
+              {t('Perfis de colaboradores')}
               <input
                 type="number"
-                min={1}
-                max={500}
+                min={
+                  selectedOffer === 'enterprise'
+                    ? 51
+                    : selectedOffer === 'business'
+                      ? 3
+                      : 1
+                }
+                max={selectedOffer === 'business' ? 50 : 500}
                 required
                 value={details.people}
                 disabled={busy}
@@ -335,7 +485,24 @@ export function CorporateSetup({
                 }
               />
             </label>
-            <fieldset className="corporate-product-picker" disabled={busy}>
+            {quotation && (companyStep === 1 || companyStep === 3) && (
+              <p className="corporate-panel">
+                <strong>
+                  {selectedOffer === 'enterprise' ? t('A partir de') : ''}{' '}
+                  {usdPrice(quotation.totalCents)} USD /{' '}
+                  {t(quotation.cycle === 'annual' ? 'ano' : 'mês')}
+                </strong>
+                <br />
+                {t(
+                  'Estimativa sem compromisso. O valor final em meticais, impostos aplicáveis e condições são confirmados na proposta. Sem débito automático.',
+                )}
+              </p>
+            )}
+            <fieldset
+              className="corporate-product-picker"
+              disabled={busy}
+              hidden={companyStep !== 2}
+            >
               <legend>{t('Produtos NFC pretendidos')}</legend>
               <p>
                 {t(
@@ -399,7 +566,37 @@ export function CorporateSetup({
                 />
               </label>
             </fieldset>
-            <label>
+            {companyStep === 3 && (
+              <section className="flow-review">
+                <h3>{t('A sua configuração')}</h3>
+                <dl>
+                  {[
+                    [t('Empresa'), details.company],
+                    [t('Localização da empresa'), details.location],
+                    [t('Telefone de contacto'), details.phone],
+                    [
+                      t('Plano da empresa'),
+                      (details.offer === 'enterprise'
+                        ? 'Enterprise'
+                        : 'Business') +
+                        ' · ' +
+                        details.people,
+                    ],
+                    [t('Equipas'), details.teams || '—'],
+                    [t('Produtos NFC'), details.products || t('A definir')],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <dt>{label}</dt>
+                      <dd>{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <button type="button" onClick={() => changeCompanyStep(0)}>
+                  {t('Editar')}
+                </button>
+              </section>
+            )}
+            <label hidden={companyStep !== 3}>
               <input
                 name="confirmed"
                 type="checkbox"
@@ -410,7 +607,7 @@ export function CorporateSetup({
                 'Confirmo o envio dos dados da empresa à Framy Connect para análise e contacto.',
               )}
             </label>
-            {!emailReady && (
+            {companyStep === 3 && !emailReady && (
               <p>
                 {t(
                   'O email não está disponível. Guarde o rascunho e tente mais tarde.',
@@ -418,6 +615,25 @@ export function CorporateSetup({
               </p>
             )}
             <div className="corporate-toolbar">
+              {companyStep > 0 && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => changeCompanyStep(companyStep - 1)}
+                >
+                  {t('Voltar')}
+                </button>
+              )}
+              {companyStep < 3 && (
+                <button
+                  type="button"
+                  className="flow-primary"
+                  disabled={busy}
+                  onClick={nextCompanyStep}
+                >
+                  {t('Seguinte')} →
+                </button>
+              )}
               <button
                 type="button"
                 disabled={busy}
@@ -426,12 +642,16 @@ export function CorporateSetup({
                 <Save size={18} aria-hidden="true" />
                 {t('Guardar rascunho')}
               </button>
-              <button type="submit" disabled={busy || !emailReady}>
+              <button
+                type="submit"
+                hidden={companyStep !== 3}
+                disabled={busy || !emailReady}
+              >
                 <Send size={18} aria-hidden="true" />
                 {t(busy ? 'A enviar…' : 'Enviar pedido de aprovação')}
               </button>
             </div>
-            <p>
+            <p hidden={companyStep !== 3}>
               {t(
                 'A aprovação desbloqueia a equipa. Preços, produtos e pagamento são acordados separadamente; não há cobrança automática.',
               )}

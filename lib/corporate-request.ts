@@ -1,4 +1,5 @@
-import { corporateText } from './corporate';
+import { companyQuote, usdPrice } from './launch-offers.ts';
+import { corporateText } from './corporate.ts';
 export function corporateRequest(
   value: Record<string, unknown>,
   complete = true,
@@ -6,7 +7,19 @@ export function corporateRequest(
   const people = value.people;
   if (!Number.isInteger(people) || Number(people) < 1 || Number(people) > 500)
     throw Error('Indique entre 1 e 500 trabalhadores.');
+  const quotation =
+    value.offer === undefined
+      ? null
+      : companyQuote(value.offer, people, value.cycle ?? 'monthly');
   return {
+    ...(quotation
+      ? {
+          offer: quotation.offer,
+          cycle: quotation.cycle,
+          quotation,
+          referenceUSD: usdPrice(quotation.totalCents),
+        }
+      : {}),
     company: corporateText(value.company ?? '', 100, complete),
     people: Number(people),
     phone: corporateText(value.phone ?? '', 40, complete),

@@ -13,7 +13,6 @@ import {
   UserRoundPlus,
   ArrowUpRight,
   UserRound,
-  MessageCircle,
   Clock3,
   MapPin,
 } from 'lucide-react';
@@ -34,13 +33,17 @@ import {
   DialogTitle,
   DialogDescription,
 } from './ui/dialog';
-import {
-  profileTheme,
-  whatsappURL,
-  directionsURL,
-} from '@/lib/profile-business';
+import { profileTheme, directionsURL } from '@/lib/profile-business';
 import { profileInLanguage, type ProfileLanguage } from '@/lib/profile-locales';
 import { socialPlatform } from '@/lib/social-platform';
+import {
+  profileLinkGroups,
+  profileActionHref,
+  socialActionName,
+  type ProfileActionLink,
+} from '@/lib/profile-link-groups';
+import { measurementBlocked, readConsent } from '@/lib/measurement-consent';
+import type { CompanyTemplate } from '@/lib/company-cards';
 import type { Profile } from '@/lib/domain';
 
 function SocialIcon({ url }: { url: string }) {
@@ -74,6 +77,7 @@ export function MobileProfile(props: {
   brandHref?: string;
   measure?: boolean;
   demoConnectionLabel?: string;
+  companyTemplate?: CompanyTemplate;
 }) {
   const [language, setLanguage] = useState<ProfileLanguage>('en');
   return (
@@ -93,6 +97,7 @@ function PortfolioProfile({
   brandHref = '/',
   measure = true,
   demoConnectionLabel,
+  companyTemplate,
   language,
   setLanguage,
 }: {
@@ -102,6 +107,7 @@ function PortfolioProfile({
   brandHref?: string;
   measure?: boolean;
   demoConnectionLabel?: string;
+  companyTemplate?: CompanyTemplate;
   language: ProfileLanguage;
   setLanguage: (value: ProfileLanguage) => void;
 }) {
@@ -127,36 +133,73 @@ function PortfolioProfile({
     [qr, setQr] = useState(''),
     [qrOpen, setQrOpen] = useState(false),
     [qrBusy, setQrBusy] = useState(false);
-  const measurement = useProfileEngagement(
+  const personalMeasurement = useProfileEngagement(
     profile.username,
     published && !preview && measure,
   );
+  const measurement = {
+    record: (target: string) => {
+      if (!companyTemplate) return personalMeasurement.record(target);
+      if (
+        !published ||
+        preview ||
+        measurementBlocked() ||
+        document.visibilityState !== 'visible'
+      )
+        return;
+      void fetch('/api/company-metrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cardId: profile.username.split('/')[1],
+          target,
+        }),
+        keepalive: true,
+      }).catch(() => {});
+    },
+  };
+  useEffect(() => {
+    if (!companyTemplate || !published || preview || readConsent() !== 'yes')
+      return;
+    void fetch('/api/company-metrics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cardId: source.username.split('/')[1],
+        target: 'view',
+        consent: true,
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  }, [companyTemplate, published, preview, source.username]);
   const Heading = preview ? 'h2' : 'h1';
-  const whatsapp = whatsappURL(profile.business);
-  const links = [
-    ...(profile.links ?? []).map((link, index) => ({
-      ...link,
-      target: `link:${index}`,
-    })),
-    ...(profile.email && profile.showEmail
-      ? [{ target: 'email', label: t('Email'), url: `mailto:${profile.email}` }]
-      : []),
-    ...(profile.phone && profile.showPhone
-      ? [
-          {
-            target: 'phone',
-            label: t('Telefone'),
-            url: `tel:${profile.phone.replace(/[^+0-9]/g, '')}`,
-          },
-        ]
-      : []),
-    ...(profile.website
-      ? [{ target: 'website', label: t('Website'), url: profile.website }]
-      : []),
-    ...(whatsapp
-      ? [{ target: 'whatsapp', label: 'WhatsApp', url: whatsapp }]
-      : []),
-  ];
+  const groups = profileLinkGroups(profile, t);
+  const hasLinks = Object.values(groups).some((links) => links.length > 0);
+  function actionLink(link: ProfileActionLink, iconsOnly = false) {
+    const href = profileActionHref(link.url);
+    const label = iconsOnly
+      ? socialActionName(link)
+      : t(link.label) || t('Título do link');
+    return (
+      <a
+        key={link.target}
+        className={iconsOnly ? 'portfolio-social-action' : 'portfolio-link'}
+        href={href}
+        target={href?.startsWith('https:') ? '_blank' : undefined}
+        rel="noopener noreferrer"
+        aria-label={label}
+        title={label}
+        aria-disabled={!href}
+        onClick={() => {
+          if (href) measurement.record(link.target);
+        }}
+      >
+        <SocialIcon url={link.url} />
+        {!iconsOnly && <span>{label}</span>}
+        {!iconsOnly && <ArrowUpRight aria-hidden="true" />}
+      </a>
+    );
+  }
   const profileUrl = () =>
     new URL(`/${profile.username}`, window.location.origin).href;
   function download() {
@@ -220,6 +263,7 @@ function PortfolioProfile({
       className="mobile-profile-frame"
       data-presentation="portfolio"
       data-theme={theme.value}
+      data-company-design={companyTemplate?.design || undefined}
       lang={language}
       style={
         {
@@ -288,6 +332,13 @@ function PortfolioProfile({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+            {companyTemplate?.logoUrl && (
+              <Image unoptimized width={100} height={50}
+                className="company-public-logo"
+                src={companyTemplate.logoUrl}
+                alt={companyTemplate.company}
+              />
+            )}
             <div className="portfolio-identity">
               <div className="portfolio-portrait-wrap">
                 <button
@@ -318,7 +369,7 @@ function PortfolioProfile({
                 <ProfileConnectionCount
                   demoLabel={demoConnectionLabel}
                   username={profile.username}
-                  enabled={published && !preview}
+                  enabled={published && !preview && measure}
                   preview={preview || !published}
                 />
               </div>
@@ -357,30 +408,42 @@ function PortfolioProfile({
                   <ArrowUpRight aria-hidden="true" />
                 </button>
               )}
-              {links.map((link, i) => (
-                <a
-                  key={`${link.target}-${i}`}
-                  className="portfolio-link"
-                  onClick={() => measurement.record(link.target)}
-                  href={
-                    /^(https:\/\/|mailto:|tel:)/i.test(link.url)
-                      ? link.url
-                      : undefined
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-disabled={!/^(https:\/\/|mailto:|tel:)/i.test(link.url)}
+              {groups.contacts.length > 0 && (
+                <section
+                  className="portfolio-link-group"
+                  aria-label={t('Contacto')}
                 >
-                  {link.target === 'whatsapp' ? (
-                    <MessageCircle aria-hidden="true" />
-                  ) : (
-                    <SocialIcon url={link.url} />
-                  )}
-                  <span>{t(link.label) || t('Título do link')}</span>
-                  <ArrowUpRight aria-hidden="true" />
-                </a>
-              ))}
-              {!links.length && preview && (
+                  <h3 className="portfolio-group-title">{t('Contacto')}</h3>
+                  <div className="portfolio-contact-grid">
+                    {groups.contacts.map((link) => actionLink(link))}
+                  </div>
+                </section>
+              )}
+              {groups.socials.length > 0 && (
+                <section
+                  className="portfolio-link-group"
+                  aria-label={t('Redes sociais')}
+                >
+                  <h3 className="portfolio-group-title">
+                    {t('Redes sociais')}
+                  </h3>
+                  <div className="portfolio-social-grid">
+                    {groups.socials.map((link) => actionLink(link, true))}
+                  </div>
+                </section>
+              )}
+              {groups.explore.length > 0 && (
+                <section
+                  className="portfolio-link-group"
+                  aria-label={t('Explorar')}
+                >
+                  <h3 className="portfolio-group-title">{t('Explorar')}</h3>
+                  <div className="portfolio-explore-list">
+                    {groups.explore.map((link) => actionLink(link))}
+                  </div>
+                </section>
+              )}
+              {!hasLinks && preview && (
                 <p className="mobile-links-placeholder">
                   {t('Adicione os seus links no editor.')}
                 </p>

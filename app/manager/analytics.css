@@ -411,7 +411,7 @@
 }
 .website-analytics .wa-method p {
   margin: 8px 0 0;
-  max-width: 100ch;
+  max-width: none;
 }
 .website-analytics .wa-ranking {
   max-height: 210px;
@@ -1050,7 +1050,7 @@
   color: #ad9c90;
 }
 .website-analytics .wa-distribution-empty p {
-  max-width: 160px;
+  max-width: none;
   font-size: 11px;
 }
 @container (max-width: 290px) {

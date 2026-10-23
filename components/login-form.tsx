@@ -1,5 +1,5 @@
 'use client';
-import { useI18n, LanguageSelector } from '@/components/language-provider';
+import { useI18n } from '@/components/language-provider';
 
 import { useEffect, useRef, useState } from 'react';
 import Link from '@/components/hard-link';
@@ -41,7 +41,6 @@ export function LoginForm({
   return (
     <main id="main" className="auth-page">
       <section className="auth-card">
-        <LanguageSelector />
         <h1>{register ? t('Criar a minha conta') : t('Bem-vindo à Framy')}</h1>
         <p>
           {purchaseReturn

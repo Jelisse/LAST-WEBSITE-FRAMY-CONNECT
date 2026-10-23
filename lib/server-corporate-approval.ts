@@ -1,3 +1,4 @@
+import { companyQuote } from './launch-offers';
 import { database } from './server-db';
 import { mayChangeAccount } from './staff-policy';
 import type { AccountRole } from './auth-policy';
@@ -23,6 +24,15 @@ export async function approveCorporate(
     (!Number.isInteger(b.seats) || Number(b.seats) < 1 || Number(b.seats) > 500)
   )
     throw Error('Indique entre 1 e 500 trabalhadores.');
+  if (active) {
+    const request = await db
+      .prepare('SELECT details_json FROM corporate_requests WHERE owner_id=?')
+      .bind(target.id)
+      .first<{ details_json: string }>();
+    const details = request ? JSON.parse(request.details_json) : null;
+    if (details?.offer)
+      companyQuote(details.offer, b.seats, details.cycle ?? 'monthly');
+  }
   const now = Date.now(),
     event = crypto.randomUUID(),
     org = crypto.randomUUID();

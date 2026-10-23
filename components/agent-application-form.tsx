@@ -33,6 +33,7 @@ export function AgentApplicationForm({
   email: string;
 }) {
   const { t } = useI18n();
+  const [applicationStep, setApplicationStep] = useState(0);
   const [app, setApp] = useState<ApplicationView | null>(null),
     [data, setData] = useState<ApplicationData>({
       name,
@@ -88,6 +89,7 @@ export function AgentApplicationForm({
       if (!r.ok) throw Error(b.error);
       setApp(b.application);
       setData(b.application.data);
+      if (action === 'save') setApplicationStep(1);
       setNotice(
         action === 'submit'
           ? 'Candidatura submetida com sucesso. Acompanhe a análise nesta página.'
@@ -158,7 +160,35 @@ export function AgentApplicationForm({
       )}
       {editable ? (
         <>
+          <ol
+            className="flow-step-nav"
+            aria-label={t('Passos de configuração')}
+          >
+            {['Sobre si', 'Documentos', 'Rever e enviar'].map(
+              (label, index) => (
+                <li
+                  key={label}
+                  aria-current={applicationStep === index ? 'step' : undefined}
+                >
+                  <button
+                    type="button"
+                    disabled={
+                      busy ||
+                      (index > 0 && !app) ||
+                      (index === 2 &&
+                        (!app || app.files.length !== 3 || unsaved))
+                    }
+                    onClick={() => setApplicationStep(index)}
+                  >
+                    <span>{index + 1}</span>
+                    {t(label)}
+                  </button>
+                </li>
+              ),
+            )}
+          </ol>
           <form
+            hidden={applicationStep !== 0}
             onSubmit={(e) => {
               e.preventDefault();
               void sendApplication('save');
@@ -284,56 +314,74 @@ export function AgentApplicationForm({
             </fieldset>
           </form>
           {app && (
-            <section className="application-documents">
-              <h2>{t('2. Fotografias e identificação')}</h2>
-              <p>
-                {t(
-                  'Envie imagens legíveis, sem cortar os dados do documento. PNG, JPG ou WebP, até 8 MB por fotografia. Num telemóvel compatível, pode usar a câmara directamente.',
-                )}
-              </p>
-              <div className="application-files-grid">
-                {fileKinds.map(([kind, label]) => {
-                  const file = app.files.find((f) => f.kind === kind);
-                  return (
-                    <MediaUploadBox
-                      key={kind}
-                      title={t(label)}
-                      src={
-                        file ? '/api/application-files/' + file.id : undefined
-                      }
-                      hint={t('PNG, JPG ou WebP · até 8 MB')}
-                      accept="image/png,image/jpeg,image/webp"
-                      capture={kind === 'portrait' ? 'user' : 'environment'}
-                      disabled={busy || unsaved}
-                      onFiles={(files) => upload(kind, files[0])}
-                    />
-                  );
-                })}
-              </div>
-              <h2>{t('3. Confirmar candidatura')}</h2>
-              {unsaved && (
-                <p role="alert">
+            <section
+              className="application-documents"
+              hidden={applicationStep === 0}
+            >
+              <div hidden={applicationStep !== 1}>
+                <h2>{t('2. Fotografias e identificação')}</h2>
+                <p>
                   {t(
-                    'Guarde as alterações dos dados pessoais antes de carregar fotografias ou submeter.',
+                    'Envie imagens legíveis, sem cortar os dados do documento. PNG, JPG ou WebP, até 8 MB por fotografia. Num telemóvel compatível, pode usar a câmara directamente.',
                   )}
                 </p>
-              )}
-              <p>
-                {t(
-                  'Depois de submeter, os dados ficam bloqueados durante a análise. Guarde quaisquer alterações antes de continuar.',
+                <div className="application-files-grid">
+                  {fileKinds.map(([kind, label]) => {
+                    const file = app.files.find((f) => f.kind === kind);
+                    return (
+                      <MediaUploadBox
+                        key={kind}
+                        title={t(label)}
+                        src={
+                          file ? '/api/application-files/' + file.id : undefined
+                        }
+                        hint={t('PNG, JPG ou WebP · até 8 MB')}
+                        accept="image/png,image/jpeg,image/webp"
+                        capture={kind === 'portrait' ? 'user' : 'environment'}
+                        disabled={busy || unsaved}
+                        onFiles={(files) => upload(kind, files[0])}
+                      />
+                    );
+                  })}
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={busy || app.files.length !== 3 || unsaved}
+                  onClick={() => setApplicationStep(2)}
+                >
+                  {t('Rever e enviar')} →
+                </button>
+              </div>
+              <div hidden={applicationStep !== 2}>
+                <h2>{t('3. Confirmar candidatura')}</h2>
+                <p>
+                  {data.name} · {data.city}
+                </p>
+                {unsaved && (
+                  <p role="alert">
+                    {t(
+                      'Guarde as alterações dos dados pessoais antes de carregar fotografias ou submeter.',
+                    )}
+                  </p>
                 )}
-              </p>
-              <button
-                className="btn btn-primary"
-                disabled={
-                  busy ||
-                  app.files.length !== 3 ||
-                  JSON.stringify(data) !== JSON.stringify(app.data)
-                }
-                onClick={() => void sendApplication('submit')}
-              >
-                {t('Submeter candidatura')}
-              </button>
+                <p>
+                  {t(
+                    'Depois de submeter, os dados ficam bloqueados durante a análise. Guarde quaisquer alterações antes de continuar.',
+                  )}
+                </p>
+                <button
+                  className="btn btn-primary"
+                  disabled={
+                    busy ||
+                    app.files.length !== 3 ||
+                    JSON.stringify(data) !== JSON.stringify(app.data)
+                  }
+                  onClick={() => void sendApplication('submit')}
+                >
+                  {t('Submeter candidatura')}
+                </button>
+              </div>
             </section>
           )}
         </>

@@ -23,15 +23,30 @@ import {
 } from '@/components/ui/dropdown-menu';
 export function AccountMenu({
   className = 'account-link',
+  identity = false,
 }: {
   className?: string;
+  identity?: boolean;
 }) {
   const { t } = useI18n();
   const [dashboard, setDashboard] = useState('');
+  const [account, setAccount] = useState<{
+    name: string;
+    email: string;
+  } | null>(null);
   useEffect(() => {
     void fetch('/api/session', { cache: 'no-store' })
-      .then((r) => r.json() as Promise<{ dashboard?: string }>)
-      .then((d) => setDashboard(d.dashboard || ''))
+      .then(
+        (r) =>
+          r.json() as Promise<{
+            dashboard?: string;
+            account?: { name: string; email: string } | null;
+          }>,
+      )
+      .then((d) => {
+        setDashboard(d.dashboard || '');
+        setAccount(d.account ?? null);
+      })
       .catch(() => {});
   }, []);
   return (
@@ -39,10 +54,19 @@ export function AccountMenu({
       <DropdownMenuTrigger
         id="framy-account-menu-trigger"
         aria-label={t('Minha Conta')}
-        className={`account-menu-trigger ${className}`}
+        className={`account-menu-trigger ${className}${identity ? ' account-identity-trigger' : ''}`}
       >
-        <UserRound size={17} />
-        <span className="account-menu-label">{t(' Minha Conta ')}</span>
+        <span className="account-avatar">
+          <UserRound size={17} />
+        </span>
+        {identity && account ? (
+          <span className="account-identity-text">
+            <strong>{account.name}</strong>
+            <small>{account.email}</small>
+          </span>
+        ) : (
+          <span className="account-menu-label">{t(' Minha Conta ')}</span>
+        )}
         <ChevronDown className="account-menu-chevron" size={14} />
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -50,6 +74,12 @@ export function AccountMenu({
         sideOffset={10}
         className="account-menu-popup"
       >
+        {identity && account && (
+          <div className="account-popup-identity">
+            <strong>{account.name}</strong>
+            <small>{account.email}</small>
+          </div>
+        )}
         {dashboard ? (
           <>
             <DropdownMenuItem

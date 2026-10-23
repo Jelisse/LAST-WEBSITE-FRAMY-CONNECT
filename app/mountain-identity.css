@@ -36,19 +36,13 @@ body .framy-home .home-brand-finale :is(.home-how,.brand-footer) {
 }
 body .framy-home .home-brand-finale :is(.home-how,.brand-footer)::before { display:none; }
 body .framy-home .home-brand-finale .home-how { padding-block:72px 88px; }
-body .framy-home .home-brand-finale .home-how > h2 { max-width:780px; }
-body .framy-home .home-brand-finale .home-how > p { max-width:430px; }
+body .framy-home .home-brand-finale .home-how > h2 { max-width: none; }
+body .framy-home .home-brand-finale .home-how > p { max-width: none; }
 /* Other footers carry a restrained crop of the same original artwork. */
 body .brand-footer::before {
   background: var(--framy-mountain) no-repeat 58% 36% / max(1200px,110%) auto;
   opacity:.20;
   mask-image:linear-gradient(180deg,#0002,#000 90%);
-}
-body .brand-footer.brand-footer-compact::before {
-  background-size:1100px auto;
-  background-position:left -80px top -150px;
-  opacity:.14;
-  mask-image:linear-gradient(90deg,#000,transparent 70%);
 }
 @media(max-width:700px) {
   body :is(.brand-topbar,.workspace-header,.manager-top,.agent-header,.staff-page > header)::before {

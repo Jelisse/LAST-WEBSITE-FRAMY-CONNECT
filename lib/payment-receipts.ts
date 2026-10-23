@@ -11,6 +11,8 @@ type Receipt = {
   cycle: string;
   method: string;
   reference: string;
+  publicReference?: string;
+  paymentReference?: string;
   providerReference: string;
   paidAt: string;
   periodStart?: string;
@@ -50,7 +52,8 @@ export function receiptMessage(r: Receipt) {
     'Pagamento feito com sucesso.',
     'Comprovativo de pagamento · Framy Connect',
     '',
-    `Referência: ${r.reference}`,
+    `Referência: ${r.publicReference ?? r.reference}`,
+    ...(r.paymentReference ? [`Pagamento: ${r.paymentReference}`] : []),
     `Referência PaySuite: ${r.providerReference}`,
     `Data: ${date(r.paidAt)} (Maputo)`,
     `Método: ${{ mpesa: 'M-Pesa', emola: 'e-Mola', credit_card: 'Visa / Mastercard' }[r.method] ?? r.method}`,
@@ -77,7 +80,11 @@ export function receiptMessage(r: Receipt) {
     lines.push(
       `Design: ${{ standard: 'FramyConnect', customer: 'O seu design', team: 'Criado pela equipa' }[c.design] ?? c.design}`,
       `Produtos: ${money(c.hardware)}`,
-      ...(c.discount ? [`Desconto embaixador (${c.ambassadorCode ?? ''}): -${money(c.discount)}`] : []),
+      ...(c.discount
+        ? [
+            `Desconto embaixador (${c.ambassadorCode ?? ''}): -${money(c.discount)}`,
+          ]
+        : []),
       `Personalização: ${money(c.customization)}`,
       ...(c.fulfilment?.mode === 'pickup'
         ? [
@@ -107,7 +114,9 @@ export function receiptMessage(r: Receipt) {
     `Total pago: ${money(r.amount)}`,
     '',
     'Consultar confirmação:',
-    `https://framyconnect.co.mz/checkout/retorno?payment=${encodeURIComponent(r.reference)}`,
+    r.kind === 'product'
+      ? `https://framyconnect.co.mz/acompanhar?referencia=${encodeURIComponent(r.publicReference ?? r.reference)}`
+      : `https://framyconnect.co.mz/checkout/retorno?payment=${encodeURIComponent(r.reference)}`,
   );
   if (r.kind === 'product')
     lines.push(
@@ -137,10 +146,15 @@ export async function paymentReceipts(
     .bind(now - 23 * 3600000)
     .run();
   const rows = await env.DB.prepare(
-    "SELECT payment_id,payload_json FROM payment_email_receipts WHERE status='pending' AND (attempted_at IS NULL OR attempted_at<?) AND (? IS NULL OR payment_id=?) ORDER BY created_at LIMIT 20",
+    "SELECT payment_id,payload_json,p.public_reference AS payment_reference,o.public_reference AS order_reference FROM payment_email_receipts r JOIN paysuite_payments p ON p.id=r.payment_id LEFT JOIN paysuite_product_orders o ON o.id=p.target_id AND p.kind='product' WHERE r.status='pending' AND (r.attempted_at IS NULL OR r.attempted_at<?) AND (? IS NULL OR payment_id=?) ORDER BY r.created_at LIMIT 20",
   )
     .bind(now - 15 * 60000, paymentId ?? null, paymentId ?? null)
-    .all<{ payment_id: string; payload_json: string }>();
+    .all<{
+      payment_id: string;
+      payload_json: string;
+      payment_reference: string;
+      order_reference: string | null;
+    }>();
   for (const row of rows.results) {
     const claim = await env.DB.prepare(
       "UPDATE payment_email_receipts SET first_attempt_at=COALESCE(first_attempt_at,?),attempted_at=? WHERE payment_id=? AND status='pending' AND (attempted_at IS NULL OR attempted_at<?)",
@@ -161,7 +175,11 @@ export async function paymentReceipts(
           from: env.PROFILE_EMAIL_FROM,
           to: [receipt.email],
           subject: 'Pagamento feito com sucesso · Framy Connect',
-          text: receiptMessage(receipt),
+          text: receiptMessage({
+            ...receipt,
+            publicReference: row.order_reference ?? row.payment_reference,
+            paymentReference: row.payment_reference,
+          }),
         }),
         signal: AbortSignal.timeout(10000),
       });

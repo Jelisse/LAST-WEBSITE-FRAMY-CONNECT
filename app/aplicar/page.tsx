@@ -1,6 +1,6 @@
 import { getTranslations } from '@/lib/server-i18n';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
-import { SiteHeader, SiteFooter } from '@/components/site-shell';
+import { SiteHeader } from '@/components/site-shell';
 import Link from '@/components/hard-link';
 import { AgentApplicationForm } from '@/components/agent-application-form';
 export const dynamic = 'force-dynamic';
@@ -52,7 +52,6 @@ export default async function Page() {
           </section>
         )}
       </main>
-      <SiteFooter />
     </>
   );
 }

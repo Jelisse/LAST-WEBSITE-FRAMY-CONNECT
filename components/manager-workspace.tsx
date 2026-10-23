@@ -1,4 +1,6 @@
 'use client';
+import { AppSidebarContents } from './app-sidebar';
+import { managerSections as sections } from './manager-sections';
 import { focusDashboardStart } from '@/lib/dashboard-navigation';
 import { AmbassadorDashboard } from './ambassador-dashboard';
 import { PanelBrand } from '@/components/panel-brand';
@@ -7,25 +9,24 @@ import { FinanceManager } from './finance-manager';
 import { SubscriptionManager } from './subscription-manager';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
 
-import { planMeticais, planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
+import {
+  planMeticais,
+  planPrice,
+  planAnnualMeticais,
+} from '@/lib/plan-pricing';
 
-import { SourceImage } from '@/components/source-image';
 import { useEffect, useState, useCallback } from 'react';
 import Link from '@/components/hard-link';
 import { orderProgress, submissionTime } from '@/lib/order-progress';
 import {
-  LayoutDashboard,
   Boxes,
-  ShoppingBag,
   Wallet,
   ArrowUpRight,
   RefreshCw,
   Search,
   Plus,
   Download,
-  Users,
   Package,
-  ChevronRight,
 } from 'lucide-react';
 import { AgentAction } from './agent-action';
 import { agentOrderView } from '@/lib/agent-workflow';
@@ -33,7 +34,7 @@ import { OrderArtwork } from './order-artwork';
 import { ProfileHandoff } from './profile-handoff';
 import { ApplicationManager } from './application-manager';
 import { AccountManager } from './account-manager';
-import { MobileNavigation } from './mobile-navigation';
+import { AppSidebarDrawer } from './app-sidebar-drawer';
 import { AccountMenu } from './account-menu';
 import { HeroManager } from './hero-manager';
 import { ProductManager } from './product-manager';
@@ -91,19 +92,12 @@ type Data = {
   products: Product[];
   plans: ManagedPlan[];
 };
-const sections = [
-  { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
-  { id: 'operations', label: 'Operações', icon: Boxes },
-  { id: 'accounts', label: 'Contas e acessos', icon: Users },
-  { id: 'subscriptions', label: 'Subscrições digitais', icon: Wallet },
-  { id: 'finance', label: 'Financeiro', icon: Wallet },
-  { id: 'ambassadors', label: 'Embaixadores', icon: Users },
-  { id: 'catalog', label: 'Produtos', icon: ShoppingBag },
-  { id: 'applications', label: 'Candidaturas', icon: Users },
-  { id: 'analytics', label: 'Análise do website', icon: ArrowUpRight },
-  { id: 'hero', label: 'Página inicial', icon: LayoutDashboard },
-];
-export function ManagerWorkspace({ displayName }: { displayName: string }) {
+
+export function ManagerWorkspace({
+  displayName: _displayName,
+}: {
+  displayName: string;
+}) {
   const { t } = useI18n();
   const date = (value: string) =>
     new Date(value).toLocaleString(t.locale, { timeZone: 'Africa/Maputo' });
@@ -363,51 +357,48 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
       )}
     </div>
   );
+  const sidebar = (
+    <AppSidebarContents
+      badge="Gestão"
+      groups={[
+        {
+          label: 'Gestão Framy Connect',
+          items: [
+            ...sections.map(({ id, label, icon: Icon }) => ({
+              id,
+              label,
+              icon: <Icon size={21} />,
+              active: section === id,
+              onSelect: () => navigate(id),
+            })),
+            {
+              id: 'payments',
+              label: 'Pagamentos',
+              href: '/manager/pagamentos',
+              icon: <Wallet size={21} />,
+            },
+          ],
+        },
+      ]}
+      footer={
+        <Link href="/" title={t('Ver website ')} aria-label={t('Ver website ')}>
+          <ArrowUpRight size={18} />
+          <span>{t('Ver website ')}</span>
+        </Link>
+      }
+    />
+  );
   return (
     <div className="manager-shell">
-      <aside className="manager-sidebar">
-        <Link href="/" aria-label={t('Página inicial')}>
-          <SourceImage src="/brand/logo.svg" alt={t('Framy Connect')} />
-        </Link>
-        <span className="manager-eyebrow">{t('MANAGER')}</span>
-        <nav aria-label={t('Gestão')}>
-          {sections.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              aria-current={section === id ? 'page' : undefined}
-              onClick={() => navigate(id)}
-            >
-              <Icon size={20} />
-              {t(label)}
-              <ChevronRight size={15} />
-            </button>
-          ))}
-        </nav>
-        <div className="manager-sidebar-bottom">
-          <strong>{displayName}</strong>
-          <small>{t('Gestão Framy Connect')}</small>
-          <Link href="/">
-            {t('Ver website ')}
-            <ArrowUpRight size={15} />
-          </Link>
-        </div>
-      </aside>
+      <aside className="manager-sidebar app-sidebar">{sidebar}</aside>
       <div className="manager-body">
         <header className="manager-top">
           <PanelBrand />
-          <MobileNavigation
-            items={sections.map(({ id, label, icon: Icon }) => ({
-              label,
-              icon: <Icon size={20} />,
-              active: section === id,
-              onSelect: () => navigate(id),
-            }))}
-          />
+          <AppSidebarDrawer>{sidebar}</AppSidebarDrawer>
           <span className="desktop-language">
             <LanguageSelector />
           </span>
-          <span>{t('Gestor')} </span>
-          <AccountMenu />
+          <AccountMenu identity />
         </header>
         <main id="main" className="manager-main">
           <div className="manager-heading">
@@ -436,27 +427,36 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                                   'Crie acessos, recupere contas e controle a disponibilidade da equipa.',
                                 )
                               : section === 'subscriptions'
-                                ? t('Gerir adesões e pagamentos dos planos digitais.')
-                              : t(
-                                  'Acompanhe os valores recebidos, pendentes e reconhecidos.',
-                                )}
+                                ? t(
+                                    'Gerir adesões e pagamentos dos planos digitais.',
+                                  )
+                                : t(
+                                    'Acompanhe os valores recebidos, pendentes e reconhecidos.',
+                                  )}
               </p>
             </div>
-            {['overview','operations','finance'].includes(section) && <Link className="manager-secondary" href="/manager/pagamentos">{t('Checkout e pagamentos PaySuite')}</Link>}
-            {section !== 'ambassadors' && section !== 'analytics' && section !== 'subscriptions' && section !== 'finance' && (
-              <button
-                className="manager-secondary"
-                disabled={busy}
-                onClick={() =>
-                  void load()
-                    .then(() => setError(''))
-                    .catch((e) => setError(e.message))
-                }
-              >
-                <RefreshCw size={16} />
-                {t(' Actualizar')}
-              </button>
+            {['overview', 'operations', 'finance'].includes(section) && (
+              <Link className="manager-secondary" href="/manager/pagamentos">
+                {t('Checkout e pagamentos PaySuite')}
+              </Link>
             )}
+            {section !== 'ambassadors' &&
+              section !== 'analytics' &&
+              section !== 'subscriptions' &&
+              section !== 'finance' && (
+                <button
+                  className="manager-secondary"
+                  disabled={busy}
+                  onClick={() =>
+                    void load()
+                      .then(() => setError(''))
+                      .catch((e) => setError(e.message))
+                  }
+                >
+                  <RefreshCw size={16} />
+                  {t(' Actualizar')}
+                </button>
+              )}
           </div>
           {section === 'operations' && (
             <p className="manager-sandbox">
@@ -471,7 +471,9 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
             </p>
           )}
           {notice && <output className="manager-notice">{t(notice)}</output>}
-          {section === 'ambassadors' ? (<AmbassadorDashboard />) : section === 'subscriptions' ? (
+          {section === 'ambassadors' ? (
+            <AmbassadorDashboard />
+          ) : section === 'subscriptions' ? (
             <SubscriptionManager />
           ) : section === 'analytics' ? (
             <WebsiteAnalytics />
@@ -947,7 +949,9 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                   </section>
                 </>
               )}
-              {section === 'catalog' && <ProductManager onSaved={() => void load()} />}
+              {section === 'catalog' && (
+                <ProductManager onSaved={() => void load()} />
+              )}
               {section === 'finance' && <FinanceManager />}
             </>
           )}
@@ -1320,10 +1324,19 @@ export function ManagerWorkspace({ displayName }: { displayName: string }) {
                     </label>
                     <label>
                       {t('MT / ano')}
-                      <input type="number" name="annualMeticais"
-                        min={(editing as ManagedPlan).id === 'free-30' ? '0' : '1'}
-                        max="120000" step="0.01" required
-                        defaultValue={planAnnualMeticais(editing as ManagedPlan)} />
+                      <input
+                        type="number"
+                        name="annualMeticais"
+                        min={
+                          (editing as ManagedPlan).id === 'free-30' ? '0' : '1'
+                        }
+                        max="120000"
+                        step="0.01"
+                        required
+                        defaultValue={planAnnualMeticais(
+                          editing as ManagedPlan,
+                        )}
+                      />
                     </label>
                     <label>
                       {t('Número de links')}

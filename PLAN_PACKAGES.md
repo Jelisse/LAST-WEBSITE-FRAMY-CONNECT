@@ -30,3 +30,17 @@ Corporate selection now opens company setup before payment. A Framy manager revi
 ## Corporate onboarding release - 19 October 2026
 
 The guided setup, manual manager approval, authorization/password administration and email-only invitations are now published. Migration 0032 applied after private backup; Worker 83e67de9-cbed-4fa3-9abe-31812d6da5df, source d1bb074. This supersedes local-only/pending release statements above. Production public access and anonymous access protection verified on canonical/workers.dev domains; real email delivery and employee acceptance still require external confirmation. See ACCOUNT_HANDOFF.md for exact verification.
+
+## Approved launch catalogue — 21 October 2026
+
+The approved public names are Personal, Professional, Business and Enterprise. Personal uses existing permanent-free id personal; Professional retains professional-v2 and its manager-published MZN checkout. New display names do not rewrite membership terms_json, invoices, receipts or negotiated Corporate contracts.
+
+USD reference prices: Personal free; Professional $4/month or $40/year; Business $2.50/employee/month or $25/employee/year for3–50 licensed employee profiles; Enterprise from $2/employee/month or $20/employee/year for51–500 profiles. Owner administration is included; an owner requiring a managed profile needs a paid seat. Physical NFC hardware, delivery and custom design remain separate. Applicable taxes and final terms are confirmed in checkout or quotation. No automatic debit.
+
+lib/launch-offers.ts is the approved reference catalogue. Actual MZN prices remain manager-published; no historical FX rate is applied and no price records are overwritten. Home pricing and account plan selection share four comparison cards, audience groupings, Business recommendation, warm Enterprise gradient, monthly/annual control and employee estimator. Plan features shown for Professional respect managed feature controls. Existing custom contracts remain available through established subscription/renewal administration.
+
+Business and Enterprise are quotation packages, not automatic per-seat checkout plans. Their company setup routes carry only a whitelisted offer through authentication. Requests persist offer, cycle, reference price and a server-recomputed integer-cent USD quotation in existing details_json. User-supplied totals are ignored; company approval enforces the selected tier's employee bounds. Legacy requests without offer retain existing1–500 capacity semantics. Approval continues to be an operational grant, not payment evidence. Professional employee access is scoped/provisioned through the agreed quotation and existing individual/negotiated contracts; no automatic corporate-to-personal entitlement inheritance was added.
+
+CRM, Wallet passes, OCR/enrichment, SSO and automatic mail signature deployment are not advertised as included launch features. Company base setup and a named Enterprise contact are offered within the negotiated scope; specialised training/integrations require quotations. Real payment settlement and inbox delivery remain external verification.
+
+Release21 October2026: approved four-plan catalogue and quote flow deployed as Worker31bac668-2604-402c-9362-e9a4cca471b5 after guarded schema/integrity checks and build.235 tests, TypeScript and targeted lint passed. No schema migration; existing paid snapshots and published MZN prices retained. See ACCOUNT_HANDOFF.md for scope and external verification boundaries.

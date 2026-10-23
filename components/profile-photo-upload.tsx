@@ -145,68 +145,73 @@ export function ProfilePhotoUpload({
           <ImagePlus size={16} />
           {t('Fotografia de capa')}
         </Button>
-      {uploading && <output>{t('A carregar…')}</output>}
+        {uploading && <output>{t('A carregar…')}</output>}
         <small>{t('JPG, PNG ou WebP · até 5 MB')}</small>
-        {profile.photoUrl && (
-          <>
-            {(
-              [
-                ['photoPositionX', 'Enquadramento horizontal', 0, 100, 50],
-                ['photoPosition', 'Enquadramento vertical', 0, 100, 50],
-                ['photoScale', 'Zoom da fotografia', 100, 150, 100],
-              ] as const
-            ).map(([key, label, min, max, fallback]) => (
-              <label key={key}>
-                {t(label)}
-                <input
-                  type="range"
-                  min={min}
-                  max={max}
+        {(profile.photoUrl || profile.coverUrl) && (
+          <details className="photo-adjustments">
+            <summary>{t('Ajustar fotografias')}</summary>
+            {profile.photoUrl && (
+              <>
+                {(
+                  [
+                    ['photoPositionX', 'Enquadramento horizontal', 0, 100, 50],
+                    ['photoPosition', 'Enquadramento vertical', 0, 100, 50],
+                    ['photoScale', 'Zoom da fotografia', 100, 150, 100],
+                  ] as const
+                ).map(([key, label, min, max, fallback]) => (
+                  <label key={key}>
+                    {t(label)}
+                    <input
+                      type="range"
+                      min={min}
+                      max={max}
+                      disabled={disabled || uploading}
+                      value={Math.max(min, profile[key] ?? fallback)}
+                      onChange={(e) =>
+                        onChange({ ...profile, [key]: Number(e.target.value) })
+                      }
+                    />
+                  </label>
+                ))}
+                <button
+                  type="button"
                   disabled={disabled || uploading}
-                  value={Math.max(min, profile[key] ?? fallback)}
-                  onChange={(e) =>
-                    onChange({ ...profile, [key]: Number(e.target.value) })
-                  }
-                />
-              </label>
-            ))}
-            <button
-              type="button"
-              disabled={disabled || uploading}
-              onClick={() => onChange({ ...profile, photoUrl: '' })}
-            >
-              <X size={14} />
-              {t('Remover fotografia')}
-            </button>
-          </>
-        )}
-        {profile.coverUrl && (
-          <>
-            <label>
-              {t('Enquadramento da capa')}
-              <input
-                type="range"
-                min="0"
-                max="100"
-                disabled={disabled || uploading}
-                value={profile.coverPosition ?? 50}
-                onChange={(e) =>
-                  onChange({
-                    ...profile,
-                    coverPosition: Number(e.target.value),
-                  })
-                }
-              />
-            </label>
-            <button
-              type="button"
-              disabled={disabled || uploading}
-              onClick={() => onChange({ ...profile, coverUrl: '' })}
-            >
-              <X size={14} />
-              {t('Remover capa')}
-            </button>
-          </>
+                  onClick={() => onChange({ ...profile, photoUrl: '' })}
+                >
+                  <X size={14} />
+                  {t('Remover fotografia')}
+                </button>
+              </>
+            )}
+            {profile.coverUrl && (
+              <>
+                <label>
+                  {t('Enquadramento da capa')}
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    disabled={disabled || uploading}
+                    value={profile.coverPosition ?? 50}
+                    onChange={(e) =>
+                      onChange({
+                        ...profile,
+                        coverPosition: Number(e.target.value),
+                      })
+                    }
+                  />
+                </label>
+                <button
+                  type="button"
+                  disabled={disabled || uploading}
+                  onClick={() => onChange({ ...profile, coverUrl: '' })}
+                >
+                  <X size={14} />
+                  {t('Remover capa')}
+                </button>
+              </>
+            )}
+          </details>
         )}
         {error && <p role="alert">{t(error)}</p>}
       </div>

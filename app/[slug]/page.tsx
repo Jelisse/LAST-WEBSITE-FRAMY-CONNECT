@@ -39,51 +39,16 @@ const pages: Record<
       },
     ],
   },
-  contacto: {
-    title: 'Vamos conectar-nos.',
-    eyebrow: 'CONTACTO',
-    intro:
-      'Conte-nos o que precisa. Um cartão, uma equipa inteira ou uma nova ideia para o seu negócio.',
-    blocks: [
-      {
-        title: 'Conversas que abrem possibilidades',
-        text: 'Para informações sobre produtos e soluções, contacte info@framyconnect.co.mz. O envio é feito pela sua aplicação de email.',
-      },
-      {
-        title: 'Apoio ao cliente',
-        text: 'Para questões sobre o seu perfil, use info@framyconnect.co.mz. Indique a referência da encomenda ao contactar a equipa. O pagamento é confirmado após verificação no prestador.',
-      },
-    ],
-  },
-  ajuda: {
-    title: 'Um toque mais simples.',
-    eyebrow: 'AJUDA',
-    intro: 'As respostas para começar a partilhar a sua identidade.',
-    blocks: [
-      {
-        title: 'Preciso de uma aplicação?',
-        text: 'Um perfil publicado abre no navegador através do seu link. A leitura NFC depende de um telemóvel compatível e das respectivas definições.',
-      },
-      {
-        title: 'Posso alterar os meus contactos?',
-        text: 'Sim. No seu espaço, edite os dados, guarde o rascunho e publique a versão actualizada. O nome de utilizador fica reservado na primeira gravação.',
-      },
-      {
-        title: 'Quem vê os meus dados?',
-        text: 'O perfil apresenta apenas os contactos cuja visibilidade activou. Quem tem o endereço pode consultar um perfil publicado enquanto o período gratuito estiver activo. Pode retirar a publicação no seu painel.',
-      },
-      {
-        title: 'Como acompanho uma encomenda?',
-        text: 'Depois de confirmar o pedido, consulte a referência e o estado na sua conta. A produção começa após confirmação do pagamento e atribuição à equipa. Reservas não pagas expiram após 24 horas.',
-      },
-    ],
-  },
   privacidade: {
     title: 'Privacidade e utilização dos dados',
     eyebrow: 'PRIVACIDADE',
     intro:
       'Conheça os dados utilizados para gerir a sua conta, publicar o seu perfil e acompanhar as suas encomendas.',
     blocks: [
+      {
+        title: 'Compras sem conta',
+        text: 'Pode comprar produtos físicos sem criar conta. Guardamos o nome, email, contacto e dados de entrega para gerir a encomenda. Um cookie necessário, inacessível a scripts e válido por 30 dias, permite recuperar a compra neste navegador. A referência recente fica no dispositivo e a tentativa de pagamento neste separador. A referência pública mostra apenas o progresso. Dados pessoais e recuperação do pagamento exigem o navegador da compra, a conta associada ou um link enviado ao email do comprador, válido por 30 minutos.',
+      },
       {
         title: 'Cookies e armazenamento no dispositivo',
         text: 'A sessão utiliza um cookie necessário, protegido contra acesso por scripts, que expira após 24 horas. A preferência de idioma é guardada durante um ano. A configuração da compra fica neste separador por até 30 minutos e é removida ao terminar sessão. As estatísticas são opcionais: só começam após Permitir, e Recusar mantém o website funcional. Guardamos essa escolha por 180 dias; depois pedimos novamente. Pode retirar a autorização nas Preferências de estatísticas. Os perfis usam apenas totais diários de cliques, sem identificadores de visitantes. Respeitamos os sinais de não rastrear e de privacidade global do navegador.',
@@ -94,7 +59,7 @@ const pages: Record<
       },
       {
         title: 'Medição dos perfis digitais',
-        text: 'Os perfis contam cliques por dia, sem cookies analíticos, identificadores de visitantes ou registos individuais de eventos. Cliques repetidos contam novamente. Os totais diários são conservados por até 90 dias; o total público de conexões preserva o histórico e acrescenta novos cliques. O histórico anterior foi recolhido com consentimento. Limites de segurança podem usar um código do IP por uma hora para prevenir abuso; não integra os relatórios. Respeitamos os sinais de não rastrear e de privacidade global.',
+        text: 'Os perfis contam cliques por dia, sem cookies analíticos, identificadores de visitantes ou registos individuais de eventos. Os cartões da empresa também contam visitas agregadas quando permite estatísticas; não identificam visitantes únicos. Cliques repetidos contam novamente. Os totais diários são conservados por até 90 dias; o total público de conexões preserva o histórico e acrescenta novos cliques. O histórico anterior foi recolhido com consentimento. Limites de segurança podem usar um código do IP por uma hora para prevenir abuso; não integra os relatórios. Respeitamos os sinais de não rastrear e de privacidade global.',
       },
       {
         title: 'Dados que escolhe guardar',
@@ -216,8 +181,15 @@ export default async function Page({
               <ArrowUpRight size={20} />
             </a>
           )}
-          <Link className="text-link" href={slug === 'contacto' ? 'https://wa.me/258846847629' : '/produtos'}>
-            {t(slug === 'contacto' ? 'O nosso WhatsApp' : 'Descobrir produtos ')}
+          <Link
+            className="text-link"
+            href={
+              slug === 'contacto' ? 'https://wa.me/258846847629' : '/produtos'
+            }
+          >
+            {t(
+              slug === 'contacto' ? 'O nosso WhatsApp' : 'Descobrir produtos ',
+            )}
             <ArrowUpRight size={19} />
           </Link>
         </main>

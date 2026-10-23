@@ -1,68 +1,13 @@
+import { PublicHeader } from './public-header';
 import { getTranslations } from '@/lib/server-i18n';
-import { LanguageSelector } from '@/components/language-provider';
-import { MobileNavigation } from '@/components/mobile-navigation';
-import { AccountMenu } from '@/components/account-menu';
 import Image from 'next/image';
 import Link from '@/components/hard-link';
 import { ArrowUpRight, Mail, MessageCircle, ShieldCheck } from 'lucide-react';
 export async function SiteHeader({ focused = false }: { focused?: boolean }) {
-  const t = await getTranslations();
-  return (
-    <header
-      className={`site-header brand-topbar${focused ? ' site-header-focused' : ''}`}
-    >
-      <Link href="/" className="brand">
-        <Image
-          width={220}
-          height={100}
-          unoptimized
-          src="/brand/logo.svg"
-          alt={t('Framy Connect')}
-        />
-      </Link>
-      {!focused && (
-        <nav aria-label={t('Navegação principal')}>
-          <Link href="/">{t('Página Inicial')}</Link>
-          <Link href="/sobre">{t('Sobre nós')}</Link>
-          <Link href="/produtos">{t('Produtos')}</Link>
-          <Link href="/contacto">{t('Contacto')}</Link>
-        </nav>
-      )}
-      <div className="header-actions">
-        <LanguageSelector />
-        {!focused && (
-          <Link className="header-agent-link" href="/aplicar">
-            {t('Tornar-se agente')}
-          </Link>
-        )}
-        <AccountMenu />
-        <MobileNavigation />
-        {focused && (
-          <Link className="header-contact-link" href="/contacto">
-            {t('Contacto')}
-          </Link>
-        )}
-      </div>
-    </header>
-  );
+  return <PublicHeader focused={focused} />;
 }
-export async function SiteFooter({
-  compact = false,
-}: { compact?: boolean } = {}) {
+export async function SiteFooter() {
   const t = await getTranslations();
-  if (compact)
-    return (
-      <footer className="brand-footer brand-footer-compact">
-        <div className="brand-footer-inner">
-          <span>© {new Date().getFullYear()} Framy Connect</span>
-          <nav aria-label={t('Conta e apoio')}>
-            <Link href="/ajuda">{t('Centro de ajuda')}</Link>
-            <Link href="/privacidade">{t('Privacidade')}</Link>
-            <Link href="/termos">{t('Termos de utilização')}</Link>
-          </nav>
-        </div>
-      </footer>
-    );
   return (
     <footer className="brand-footer">
       <div className="brand-footer-inner">
@@ -89,19 +34,21 @@ export async function SiteFooter({
           <nav aria-label={t('Navegação do rodapé')}>
             <h2>{t('Navegação')}</h2>
             <Link href="/">{t('Página Inicial')}</Link>
+            <Link href="/porque-framy">{t('Porquê Framy Connect')}</Link>
             <Link href="/sobre">{t('Sobre nós')}</Link>
+            <Link href="/para-empresas">{t('Para empresas')}</Link>
             <Link href="/produtos">{t('Produtos')}</Link>
-            <Link href="/contacto">{t('Contacto')}</Link>
+            <Link href="/contacto">{t('Contactar a Framy')}</Link>
             <Link href="/aplicar">{t('Torne-se agente')}</Link>
-              <Link href="/embaixadores">{t('Embaixadores Framy')}</Link>
+            <Link href="/embaixadores">{t('Embaixadores Framy')}</Link>
           </nav>
           <div className="brand-footer-contact">
-            <h2>{t('Fale connosco')}</h2>
-            <a href="mailto:info@framyconnect.co.mz">
+            <h2>{t('Contactar a Framy')}</h2>
+            <a href="mailto:sales@framyconnect.co.mz">
               <Mail size={16} />
               <span>
                 <small>{t('Produtos e soluções')}</small>
-                {t('info@framyconnect.co.mz')}
+                sales@framyconnect.co.mz
               </span>
             </a>
             <a
@@ -116,7 +63,7 @@ export async function SiteFooter({
               </span>
             </a>
             <Link className="brand-footer-pill" href="/contacto">
-              {t('Vamos conversar ')}
+              {t('Contactar a Framy')}
               <ArrowUpRight size={15} />
             </Link>
           </div>

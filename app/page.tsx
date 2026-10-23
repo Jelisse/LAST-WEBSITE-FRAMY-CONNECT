@@ -1,21 +1,18 @@
+import './why-framy.css';
+import { ProblemPaths } from '@/components/problem-paths';
+import { PlanComparison, PlanQuestions } from '@/components/plan-comparison';
 import { env } from 'cloudflare:workers';
 import { paysuiteReady } from '@/lib/server-paysuite';
 import { database } from '@/lib/server-db';
 import { HomeProfilePlans } from '@/components/home-profile-plans';
 import { getTranslations } from '@/lib/server-i18n';
-import { LanguageSelector } from '@/components/language-provider';
 import { planMeticais } from '@/lib/plan-pricing';
 import { publicPageRobots } from '@/lib/server-site';
 import { HomePurchaseOffers } from '@/components/home-purchase-offers';
-import { AccountMenu } from '@/components/account-menu';
-import { HomeMobileMenu } from '@/components/home-mobile-menu';
-import { HomeHeader } from '@/components/home-header';
-import Image from 'next/image';
 import Link from '@/components/hard-link';
-import { ArrowUpRight, Nfc, Smartphone, RefreshCw } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { SiteFooter } from '@/components/site-shell';
 import { getHeroMedia } from '@/lib/server-hero-media';
-import { HomeHeroScene } from '@/components/home-hero-scene';
 import { HomeSharingScene } from '@/components/home-sharing-scene';
 import { getProducts } from '@/lib/server-catalog';
 import { getManagedPlans } from '@/lib/server-plans';
@@ -25,6 +22,10 @@ import './home-atmosphere.css';
 import './home-interactions.css';
 import './home-featured.css';
 import './home-refinements.css';
+import './public-marketing.css';
+import { PublicHeader } from '@/components/public-header';
+import { PublicSolutions, PublicTrust } from '@/components/public-solutions';
+import { ConnectionDemo } from '@/components/connection-demo';
 
 const questions = [
   [
@@ -45,7 +46,7 @@ const questions = [
   ],
   [
     'O produto inclui uma subscrição?',
-    'O produto físico é pago separadamente do perfil digital. O plano Individual é gratuito, sem prazo. Profissional e Corporativo são pagos, com renovação confirmada pelo cliente.',
+    'O produto físico é pago separadamente do perfil digital. O plano Personal é gratuito, sem prazo. Professional, Business e Enterprise são pagos, com renovação confirmada pelo cliente.',
   ],
   [
     'Como indico o local de entrega?',
@@ -57,15 +58,28 @@ const questions = [
   ],
 ];
 export const dynamic = 'force-dynamic';
-export const metadata = { robots: publicPageRobots() };
+export async function generateMetadata() {
+  const t = await getTranslations();
+  return {
+    title: t('Perfis profissionais e equipas conectadas'),
+    description: t(
+      'Perfis digitais, produtos NFC e ferramentas para equipas. Partilhe contactos, organize campanhas e acompanhe a actividade da sua empresa com a Framy Connect.',
+    ),
+    robots: publicPageRobots(),
+  };
+}
 export default async function Home() {
   const t = await getTranslations();
   const billing = await database()
     .prepare('SELECT enabled FROM profile_billing_settings WHERE id=1')
     .first<{ enabled: number }>()
     .catch(() => null);
-  const checkoutSettings = await database().prepare('SELECT enabled FROM checkout_pricing WHERE id=1').first<{enabled:number}>().catch(() => null);
-  const checkoutAvailable = paysuiteReady(env) && checkoutSettings?.enabled === 1;
+  const checkoutSettings = await database()
+    .prepare('SELECT enabled FROM checkout_pricing WHERE id=1')
+    .first<{ enabled: number }>()
+    .catch(() => null);
+  const checkoutAvailable =
+    paysuiteReady(env) && checkoutSettings?.enabled === 1;
   const [products, allPlans, heroMedia] = await Promise.all([
     getProducts(),
     getManagedPlans(),
@@ -75,113 +89,63 @@ export default async function Home() {
     .filter((p) => p.active)
     .sort((a, b) => planMeticais(a) - planMeticais(b));
   return (
-    <div className="framy-home">
-      <HomeHeader>
-        <Link href="/" aria-label={t('Framy Connect — início')}>
-          <Image
-            src="/brand/logo.svg"
-            alt={t('Framy Connect')}
-            width={220}
-            height={100}
-            unoptimized
-            className="home-brand"
-          />
-        </Link>
-        <nav aria-label={t('Navegação principal')}>
-          <a href="#como-funciona">{t('Como funciona')}</a>
-          <a href="#produtos">{t('Produtos')}</a>
-          <a href="#planos">{t('Planos')}</a>
-          <a href="#sobre">{t('Sobre nós')}</a>
-        </nav>
-        <div className="home-nav-actions">
-          <LanguageSelector />
-          <Link className="home-agent" href="/aplicar">
-            {t('Tornar-se agente')}
-          </Link>
-          <AccountMenu className="home-account" />
-          <HomeMobileMenu />
-        </div>
-      </HomeHeader>
+    <div className="framy-home phase-one">
+      <PublicHeader />
       <main id="main">
-        <section className="home-hero">
-          <div className="home-hero-inner">
-            <div className="home-hero-copy">
-              <h1>
-                <span>
-                  {t('O Seu Mundo,')}
-                  <br />
-                  {t('Num Toque.')}
-                </span>
-                <svg
-                  className="home-contactless-mark"
-                  viewBox="0 0 48 64"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path d="M7 25 Q12 32 7 39" />
-                  <path d="M17 18 Q27 32 17 46" />
-                  <path d="M27 11 Q42 32 27 53" />
-                  <path d="M37 4 Q57 32 37 60" />
-                </svg>
-              </h1>
-              <p className="home-offer">
-                {t(
-                  'Partilhe contactos, redes sociais e trabalho por toque ou QR.',
-                )}
-              </p>
-              <div className="home-hero-actions">
-                <a className="home-primary" href="#produtos">
-                  {t('Escolher o meu produto')}
-                  <ArrowUpRight size={18} />
-                </a>
-                <a className="home-secondary" href="#como-funciona">
-                  {t('Como funciona ')}
-                  <Nfc size={19} />
-                </a>
-              </div>
-              <div className="home-hero-benefits">
-                <span>
-                  <Nfc />
-                  {t('Toque ou QR')}
-                </span>
-                <span>
-                  <Smartphone />
-                  {t('Abre no navegador')}
-                </span>
-                <span>
-                  <RefreshCw />
-                  {t('Perfil actualizável')}
-                </span>
-              </div>
+        <section className="public-hero">
+          <div className="public-hero-copy">
+            <span className="public-eyebrow">
+              {t('PESSOAS. EQUIPAS. NOVAS CONEXÕES.')}
+            </span>
+            <h1>
+              {t('A sua equipa conecta.')}{' '}
+              <em>{t('A sua empresa acompanha.')}</em>
+            </h1>
+            <p>
+              {t(
+                'Apresente-se com um perfil profissional. Partilhe contactos por NFC ou QR e acompanhe a actividade e os contactos recebidos nas campanhas da sua equipa.',
+              )}
+            </p>
+            <div className="public-actions">
+              <Link className="public-button" href="/perfil?plans=1">
+                {t('Criar o meu perfil gratuito')}
+                <ArrowUpRight size={18} aria-hidden="true" />
+              </Link>
+              <Link
+                className="public-button public-button-outline"
+                href="/para-empresas"
+              >
+                {t('Para a minha empresa')}
+                <ArrowUpRight size={18} aria-hidden="true" />
+              </Link>
             </div>
-            <HomeHeroScene media={heroMedia} />
+            <p className="public-hero-note">
+              {t(
+                'Personal gratuito, sem prazo. Produtos físicos e planos pagos à parte.',
+              )}
+            </p>
+            <div className="public-hero-utility">
+              <span>{t('O Seu Mundo, Num Toque.')}</span>
+              <Link href="/acompanhar">
+                {t('Acompanhar a minha encomenda')}
+                <ArrowUpRight size={14} aria-hidden="true" />
+              </Link>
+            </div>
           </div>
+          <ConnectionDemo />
         </section>
+        <PublicSolutions />
         <HomeSharingScene media={heroMedia} />
-        <HomePurchaseOffers products={products} checkoutAvailable={checkoutAvailable} />
+        <HomePurchaseOffers
+          products={products}
+          checkoutAvailable={checkoutAvailable}
+        />
         <section className="home-plans" id="planos">
           <div className="home-section-heading">
             <div>
-              <h2>{t('Planos para o seu perfil digital')}</h2>
+              <h2>{t('Planos e preços')}</h2>
             </div>
           </div>
-          {plans.find((p) => p.id === 'personal') && (
-            <div className="home-trial-banner">
-              <strong>{t('Individual gratuito, sem prazo')}</strong>
-              <span>
-                {t(
-                  'O plano Individual é gratuito, sem prazo e sem renovação.',
-                )}
-              </span>
-              <Link className="home-primary" href="/perfil?plans=1">
-                {t('Começar gratuitamente')} <ArrowUpRight size={18} />
-              </Link>
-            </div>
-          )}
           <HomeProfilePlans
             plans={plans}
             billingAvailable={billing?.enabled === 1}
@@ -195,6 +159,10 @@ export default async function Home() {
             </p>
           ) : null}
         </section>
+        <ProblemPaths />
+        <PlanComparison plans={plans} />
+        <PlanQuestions />
+        <PublicTrust />
         <section className="home-about" id="sobre">
           <h2>
             {t('Quem somos')}
@@ -203,7 +171,7 @@ export default async function Home() {
           <div className="home-about-content">
             <p className="home-about-intro">
               {t(
-                'A Framy Connect liga os seus produtos NFC a um perfil digital com contactos, redes sociais e trabalho. Uma forma simples de se apresentar e manter a sua informação actualizada.',
+                'A Framy Connect aproxima pessoas e empresas através de perfis digitais, produtos NFC e ferramentas para equipas. Começamos em Moçambique, com apoio à configuração e uma experiência pensada para as suas conexões.',
               )}
             </p>
             <Link className="home-text-link" href="/sobre">
@@ -217,7 +185,13 @@ export default async function Home() {
             {questions.map(([q, a]) => (
               <details key={q}>
                 <summary>{t(q)}</summary>
-                <p>{q === 'Já posso comprar?' && checkoutAvailable ? t('Sim. Configure o produto e confirme o total antes de pagar na PaySuite. Entregas fora da cidade de Maputo requerem proposta.') : t(a)}</p>
+                <p>
+                  {q === 'Já posso comprar?' && checkoutAvailable
+                    ? t(
+                        'Sim. Configure o produto e confirme o total antes de pagar na PaySuite. Entregas fora da cidade de Maputo requerem proposta.',
+                      )
+                    : t(a)}
+                </p>
               </details>
             ))}
           </div>
@@ -229,18 +203,18 @@ export default async function Home() {
       </main>
       <div className="home-brand-finale">
         <section className="home-how" id="primeiros-passos">
-          <h2>{t('Veja as opções para o seu cartão ou porta-chaves')}</h2>
+          <h2>{t('A próxima conexão começa consigo.')}</h2>
           <p>
             {t(
-              'Compare materiais e escolha entre o design FramyConnect, o seu próprio design ou a criação pela nossa equipa.',
+              'Crie o seu perfil gratuito ou descubra como organizar as conexões da sua equipa.',
             )}
           </p>
-          <Link className="home-primary" href="/comprar">
-            {t('Ver opções')}
+          <Link className="home-primary" href="/perfil?plans=1">
+            {t('Criar o meu perfil gratuito')}
             <ArrowUpRight size={18} />
           </Link>
         </section>
-      <SiteFooter />
+        <SiteFooter />
       </div>
     </div>
   );

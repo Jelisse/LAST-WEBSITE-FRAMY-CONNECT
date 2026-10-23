@@ -8,8 +8,9 @@ import {
 } from './paysuite.ts';
 
 export type GatewayPayment = {
+  public_reference?: string;
   id: string;
-  owner_id: string;
+  owner_id: string | null;
   kind: 'product' | 'subscription';
   target_id: string;
   amount: number;
@@ -156,7 +157,10 @@ export async function failGatewayPayment(
 // Abandoned checkouts must not reserve stock or block the pending-order limit
 // forever. Staleness uses created_at: reconciliation keeps touching updated_at.
 // A launch that never reached the provider ('creating') has no charge to lose.
-export async function expireStaleProductPayments(db: D1Database, now = Date.now()) {
+export async function expireStaleProductPayments(
+  db: D1Database,
+  now = Date.now(),
+) {
   const stale = await db
     .prepare(
       "SELECT * FROM paysuite_payments WHERE kind='product' AND ((status='creating' AND created_at<=?) OR (status='pending' AND created_at<=?)) ORDER BY created_at LIMIT 25",

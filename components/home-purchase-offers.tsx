@@ -99,7 +99,7 @@ export async function HomePurchaseOffers({
           <h2>{t('Produtos NFC')}</h2>
           <p>
             {t(
-              'Pague uma vez pelo produto. Active o seu perfil digital com um plano à parte.',
+              'Pague uma vez pelo produto físico. O perfil Personal é gratuito, sem prazo.',
             )}
           </p>
         </div>

@@ -1,0 +1,340 @@
+.company-tools {
+  min-width: 0;
+  margin: 24px 0;
+  color: #292a27;
+}
+.company-tools h2 {
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.25;
+  max-width: none;
+}
+.company-tools h3 {
+  font-size: 19px;
+  line-height: 1.35;
+}
+.company-tools p,
+.company-tools small,
+.company-tools label {
+  max-width: none;
+  overflow-wrap: anywhere;
+}
+.tool-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+.tool-intro > svg {
+  flex-shrink: 0;
+  box-sizing: content-box;
+  padding: 14px;
+  background: #fff0e3;
+  color: #a83d0b;
+  border-radius: 14px;
+}
+.tool-intro p {
+  margin-top: 10px;
+  color: #62645f;
+}
+.company-tools label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.company-tools select,
+.company-tools input:not([type='checkbox']) {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #dcd6ca;
+  background: #fffefa;
+  color: #292a27;
+  border-radius: 10px;
+  padding: 12px;
+  font: inherit;
+}
+.company-tools :is(button, .tool-download) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #b84108;
+  color: #fff;
+  padding: 12px 16px;
+  border: 1px solid #b84108;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: normal;
+}
+.company-tools button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.company-tools button:focus-visible,
+.company-tools a:focus-visible,
+.company-tools input:focus-visible,
+.company-tools select:focus-visible {
+  outline: 3px solid #a33b09;
+  outline-offset: 3px;
+}
+.tool-studio {
+  display: grid;
+  grid-template-columns: minmax(210px, 280px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.tool-controls {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+  background: #f3f0e7;
+  border: 1px solid #e4dfd4;
+  border-radius: 18px;
+}
+.tool-controls small {
+  color: #62645f;
+}
+.tool-preview {
+  min-width: 0;
+  border: 1px solid #e4dfd4;
+  border-radius: 18px;
+  overflow: hidden;
+  background: white;
+}
+.tool-preview iframe {
+  border: 0;
+  width: 100%;
+  min-height: 330px;
+  background: white;
+}
+.tool-preview-label {
+  padding: 16px 24px;
+  border-bottom: 1px solid #eee8de;
+  color: #62645f;
+  font-size: 13px;
+}
+.tool-background-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+}
+.tool-actions {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid #dcd6ca;
+}
+.tool-actions button + button {
+  background: transparent;
+  color: #a83d0b;
+}
+.tool-help {
+  padding: 24px;
+  margin-top: 24px;
+  border: 1px solid #e4dfd4;
+  background: #fffdf8;
+  border-radius: 18px;
+}
+.tool-help p,
+.tool-help ol {
+  margin: 12px 0;
+  color: #62645f;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.tool-help ol {
+  padding-left: 24px;
+}
+.tool-help a,
+.tool-empty a,
+.tool-link {
+  color: #a83d0b;
+}
+.tool-help form {
+  display: grid;
+  gap: 16px;
+  max-width: 620px;
+  margin: 20px 0;
+}
+.tool-help form small {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.8;
+}
+.tool-help > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px;
+}
+.tool-filters {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.tool-filters label:first-child {
+  flex: 1;
+  min-width: 180px;
+  position: relative;
+}
+.tool-filters label:first-child > svg {
+  position: absolute;
+  right: 14px;
+  bottom: 15px;
+}
+.tool-filters label:first-child input {
+  padding-right: 42px;
+}
+.tool-filters label:last-child {
+  min-width: 180px;
+}
+.tool-directory {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+.tool-directory article {
+  padding: 24px;
+  border: 1px solid #e4dfd4;
+  border-radius: 18px;
+  background: #fffdf8;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.tool-directory article img,
+.tool-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 18px;
+}
+.tool-avatar {
+  display: grid;
+  place-items: center;
+  background: #f4dfcf;
+  color: #8c350e;
+  font-size: 24px;
+}
+.tool-directory article h3 {
+  margin-bottom: 8px;
+}
+.tool-directory article p {
+  margin: 0 0 8px;
+}
+.tool-directory article small {
+  color: #62645f;
+}
+.tool-contact-links {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+  max-width: 100%;
+  font-size: 14px;
+}
+.tool-contact-links a {
+  color: #41443f;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.tool-link {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: auto;
+}
+.tool-empty {
+  padding: 40px 24px;
+  border: 1px dashed #d8cfc1;
+  border-radius: 18px;
+  text-align: center;
+}
+.tool-empty h3,
+.tool-empty p {
+  margin-bottom: 16px;
+}
+.tool-notice,
+.tool-alert {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  background: #edf3e8;
+  color: #2f512c;
+}
+.tool-alert {
+  background: #fff0e8;
+  color: #9d3515;
+}
+.tool-crm-leads {
+  display: grid;
+  max-height: 420px;
+  overflow: auto;
+  margin: 20px 0;
+}
+.tool-crm-leads > label {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e4dfd4;
+}
+.tool-crm-leads small {
+  display: block;
+  font-weight: 400;
+  color: #62645f;
+}
+.company-tools input[type='checkbox'] {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  accent-color: #b84108;
+}
+.tool-review {
+  padding: 20px;
+  background: #f3f0e7;
+  border-radius: 12px;
+}
+.tool-review > label {
+  flex-direction: row;
+  align-items: flex-start;
+  margin: 18px 0;
+}
+.tool-review button {
+  margin: 5px 10px 0 0;
+}
+@media (max-width: 800px) {
+  .tool-studio {
+    grid-template-columns: 1fr;
+  }
+  .tool-preview iframe {
+    min-height: 350px;
+  }
+  .tool-controls {
+    padding: 18px;
+  }
+  .tool-help {
+    padding: 18px;
+  }
+  .tool-filters {
+    flex-direction: column;
+  }
+  .tool-intro {
+    gap: 12px;
+  }
+  .tool-intro > svg {
+    padding: 10px;
+  }
+}

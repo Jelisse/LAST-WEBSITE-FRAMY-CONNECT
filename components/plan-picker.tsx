@@ -1,13 +1,12 @@
 'use client';
-import { PlanFeatureIcon, BasePlanIcon } from './plan-feature-icon';
-import { planFeatures, featureCatalog, type FeatureKey } from '@/lib/plan-features';
+import { BasePlanIcon } from './plan-feature-icon';
 import { useI18n } from '@/components/language-provider';
 
-import { CorporatePlan } from './corporate-plan';
-import { planPrice, planAnnualMeticais } from '@/lib/plan-pricing';
+import { HomeProfilePlans } from './home-profile-plans';
+import { planPrice } from '@/lib/plan-pricing';
 
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -138,92 +137,19 @@ export function PlanPicker({
                 'Compare os planos e escolha o período mensal ou anual disponível. A renovação exige a sua autorização.',
               )}
             </DialogDescription>
-            <div className="plans-grid">
-              {plans.filter(p=>p.id!=='corporate').map((plan) => (
-                <article
-                  className={`plan-card ${plan.id === 'personal' ? 'plan-trial-banner' : ''} ${plan.id === 'professional-v2' ? 'plan-featured' : ''}`}
-                  key={plan.id}
-                >
-                  <span className="plan-recommendation">
-                    {plan.id === current
-                      ? t('O seu plano')
-                      : plan.id === 'professional-v2'
-                        ? t('A nossa sugestão')
-                        : t(plan.audience)}
-                  </span>
-                  <h3>{t(plan.name)}</h3>
-                  <p>{t(plan.description)}</p>
-                  <div className="plan-price">
-                    <strong>{planPrice(plan.monthlyEnabled === false ? {meticais:planAnnualMeticais(plan)} : plan, t.locale)}</strong>
-                    <span>
-                      {plan.id === 'personal' ? t('Gratuito') : plan.monthlyEnabled === false ? t(' / ano') : t('/mês')}
-                    </span>
-                  </div>
-                  <p className="plan-per-profile">
-                    {plan.id !== 'personal' && plan.annualEnabled !== false && plan.monthlyEnabled !== false && <>{planPrice({ meticais: planAnnualMeticais(plan) }, t.locale)}{t(' / ano')} · {t('Sem renovação automática')}<br /></>}
-                    {plan.id === 'personal'
-                      ? t('Sem renovação automática')
-                      : t('Por perfil')}
-                  </p>
-                  <Button
-                    className={
-                      plan.id === 'professional-v2'
-                        ? 'plan-upgrade'
-                        : 'plan-select'
-                    }
-                    variant="outline"
-                    disabled={
-                      (!paidAvailable && plan.id !== 'personal') ||
-                      plan.id === current ||
-                      busy
-                    }
-                    onClick={() =>
-                      plan.id === 'personal'
-                        ? setSelected(plan.id)
-                        : onSelect(plan.id)
-                    }
-                  >
-                    {plan.id === current
-                      ? t('Plano actual')
-                      : plan.id === 'personal'
-                        ? t('Começar gratuitamente')
-                        : paidAvailable
-                          ? t('Ver opções de pagamento')
-                          : t('Em breve')}
-                    {plan.id !== current && <ArrowRight size={16} />}
-                  </Button>
-                  <ul>
-                    <li>
-                      <Check />{' '}
-                      <strong>
-                        {plan.links}
-                        {t(' links à sua escolha')}
-                      </strong>
-                    </li>
-                    <li>
-                      <Check />
-                      {plan.bio
-                        ? t('Bio: {0} caracteres', [plan.bio])
-                        : t('Nome e título')}
-                    </li>
-                    <li>
-                      <Check />
-                      {t('Contactos e privacidade')}
-                    </li>
-                    <li>
-                      <Check />
-                      {t('Partilha de perfil')}
-                    </li>
-                    {(Object.keys(featureCatalog) as FeatureKey[]).filter(k=>k !== 'domain' && planFeatures(plan)[k]).map(k=><li key={k}><PlanFeatureIcon feature={k}/>{t(featureCatalog[k])}</li>)}
-                    {(plan.benefits??[]).map(b=><li key={b}><Check/>{b}</li>)}
-                  </ul>
-                </article>
-              ))}
-              <CorporatePlan />
-            </div>
+            <HomeProfilePlans
+              plans={plans}
+              billingAvailable={paidAvailable}
+              annualAvailable={paidAvailable}
+              current={current}
+              busy={busy}
+              onSelect={(id) =>
+                id === 'personal' ? setSelected(id) : onSelect(id)
+              }
+            />
             <p className="plan-disclosure">
               {t(
-                'Cada plano inclui um perfil digital. Produtos físicos são pagos separadamente. Corporativo: condições sob consulta.',
+                'Personal e Professional incluem um perfil. Business e Enterprise são propostas por colaborador. Produtos físicos são pagos separadamente.',
               )}
             </p>
           </>

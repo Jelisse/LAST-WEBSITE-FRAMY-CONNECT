@@ -10,7 +10,16 @@ export function dashboardFor(role: AccountRole) {
 export function loginDestination(role: AccountRole, requested: string) {
   if (
     ['customer', 'agent'].includes(role) &&
-    requested === '/corporativo/configurar'
+    /^\/acompanhar(?:\?referencia=(?:[a-f0-9]{32}|FC-(?:OR|PY)-\d{2}-\d{4}-\d{4}))?$/.test(
+      requested,
+    )
+  )
+    return requested;
+  if (
+    ['customer', 'agent'].includes(role) &&
+    /^\/corporativo\/configurar(?:\?offer=(?:business|enterprise))?$/.test(
+      requested,
+    )
   )
     return requested;
   if (
@@ -20,6 +29,11 @@ export function loginDestination(role: AccountRole, requested: string) {
       '/corporativo',
       '/corporativo/aceitar',
       '/corporativo/equipa',
+      '/corporativo/cartoes',
+      '/corporativo/assinaturas',
+      '/corporativo/fundos',
+      '/corporativo/directorio',
+      '/corporativo/integracoes',
       '/corporativo/campanhas',
       '/corporativo/contactos',
       '/corporativo/guia',

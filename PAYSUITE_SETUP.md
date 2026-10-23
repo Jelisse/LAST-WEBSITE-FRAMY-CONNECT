@@ -61,3 +61,8 @@ Shared client/server purchaseAmounts fixes the discounted subtotal before delive
 ## Discount correction deployed - 19 October 2026
 
 The requested checkout correction is live as Worker 3b2ce6fa-f092-496e-843b-f8f2896a3280. Guarded deployment passed schema/relationship checks and rebuilt successfully; no migration or billing-setting/price writes required. Existing D1/R2, sender/canonical URL, PaySuite enabled flag and schedule preserved. Both canonical/workers.dev purchase pages returned200, public ambassador choices returned2 eligible entries with name/code fields only, listed-code validation passed, and configurator/ambassador bundle SHA-256 matched the final build. Real merchant payment/settlement was not performed. Browser visual verification remained partial due test-browser timeout. Source changes remain uncommitted/unpushed for this task; do not confuse the deployed build with the older Git HEAD.
+
+
+## Guest physical checkout - local20 October2026
+
+Physical purchases no longer require an auth account after migration0034. Names/emails and protected browser recovery live in dedicated guest tables; subscription authentication is unchanged. The same quote/reservation/settlement logic handles both buyer types. Homepage tracking is `/acompanhar`, with limited public progress and private email-capability/browser recovery. Manager and assigned agent update progress; no courier API is used. Read GUEST_CHECKOUT.md before migration/deployment. Migration0034 rebuilds two populated ledgers and restores all dependent triggers; use backups and the guarded process, never resets. Real email delivery/payment remain external checks. This section supersedes older documentation that required profile/account setup before physical payment.

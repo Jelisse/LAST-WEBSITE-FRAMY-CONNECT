@@ -1,4 +1,4 @@
-import { SiteHeader, SiteFooter } from '@/components/site-shell';
+import { SiteHeader } from '@/components/site-shell';
 import { PaySuiteStatus } from '@/components/paysuite-status';
 import { getTranslations } from '@/lib/server-i18n';
 export async function generateMetadata() {
@@ -15,7 +15,6 @@ export default function Page() {
       <main id="main" className="section-wrap">
         <PaySuiteStatus />
       </main>
-      <SiteFooter compact />
     </>
   );
 }

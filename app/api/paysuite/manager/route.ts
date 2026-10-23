@@ -1,3 +1,4 @@
+import { normalizeReference } from '@/lib/public-reference';
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { profileBody, profileJSON as json } from '@/lib/profile-api';
@@ -7,11 +8,17 @@ import {
   type GatewayPayment,
 } from '@/lib/server-paysuite';
 export const dynamic = 'force-dynamic';
-export async function GET() {
+export async function GET(request?: Request) {
   const user = await getChatGPTUser();
   if (user?.role !== 'manager')
     return json({ error: 'Acesso reservado ao gestor.' }, 403);
   try {
+    const input = request
+      ? new URL(request.url).searchParams.get('reference')
+      : null;
+    const reference = input ? normalizeReference(input) : null;
+    if (input && !reference)
+      return json({ error: 'Referência inválida.' }, 400);
     return json({
       ready: paysuiteReady(env),
       pricing: await env.DB.prepare(
@@ -19,8 +26,10 @@ export async function GET() {
       ).first(),
       payments: (
         await env.DB.prepare(
-          'SELECT p.*,(SELECT e.status FROM payment_email_receipts e WHERE e.payment_id=p.id) AS receipt_status,o.configuration_json,o.status AS order_status,a.name,a.email FROM paysuite_payments p JOIN auth_accounts a ON a.id=p.owner_id LEFT JOIN paysuite_product_orders o ON o.id=p.target_id ORDER BY p.created_at DESC LIMIT 100',
-        ).all()
+          'SELECT p.*,o.public_reference AS order_reference,(SELECT e.status FROM payment_email_receipts e WHERE e.payment_id=p.id) AS receipt_status,o.configuration_json,o.status AS order_status,COALESCE(a.name,g.name) AS name,COALESCE(a.email,g.email) AS email FROM paysuite_payments p LEFT JOIN auth_accounts a ON a.id=p.owner_id LEFT JOIN guest_purchases g ON g.id=p.id LEFT JOIN paysuite_product_orders o ON o.id=p.target_id WHERE (? IS NULL OR p.id=? OR p.public_reference=? OR o.public_reference=?) ORDER BY p.created_at DESC LIMIT 100',
+        )
+          .bind(reference, reference, reference, reference)
+          .all()
       ).results,
     });
   } catch {

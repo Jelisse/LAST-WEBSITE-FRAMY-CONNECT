@@ -606,7 +606,7 @@
   gap: 20px;
 }
 .subscription-manager .subscription-heading h2 { margin: 0 0 6px; font-size: 20px; font-weight: 600; }
-.subscription-manager .subscription-heading p { margin: 0; color: #6e6a67; max-width: 70ch; }
+.subscription-manager .subscription-heading p { margin: 0; color: #6e6a67; max-width: none; }
 .subscription-manager .subscription-heading button { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .subscription-status-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .subscription-status-grid article { display: flex; align-items: flex-start; gap: 14px; padding: 22px; border: 1px solid #e9e3de; border-radius: 16px; background: #fff; }
@@ -631,7 +631,7 @@
 .subscription-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 32px 16px; border: 1px dashed #e2d8cf; border-radius: 12px; background: #fcfaf8; }
 .subscription-empty svg { color: #968d85; }
 .subscription-empty strong { font-weight: 500; }
-.subscription-manager .subscription-empty p { margin: 0; max-width: 55ch; color: #6e6a67; }
+.subscription-manager .subscription-empty p { margin: 0; max-width: none; color: #6e6a67; }
 .subscription-manager button:hover:not(:disabled) { filter: brightness(.96); }
 .subscription-manager output { display: block; padding: 12px 16px; border-radius: 10px; color: #286344; background: #eef8f0; }
 @media (max-width: 640px) {

@@ -1,10 +1,13 @@
 'use client';
+import { OrderFulfilment } from './order-fulfilment';
 import { useI18n } from '@/components/language-provider';
 import Link from '@/components/hard-link';
 import { useEffect, useState } from 'react';
 import type { CheckoutPricing } from '@/lib/checkout-pricing';
 type Payment = {
   id: string;
+  public_reference: string;
+  order_reference: string | null;
   amount: number;
   status: string;
   name: string;
@@ -22,9 +25,16 @@ export function PaySuiteManager() {
       payments: Payment[];
     } | null>(null),
     [error, setError] = useState(''),
-    [busy, setBusy] = useState(false);
-  async function load() {
-    const r = await fetch('/api/paysuite/manager', { cache: 'no-store' });
+    [busy, setBusy] = useState(false),
+    [search, setSearch] = useState('');
+  async function load(reference = search) {
+    const r = await fetch(
+      '/api/paysuite/manager' +
+        (reference.trim()
+          ? '?reference=' + encodeURIComponent(reference.trim())
+          : ''),
+      { cache: 'no-store' },
+    );
     const d = (await r.json()) as {
       ready: boolean;
       pricing: CheckoutPricing;
@@ -60,6 +70,7 @@ export function PaySuiteManager() {
   return (
     <section className="panel">
       <h1>{t('Checkout e pagamentos PaySuite')}</h1>
+      <OrderFulfilment />
       <Link href="/manager">{t('Voltar ao gestor')}</Link>
       {error && <p role="alert">{t(error)}</p>}
       {data && (
@@ -135,6 +146,33 @@ export function PaySuiteManager() {
             <button disabled={busy}>{t('Guardar preços')}</button>
           </form>
           <h2>{t('Pedidos e pagamentos')}</h2>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void load().catch((e) => setError(e.message));
+            }}
+          >
+            <label>
+              {t('Referência: ')}
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="FC-OR-26-5827-4191"
+                maxLength={64}
+              />
+            </label>
+            <button type="submit">{t('Pesquisar')}</button>
+            <button
+              type="button"
+              onClick={() => {
+                setSearch('');
+                void load('').catch((e) => setError(e.message));
+              }}
+            >
+              {t('Limpar')}
+            </button>
+          </form>
+          {!data.payments.length && <p>{t('Referência não encontrada.')}</p>}
           {data.payments.map((p) => {
             const c = p.configuration_json
               ? JSON.parse(p.configuration_json)
@@ -145,7 +183,9 @@ export function PaySuiteManager() {
                   {p.name} · {(p.amount / 100).toFixed(2)} {t(' MT ')}
                 </h3>
                 <p>
-                  {p.email} · {p.status} · {p.id}
+                  {p.email} · {p.status} ·{' '}
+                  {p.order_reference ? p.order_reference + ' · ' : ''}
+                  {p.public_reference}
                 </p>
                 {p.receipt_status && (
                   <p>
@@ -174,11 +214,33 @@ export function PaySuiteManager() {
                         {c.pvcModel.name}
                       </p>
                     )}
-                    {(['cardArtwork', 'pvcArtwork'] as const).map((field) => c[field] && <div key={field}>
-                      <strong>{t(field === 'cardArtwork' ? 'Cartão' : 'Porta-chaves PVC + epóxi')}</strong>
-                      <p><a href={'/api/design-assets/' + c[field].assetId}>{t('Descarregar logótipo: ')}{c[field].fileName}</a></p>
-                      <p>{t('Página')} {c[field].page} · {t('Escala')} {c[field].scale}% · X {c[field].x} · Y {c[field].y}</p>
-                    </div>)}
+                    {(['cardArtwork', 'pvcArtwork'] as const).map(
+                      (field) =>
+                        c[field] && (
+                          <div key={field}>
+                            <strong>
+                              {t(
+                                field === 'cardArtwork'
+                                  ? 'Cartão'
+                                  : 'Porta-chaves PVC + epóxi',
+                              )}
+                            </strong>
+                            <p>
+                              <a
+                                href={'/api/design-assets/' + c[field].assetId}
+                              >
+                                {t('Descarregar logótipo: ')}
+                                {c[field].fileName}
+                              </a>
+                            </p>
+                            <p>
+                              {t('Página')} {c[field].page} · {t('Escala')}{' '}
+                              {c[field].scale}% · X {c[field].x} · Y{' '}
+                              {c[field].y}
+                            </p>
+                          </div>
+                        ),
+                    )}
                     {c.leather && (
                       <div>
                         <strong>{t('Porta-chaves de couro')}</strong>
@@ -242,7 +304,13 @@ export function PaySuiteManager() {
                       {c.hardware / 100} {t(' MT · Design:')}{' '}
                       {c.customization / 100} {t(' MT · Entrega: ')}
                       {c.delivery / 100} {t(' MT ')}
-                      {c.discount ? <> · {t('Desconto embaixador (10%)')}: −{c.discount / 100} MT ({c.ambassadorCode})</> : null}
+                      {c.discount ? (
+                        <>
+                          {' '}
+                          · {t('Desconto embaixador (10%)')}: −
+                          {c.discount / 100} MT ({c.ambassadorCode})
+                        </>
+                      ) : null}
                     </p>
                   </>
                 )}

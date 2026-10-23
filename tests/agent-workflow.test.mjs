@@ -190,6 +190,7 @@ const dataModule = (code) =>
   'data:text/javascript;base64,' + Buffer.from(code).toString('base64');
 async function route(file) {
   const dependencies = {
+    '@/lib/guest-checkout': dataModule('export async function guestSession(){return null;}'),
     '@/lib/plan-features': new URL('../lib/plan-features.ts', import.meta.url).href,
     '@/lib/service-failure': new URL(
       '../lib/service-failure.ts',

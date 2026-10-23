@@ -73,7 +73,10 @@ export function CorporateApproval({
       {error && <p role="alert">{t(error)}</p>}
       <dl>
         {Object.entries({
-          people: 'Número de trabalhadores',
+          offer: 'Plano da empresa',
+          referenceUSD: 'Referência de preço USD',
+          cycle: 'Periodicidade',
+          people: 'Perfis de colaboradores',
           phone: 'Telefone de contacto',
           location: 'Localização da empresa',
           sector: 'Sector de actividade',

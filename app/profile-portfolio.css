@@ -684,3 +684,227 @@ body
     margin-bottom: 0;
   }
 }
+
+/* Grouped actions share the existing theme and independently scrolling body. */
+.portfolio-link-group {
+  display: grid;
+  gap: 8px;
+  margin-top: 9px;
+}
+.portfolio-group-title {
+  margin: 0;
+  color: var(--portfolio-muted);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+.portfolio-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 92px), 1fr));
+  gap: 8px;
+}
+.portfolio-contact-grid .portfolio-link {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  min-height: 48px;
+  padding: 10px 7px;
+  font-size: 11px;
+}
+.portfolio-contact-grid .portfolio-link > svg:last-child {
+  display: none;
+}
+.portfolio-contact-grid .mobile-social-icon,
+.portfolio-contact-grid .portfolio-link > svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+.portfolio-social-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.portfolio-social-action {
+  width: 46px;
+  min-height: 46px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--portfolio-ink) 18%, transparent);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--portfolio-ink) 4%, transparent);
+  color: var(--portfolio-ink);
+}
+.portfolio-social-action:hover {
+  border-color: var(--portfolio-accent);
+}
+.portfolio-social-action:focus-visible,
+.portfolio-link:focus-visible {
+  outline: 2px solid var(--portfolio-accent);
+  outline-offset: 3px;
+}
+.portfolio-explore-list {
+  display: grid;
+  gap: 8px;
+}
+.connection-stage[data-mode='0'] {
+  display: flex;
+  justify-content: center;
+  padding: 22px;
+}
+.connection-live-profile {
+  width: 330px;
+  max-width: 100%;
+  height: 610px;
+  overflow: hidden;
+  border: 5px solid #242424;
+  border-radius: 34px;
+  box-shadow: 0 16px 35px #25251c22;
+}
+.connection-live-profile > .mobile-profile-frame {
+  height: 100%;
+}
+
+body
+  .mobile-profile-frame[data-presentation='portfolio']
+  .portfolio-contact-grid
+  .portfolio-link {
+  display: flex;
+  gap: 7px;
+  padding: 10px 7px;
+  min-height: 48px;
+  justify-content: center;
+}
+body
+  .mobile-profile-frame[data-presentation='portfolio']
+  .portfolio-contact-grid
+  .portfolio-link
+  > span {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+body
+  .mobile-profile-frame[data-presentation='portfolio']
+  .portfolio-social-grid
+  .portfolio-social-action {
+  display: grid;
+  width: 46px;
+  padding: 0;
+  min-height: 46px;
+  flex: none;
+}
+
+/* The demo keeps the three primary contact actions together at every size. */
+.connection-live-profile .portfolio-contact-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+body
+  .connection-live-profile
+  .mobile-profile-frame[data-presentation='portfolio']
+  .portfolio-contact-grid
+  .portfolio-link {
+  gap: 4px;
+  padding: 10px 3px;
+}
+body
+  .connection-live-profile
+  .mobile-profile-frame[data-presentation='portfolio']
+  .portfolio-contact-grid
+  .portfolio-link
+  > span {
+  font-size: 10px;
+}
+.connection-stage[data-mode='0'] {
+  justify-content: flex-start;
+  gap: 16px;
+  padding: 16px;
+}
+.connection-live-profile {
+  width: 360px;
+  max-width: none;
+  height: 740px;
+  flex: none;
+  zoom: 0.53;
+}
+.connection-stage .connection-ready {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  transform: none;
+  padding: 18px;
+}
+.connection-ready .connection-channels {
+  flex-wrap: wrap;
+}
+/* The standalone example is a compact phone preview, not a stretched desktop card. */
+body
+  .standalone-mobile-profile.demo-mobile-profile
+  > .mobile-profile-frame[data-presentation='portfolio'] {
+  width: min(100%, 360px);
+  max-width: 360px;
+  height: min(760px, calc(100dvh - 24px));
+  border-radius: 28px;
+}
+.demo-mobile-profile .portfolio-identity {
+  padding-top: 42px;
+}
+.demo-mobile-profile .portfolio-portrait-wrap {
+  width: 72px;
+  margin-bottom: 4px;
+}
+body
+  .demo-mobile-profile
+  .mobile-profile-frame[data-presentation='portfolio']
+  .portfolio-name {
+  font-size: 34px;
+}
+.demo-mobile-profile .portfolio-cover {
+  height: 120px;
+}
+.demo-mobile-profile .portfolio-header {
+  padding-bottom: 8px;
+}
+.demo-mobile-profile .portfolio-scroll {
+  padding: 5px 16px 10px;
+}
+body
+  .demo-mobile-profile
+  .mobile-profile-frame[data-presentation='portfolio']
+  .portfolio-link {
+  min-height: 44px;
+  padding: 9px 12px;
+}
+.demo-mobile-profile .portfolio-link-group {
+  gap: 6px;
+  margin-top: 4px;
+}
+.demo-mobile-profile .portfolio-contact-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+body
+  .demo-mobile-profile
+  .mobile-profile-frame[data-presentation='portfolio']
+  .portfolio-contact-grid
+  .portfolio-link {
+  min-height: 44px;
+  padding: 8px 4px;
+  gap: 5px;
+}
+.demo-mobile-profile .portfolio-dock {
+  padding-top: 5px;
+  padding-bottom: 8px;
+}
+.demo-mobile-profile .portfolio-brand img {
+  height: 30px;
+  width: 84px;
+}
+@media (max-width: 600px) {
+  body .standalone-mobile-profile.demo-mobile-profile {
+    padding: 12px;
+  }
+}

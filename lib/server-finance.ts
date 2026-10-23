@@ -10,7 +10,7 @@ export async function financeData() {
   const [gateway, manual, legacy, entries, documents] = await Promise.all([
     db
       .prepare(
-        "SELECT p.*,a.name,a.email,o.configuration_json,o.fulfilled_at,i.terms_json,i.period_start,i.period_end FROM paysuite_payments p JOIN auth_accounts a ON a.id=p.owner_id LEFT JOIN paysuite_product_orders o ON p.kind='product' AND o.id=p.target_id LEFT JOIN profile_invoices i ON p.kind='subscription' AND i.id=p.target_id ORDER BY p.created_at DESC LIMIT 10001",
+        "SELECT p.*,COALESCE(a.name,g.name) AS name,COALESCE(a.email,g.email) AS email,o.configuration_json,o.fulfilled_at,i.terms_json,i.period_start,i.period_end FROM paysuite_payments p LEFT JOIN auth_accounts a ON a.id=p.owner_id LEFT JOIN guest_purchases g ON g.id=p.id LEFT JOIN paysuite_product_orders o ON p.kind='product' AND o.id=p.target_id LEFT JOIN profile_invoices i ON p.kind='subscription' AND i.id=p.target_id ORDER BY p.created_at DESC LIMIT 10001",
       )
       .all<Record<string, unknown>>(),
     db

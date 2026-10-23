@@ -1,17 +1,89 @@
 export const profileColors = [
-  { value: 'orange', label: 'Laranja Framy', hex: '#ee590d', ink: '#32251e', muted: '#695347', accent: '#a33b09' },
-  { value: 'black', label: 'Preto', hex: '#101112', ink: '#f7f4ef', muted: '#c5bfb7', accent: '#f7a873' },
-  { value: 'charcoal', label: 'Carvão', hex: '#28292b', ink: '#faf7f2', muted: '#cec8c0', accent: '#f6b080' },
-  { value: 'white', label: 'Branco', hex: '#ffffff', ink: '#232427', muted: '#626369', accent: '#a73c09' },
-  { value: 'porcelain', label: 'Porcelana', hex: '#f5f3ee', ink: '#2e2d2b', muted: '#69655f', accent: '#9a441b' },
-  { value: 'rose', label: 'Rosa', hex: '#ead9dc', ink: '#402e38', muted: '#725660', accent: '#804255' },
-  { value: 'sage', label: 'Sálvia', hex: '#dce3d9', ink: '#2b3c32', muted: '#526357', accent: '#365b45' },
-  { value: 'sand', label: 'Areia', hex: '#e9dfd0', ink: '#3b3028', muted: '#6d5b4c', accent: '#845031' },
+  {
+    value: 'orange',
+    label: 'Laranja Framy',
+    hex: '#ee590d',
+    ink: '#32251e',
+    muted: '#695347',
+    accent: '#a33b09',
+  },
+  {
+    value: 'black',
+    label: 'Preto',
+    hex: '#101112',
+    ink: '#f7f4ef',
+    muted: '#c5bfb7',
+    accent: '#f7a873',
+  },
+  {
+    value: 'charcoal',
+    label: 'Carvão',
+    hex: '#28292b',
+    ink: '#faf7f2',
+    muted: '#cec8c0',
+    accent: '#f6b080',
+  },
+  {
+    value: 'white',
+    label: 'Branco',
+    hex: '#ffffff',
+    ink: '#232427',
+    muted: '#626369',
+    accent: '#a73c09',
+  },
+  {
+    value: 'porcelain',
+    label: 'Porcelana',
+    hex: '#f5f3ee',
+    ink: '#2e2d2b',
+    muted: '#69655f',
+    accent: '#9a441b',
+  },
+  {
+    value: 'rose',
+    label: 'Rosa',
+    hex: '#ead9dc',
+    ink: '#402e38',
+    muted: '#725660',
+    accent: '#804255',
+  },
+  {
+    value: 'sage',
+    label: 'Sálvia',
+    hex: '#dce3d9',
+    ink: '#2b3c32',
+    muted: '#526357',
+    accent: '#365b45',
+  },
+  {
+    value: 'sand',
+    label: 'Areia',
+    hex: '#e9dfd0',
+    ink: '#3b3028',
+    muted: '#6d5b4c',
+    accent: '#845031',
+  },
 ] as const;
 // Old records remain valid; the editor offers only the curated themes above.
-const legacyColors = { blue: '#1d4ed8', green: '#166534', plum: '#7e2265', slate: '#334155' };
+const legacyColors = {
+  blue: '#1d4ed8',
+  green: '#166534',
+  plum: '#7e2265',
+  slate: '#334155',
+};
 export function profileTheme(value: unknown) {
-  const theme = profileColors.find(color => color.value === value) ?? profileColors[0];
+  if (typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value)) {
+    const light = profileColorIsLight(value);
+    return {
+      value,
+      hex: value,
+      ink: light ? '#000000' : '#ffffff',
+      muted: light ? '#000000' : '#ffffff',
+      accent: light ? '#000000' : '#ffffff',
+    };
+  }
+  const theme =
+    profileColors.find((color) => color.value === value) ?? profileColors[0];
   return theme.value === 'orange' ? { ...theme, hex: '#f4dfcf' } : theme;
 }
 /** Only named presets or six-digit hex colours may reach CSS or stored profiles. */
@@ -20,7 +92,8 @@ export function isProfileColor(
 ): value is ProfileBusiness['accent'] {
   return (
     typeof value === 'string' &&
-    (profileColors.some((color) => color.value === value) || Object.hasOwn(legacyColors, value) ||
+    (profileColors.some((color) => color.value === value) ||
+      Object.hasOwn(legacyColors, value) ||
       /^#[0-9a-f]{6}$/i.test(value))
   );
 }
@@ -48,7 +121,10 @@ export type ProfileBusiness = {
   message: string;
   address: string;
   hours: string;
-  accent: (typeof profileColors)[number]['value'] | keyof typeof legacyColors | `#${string}`;
+  accent:
+    | (typeof profileColors)[number]['value']
+    | keyof typeof legacyColors
+    | `#${string}`;
   layout: 'portrait' | 'compact';
 };
 export const defaultBusiness: ProfileBusiness = {

@@ -73,6 +73,11 @@ test('database repair identifies missing post-auth migrations without replaying 
     '0031_corporate_organisations.sql',
     '0032_corporate_onboarding.sql',
     '0033_profile_publication_alerts.sql',
+    '0034_guest_product_checkout.sql',
+    '0035_company_cards_followup.sql',
+    '0036_company_experience.sql',
+      '0037_company_tools.sql',
+      '0038_public_references.sql',
   ]);
 });
 test('database repair is a no-op when schema and inventory migration are applied', () => {

@@ -1,3 +1,4 @@
+import {guestOrderEmails} from './lib/guest-order-email';
 import {profilePublicationAlerts} from './lib/profile-publication-alerts';
 import { paymentReceipts } from './lib/payment-receipts';
 import { profileReminders } from './lib/profile-reminders';
@@ -19,6 +20,8 @@ const worker = {
     ctx: ExecutionContext,
   ) {
     ctx.waitUntil(env.DB.prepare('DELETE FROM corporate_leads WHERE id IN (SELECT id FROM corporate_leads WHERE created_at<? LIMIT 1000)').bind(Date.now()-90*86400000).run());
+    ctx.waitUntil(env.DB.prepare('DELETE FROM corporate_card_metrics WHERE day<?').bind(Date.now()-90*86400000).run());
+    ctx.waitUntil(guestOrderEmails().catch(()=>{}));
     ctx.waitUntil(cleanupReservations(env.DB));
     ctx.waitUntil(expireStaleProductPayments(env.DB));
     if (env.PAYSUITE_API_TOKEN)
@@ -96,6 +99,7 @@ const worker = {
         : await handler.fetch(routed, env, ctx);
     if(request.method==='POST' && new URL(request.url).pathname==='/api/workspace' && response.ok)
       ctx.waitUntil(profilePublicationAlerts(env).catch(()=>{}));
+    if(request.method==='POST' && new URL(request.url).pathname==='/api/paysuite/checkout')ctx.waitUntil(guestOrderEmails().catch(()=>{}));
     // Preserve development websocket upgrades and streams.
     if (response.status === 101) return response;
     const localized = await localizedResponse(request, response);

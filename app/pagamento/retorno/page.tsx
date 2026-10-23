@@ -1,4 +1,4 @@
-import { SiteHeader, SiteFooter } from '@/components/site-shell';
+import { SiteHeader } from '@/components/site-shell';
 import { PaymentReturn } from '@/components/payment-return';
 import { getTranslations } from '@/lib/server-i18n';
 export async function generateMetadata() {
@@ -18,7 +18,6 @@ export default function Page() {
       >
         <PaymentReturn />
       </main>
-      <SiteFooter compact />
     </>
   );
 }

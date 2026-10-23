@@ -1320,3 +1320,134 @@ test('corporate report totals include more than the contact-table limit and excl
  f.sql.prepare("INSERT INTO corporate_metrics(assignment_id,day,target,count) VALUES('report-buyer',?,'profile_open',10000)").run(f.day-7*86400000);
  const b=await(await f.get()).json();assert.equal(b.totals.contacts,556);assert.equal(b.totals.opens,35);assert.equal(b.daily.reduce((sum,row)=>sum+row.contacts,0),556);
 });
+
+async function guestFixture(t){
+ const f=fixture(t);globalThis.__paysuite.user=null;
+ const sessionApi=await api('app/api/guest-checkout/route.ts');
+ const response=await sessionApi.POST(request({}));assert.equal(response.status,200,await response.clone().text());
+ const cookie=response.headers.get('set-cookie').split(';')[0];
+ const req=(body)=>{const r=request(body);r.headers.set('cookie',cookie);return r;};
+ const checkout=await api('app/api/paysuite/checkout/route.ts');
+ const tracking=await api('app/api/order-tracking/route.ts');
+ const body=product({buyerName:'Fictional Guest',buyerEmail:'buyer@example.test'});
+ return {...f,cookie,req,checkout,tracking,body};
+}
+test('guest physical checkout reserves stock without an account, retries once and isolates private details',async t=>{
+ const f=await guestFixture(t);const accounts=f.sql.prepare('SELECT COUNT(*) n FROM auth_accounts').get().n;
+ let r=await f.checkout.POST(f.req(f.body));assert.equal(r.status,200,await r.clone().text());const created=await r.json();
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM auth_accounts').get().n,accounts);
+ assert.equal(f.sql.prepare('SELECT owner_id FROM paysuite_payments WHERE id=?').get(created.paymentId).owner_id,null);
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM paysuite_stock_reservations').get().n,2);
+ assert.equal((await f.checkout.POST(f.req(f.body))).status,200);assert.equal(f.creates(),1);
+ assert.equal((await f.checkout.POST(f.req({...f.body,kind:'subscription',requestId:crypto.randomUUID().replaceAll('-','')}))).status,401);
+ const get=new Request('https://framyconnect.co.mz/api/paysuite/checkout?payment='+created.paymentId);assert.equal((await f.checkout.GET(get)).status,401);get.headers.set('cookie',f.cookie);assert.equal((await f.checkout.GET(get)).status,200);
+ const publicResult=await (await f.tracking.POST(request({reference:created.paymentId}))).json();assert.equal(publicResult.privateAccess,false);assert.equal(publicResult.paymentStatus,'pending');for(const key of ['address','buyerEmail','contact','url','amount'])assert.ok(!(key in publicResult),key);
+ const privateResult=await (await f.tracking.POST(f.req({reference:created.paymentId}))).json();assert.equal(privateResult.privateAccess,true);assert.equal(privateResult.amount,155000);assert.equal(privateResult.buyerEmail,'buyer@example.test');
+ assert.equal((await f.tracking.POST(request({reference:'0'.repeat(32)}))).status,404);
+ assert.equal(f.sql.prepare('SELECT status FROM paysuite_payments').get().status,'pending','browser status cannot settle');
+ assert.deepEqual(f.sql.prepare('PRAGMA foreign_key_check').all(),[]);
+});
+test('guest discounts retain original hardware commission and reject self referral by purchase email',async t=>{
+ const f=await guestFixture(t);f.sql.prepare("INSERT INTO ambassadors(account_id,code,commission_bps,created_at) VALUES('other','ANA0001',1500,?)").run(new Date().toISOString());
+ const bad=await f.checkout.POST(f.req({...f.body,buyerEmail:'other@example.test',ambassadorCode:'ANA0001',expectedAmount:141500}));assert.equal(bad.status,422);
+ const result=await f.checkout.POST(f.req({...f.body,ambassadorCode:'ANA0001',expectedAmount:141500}));assert.equal(result.status,200,await result.clone().text());
+ assert.equal(f.sql.prepare('SELECT amount FROM paysuite_payments').get().amount,141500);assert.equal(f.sql.prepare('SELECT commission_amount FROM ambassador_sales').get().commission_amount,20250);
+});
+test('guest settlement queues the buyer receipt; manager and assigned agent advance audited progress once',async t=>{
+ const f=await guestFixture(t);const c=await (await f.checkout.POST(f.req(f.body))).json();const progress=await api('app/api/order-progress/route.ts');
+ globalThis.__paysuite.user={userId:'manager',role:'manager'};assert.equal((await progress.POST(request({id:c.paymentId,action:'advance',version:0}))).status,403);
+ const gateway=await api('lib/server-paysuite.ts');const row=f.sql.prepare('SELECT * FROM paysuite_payments').get();await gateway.settlePayment(f.db,row,row.provider_id);
+ const receipt=JSON.parse(f.sql.prepare('SELECT payload_json FROM payment_email_receipts').get().payload_json);assert.equal(receipt.email,'buyer@example.test');assert.equal(receipt.name,'Fictional Guest');
+ f.sql.prepare("UPDATE auth_accounts SET role='agent' WHERE id='other'").run();
+ assert.equal((await progress.POST(request({id:c.paymentId,action:'assign',agentId:'other',version:0}))).status,200);
+ globalThis.__paysuite.user={userId:'buyer',role:'agent'};assert.equal((await progress.POST(request({id:c.paymentId,action:'advance',version:1}))).status,403);assert.equal((await (await progress.GET()).json()).orders.length,0);
+ globalThis.__paysuite.user={userId:'other',role:'agent'};
+ assert.equal((await progress.POST(request({id:c.paymentId,action:'advance',version:1}))).status,200);
+ assert.equal((await progress.POST(request({id:c.paymentId,action:'advance',version:1}))).status,409);
+ assert.equal((await progress.POST(request({id:c.paymentId,action:'advance',version:2}))).status,200);
+ assert.equal((await progress.POST(request({id:c.paymentId,action:'advance',version:3}))).status,200);
+ assert.equal(f.sql.prepare('SELECT status FROM paysuite_product_orders').get().status,'fulfilled');
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM order_progress_events').get().n,4);
+ assert.ok(f.sql.prepare('SELECT fulfilled_at FROM paysuite_product_orders').get().fulfilled_at);
+ globalThis.__paysuite.user=null;const view=await(await f.tracking.POST(request({reference:c.paymentId}))).json();assert.equal(view.stage,'delivered');assert.equal(view.privateAccess,false);
+});
+test('guest access links require the purchase email and expire; linking an account preserves payment and ownership',async t=>{
+ const f=await guestFixture(t);const c=await(await f.checkout.POST(f.req(f.body))).json();
+ const gateway=await api('lib/server-paysuite.ts');const row=f.sql.prepare('SELECT * FROM paysuite_payments').get();await gateway.settlePayment(f.db,row,row.provider_id);
+ f.env.RESEND_API_KEY='fake-key';f.env.PROFILE_EMAIL_FROM='Framy <info@example.invalid>';const original=globalThis.fetch;let mail;
+ globalThis.fetch=async(url,opts)=>{if(String(url)==='https://api.resend.com/emails'){mail=JSON.parse(opts.body);return Response.json({id:'fake'});}return original(url,opts);};
+ assert.equal((await f.tracking.POST(request({reference:c.paymentId,action:'access',email:'attacker@example.invalid'}))).status,200);assert.deepEqual(mail.to,['buyer@example.test']);const token=mail.text.match(/#([a-f0-9]{64})/)[1];
+ assert.equal((await(await f.tracking.POST(request({reference:c.paymentId,token}))).json()).privateAccess,true);
+ globalThis.__paysuite.user={userId:'other',role:'customer',email:'other@example.test'};assert.equal((await f.tracking.POST(request({reference:c.paymentId,token,action:'claim'}))).status,403);
+ globalThis.__paysuite.user={userId:'buyer',role:'customer',email:'buyer@example.test'};assert.equal((await f.tracking.POST(request({reference:c.paymentId,token,action:'claim'}))).status,200);
+ assert.equal(f.sql.prepare('SELECT owner_id FROM paysuite_payments').get().owner_id,'buyer');assert.equal(f.sql.prepare('SELECT owner_id FROM paysuite_product_orders').get().owner_id,'buyer');
+ globalThis.__paysuite.user=null;assert.equal((await(await f.tracking.POST(request({reference:c.paymentId,token}))).json()).privateAccess,false);assert.deepEqual(f.sql.prepare('PRAGMA foreign_key_check').all(),[]);
+});
+
+test('guest ambiguous provider failure is retried with the same reference without a second create',async t=>{
+ const f=await guestFixture(t);let attempts=0;globalThis.fetch=async()=>{attempts++;throw Error('connection timeout');};
+ const first=await f.checkout.POST(f.req(f.body));assert.equal(first.status,202);const id=(await first.json()).paymentId;
+ const second=await f.checkout.POST(f.req(f.body));assert.equal(second.status,200);assert.equal((await second.json()).paymentId,id);assert.equal(attempts,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM paysuite_payments').get().n,1);
+});
+test('guest upload quota does not create an auth account and expired email proof reveals no private details',async t=>{
+ const f=await guestFixture(t);const quota=await api('lib/server-upload-quota.ts');const session=f.sql.prepare('SELECT id FROM guest_checkout_sessions').get().id;
+ assert.equal(await quota.reserveUpload('asset-a','guest:'+session,'designs',8*1024*1024),true);assert.equal(await quota.reserveUpload('asset-b','guest:'+session,'designs',8*1024*1024),true);assert.equal(await quota.reserveUpload('asset-c','guest:'+session,'designs',8*1024*1024),false);await quota.releaseUpload('asset-a','guest:'+session);assert.equal(await quota.reserveUpload('asset-c','guest:'+session,'designs',8*1024*1024),true);
+ const c=await(await f.checkout.POST(f.req(f.body))).json();const {guestHash}=await api('lib/guest-checkout.ts');const token='a'.repeat(64);f.sql.prepare('INSERT INTO guest_order_access VALUES(?,?,?)').run(await guestHash(token),c.paymentId,Date.now()-1);
+ const result=await(await f.tracking.POST(request({reference:c.paymentId,token}))).json();assert.equal(result.privateAccess,false);assert.ok(!('buyerEmail' in result));
+});
+test('guest reference email outbox retries safely without treating the order as paid',async t=>{
+ const f=await guestFixture(t);const c=await(await f.checkout.POST(f.req(f.body))).json();f.env.RESEND_API_KEY='fake';f.env.PROFILE_EMAIL_FROM='Framy <info@example.invalid>';let sent=0;globalThis.fetch=async(_url,options)=>{sent++;const email=JSON.parse(options.body);assert.match(email.text,new RegExp(c.orderReference));assert.doesNotMatch(email.text,new RegExp(c.paymentId));assert.match(email.text,/não confirma o pagamento/);return Response.json({id:'fake-mail'});};const outbox=await api('lib/guest-order-email.ts');await outbox.guestOrderEmails();await outbox.guestOrderEmails();assert.equal(sent,1);assert.equal(f.sql.prepare('SELECT status FROM guest_order_emails').get().status,'sent');assert.equal(f.sql.prepare('SELECT status FROM paysuite_payments').get().status,'pending');
+});
+
+test('guest migration preserves populated ledgers, children and receipt triggers inside a D1-style transaction',()=>{
+ const sql=new DatabaseSync(':memory:');try{
+ sql.exec('PRAGMA foreign_keys=ON');for(const file of readdirSync('drizzle').filter(f=>f.endsWith('.sql')&&f<'0034').sort())sql.exec(readFileSync('drizzle/'+file,'utf8'));
+ const now=new Date().toISOString();for(const id of ['old-buyer','old-ambassador'])sql.prepare("INSERT INTO auth_accounts(id,email,name,password_hash,role,created_at) VALUES(?,?,?,'!','customer',?)").run(id,id+'@example.invalid',id,now);
+ sql.prepare("INSERT INTO ambassadors(account_id,code,commission_bps,created_at) VALUES('old-ambassador','OLD0001',1000,?)").run(now);
+ sql.prepare("INSERT INTO paysuite_product_orders(id,owner_id,configuration_json,amount,status,created_at) VALUES('old-order','old-buyer','{}',1000,'pending',?)").run(now);
+ sql.prepare("INSERT INTO paysuite_payments(id,owner_id,kind,target_id,amount,cycle,status,created_at,updated_at) VALUES('old-order','old-buyer','product','old-order',1000,'once','pending',?,?)").run(now,now);
+ sql.prepare("INSERT INTO paysuite_events VALUES('old-event','old-order','pending',?)").run(now);
+ sql.prepare("INSERT INTO ambassador_sales(order_id,ambassador_id,code,base_amount,discount_amount,commission_bps,commission_amount,created_at) VALUES('old-order','old-ambassador','OLD0001',1000,100,1000,100,?)").run(now);
+ const tables=['paysuite_payments','paysuite_product_orders','paysuite_events','ambassador_sales'];const before=tables.map(table=>sql.prepare('SELECT * FROM '+table).all());
+ sql.exec('BEGIN');sql.exec(readFileSync('drizzle/0034_guest_product_checkout.sql','utf8'));assert.deepEqual(sql.prepare('PRAGMA foreign_key_check').all(),[]);sql.exec('COMMIT');
+ for(let i=0;i<tables.length;i++)assert.deepEqual(sql.prepare('SELECT * FROM '+tables[i]).all(),before[i],tables[i]);
+ assert.equal(sql.prepare('PRAGMA foreign_keys').get().foreign_keys,1);
+ assert.throws(()=>sql.prepare("INSERT INTO paysuite_events VALUES('bad','missing','pending',?)").run(now));
+ sql.prepare("UPDATE paysuite_payments SET status='paid' WHERE id='old-order'").run();assert.equal(sql.prepare('SELECT status FROM ambassador_sales').get().status,'earned');assert.equal(sql.prepare('SELECT COUNT(*) n FROM payment_email_receipts').get().n,1);
+ }finally{sql.close();}
+});
+
+test('guest card, keychain and kit orders share validated physical checkout and stock rules',async t=>{
+ const f=await guestFixture(t);
+ for(const [format,expectedAmount] of [['card',115000],['keychain',70000],['kit',155000]]){
+ const r=await f.checkout.POST(f.req({...f.body,format,expectedAmount,requestId:crypto.randomUUID().replaceAll('-','')}));assert.equal(r.status,200,format+': '+await r.clone().text());
+ }
+ assert.equal(f.creates(),3);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM paysuite_stock_reservations').get().n,4);
+ assert.equal((await f.checkout.POST(f.req({...f.body,requestId:crypto.randomUUID().replaceAll('-','')}))).status,409);
+});
+
+test('payment receipts route physical orders to guest tracking and keep subscriptions in authenticated payment status',async()=>{
+ const {receiptMessage}=await api('lib/payment-receipts.ts');const common={email:'buyer@example.invalid',name:'Demo Buyer',amount:50000,cycle:'monthly',method:'mpesa',reference:'a'.repeat(32),providerReference:'fake-provider',paidAt:new Date().toISOString()};
+ const physical=receiptMessage({...common,kind:'product',configuration:{format:'card',card:'PVC',design:'standard',hardware:50000,customization:0,delivery:0}});assert.match(physical,/\/acompanhar\?referencia=/);
+ const subscription=receiptMessage({...common,kind:'subscription'});assert.match(subscription,/\/checkout\/retorno\?payment=/);assert.doesNotMatch(subscription,/\/acompanhar\?/);
+});
+
+
+test('public references resolve guest tracking and manager search without granting private access',async t=>{
+ const f=await guestFixture(t); const response=await f.checkout.POST(f.req(f.body));
+ assert.equal(response.status,200,await response.clone().text());const c=await response.json();
+ assert.match(c.orderReference,/^FC-OR-26-\d{4}-\d{4}$/);assert.match(c.paymentReference,/^FC-PY-26-\d{4}-\d{4}$/);
+ const duplicate=await(await f.checkout.POST(f.req(f.body))).json();assert.equal(duplicate.orderReference,c.orderReference);assert.equal(f.creates(),1);
+ const tracking=await api('app/api/order-tracking/route.ts');
+ globalThis.__paysuite.user=null;globalThis.__paysuite.cookie='';
+ for(const reference of [c.orderReference,c.paymentReference,c.paymentId,c.orderReference.toLowerCase().replaceAll('-',' ')]) {
+  const r=await tracking.POST(request({reference}));assert.equal(r.status,200,await r.clone().text());
+  const d=await r.json();assert.equal(d.reference,c.orderReference);assert.equal(d.id,c.paymentId);assert.equal(d.privateAccess,false);assert.equal(d.buyerEmail,undefined);assert.equal(d.url,undefined);
+ }
+ const wrong=c.orderReference.slice(0,-1)+(Number(c.orderReference.at(-1))+1)%10;
+ assert.equal((await tracking.POST(request({reference:wrong}))).status,404);
+ const manager=await api('app/api/paysuite/manager/route.ts');
+ assert.equal((await manager.GET(new Request('https://framy.example/api/paysuite/manager?reference='+c.orderReference))).status,403);
+ globalThis.__paysuite.user={userId:'buyer',role:'manager'};
+ const r=await manager.GET(new Request('https://framy.example/api/paysuite/manager?reference='+c.orderReference));assert.equal(r.status,200,await r.clone().text());assert.equal((await r.json()).payments[0].id,c.paymentId);
+});

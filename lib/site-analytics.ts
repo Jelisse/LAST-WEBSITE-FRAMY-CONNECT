@@ -8,7 +8,7 @@ export function analyticsPath(raw: unknown): string | null {
   )
     return null;
   if (
-    /^\/(?:|produtos|sobre|contacto|ajuda|termos|privacidade|aplicar|entrar)$/.test(
+    /^\/(?:|porque-framy|para-empresas|produtos|sobre|contacto|ajuda|termos|privacidade|aplicar|entrar)$/.test(
       raw,
     )
   )

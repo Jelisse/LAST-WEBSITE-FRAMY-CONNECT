@@ -37,7 +37,7 @@ if (markers.length !== 2 || markers.some(rows => !rows.length))
   throw Error('Publicação bloqueada: falta a migração de stock D1.');
 console.log('Esquema D1 compatível com todas as migrações do projecto.');
 const integrity = queryBatch(`PRAGMA foreign_key_check;
-SELECT COUNT(*) AS mismatches FROM paysuite_payments p LEFT JOIN paysuite_product_orders o ON o.id=p.target_id WHERE p.kind='product' AND (o.id IS NULL OR o.owner_id<>p.owner_id OR o.amount<>p.amount OR (p.status='paid' AND o.status NOT IN ('paid','fulfilled')));
+SELECT COUNT(*) AS mismatches FROM paysuite_payments p LEFT JOIN paysuite_product_orders o ON o.id=p.target_id WHERE p.kind='product' AND (o.id IS NULL OR o.owner_id IS NOT p.owner_id OR o.amount<>p.amount OR (p.status='paid' AND o.status NOT IN ('paid','fulfilled')));
 SELECT COUNT(*) AS mismatches FROM paysuite_payments p LEFT JOIN profile_invoices i ON i.id=p.target_id WHERE p.kind='subscription' AND (i.id IS NULL OR i.owner_id<>p.owner_id OR i.amount<>p.amount OR (p.status='paid' AND i.status<>'confirmed'));`);
 if (integrity.length !== 3 || integrity[0].length || integrity.slice(1).some(rows => rows[0]?.mismatches !== 0))
   throw Error('Database relationship audit failed. Deployment stopped: review foreign keys and payment/order/invoice consistency. No customer records were printed or changed.');

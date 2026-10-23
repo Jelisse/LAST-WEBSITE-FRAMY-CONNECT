@@ -61,7 +61,7 @@ export async function corporateAssignment(id: string) {
   if (!/^[a-f0-9-]{36}$/.test(id)) return null;
   const row = await database()
     .prepare(
-      'SELECT x.*,c.organisation_id,c.name AS campaign_name,o.name AS organisation_name,p.username,a.name FROM corporate_assignments x JOIN corporate_campaigns c ON c.id=x.campaign_id AND c.active=1 JOIN corporate_organisations o ON o.id=c.organisation_id JOIN corporate_effective_members m ON m.organisation_id=o.id AND m.account_id=x.account_id AND m.active=1 JOIN auth_accounts a ON a.id=x.account_id AND a.active=1 LEFT JOIN profiles p ON p.owner_id=a.id AND p.published_json IS NOT NULL WHERE x.id=?',
+      'SELECT x.*,c.organisation_id,c.name AS campaign_name,o.name AS organisation_name,p.username,a.name,cc.id AS company_card_id FROM corporate_assignments x JOIN corporate_campaigns c ON c.id=x.campaign_id AND c.active=1 JOIN corporate_organisations o ON o.id=c.organisation_id JOIN corporate_effective_members m ON m.organisation_id=o.id AND m.account_id=x.account_id AND m.active=1 JOIN auth_accounts a ON a.id=x.account_id AND a.active=1 LEFT JOIN profiles p ON p.owner_id=a.id AND p.published_json IS NOT NULL LEFT JOIN corporate_cards cc ON cc.organisation_id=o.id AND cc.account_id=a.id AND cc.published_json IS NOT NULL WHERE x.id=?',
     )
     .bind(id)
     .first<{
@@ -70,6 +70,7 @@ export async function corporateAssignment(id: string) {
       organisation_id: string;
       organisation_name: string;
       campaign_name: string;
+      company_card_id: string | null;
       name: string;
       username: string | null;
     }>();

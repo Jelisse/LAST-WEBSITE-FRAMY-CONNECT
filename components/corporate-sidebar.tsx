@@ -1,6 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { AppSidebarContents } from './app-sidebar';
+import { AppSidebarDrawer } from './app-sidebar-drawer';
 import {
+  Mail,
+  Image,
+  BookUser,
+  Plug,
   BarChart3,
   Users,
   Megaphone,
@@ -8,20 +13,18 @@ import {
   CircleHelp,
   Building2,
   UserRound,
-  ShieldCheck,
-  ArrowUpRight,
-  Menu,
-  X,
-  ChevronRight,
 } from 'lucide-react';
-import Link from './hard-link';
-import { useI18n } from './language-provider';
 import {
   corporateSections,
   corporateSectionURL,
   type CorporateSection,
 } from '@/lib/corporate-navigation';
 const icons = {
+  signatures: Mail,
+  backgrounds: Image,
+  directory: BookUser,
+  integrations: Plug,
+  cards: Building2,
   reports: BarChart3,
   team: Users,
   campaigns: Megaphone,
@@ -35,79 +38,78 @@ export function CorporateSidebar({
   current: CorporateSection | 'company';
   organisation?: string;
 }) {
-  const { t } = useI18n();
-  const [open, setOpen] = useState(false);
+  const sidebar = (
+    <AppSidebarContents
+      badge="Corporativo"
+      groups={[
+        {
+          label: 'Criar e partilhar',
+          items: corporateSections
+            .filter((s) =>
+              ['cards', 'signatures', 'backgrounds'].includes(s.id),
+            )
+            .map((section) => {
+              const Icon = icons[section.id];
+              return {
+                id: section.id,
+                label: section.label,
+                href: corporateSectionURL(section.path, organisation),
+                icon: <Icon size={21} />,
+                active: current === section.id,
+              };
+            }),
+        },
+        {
+          label: 'Gerir a equipa',
+          items: corporateSections
+            .filter(
+              (s) =>
+                !['cards', 'signatures', 'backgrounds', 'guide'].includes(s.id),
+            )
+            .map((section) => {
+              const Icon = icons[section.id];
+              return {
+                id: section.id,
+                label: section.label,
+                href: corporateSectionURL(section.path, organisation),
+                icon: <Icon size={21} />,
+                active: current === section.id,
+              };
+            }),
+        },
+        {
+          label: 'A minha conta',
+          items: [
+            {
+              id: 'company',
+              label: 'Empresa',
+              href: '/corporativo/configurar',
+              active: current === 'company',
+              icon: <Building2 size={21} />,
+            },
+            {
+              id: 'profile',
+              label: 'Perfil',
+              href: '/perfil',
+              icon: <UserRound size={21} />,
+            },
+            {
+              id: 'guide',
+              label: 'Como funciona',
+              href: '/corporativo/guia',
+              icon: <CircleHelp size={21} />,
+            },
+          ],
+        },
+      ]}
+    />
+  );
   return (
-    <aside className={'corporate-sidebar' + (open ? ' is-open' : '')}>
-      <button
-        type="button"
-        className="corporate-sidebar-toggle"
-        aria-expanded={open}
-        aria-controls="corporate-side-links"
-        onClick={() => setOpen(!open)}
-      >
-        {open ? (
-          <X size={20} aria-hidden="true" />
-        ) : (
-          <Menu size={20} aria-hidden="true" />
-        )}
-        <span>{t('Navegação corporativa')}</span>
-        <ChevronRight
-          size={18}
-          className="corporate-sidebar-chevron"
-          aria-hidden="true"
-        />
-      </button>
-      <nav id="corporate-side-links" aria-label={t('Navegação corporativa')}>
-        <p className="corporate-sidebar-label">{t('Corporativo')}</p>
-        {corporateSections.map((section) => {
-          const Icon = icons[section.id];
-          return (
-            <Link
-              key={section.id}
-              href={corporateSectionURL(section.path, organisation)}
-              aria-current={current === section.id ? 'page' : undefined}
-              onClick={() => setOpen(false)}
-            >
-              <Icon size={21} aria-hidden="true" />
-              <span>{t(section.label)}</span>
-              <ChevronRight
-                size={16}
-                className="corporate-sidebar-chevron"
-                aria-hidden="true"
-              />
-            </Link>
-          );
-        })}
-        <Link
-          href="/corporativo/configurar"
-          aria-current={current === 'company' ? 'page' : undefined}
-          onClick={() => setOpen(false)}
-        >
-          <Building2 size={21} aria-hidden="true" />
-          <span>{t('Empresa')}</span>
-          <ChevronRight
-            size={16}
-            className="corporate-sidebar-chevron"
-            aria-hidden="true"
-          />
-        </Link>
-        <div className="corporate-sidebar-account">
-          <p className="corporate-sidebar-label">{t('A minha conta')}</p>
-          <Link href="/perfil">
-            <UserRound size={21} aria-hidden="true" />
-            <span>{t('Perfil')}</span>
-          </Link>
-          <Link href="/seguranca">
-            <ShieldCheck size={21} aria-hidden="true" />
-            <span>{t('Segurança da conta')}</span>
-          </Link>
-          <Link href="/">
-            <ArrowUpRight size={21} aria-hidden="true" />
-            <span>{t('Página inicial')}</span>
-          </Link>
-        </div>
-      </nav>
+    <aside className="corporate-sidebar">
+      <AppSidebarDrawer>{sidebar}</AppSidebarDrawer>
+      <div id="corporate-side-links" className="app-sidebar">
+        {sidebar}
+      </div>
     </aside>
   );
 }

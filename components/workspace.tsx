@@ -1,6 +1,14 @@
 'use client';
+import { AppSidebarContents } from './app-sidebar';
+import { ProfileSetupNavigation, ProfileSetupReview } from './profile-setup';
+import {
+  profileSetupIssue,
+  profileIssueLocation,
+  resumeProfileStep,
+} from '@/lib/profile-setup';
 import { focusDashboardStart } from '@/lib/dashboard-navigation';
 import { AmbassadorDashboard } from './ambassador-dashboard';
+import { AccountMenu } from './account-menu';
 import { PanelBrand } from '@/components/panel-brand';
 
 import { membershipFeatures } from '@/lib/entitlement';
@@ -12,12 +20,10 @@ import { AgentContact } from '@/components/agent-contact';
 import { useI18n, LanguageSelector } from '@/components/language-provider';
 
 import type { CustomerOrder as SandboxOrder } from '@/lib/customer-order';
-import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import Link from '@/components/hard-link';
 import {
   ArrowUpRight,
-  ChevronDown,
   LayoutDashboard,
   UserRound,
   Package,
@@ -31,24 +37,18 @@ import {
   Check,
   LogOut,
   Download,
-  ShieldCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CustomerOverview } from '@/components/customer-overview';
 import { PlanPicker } from '@/components/plan-picker';
 import { ProfileBusinessEditor } from './profile-business-editor';
 import { ProfileEngagementPanel } from './profile-engagement';
-import { TrialNotice } from './trial-notice';
 import { ProfileLinksEditor } from '@/components/profile-links-editor';
 import { MobileProfile } from '@/components/mobile-profile';
 import { EditorLivePreview } from '@/components/editor-live-preview';
 import { ProfilePhotoUpload } from '@/components/profile-photo-upload';
 import { ProfileHandoff } from '@/components/profile-handoff';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -69,12 +69,6 @@ import {
 import {
   SidebarProvider,
   Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton as BaseSidebarMenuButton,
   useSidebar,
   SidebarInset,
   SidebarTrigger,
@@ -120,17 +114,6 @@ const date = (value: string, locale: string) =>
   }).format(new Date(value));
 const payment = (o: SandboxOrder) =>
   o.refunded ? 'Reembolsado' : o.paid ? 'Pagamento registado' : 'Por pagar';
-function initials(name: string) {
-  return (
-    name
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((s) => s[0])
-      .join('')
-      .toUpperCase() || 'FC'
-  );
-}
 export function Workspace({ displayName }: { displayName: string }) {
   const { t } = useI18n();
   const [growthInitialTab, setGrowthInitialTab] = useState<
@@ -150,9 +133,18 @@ export function Workspace({ displayName }: { displayName: string }) {
     [proof, setProof] = useState(''),
     [checks, setChecks] = useState<boolean[]>([false, false, false, false]),
     [chosenProduct, setChosenProduct] = useState('keychain'),
-    [testToolsOpen, setTestToolsOpen] = useState(false),
+    [_testToolsOpen, setTestToolsOpen] = useState(false),
     [plansOpen, setPlansOpen] = useState(false),
     [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [editorStep, setEditorStep] = useState<number>(0);
+  function goToEditorStep(step: number) {
+    setEditorStep(step);
+    requestAnimationFrame(() => {
+      const start = document.getElementById('profile-setup-start');
+      start?.scrollIntoView({ block: 'start' });
+      start?.focus({ preventScroll: true });
+    });
+  }
   const [conflict, setConflict] = useState<string | null>(null);
   const [errorField, setErrorField] = useState('');
   const dirtyRef = useRef(false);
@@ -161,10 +153,13 @@ export function Workspace({ displayName }: { displayName: string }) {
   }, [dirty]);
   useEffect(() => {
     if (tab !== 'profile' || !toolSection.current) return;
+    setEditorStep(2);
     const section = document.getElementById(
       `professional-${toolSection.current}`,
     );
     if (section) {
+      const parentDetails = section.closest('details');
+      if (parentDetails) parentDetails.open = true;
       section.querySelectorAll('details').forEach((detail) => {
         detail.open = true;
       });
@@ -207,7 +202,15 @@ export function Workspace({ displayName }: { displayName: string }) {
       })
       .then((d) => {
         setData(d);
-        setProfile(d.profile ?? blankProfile);
+        setProfile(
+          d.profile ?? {
+            ...blankProfile,
+            name: displayName,
+            username: usernameFromName(displayName),
+          },
+        );
+        setEditorStep(d.published ? 0 : resumeProfileStep(d.profile));
+        if (!d.published && d.profileVersion > 0) setTab('profile');
         const routeTab: Record<string, string> = {
           '/perfil': 'profile',
           '/preview': 'profile',
@@ -253,7 +256,7 @@ export function Workspace({ displayName }: { displayName: string }) {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, []);
+  }, [displayName]);
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
       if (dirty) {
@@ -394,7 +397,7 @@ export function Workspace({ displayName }: { displayName: string }) {
   }
   const savedMessage = (action: string) =>
     action === 'publish-profile'
-      ? 'Perfil publicado nesta prévia privada.'
+      ? 'Perfil publicado. O seu link está pronto para partilhar.'
       : action === 'unpublish-profile'
         ? 'Perfil retirado da publicação.'
         : 'Rascunho guardado.';
@@ -426,14 +429,35 @@ export function Workspace({ displayName }: { displayName: string }) {
     setConflict(null);
   }
   async function save(action: string) {
-    if (!data || uploadingPhoto || busy) return;
+    if (!data || uploadingPhoto || busy) return false;
     // Human names pasted into a new username field must produce a valid URL,
     // just like usernames generated from the full-name field. Existing URLs
     // remain immutable and the server still validates and reserves the result.
-    const submittedProfile = data.profileVersion === 0
-      ? { ...profile, username: usernameFromName(profile.username || profile.name) }
-      : profile;
+    const submittedProfile =
+      data.profileVersion === 0
+        ? {
+            ...profile,
+            username: usernameFromName(profile.username || profile.name),
+          }
+        : profile;
     setProfile(submittedProfile);
+    const issue =
+      action === 'unpublish-profile'
+        ? null
+        : profileSetupIssue(submittedProfile);
+    if (issue) {
+      setError(issue.message);
+      setErrorField(issue.field);
+      setNotice('');
+      setEditorStep(issue.step);
+      requestAnimationFrame(() => {
+        const target = document.getElementById(
+          issue.field ? `profile-${issue.field}` : 'profile-setup-start',
+        );
+        target?.focus();
+      });
+      return false;
+    }
     setBusy(true);
     setErrorField('');
     setError('');
@@ -447,21 +471,39 @@ export function Workspace({ displayName }: { displayName: string }) {
           data.profileVersion === 0 &&
           submittedProfile.username === usernameFromName(submittedProfile.name),
       });
-      applySavedProfile({ ...result, profile: result.profile ?? submittedProfile });
+      applySavedProfile({
+        ...result,
+        profile: result.profile ?? submittedProfile,
+      });
       setNotice(savedMessage(action));
       // Best-effort revalidation; the save itself already succeeded.
       await load().catch(() => {});
+      if (action === 'publish-profile') setEditorStep(3);
+      return true;
     } catch (e) {
       if ((e as { status?: number }).status === 409) {
         // Never auto-merge: ask the user which side wins.
         setConflict(action);
       } else {
         setError(e instanceof Error ? e.message : 'Tente novamente.');
-        if ((e as { errorField?: string }).errorField === 'website') {
-          setErrorField('website');
-          requestAnimationFrame(() => document.getElementById('profile-website')?.focus());
-        }
+        const location = profileIssueLocation(
+          e instanceof Error ? e.message : '',
+        );
+        setErrorField(
+          (e as { errorField?: string }).errorField || location.field,
+        );
+        if (location.field || location.step !== 2) setEditorStep(location.step);
+        requestAnimationFrame(() =>
+          document
+            .getElementById(
+              location.field
+                ? `profile-${location.field}`
+                : 'profile-setup-start',
+            )
+            ?.focus(),
+        );
       }
+      return false;
     } finally {
       setBusy(false);
     }
@@ -479,24 +521,21 @@ export function Workspace({ displayName }: { displayName: string }) {
     }
     // Keep my edits: resync the version explicitly, then retry the same action.
     if (!data) return;
-    await run(
-      async () => {
-        const r = await fetch('/api/workspace', { cache: 'no-store' });
-        const fresh = (await r.json()) as WorkspaceData & { error?: string };
-        if (!r.ok) throw new Error(fresh.error ?? 'Não foi possível carregar.');
-        const result = await send({
-          action,
-          profile,
-          version: fresh.profileVersion,
-          autoUsername:
-            fresh.profileVersion === 0 &&
-            profile.username === usernameFromName(profile.name),
-        });
-        applySavedProfile(result);
-        await load().catch(() => {});
-      },
-      savedMessage(action),
-    );
+    await run(async () => {
+      const r = await fetch('/api/workspace', { cache: 'no-store' });
+      const fresh = (await r.json()) as WorkspaceData & { error?: string };
+      if (!r.ok) throw new Error(fresh.error ?? 'Não foi possível carregar.');
+      const result = await send({
+        action,
+        profile,
+        version: fresh.profileVersion,
+        autoUsername:
+          fresh.profileVersion === 0 &&
+          profile.username === usernameFromName(profile.name),
+      });
+      applySavedProfile(result);
+      await load().catch(() => {});
+    }, savedMessage(action));
   }
   function openPlans() {
     setError('');
@@ -594,7 +633,8 @@ export function Workspace({ displayName }: { displayName: string }) {
               <TableCell>
                 <strong>{t(o.productName)}</strong>
                 <small>
-                  #{o.id.slice(0, 8).toUpperCase()} · {date(o.createdAt, t.locale)}
+                  #{o.id.slice(0, 8).toUpperCase()} ·{' '}
+                  {date(o.createdAt, t.locale)}
                 </small>
               </TableCell>
               <TableCell>
@@ -652,153 +692,144 @@ export function Workspace({ displayName }: { displayName: string }) {
           onSelect={selectPlan}
         />
       )}
-      <Sidebar className="workspace-sidebar">
-        <SidebarHeader className="p-6">
-          <Link className="brand" href="/">
-            <Image
-              width={220}
-              height={100}
-              unoptimized
-              src="/brand/logo.svg"
-              alt={t('Framy Connect')}
-            />
-          </Link>
-          <span className="workspace-label">{t('O SEU ESPAÇO')}</span>
-        </SidebarHeader>
-        <SidebarContent className="px-4">
-          <SidebarMenu>
-            {menu.slice(0, 6).map((m) => (
-              <SidebarMenuItem key={m.id}>
-                <SidebarMenuButton
-                  className="workspace-menu-item"
-                  isActive={tab === m.id}
-                  onClick={() => {
+      <Sidebar className="workspace-sidebar app-sidebar">
+        <CustomerSidebar
+          badge={
+            data?.membership.planId === 'personal'
+              ? 'Individual'
+              : (data?.membership.terms.name ?? 'Individual')
+          }
+          groups={[
+            {
+              label: 'O seu espaço',
+              items: menu
+                .filter((m) => ['overview', 'orders'].includes(m.id))
+                .map((m) => ({
+                  id: m.id,
+                  label: m.label,
+                  icon: <m.icon size={21} />,
+                  active: tab === m.id,
+                  onSelect: () => {
                     setTab(m.id);
                     focusDashboardStart();
                     setNotice('');
-                  }}
-                >
-                  <m.icon />
-                  <span>{t(m.label)}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-          <Link className="corporate-workspace-link" href="/corporativo">{t('Equipa corporativa')}</Link>
-          {['operations', 'agent', 'finance', 'ceo'].includes(tab) && (
-            <Collapsible
-              className="workspace-test-tools"
-              open={testToolsOpen}
-              onOpenChange={setTestToolsOpen}
-            >
-              <CollapsibleTrigger className="workspace-test-trigger">
-                <Settings2 size={17} />
-                {t(' Ferramentas de teste')} <ChevronDown size={16} />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <p>{t('Vistas de demonstração, sem permissões reais.')}</p>
-                <SidebarMenu>
-                  {menu.slice(6).map((m) => (
-                    <SidebarMenuItem key={m.id}>
-                      <SidebarMenuButton
-                        className="workspace-menu-item"
-                        isActive={tab === m.id}
-                        onClick={() => {
-                          setTab(m.id);
+                  },
+                })),
+            },
+            {
+              label: 'Criar e partilhar',
+              items: menu
+                .filter((m) => ['profile', 'growth'].includes(m.id))
+                .map((m) => ({
+                  id: m.id,
+                  label: m.label,
+                  icon: <m.icon size={21} />,
+                  active: tab === m.id,
+                  onSelect: () => {
+                    setTab(m.id);
                     focusDashboardStart();
-                          setNotice('');
-                        }}
-                      >
-                        <m.icon />
-                        <span>{t(m.label)}</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </CollapsibleContent>
-            </Collapsible>
-          )}
-        </SidebarContent>
-        <SidebarFooter className="p-6">
-          <Link className="catalog-link" href="/produtos">
-            {t('Explorar produtos ')}
-            <ArrowUpRight size={18} />
-          </Link>
-          <div className="user-mini">
-            <span>{initials(displayName)}</span>
-            <div>
-              <strong>{displayName}</strong>
-              <small>{t('A sua conta Framy Connect')}</small>
-            </div>
-          </div>
-          <a className="signout" href={signOutHref} target="_top">
-            <LogOut size={16} />
-            {t(' Terminar sessão')}
-          </a>
-        </SidebarFooter>
+                    setNotice('');
+                  },
+                })),
+            },
+            {
+              label: 'Acompanhar',
+              items: menu
+                .filter((m) => ['analytics', 'ambassadors'].includes(m.id))
+                .map((m) => ({
+                  id: m.id,
+                  label: m.label,
+                  icon: <m.icon size={21} />,
+                  active: tab === m.id,
+                  onSelect: () => {
+                    setTab(m.id);
+                    focusDashboardStart();
+                    setNotice('');
+                  },
+                })),
+            },
+            {
+              label: 'Para a sua equipa',
+              items: [
+                {
+                  id: 'company',
+                  label: 'Equipa corporativa',
+                  href: '/corporativo',
+                  icon: <BriefcaseBusiness size={21} />,
+                },
+              ],
+            },
+          ]}
+          onUpgrade={openPlans}
+          footer={
+            <a className="signout" href={signOutHref} target="_top">
+              <LogOut size={20} />
+              <span>{t('Terminar sessão')}</span>
+            </a>
+          }
+        />
       </Sidebar>
       <SidebarInset>
         <header className="workspace-header">
           <PanelBrand />
-          <div>
+          <div className="workspace-mobile-navigation">
             <SidebarTrigger />
-            <span>
-              {t('Minha Conta')}{' '}
-              <span className="breadcrumb">
-                / {t(menu.find((m) => m.id === tab)?.label)}
-              </span>
-            </span>
           </div>
-          <LanguageSelector />
+          <div className="workspace-account-tools">
+            <LanguageSelector />
+            <AccountMenu identity />
+          </div>
         </header>
         <main
           id="main"
           className={`workspace-main ${['overview', 'profile', 'orders'].includes(tab) ? 'customer-main' : ''}`}
         >
-          <div className="sandbox-banner">
-            <ShieldCheck size={19} />
-            <span>
-              <strong>{t('A sua conta')}</strong>
-              {t(
-                ' · Acompanhe o perfil e as encomendas. O pagamento do produto é confirmado pela equipa.',
-              )}
-            </span>
-          </div>
-          <div className="workspace-title">
-            <div>
-              <h1>
-                {tab === 'overview'
-                  ? t('Olá, {0}.', [
-                      displayName.trim().split(/\s+/)[0] || t('bem-vindo'),
-                    ])
-                  : t(
-                      menu
-                        .find((m) => m.id === tab)
-                        ?.label.replace(' · teste', '') ?? '',
-                    )}
-              </h1>
+          {tab !== 'profile' && (
+            <div className="workspace-title">
+              <div>
+                <h1>
+                  {tab === 'overview'
+                    ? t('Olá, {0}.', [
+                        displayName.trim().split(/\s+/)[0] || t('bem-vindo'),
+                      ])
+                    : t(
+                        menu
+                          .find((m) => m.id === tab)
+                          ?.label.replace(' · teste', '') ?? '',
+                      )}
+                </h1>
+              </div>
+              <Button
+                variant="outline"
+                className="control-btn"
+                aria-label={t('Actualizar dados')}
+                disabled={busy || loading || uploadingPhoto}
+                onClick={() =>
+                  run(
+                    () => load(false),
+                    dirty
+                      ? 'Dados actualizados. As alterações por guardar foram mantidas.'
+                      : 'Dados actualizados.',
+                  )
+                }
+              >
+                <RefreshCw size={17} />
+                {t(' Actualizar')}
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              className="control-btn"
-              aria-label={t('Actualizar dados')}
-              disabled={busy || loading || uploadingPhoto}
-              onClick={() =>
-                run(
-                  () => load(false),
-                  dirty
-                    ? 'Dados actualizados. As alterações por guardar foram mantidas.'
-                    : 'Dados actualizados.',
-                )
-              }
-            >
-              <RefreshCw size={17} />
-              {t(' Actualizar')}
-            </Button>
-          </div>
-          {error && (
+          )}
+          {error && (tab !== 'profile' || !data) && (
             <div role="alert" className="message error-message">
-              {t(error)}
+              <strong>{t('Não foi possível concluir.')}</strong>
+              <p>{t(error)}</p>
+              <span>
+                {t(
+                  data
+                    ? 'As alterações continuam neste formulário. Corrija os dados ou tente novamente.'
+                    : 'Tente carregar o seu espaço novamente. Se o problema continuar, contacte a equipa.',
+                )}
+              </span>
+              <Link href="/ajuda">{t('Centro de ajuda')}</Link>
             </div>
           )}
           {conflict && (
@@ -826,7 +857,9 @@ export function Workspace({ displayName }: { displayName: string }) {
               </div>
             </div>
           )}
-          {notice && <output className="message">{t(notice)}</output>}
+          {notice && tab !== 'profile' && (
+            <output className="message">{t(notice)}</output>
+          )}
           {loading ? (
             <output className="empty-panel">
               {t('A carregar o seu espaço…')}
@@ -854,25 +887,29 @@ export function Workspace({ displayName }: { displayName: string }) {
                 />
               )}
               {tab === 'profile' && (
-                <div className="editor-grid profile-editor-layout">
-                  <section className="panel">
-                    <div className="section-heading">
-                      <h2>{t('A sua identidade')}</h2>
-                      <span className="status-badge">
-                        {dirty
-                          ? t('Alterações por guardar')
-                          : data.published
-                            ? t('Publicada')
-                            : t('Rascunho')}
-                      </span>
-                    </div>
-                    <p className="muted">
-                      {t(
-                        'Escolha os dados que quer partilhar. O nome de utilizador fica reservado na primeira gravação.',
+                <div
+                  className="editor-grid profile-editor-layout guided-profile-editor"
+                  data-editor-step={editorStep}
+                >
+                  <section
+                    className="panel"
+                    id="profile-setup-start"
+                    tabIndex={-1}
+                  >
+                    <ProfileSetupNavigation
+                      status={t(
+                        dirty
+                          ? 'Alterações por guardar'
+                          : data.profileVersion > 0
+                            ? 'Rascunho guardado'
+                            : 'Rascunho',
                       )}
-                    </p>
-                    <TrialNotice membership={data.membership} />
+                      step={editorStep}
+                      busy={busy || uploadingPhoto}
+                      onStep={goToEditorStep}
+                    />
                     <form
+                      noValidate
                       onSubmit={(e) => {
                         e.preventDefault();
                         void save('save-profile');
@@ -882,15 +919,17 @@ export function Workspace({ displayName }: { displayName: string }) {
                         className="profile-editor-fields"
                         disabled={busy || uploadingPhoto}
                       >
-                        <ProfilePhotoUpload
-                          profile={profile}
-                          disabled={busy}
-                          onUploading={setUploadingPhoto}
-                          onChange={(next) => {
-                            setProfile(next);
-                            setDirty(true);
-                          }}
-                        />
+                        <div className="setup-part setup-presentation">
+                          <ProfilePhotoUpload
+                            profile={profile}
+                            disabled={busy}
+                            onUploading={setUploadingPhoto}
+                            onChange={(next) => {
+                              setProfile(next);
+                              setDirty(true);
+                            }}
+                          />
+                        </div>
                         <div className="form-grid">
                           {(
                             [
@@ -901,7 +940,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                               },
                               {
                                 key: 'username',
-                                label: 'Nome de utilizador',
+                                label: 'Endereço do perfil',
                                 placeholder: 'o_seu_nome',
                               },
                               {
@@ -927,7 +966,7 @@ export function Workspace({ displayName }: { displayName: string }) {
                             ] as const
                           ).map((f) => (
                             <label
-                              className="field"
+                              className={`field setup-part ${['name', 'username', 'title'].includes(f.key) ? 'setup-identity' : 'setup-contacts'}`}
                               key={f.key}
                               htmlFor={`profile-${f.key}`}
                             >
@@ -936,7 +975,11 @@ export function Workspace({ displayName }: { displayName: string }) {
                                 id={`profile-${f.key}`}
                                 value={profile[f.key]}
                                 aria-invalid={f.key === errorField || undefined}
-                                aria-describedby={f.key === 'website' ? 'profile-website-help' : undefined}
+                                aria-describedby={
+                                  f.key === 'website'
+                                    ? 'profile-website-help'
+                                    : undefined
+                                }
                                 maxLength={
                                   f.key === 'username'
                                     ? 40
@@ -957,23 +1000,48 @@ export function Workspace({ displayName }: { displayName: string }) {
                                   f.key === 'username' &&
                                   data.profileVersion > 0
                                 }
-                                inputMode={f.key === 'website' ? 'url' : undefined}
-                                autoCapitalize={f.key === 'username' || f.key === 'website' ? 'none' : undefined}
-                                spellCheck={f.key === 'username' || f.key === 'website' ? false : undefined}
-                                onBlur={f.key === 'username' && data.profileVersion === 0
-                                  ? () => {
-                                      const username = usernameFromName(profile.username || profile.name);
-                                      if (username !== profile.username) {
-                                        setProfile({ ...profile, username });
-                                        setDirty(true);
+                                inputMode={
+                                  f.key === 'website' ? 'url' : undefined
+                                }
+                                autoCapitalize={
+                                  f.key === 'username' || f.key === 'website'
+                                    ? 'none'
+                                    : undefined
+                                }
+                                spellCheck={
+                                  f.key === 'username' || f.key === 'website'
+                                    ? false
+                                    : undefined
+                                }
+                                onBlur={
+                                  f.key === 'username' &&
+                                  data.profileVersion === 0
+                                    ? () => {
+                                        const username = usernameFromName(
+                                          profile.username || profile.name,
+                                        );
+                                        if (username !== profile.username) {
+                                          setProfile({ ...profile, username });
+                                          setDirty(true);
+                                        }
                                       }
-                                    }
-                                  : f.key === 'website' ? () => {
-                                      const website = normalizeProfileURL(profile.website);
-                                      if (website !== profile.website) { setProfile({ ...profile, website }); setDirty(true); }
-                                    } : undefined}
+                                    : f.key === 'website'
+                                      ? () => {
+                                          const website = normalizeProfileURL(
+                                            profile.website,
+                                          );
+                                          if (website !== profile.website) {
+                                            setProfile({ ...profile, website });
+                                            setDirty(true);
+                                          }
+                                        }
+                                      : undefined
+                                }
                                 onChange={(e) => {
-                                  if (f.key === errorField) { setErrorField(''); setError(''); }
+                                  if (f.key === errorField) {
+                                    setErrorField('');
+                                    setError('');
+                                  }
                                   setProfile({
                                     ...profile,
                                     [f.key]: e.target.value,
@@ -993,11 +1061,24 @@ export function Workspace({ displayName }: { displayName: string }) {
                                 }}
                                 placeholder={t(f.placeholder)}
                               />
-                              {f.key === 'website' && <small id="profile-website-help">{errorField === 'website' ? t(error) : t('Opcional. Pode escrever www.exemplo.com; adicionamos https:// automaticamente.')}</small>}
+                              {f.key === 'username' && (
+                                <small>
+                                  framyconnect.co.mz/{profile.username || '…'}
+                                </small>
+                              )}
+                              {f.key === 'website' && (
+                                <small id="profile-website-help">
+                                  {errorField === 'website'
+                                    ? t(error)
+                                    : t(
+                                        'Opcional. Pode escrever www.exemplo.com; adicionamos https:// automaticamente.',
+                                      )}
+                                </small>
+                              )}
                             </label>
                           ))}
                         </div>
-                        <div className="visibility">
+                        <div className="visibility setup-part setup-contacts">
                           <h3>{t('O que aparece no seu perfil?')}</h3>
                           <label htmlFor="show-email">
                             <span>{t('Mostrar email ao público')}</span>
@@ -1022,65 +1103,136 @@ export function Workspace({ displayName }: { displayName: string }) {
                             />
                           </label>
                         </div>
-                        <button
-                          type="button"
-                          className="btn btn-outline"
-                          onClick={() => {
-                            setGrowthInitialTab('overview');
-                            setTab('growth');
-                          }}
-                        >
-                          <BriefcaseBusiness size={18} />
-                          {t('Ferramentas profissionais')}
-                        </button>
-                        <div
-                          id="professional-business"
-                          tabIndex={-1}
-                          style={{ scrollMarginTop: 110 }}
-                        >
-                          <ProfileBusinessEditor
-                            features={membershipFeatures({
-                              plan_id: data.membership.planId,
-                              terms_json: JSON.stringify(data.membership.terms),
-                            })}
+                        <div className="setup-part setup-presentation">
+                          <label className="field" htmlFor="profile-bio">
+                            {t('Sobre si (opcional)')}
+                            <textarea
+                              id="profile-bio"
+                              rows={4}
+                              value={profile.bio || ''}
+                              maxLength={Math.max(
+                                data.membership.terms.bio,
+                                profile.bio?.length || 0,
+                              )}
+                              onChange={(event) => {
+                                setProfile({
+                                  ...profile,
+                                  bio: event.target.value,
+                                });
+                                setDirty(true);
+                              }}
+                            />
+                            <small>
+                              {profile.bio?.length || 0} /{' '}
+                              {data.membership.terms.bio} {t('caracteres')}
+                            </small>
+                          </label>
+                          <details className="setup-advanced">
+                            <summary>
+                              {t('Ferramentas adicionais (opcional)')}
+                            </summary>
+                            <button
+                              type="button"
+                              className="btn btn-outline"
+                              onClick={() => {
+                                setGrowthInitialTab('overview');
+                                setTab('growth');
+                              }}
+                            >
+                              <BriefcaseBusiness size={18} />
+                              {t('Ferramentas profissionais')}
+                            </button>
+                            <div
+                              id="professional-business"
+                              tabIndex={-1}
+                              style={{ scrollMarginTop: 110 }}
+                            >
+                              <ProfileBusinessEditor
+                                features={membershipFeatures({
+                                  plan_id: data.membership.planId,
+                                  terms_json: JSON.stringify(
+                                    data.membership.terms,
+                                  ),
+                                })}
+                                profile={profile}
+                                onChange={(next) => {
+                                  setProfile(next);
+                                  setDirty(true);
+                                }}
+                              />
+                            </div>
+                            <div
+                              id="professional-extras"
+                              tabIndex={-1}
+                              style={{ scrollMarginTop: 110 }}
+                            >
+                              <ProfileExtrasEditor
+                                features={membershipFeatures({
+                                  plan_id: data.membership.planId,
+                                  terms_json: JSON.stringify(
+                                    data.membership.terms,
+                                  ),
+                                })}
+                                profile={profile}
+                                limit={data.membership.terms.links}
+                                onChange={(p) => {
+                                  setProfile(p);
+                                  setDirty(true);
+                                }}
+                              />
+                            </div>
+                          </details>
+                        </div>
+                        <div className="setup-part setup-contacts">
+                          <ProfileLinksEditor
+                            showBio={false}
+                            profile={profile}
+                            planId={data.membership.planId}
+                            terms={data.membership.terms}
+                            disabled={busy}
+                            onChange={(next) => {
+                              setProfile(next);
+                              setDirty(true);
+                            }}
+                            onUpgrade={openPlans}
+                          />
+                        </div>
+                        <details className="setup-part setup-presentation setup-advanced">
+                          <summary>{t('Idiomas do perfil (opcional)')}</summary>
+                          <ProfileTranslationsEditor
                             profile={profile}
                             onChange={(next) => {
                               setProfile(next);
                               setDirty(true);
                             }}
                           />
+                        </details>
+                        {(editorStep === 3 || editorStep === null) && (
+                          <ProfileSetupReview
+                            profile={profile}
+                            published={data.published}
+                            dirty={dirty}
+                            onStep={goToEditorStep}
+                          />
+                        )}
+                        <div className="editor-feedback" aria-live="polite">
+                          {notice && <output>{t(notice)}</output>}
+                          {error && <p role="alert">{t(error)}</p>}
                         </div>
                         <div
-                          id="professional-extras"
-                          tabIndex={-1}
-                          style={{ scrollMarginTop: 110 }}
+                          className="form-actions setup-save-actions"
+                          aria-label={t('Acções do perfil')}
                         >
-                          <ProfileExtrasEditor
-                            features={membershipFeatures({
-                              plan_id: data.membership.planId,
-                              terms_json: JSON.stringify(data.membership.terms),
-                            })}
-                            profile={profile}
-                            limit={data.membership.terms.links}
-                            onChange={(p) => {
-                              setProfile(p);
-                              setDirty(true);
-                            }}
-                          />
-                        </div>
-                        <ProfileLinksEditor
-                          profile={profile}
-                          planId={data.membership.planId}
-                          terms={data.membership.terms}
-                          disabled={busy}
-                          onChange={(next) => {
-                            setProfile(next);
-                            setDirty(true);
-                          }}
-                          onUpgrade={openPlans}
-                        />
-                        <ProfileTranslationsEditor profile={profile} onChange={next => { setProfile(next); setDirty(true); }} />
-                        <div className="form-actions">
+                          {editorStep !== null && editorStep > 0 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              disabled={busy}
+                              onClick={() => goToEditorStep(editorStep - 1)}
+                            >
+                              {t('Voltar')}
+                            </Button>
+                          )}
                           <Button
                             className="control-btn"
                             variant="outline"
@@ -1090,54 +1242,73 @@ export function Workspace({ displayName }: { displayName: string }) {
                             <Save size={17} />
                             {t(' Guardar rascunho')}
                           </Button>
+                          {editorStep !== null && editorStep < 3 && (
+                            <Button
+                              type="button"
+                              disabled={busy || uploadingPhoto}
+                              onClick={async () => {
+                                if (await save('save-profile'))
+                                  goToEditorStep(editorStep + 1);
+                              }}
+                            >
+                              {t('Guardar e continuar')}
+                              <ArrowUpRight size={17} />
+                            </Button>
+                          )}
                           <Button
                             className="btn btn-primary"
                             type="button"
                             disabled={busy}
+                            hidden={editorStep !== null && editorStep !== 3}
                             onClick={() => save('publish-profile')}
                           >
-                            {t('Publicar perfil ')}
+                            {t(
+                              data.published
+                                ? 'Actualizar perfil publicado'
+                                : 'Publicar perfil ',
+                            )}
                             <ArrowUpRight size={20} />
                           </Button>
                         </div>
                       </fieldset>
                     </form>
-                    {error && <p role="alert" className="message error-message">{t(error)}</p>}
-                    {data.published && (
-                      <div className="published-actions">
-                        <a
-                          href={`/${data.publishedUsername}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <Eye size={17} />
-                          {t(' Abrir perfil publicado')}
-                        </a>
-                        <Button
-                          variant="ghost"
-                          disabled={busy}
-                          onClick={() => save('unpublish-profile')}
-                        >
-                          {t('Retirar publicação')}
-                        </Button>
-                      </div>
-                    )}
-                    <p className="quiet-note">
-                      {t(
-                        'Quem tiver o endereço pode consultar o perfil publicado enquanto o plano estiver activo. Pode retirar a publicação a qualquer momento. O perfil não é indexado em motores de pesquisa.',
+
+                    {(editorStep === 3 || editorStep === null) &&
+                      data.published && (
+                        <div className="published-actions">
+                          <a
+                            href={`/${data.publishedUsername}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <Eye size={17} />
+                            {t(' Abrir perfil publicado')}
+                          </a>
+                          <details className="publication-options">
+                            <summary>{t('Mais opções')}</summary>
+                            <Button
+                              variant="ghost"
+                              disabled={busy}
+                              onClick={() => save('unpublish-profile')}
+                            >
+                              {t('Retirar publicação')}
+                            </Button>
+                          </details>
+                        </div>
                       )}
-                    </p>
-                    <ProfileHandoff
-                      username={
-                        data.publishedUsername || data.profile?.username
-                      }
-                      published={data.published}
-                    />
                   </section>
-                  <aside className="profile-preview-column">
+                  <aside
+                    className="profile-preview-column"
+                    id="profile-live-preview"
+                  >
                     <span className="preview-label">
                       {t('O SEU PERFIL · PRÉ-VISUALIZAÇÃO')}
                     </span>
+                    <p className="setup-preview-note">
+                      {t(
+                        'Pré-visualização do rascunho. A versão pública só muda ao publicar.',
+                      )}
+                    </p>
                     <EditorLivePreview>
                       <MobileProfile
                         profile={profilePresentation(
@@ -1152,7 +1323,6 @@ export function Workspace({ displayName }: { displayName: string }) {
                         preview
                       />
                     </EditorLivePreview>
-
                   </aside>
                 </div>
               )}
@@ -1395,7 +1565,8 @@ export function Workspace({ displayName }: { displayName: string }) {
                               (
                                 {
                                   created: 'Pedido criado',
-                                  'delivery-address': 'Local de entrega indicado',
+                                  'delivery-address':
+                                    'Local de entrega indicado',
                                   pay: 'Pagamento simulado',
                                   assign: 'Agente atribuído',
                                   start: 'Produção iniciada',
@@ -1653,17 +1824,15 @@ function Metric({
   );
 }
 
-function SidebarMenuButton(
-  props: React.ComponentProps<typeof BaseSidebarMenuButton>,
+function CustomerSidebar(
+  props: React.ComponentProps<typeof AppSidebarContents>,
 ) {
-  const { isMobile, setOpenMobile } = useSidebar();
+  const { setOpenMobile, isMobile } = useSidebar();
   return (
-    <BaseSidebarMenuButton
+    <AppSidebarContents
       {...props}
-      onClick={(event) => {
-        props.onClick?.(event);
-        if (isMobile) setOpenMobile(false);
-      }}
+      mobile={isMobile}
+      onNavigate={() => setOpenMobile(false)}
     />
   );
 }
