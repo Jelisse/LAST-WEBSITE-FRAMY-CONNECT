@@ -643,3 +643,9 @@ Header validation: CSS formatter passed. Local browser geometry confirms custome
 User requested commit, GitHub push and Cloudflare deployment of accumulated approved work including the final shared header baseline. GitHub main matched local HEAD before commit. Generated builds, local databases, temporary logs, environment files and private backups remain ignored. TypeScript passed; full suite and deployment checks are recorded by the release continuation below.
 
 Pre-commit validation: all 266 tests passed, TypeScript passed, whitespace check passed and staged source credential-pattern scan found no matches. GitHub main was current before staging.
+
+## Committed, pushed and deployed — 23 October 2026
+
+Implementation commit d887014 pushed to github/main. Cloudflare release 6390aaa7-5a19-4bc8-9fb4-3a8864eca080 includes all accumulated approved implementation and the latest shared dashboard header alignment. Guarded database schema/integrity checks and fresh production build passed, no migration required. All 266 tests and TypeScript passed before commit.
+
+Live workspace SHA256 matches release; homepage/login/product options return 200 and anonymous workspace returns 401. Tracking, sign-in, recovery and purchase have no site footer; public Help/Contact retain their full footer, all returned 200. Final header layout was measured locally on customer expanded/collapsed and agent dashboards; no private customer data or external writes were used in deployment verification. Deployment log remains ignored at tmp/refinement-review/header-baseline-deploy.log. Supersedes the local-only header baseline note above.
