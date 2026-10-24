@@ -261,3 +261,46 @@ test('version three drafts store semantic steps and cannot restore payment conse
       null,
     );
 });
+
+test('ready-made kits skip material design work and retain a five-stage journey', () => {
+  for (const design of ['standard', 'customer', 'team'])
+    assert.deepEqual(
+      purchaseJourney(design, true).map((s) => s.key),
+      ['materials', 'delivery', 'buyer', 'coupon', 'review'],
+    );
+});
+
+test('kit drafts retain the selected combination and bounded optional landmark', () => {
+  const draft = {
+    version: 3,
+    expires: 1100,
+    format: 'kit',
+    kitVariant: 'orange',
+    card: 'PVC',
+    keychain: 'PVC + epóxi',
+    design: 'standard',
+    delivery: 'standard',
+    city: 'maputo',
+    pickupPoint: '',
+    contact: '841234567',
+    address: 'Test address',
+    landmark: 'Near test square',
+    designInstructions: '',
+    step: 'delivery',
+  };
+  const read = readPurchaseDraft(JSON.stringify(draft), 1000);
+  assert.equal(read.kitVariant, 'orange');
+  assert.equal(read.landmark, draft.landmark);
+  for (const kitVariant of ['invented', null, 1])
+    assert.equal(
+      readPurchaseDraft(JSON.stringify({ ...draft, kitVariant }), 1000),
+      null,
+    );
+  assert.equal(
+    readPurchaseDraft(
+      JSON.stringify({ ...draft, landmark: 'x'.repeat(71) }),
+      1000,
+    ),
+    null,
+  );
+});

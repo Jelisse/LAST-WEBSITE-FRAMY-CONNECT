@@ -53,6 +53,7 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
       return null;
     for (const [field, maximum] of [
       ['locality', 100],
+      ['landmark', 70],
       ['buyerName', 100],
       ['buyerEmail', 254],
     ] as const)
@@ -65,6 +66,11 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
       value.ambassadorCode !== undefined &&
       (typeof value.ambassadorCode !== 'string' ||
         value.ambassadorCode.length > 100)
+    )
+      return null;
+    if (
+      value.kitVariant !== undefined &&
+      !['black', 'orange'].includes(value.kitVariant)
     )
       return null;
     value.designReferences = validateDesignReferences(
@@ -85,9 +91,11 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
         value.leather.assetId ? 'customer' : 'standard',
       );
     return value as {
+      kitVariant?: 'black' | 'orange';
       step?: PurchaseEditorStep;
       designReferences?: DesignReferences;
       locality?: string;
+      landmark?: string;
       format?: 'card' | 'keychain' | 'kit';
       stage?: number;
       buyerName?: string;

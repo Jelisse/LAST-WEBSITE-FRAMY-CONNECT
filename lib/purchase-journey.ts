@@ -18,12 +18,19 @@ export const purchaseStages = [
   'O seu desconto',
   'Reveja e confirme',
 ] as const;
-export function purchaseJourney(design: string) {
+export function purchaseJourney(design: string, readyKit = false) {
   return purchaseStageKeys
-    .filter((key) => key !== 'personalise' || design !== 'standard')
+    .filter((key) =>
+      readyKit
+        ? !['design', 'personalise'].includes(key)
+        : key !== 'personalise' || design !== 'standard',
+    )
     .map((key) => ({
       key,
-      label: purchaseStages[purchaseStageKeys.indexOf(key)],
+      label:
+        readyKit && key === 'materials'
+          ? 'Escolha o seu kit NFC'
+          : purchaseStages[purchaseStageKeys.indexOf(key)],
     }));
 }
 export function purchaseReceptionIssue(input: {

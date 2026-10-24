@@ -45,7 +45,7 @@ export function FirstUseGuidance() {
     setTip(null);
   }, [tip]);
   useEffect(() => {
-    if (!isDashboardSupportPath(path)) {
+    if (!isDashboardSupportPath(path) && path !== '/comprar') {
       queueMicrotask(() => setTip(null));
       return;
     }
@@ -66,7 +66,11 @@ export function FirstUseGuidance() {
         document.querySelector('main');
       const scope = guidanceScope(
         path,
-        main?.getAttribute('data-guidance-panel') ?? '',
+        main?.getAttribute('data-guidance-panel') ??
+          document
+            .querySelector('[data-purchase-step]')
+            ?.getAttribute('data-purchase-step') ??
+          '',
       );
       if (
         quiet.current.has(scope) ||
@@ -153,6 +157,7 @@ export function FirstUseGuidance() {
       attributes: true,
       attributeFilter: [
         'data-guidance-panel',
+        'data-purchase-step',
         'data-collapsed',
         'aria-current',
         'aria-pressed',
@@ -186,11 +191,17 @@ export function FirstUseGuidance() {
     const escape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') dismiss();
     };
+    const used = (event: Event) => {
+      if (event.target instanceof Node && anchor.contains(event.target))
+        dismiss();
+    };
+    document.addEventListener('click', used, true);
     document.addEventListener('keydown', escape);
     return () => {
       if (previous) anchor.setAttribute('aria-describedby', previous);
       else anchor.removeAttribute('aria-describedby');
       anchor.classList.remove('first-use-target');
+      document.removeEventListener('click', used, true);
       document.removeEventListener('keydown', escape);
     };
   }, [tip, id, dismiss]);

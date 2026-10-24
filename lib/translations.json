@@ -10767,5 +10767,66 @@
   "Pré-visualização da arte personalizada. O perfil digital é configurado depois da compra; a equipa confirma a arte física antes da produção.": [
     "Custom artwork preview. Your digital profile is configured after purchase; the team confirms physical artwork before production.",
     "客製化設計預覽。購買後可設定數位個人檔案；團隊會在生產前確認實體設計。"
+  ],
+  "Escolha o seu kit NFC": ["Choose your NFC kit", "選擇您的 NFC 套裝"],
+  "Kit Preto": ["Black kit", "黑色套裝"],
+  "Kit Laranja e Branco": ["Orange and white kit", "橙白套裝"],
+  "Cartão NFC + porta-chaves + caixa": [
+    "NFC card + keychain + box",
+    "NFC 卡片＋鑰匙圈＋禮盒"
+  ],
+  "Preço e disponibilidade sob consulta": [
+    "Price and availability on request",
+    "價格及供應情況需查詢"
+  ],
+  "Ver o kit completo": ["View the complete kit", "查看完整套裝"],
+  "Preço e disponibilidade do kit a confirmar pela Framy.": [
+    "Framy will confirm the kit price and availability.",
+    "Framy 將確認套裝價格及供應情況。"
+  ],
+  "Precisa de um kit personalizado? Fale com a Framy": [
+    "Need a custom kit? Talk to Framy",
+    "需要客製套裝？聯絡 Framy"
+  ],
+  "Inclui cartão NFC, porta-chaves e caixa a condizer.": [
+    "Includes an NFC card, keychain and matching box.",
+    "包含 NFC 卡片、鑰匙圈及配套禮盒。"
+  ],
+  "Escolher este kit": ["Choose this kit", "選擇此套裝"],
+  "Escolha uma combinação completa, pronta para si.": [
+    "Choose a complete, coordinated kit.",
+    "選擇完整配搭的套裝。"
+  ],
+  "Kits completos": ["Complete kits", "完整套裝"],
+  "A combinação escolhida será confirmada na cotação antes do pagamento.": [
+    "Your selected combination will be confirmed in the quotation before payment.",
+    "您所選的組合將於付款前在報價中確認。"
+  ],
+  "Cidade de recepção": ["Delivery or pickup city", "收貨或取貨城市"],
+  "Entrega na morada": ["Deliver to my address", "送貨至我的地址"],
+  "Preparação e transporte são etapas distintas. Confirmamos o prazo quando o produto estiver pronto.": [
+    "Preparation and delivery are separate stages. We confirm the delivery timing when your product is ready.",
+    "備貨與運送為不同階段。商品備妥時，我們將確認送達時間。"
+  ],
+  "Bairro e morada": ["Neighbourhood and address", "地區及地址"],
+  "Ponto de referência (opcional)": [
+    "Nearby landmark (optional)",
+    "附近地標（選填）"
+  ],
+  "Pode mudar entre cartão, porta-chaves e kit aqui, antes de continuar.": [
+    "You can switch between a card, keychain and kit here before continuing.",
+    "繼續前，您可在此切換卡片、鑰匙圈或套裝。"
+  ],
+  "Abra a imagem para ver o produto em detalhe. Nos modelos com duas faces, pode alternar entre frente e verso.": [
+    "Open the image to see the product in detail. For two-sided models, switch between front and back.",
+    "開啟圖片以查看商品細節。雙面款式可切換正反面。"
+  ],
+  "Alterne entre cartão e porta-chaves para preparar a arte de cada peça.": [
+    "Switch between card and keychain to prepare the artwork for each item.",
+    "切換卡片及鑰匙圈，分別準備每件商品的設計稿。"
+  ],
+  "Abra a mensagem para rever e enviar à equipa.": [
+    "Open the message to review and send it to the team.",
+    "開啟訊息以檢查並傳送給團隊。"
   ]
 }

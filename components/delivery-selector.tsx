@@ -1,3 +1,5 @@
+'use client';
+import { useEffect } from 'react';
 import { MapPin, Truck, Zap } from 'lucide-react';
 import { useI18n } from '@/components/language-provider';
 import type { FulfilmentSettings } from '@/lib/fulfilment';
@@ -25,6 +27,11 @@ export function DeliverySelector({
   const points =
     settings?.points.filter((p) => p.cityId === city && p.active) ?? [];
   const selectedPoint = points.find((p) => p.id === point);
+  const onlyPoint = points.length === 1 ? points[0].id : '';
+  useEffect(() => {
+    if (mode === 'pickup' && onlyPoint && point !== onlyPoint)
+      onPoint(onlyPoint);
+  }, [mode, onlyPoint, point, onPoint]);
   const amount = (n: number) =>
     new Intl.NumberFormat(t.locale, {
       minimumFractionDigits: 2,
@@ -33,7 +40,7 @@ export function DeliverySelector({
   return (
     <>
       <label>
-        {t(' Em que cidade pretende receber ou levantar o produto? ')}
+        {t('Cidade de recepção')}
         <select
           aria-invalid={invalid}
           aria-describedby={invalid ? 'delivery-validation' : undefined}
@@ -86,7 +93,7 @@ export function DeliverySelector({
                   onChange={() => onMode('standard')}
                 />
                 <Truck size={22} aria-hidden="true" />
-                <strong>{t('Receber na minha morada')}</strong>
+                <strong>{t('Entrega na morada')}</strong>
                 <small>
                   {t(
                     selected?.standardEnabled
@@ -116,22 +123,27 @@ export function DeliverySelector({
           </fieldset>
           {mode === 'pickup' && points.length > 0 && (
             <>
-              <label>
-                {t(' Ponto de levantamento ')}
-                <select value={point} onChange={(e) => onPoint(e.target.value)}>
-                  <option value="">{t('Seleccionar ponto')}</option>
-                  {points.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              {points.length > 1 && (
+                <label>
+                  {t(' Ponto de levantamento ')}
+                  <select
+                    value={point}
+                    onChange={(e) => onPoint(e.target.value)}
+                  >
+                    <option value="">{t('Seleccionar ponto')}</option>
+                    {points.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
               {selectedPoint && (
                 <div className="pickup-location">
                   <strong>{selectedPoint.name}</strong>
                   <p>{selectedPoint.address}</p>
-                  <p>{selectedPoint.hours}</p>
+                  <p className="pickup-hours">{selectedPoint.hours}</p>
                   <a
                     href={
                       'https://www.google.com/maps/search/?api=1&query=' +
@@ -165,7 +177,7 @@ export function DeliverySelector({
               <p>{selected.eta}</p>
               <small>
                 {t(
-                  ' O prazo de entrega começa depois de o produto estar pronto. ',
+                  'Preparação e transporte são etapas distintas. Confirmamos o prazo quando o produto estiver pronto.',
                 )}
               </small>
             </div>
@@ -174,7 +186,7 @@ export function DeliverySelector({
             <div className="pickup-location">
               <p>{selected.expressNote}</p>
               {selected.expressFee === null && (
-                <p>
+                <p className="delivery-quote-note">
                   {t(
                     'O preço desta entrega será confirmado pela equipa na cotação.',
                   )}

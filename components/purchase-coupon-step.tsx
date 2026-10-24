@@ -210,7 +210,9 @@ export function PurchaseCouponStep({
         )}
         <button
           type="button"
-          className="purchase-secondary-link"
+          className={
+            appliedCode ? 'purchase-secondary-link' : 'btn btn-primary'
+          }
           onClick={() => {
             clear();
             onSkip();

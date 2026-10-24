@@ -1,4 +1,5 @@
 'use client';
+import { ReadyKitPicker, readyKits } from './ready-kit-picker';
 import { DesignReferenceUpload } from './design-reference-upload';
 import {
   validateDesignReferences,
@@ -120,6 +121,9 @@ export function PurchaseConfigurator({
   }, []);
   const selection = purchaseSelection(initial);
   const [format, setFormat] = useState(selection.format);
+  const [kitVariant, setKitVariant] = useState<'black' | 'orange'>('black');
+  const readyKit = format === 'kit';
+  const kit = readyKits.find((item) => item.id === kitVariant)!;
   const [productChoicesOpen, setProductChoicesOpen] = useState(false);
   const [editingReview, setEditingReview] = useState(false);
   const [ambassadorCode, setAmbassadorCode] = useState('');
@@ -188,6 +192,10 @@ export function PurchaseConfigurator({
   }, [signedIn]);
   const [contact, setContact] = useState('');
   const [address, setAddress] = useState('');
+  const [landmark, setLandmark] = useState('');
+  const fullAddress = [address.trim(), landmark.trim()]
+    .filter(Boolean)
+    .join(' · ');
   const [delivery, setDelivery] = useState('pickup');
   const [city, setCity] = useState('');
   const [pickupPoint, setPickupPoint] = useState('');
@@ -227,7 +235,12 @@ export function PurchaseConfigurator({
       if (draft) {
         setCard(draft.card);
         setKeychain(draft.keychain);
-        setDesign(draft.design);
+        setDesign(
+          (draft.format ?? selection.format) === 'kit'
+            ? 'standard'
+            : draft.design,
+        );
+        setKitVariant(draft.kitVariant ?? 'black');
 
         setCardArtworkValue(draft.cardArtwork ?? defaultLeather);
         setPvcArtworkValue(draft.pvcArtwork ?? defaultLeather);
@@ -239,6 +252,7 @@ export function PurchaseConfigurator({
         setPickupPoint(draft.pickupPoint);
         setContact(draft.contact);
         setAddress(draft.address);
+        setLandmark(draft.landmark ?? '');
         setDesignInstructions(draft.designInstructions);
         setDesignReferences(draft.designReferences ?? { assets: [], url: '' });
         setFormat(draft.format ?? selection.format);
@@ -251,9 +265,12 @@ export function PurchaseConfigurator({
             Math.min(draft.stage ?? 0, 3)
           ];
         setActiveConfiguration(
-          step === 'personalise' && draft.design === 'standard'
-            ? 'design'
-            : step,
+          (draft.format ?? selection.format) === 'kit' &&
+            ['design', 'personalise'].includes(step)
+            ? 'materials'
+            : step === 'personalise' && draft.design === 'standard'
+              ? 'design'
+              : step,
         );
       }
       setDraftReady(true);
@@ -266,6 +283,7 @@ export function PurchaseConfigurator({
         'framy-checkout:configuration:' + initial,
         JSON.stringify({
           version: 3,
+          kitVariant,
           format,
           locality,
           step: paymentStep ? 'coupon' : activeConfiguration,
@@ -290,6 +308,7 @@ export function PurchaseConfigurator({
           pickupPoint,
           contact,
           address,
+          landmark,
           designInstructions,
           designReferences,
         }),
@@ -299,6 +318,7 @@ export function PurchaseConfigurator({
     }
   }, [
     draftReady,
+    kitVariant,
     format,
     locality,
     activeConfiguration,
@@ -323,12 +343,15 @@ export function PurchaseConfigurator({
     pickupPoint,
     contact,
     address,
+    landmark,
     designInstructions,
     designReferences,
   ]);
   const selected = purchaseFormats.find((item) => item.id === format)!;
   const selectedDesign = designServices.find((item) => item.id === design)!;
-  const estimate = hardwareEstimate(prices, format, card, keychain);
+  const estimate = readyKit
+    ? null
+    : hardwareEstimate(prices, format, card, keychain);
   const preview = [
     ...(format !== 'keychain' ? [card] : []),
     ...(format !== 'card' ? [keychain] : []),
@@ -381,7 +404,7 @@ export function PurchaseConfigurator({
     ...(format !== 'keychain'
       ? [{ PVC: 'pvc', Madeira: 'wood', Metal: 'metal' }[card] ?? '']
       : []),
-    ...(format !== 'card'
+    ...(!readyKit && format !== 'card'
       ? [keychain === 'Couro' ? 'keychain-leather' : 'keychain']
       : []),
   ];
@@ -408,14 +431,14 @@ export function PurchaseConfigurator({
     contact,
   });
   const deliveryReady = !deliveryIssue && !buyerIssue;
-  const route = purchaseJourney(design);
+  const route = purchaseJourney(design, readyKit);
   const currentKey = paymentStep ? 'review' : activeConfiguration;
   const currentStage = route.findIndex((item) => item.key === currentKey);
   const stageCount = route.length;
   const stageLabel = route[currentStage]?.label ?? route[0].label;
   const productTitle =
     format === 'kit'
-      ? 'Configure o seu kit NFC'
+      ? 'Escolha o seu kit NFC'
       : format === 'card'
         ? 'Configure o seu cartão NFC'
         : 'Configure o seu porta-chaves NFC';
@@ -536,7 +559,7 @@ export function PurchaseConfigurator({
   const goToDesign = () => {
     if (validConfiguration(0)) {
       if (canReturnToReview) showSummary();
-      else moveTo('design');
+      else moveTo(readyKit ? 'delivery' : 'design');
     }
   };
   const continueDesign = () => {
@@ -569,9 +592,17 @@ export function PurchaseConfigurator({
     </label>
   );
   const quotationSummary = [
-    t(selected.name),
-    ...(format !== 'keychain' ? [t('Cartão') + ': ' + t(card)] : []),
-    ...(format !== 'card'
+    readyKit ? t(kit.name) : t(selected.name),
+    ...(readyKit
+      ? [
+          t('Inclui cartão NFC, porta-chaves e caixa a condizer.'),
+          t('Preço e disponibilidade do kit a confirmar pela Framy.'),
+        ]
+      : []),
+    ...(!readyKit && format !== 'keychain'
+      ? [t('Cartão') + ': ' + t(card)]
+      : []),
+    ...(!readyKit && format !== 'card'
       ? [
           t('Porta-chaves') +
             ': ' +
@@ -592,7 +623,7 @@ export function PurchaseConfigurator({
                 : ''),
         ]
       : []),
-    t('Design') + ': ' + t(selectedDesign.name),
+    ...(!readyKit ? [t('Design') + ': ' + t(selectedDesign.name)] : []),
     ambassadorCode ? t('Cupão para verificação') + ': ' + ambassadorCode : '',
     t('Cidade') +
       ': ' +
@@ -621,7 +652,7 @@ export function PurchaseConfigurator({
     t('Contacto') + ': ' + contact,
     buyerName ? t('Nome do comprador') + ': ' + buyerName : '',
     buyerEmail ? 'Email: ' + buyerEmail : '',
-    address && delivery !== 'pickup' ? t('Morada') + ': ' + address : '',
+    address && delivery !== 'pickup' ? t('Morada') + ': ' + fullAddress : '',
     design !== 'standard' && designInstructions
       ? t('Instruções para o design') + ': ' + designInstructions.slice(0, 500)
       : '',
@@ -746,16 +777,17 @@ export function PurchaseConfigurator({
       />
       {currentStage === 0 && (
         <div className="purchase-stage-intro">
-          <p>
+          <p hidden={readyKit}>
             {t(
               format === 'kit'
-                ? 'Escolha o material do cartão e do porta-chaves.'
+                ? 'Escolha uma combinação completa, pronta para si.'
                 : 'Escolha o material que combina consigo.',
             )}
           </p>
           <button
             type="button"
             className="purchase-secondary-link"
+            data-purchase-tip="change-product"
             aria-expanded={productChoicesOpen}
             onClick={() => setProductChoicesOpen(!productChoicesOpen)}
           >
@@ -773,6 +805,7 @@ export function PurchaseConfigurator({
                   aria-pressed={format === item.id}
                   onClick={() => {
                     setFormat(item.id);
+                    if (item.id === 'kit') setDesign('standard');
                     setEditingReview(false);
                     setStageError('');
                   }}
@@ -821,9 +854,12 @@ export function PurchaseConfigurator({
           >
             <legend>
               <Layers className="purchase-icon" size={20} aria-hidden="true" />
-              {t('Materiais')}
+              {t(readyKit ? 'Kits completos' : 'Materiais')}
             </legend>
-            <div className="purchase-materials">
+            {readyKit && (
+              <ReadyKitPicker value={kitVariant} onChange={setKitVariant} />
+            )}
+            <div className="purchase-materials" hidden={readyKit}>
               {format !== 'keychain' && (
                 <fieldset className="material-option-group">
                   <legend>{t('Cartão')}</legend>
@@ -897,25 +933,29 @@ export function PurchaseConfigurator({
                 </fieldset>
               )}
             </div>
-            {quotation && (
+            {!readyKit && quotation && (
               <p className="purchase-quotation-notice">
                 {t(
                   'Esta escolha requer cotação. Pode continuar a configurar; o preço e a disponibilidade serão confirmados antes de pagar.',
                 )}
               </p>
             )}
-            <button
-              type="button"
-              className="btn btn-primary material-continue"
-              onClick={goToDesign}
-            >
-              {t(
-                canReturnToReview
-                  ? 'Guardar alterações'
-                  : 'Continuar para o design',
-              )}{' '}
-              →
-            </button>
+            <div className="purchase-step-actions purchase-material-actions">
+              <button
+                type="button"
+                className="btn btn-primary material-continue"
+                onClick={goToDesign}
+              >
+                {t(
+                  canReturnToReview
+                    ? 'Guardar alterações'
+                    : readyKit
+                      ? 'Continuar'
+                      : 'Continuar',
+                )}{' '}
+                →
+              </button>
+            </div>
           </fieldset>
           <fieldset
             id="design-panel"
@@ -1070,7 +1110,7 @@ export function PurchaseConfigurator({
                       ? 'Descrever a minha ideia'
                       : canReturnToReview
                         ? 'Guardar alterações'
-                        : 'Continuar para entrega',
+                        : 'Continuar',
                 )}{' '}
                 →
               </button>
@@ -1276,12 +1316,7 @@ export function PurchaseConfigurator({
                   className="btn btn-primary configuration-next"
                   onClick={goToDelivery}
                 >
-                  {t(
-                    canReturnToReview
-                      ? 'Guardar alterações'
-                      : 'Continuar para entrega',
-                  )}{' '}
-                  →
+                  {t(canReturnToReview ? 'Guardar alterações' : 'Continuar')} →
                 </button>
               </div>
             </div>
@@ -1337,30 +1372,49 @@ export function PurchaseConfigurator({
               </label>
             )}
             {city && delivery !== 'pickup' && (
-              <label>
-                {t('Bairro, morada e ponto de referência')}
-                <textarea
-                  value={address}
-                  aria-invalid={deliveryAttempted && address.trim().length < 8}
-                  aria-describedby={
-                    deliveryAttempted &&
-                    deliveryIssue ===
-                      'Indique a morada e um ponto de referência.'
-                      ? 'delivery-validation'
-                      : undefined
-                  }
-                  onChange={(e) => setAddress(e.target.value)}
-                  maxLength={300}
-                  autoComplete="street-address"
-                />
-              </label>
+              <div className="delivery-address-fields">
+                <label>
+                  {t('Bairro e morada')}
+                  <textarea
+                    value={address}
+                    aria-invalid={
+                      deliveryAttempted && address.trim().length < 8
+                    }
+                    aria-describedby={
+                      deliveryAttempted &&
+                      deliveryIssue ===
+                        'Indique a morada e um ponto de referência.'
+                        ? 'delivery-validation'
+                        : undefined
+                    }
+                    onChange={(e) => setAddress(e.target.value)}
+                    maxLength={220}
+                    rows={2}
+                    autoComplete="street-address"
+                  />
+                </label>
+                <label>
+                  {t('Ponto de referência (opcional)')}
+                  <input
+                    value={landmark}
+                    maxLength={70}
+                    onChange={(e) => setLandmark(e.target.value)}
+                  />
+                </label>
+              </div>
             )}
             <div className="purchase-step-actions">
               <button
                 type="button"
                 className="btn btn-outline"
                 onClick={() =>
-                  moveTo(design === 'standard' ? 'design' : 'personalise')
+                  moveTo(
+                    readyKit
+                      ? 'materials'
+                      : design === 'standard'
+                        ? 'design'
+                        : 'personalise',
+                  )
                 }
               >
                 {t('Voltar')}
@@ -1370,12 +1424,7 @@ export function PurchaseConfigurator({
                 className="btn btn-primary configuration-next"
                 onClick={continueDelivery}
               >
-                {t(
-                  canReturnToReview
-                    ? 'Guardar alterações'
-                    : 'Continuar para os dados',
-                )}{' '}
-                →
+                {t(canReturnToReview ? 'Guardar alterações' : 'Continuar')} →
               </button>
             </div>
           </section>
@@ -1494,12 +1543,7 @@ export function PurchaseConfigurator({
                 className="btn btn-primary configuration-next"
                 onClick={continueBuyer}
               >
-                {t(
-                  canReturnToReview
-                    ? 'Guardar alterações'
-                    : 'Continuar para o desconto',
-                )}{' '}
-                →
+                {t(canReturnToReview ? 'Guardar alterações' : 'Continuar')} →
               </button>
             </div>
           </section>
@@ -1542,7 +1586,7 @@ export function PurchaseConfigurator({
               />
               {t(quotation ? 'O seu pedido de cotação' : 'A sua encomenda')}
             </h2>
-            {isLeather && (
+            {!readyKit && isLeather && (
               <p className="leather-summary">
                 <span key={`${leather.color}-${t.locale}`}>
                   {t(
@@ -1561,12 +1605,28 @@ export function PurchaseConfigurator({
                     : t('Design pela equipa')}
               </p>
             )}
-            {isPvcStandard && (
+            {!readyKit && isPvcStandard && (
               <p className="pvc-selection" aria-live="polite">
                 {t('Modelo')}: {t(pvcModel(pvc).name)}
               </p>
             )}
-            <div className="configuration-photos">
+            {readyKit && (
+              <figure className="ready-kit-review">
+                <SourceImage
+                  src={kit.image}
+                  alt={t(kit.name)}
+                  width={640}
+                  height={520}
+                />
+                <figcaption>
+                  <strong>{t(kit.name)}</strong>
+                  <p>
+                    {t('Inclui cartão NFC, porta-chaves e caixa a condizer.')}
+                  </p>
+                </figcaption>
+              </figure>
+            )}
+            <div className="configuration-photos" hidden={readyKit}>
               {preview.map((material) => {
                 const photo = photos.find((item) => item.material === material);
                 return (
@@ -1615,20 +1675,25 @@ export function PurchaseConfigurator({
               })}
             </div>
             <div
+              hidden={readyKit}
               aria-live="polite"
               key={`${format}-${card}-${keychain}-${design}-${t.locale}`}
             >
-              <h3>{t(selected.name)}</h3>
-              <p>
-                {t(selectedDesign.name)}
-                {design === 'customer' ? ` · ${t(method)}` : ''}
-              </p>
+              <h3>{t(readyKit ? kit.name : selected.name)}</h3>
+              {!readyKit && (
+                <p>
+                  {t(selectedDesign.name)}
+                  {design === 'customer' ? ` · ${t(method)}` : ''}
+                </p>
+              )}
             </div>
             <p className="purchase-preview-note">
               {t(
-                design === 'standard'
-                  ? 'Este é o modelo escolhido. O perfil digital é configurado após o pagamento.'
-                  : 'Pré-visualização da arte personalizada. O perfil digital é configurado depois da compra; a equipa confirma a arte física antes da produção.',
+                readyKit
+                  ? 'A combinação escolhida será confirmada na cotação antes do pagamento.'
+                  : design === 'standard'
+                    ? 'Este é o modelo escolhido. O perfil digital é configurado após o pagamento.'
+                    : 'Pré-visualização da arte personalizada. O perfil digital é configurado depois da compra; a equipa confirma a arte física antes da produção.',
               )}
             </p>
             {design === 'team' && (
@@ -1690,9 +1755,11 @@ export function PurchaseConfigurator({
               <button type="button" onClick={() => editStage('materials')}>
                 {t('Editar produto')}
               </button>
-              <button type="button" onClick={() => editStage('design')}>
-                {t('Editar design')}
-              </button>
+              {!readyKit && (
+                <button type="button" onClick={() => editStage('design')}>
+                  {t('Editar design')}
+                </button>
+              )}
               {design !== 'standard' && (
                 <button type="button" onClick={() => editStage('personalise')}>
                   {t('Editar personalização')}
@@ -1725,7 +1792,9 @@ export function PurchaseConfigurator({
                   )}
                 </p>
                 <p>
-                  {delivery === 'pickup' ? fulfilment?.point?.name : address}
+                  {delivery === 'pickup'
+                    ? fulfilment?.point?.name
+                    : fullAddress}
                 </p>
               </section>
               <section className="purchase-delivery-review">
@@ -1864,7 +1933,8 @@ export function PurchaseConfigurator({
                   {t('Completar entrega para pagar')}
                 </button>
               )}
-              {paymentAvailable &&
+              {!quotation &&
+                paymentAvailable &&
                 (artworkMissing ||
                   instructionsMissing ||
                   uploadBusy ||
@@ -1895,7 +1965,10 @@ export function PurchaseConfigurator({
                   </div>
                 )}
               {quotation ? (
-                <PurchaseQuotation summary={quotationSummary} />
+                <PurchaseQuotation
+                  summary={quotationSummary}
+                  hasAttachments={!readyKit && design !== 'standard'}
+                />
               ) : paymentAvailable ? (
                 <PaySuiteCheckout
                   compact
@@ -1928,7 +2001,7 @@ export function PurchaseConfigurator({
                     city,
                     pickupPoint,
                     contact,
-                    address,
+                    address: fullAddress,
                     designInstructions:
                       design === 'standard' ? '' : designInstructions,
                     ...(design === 'team' ? { designReferences } : {}),

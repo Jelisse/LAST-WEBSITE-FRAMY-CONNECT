@@ -1,7 +1,13 @@
 'use client';
 import { useI18n } from './language-provider';
 import { contactLinks } from '@/lib/support-contact';
-export function PurchaseQuotation({ summary }: { summary: string }) {
+export function PurchaseQuotation({
+  summary,
+  hasAttachments = false,
+}: {
+  summary: string;
+  hasAttachments?: boolean;
+}) {
   const { t } = useI18n();
   const links = contactLinks('sales', t('Pedido de cotação'), summary);
   return (
@@ -18,7 +24,9 @@ export function PurchaseQuotation({ summary }: { summary: string }) {
       </details>
       <p>
         {t(
-          'Abra a mensagem para rever e enviar à equipa. Os ficheiros não são anexados automaticamente.',
+          hasAttachments
+            ? 'Abra a mensagem para rever e enviar à equipa. Os ficheiros não são anexados automaticamente.'
+            : 'Abra a mensagem para rever e enviar à equipa.',
         )}
       </p>
       <div className="purchase-step-actions">

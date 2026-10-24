@@ -1,14 +1,16 @@
 export const guidanceStorageKey = 'framy-first-use-v1';
 export function guidanceScope(path: string, panel = '') {
-  const role = /^\/manager/.test(path)
-    ? 'manager'
-    : /^\/cofounder/.test(path)
-      ? 'director'
-      : /^\/agent/.test(path)
-        ? 'agent'
-        : /^\/corporativo/.test(path)
-          ? 'company'
-          : 'customer';
+  const role = /^\/comprar(?:\/|$)/.test(path)
+    ? 'purchase'
+    : path.startsWith('/manager')
+      ? 'manager'
+      : path.startsWith('/cofounder')
+        ? 'director'
+        : path.startsWith('/agent')
+          ? 'agent'
+          : path.startsWith('/corporativo')
+            ? 'company'
+            : 'customer';
   const section =
     panel || path.split('/').filter(Boolean).slice(1).join('-') || 'overview';
   return `${role}:${section.replace(/[^a-z0-9-]/gi, '').slice(0, 60)}`;
@@ -29,6 +31,28 @@ export function readGuidance(raw: string | null): string[] {
   }
 }
 export const guidanceTips = [
+  {
+    id: 'change-product',
+    selector: '[data-purchase-tip="change-product"]',
+    message:
+      'Pode mudar entre cartão, porta-chaves e kit aqui, antes de continuar.',
+    global: true,
+  },
+  {
+    id: 'product-view',
+    selector:
+      '.pvc-model-options > button[aria-haspopup="dialog"], .card-design-selection button[aria-haspopup="dialog"], .ready-kit-expand',
+    message:
+      'Abra a imagem para ver o produto em detalhe. Nos modelos com duas faces, pode alternar entre frente e verso.',
+    global: true,
+  },
+  {
+    id: 'kit-artwork',
+    selector: '.kit-editor-tabs',
+    message:
+      'Alterne entre cartão e porta-chaves para preparar a arte de cada peça.',
+    global: true,
+  },
   {
     id: 'preview',
     selector: '.preview-mobile-toggle',
@@ -72,12 +96,6 @@ export const guidanceTips = [
     message:
       'Recolha o menu para ganhar espaço. Os ícones mantêm as ferramentas acessíveis.',
     global: true,
-  },
-  {
-    id: 'panel',
-    selector: 'main h1, .corporate-hero h1, #director-title',
-    message:
-      'Use o menu lateral para mudar de tarefa. As acções e os resultados desta área aparecem neste painel.',
   },
 ] as const;
 
