@@ -1,3 +1,4 @@
+import { validateDesignReferences } from '@/lib/design-references';
 import { purchaseProduct } from '@/lib/purchase-history';
 import { guestSession, guestOwns, buyerDetails } from '@/lib/guest-checkout';
 import { purchaseAmounts } from '@/lib/purchase-amounts';
@@ -101,6 +102,7 @@ export async function GET(request: Request) {
             )?.status ?? null)
           : null,
       profileReady: !!profile?.published_json,
+      profileExists: !!profile,
       id: row.id,
       paymentReference: row.public_reference,
       orderReference: order?.public_reference ?? null,
@@ -248,7 +250,16 @@ export async function POST(request: Request) {
         quote.keychain === 'PVC + epóxi'
           ? validateLeather(b.pvcArtwork, 'customer')
           : null;
-      for (const artwork of [leather, cardArtwork, pvcArtwork]) {
+      const designReferences =
+        quote.design === 'team'
+          ? validateDesignReferences(b.designReferences)
+          : { assets: [], url: '' };
+      for (const artwork of [
+        leather,
+        cardArtwork,
+        pvcArtwork,
+        ...designReferences.assets,
+      ]) {
         if (!artwork?.assetId) continue;
         const asset = await env.PROFILE_PHOTOS?.head(
           `designs/${artwork.assetId}`,
@@ -284,6 +295,7 @@ export async function POST(request: Request) {
       const configuration = {
         ambassadorCode: referral?.code ?? null,
         originalTotal: baseQuote.total,
+        ...(quote.design === 'team' ? { designReferences } : {}),
         ...(cardArtwork ? { cardArtwork } : {}),
         ...(pvcArtwork ? { pvcArtwork } : {}),
         ...(selectedPvc ? { pvcModel: selectedPvc } : {}),

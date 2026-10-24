@@ -3853,7 +3853,7 @@
     "已達儲存上限（50 MB 或 100 個檔案）。請聯絡客服。"
   ],
   "Não foi possível guardar o ficheiro.": [
-    "Unable to save the file.",
+    "Could not save the file.",
     "無法儲存檔案。"
   ],
   "Inválido": ["Invalid", "無效"],
@@ -10640,5 +10640,103 @@
   "Preencha o nome e o email na etapa dos seus dados.": [
     "Enter your name and email in the Your details step.",
     "請在「您的資料」步驟填寫姓名及電子郵件。"
+  ],
+  "Continue a preparar o seu perfil": [
+    "Continue setting up your profile",
+    "繼續設定您的個人檔案"
+  ],
+  "O cartão e o porta-chaves podem partilhar o mesmo perfil.": [
+    "The card and keychain can share the same profile.",
+    "卡片和鑰匙圈可共用同一個人檔案。"
+  ],
+  "Referências de inspiração": ["Inspiration references", "靈感參考"],
+  "Opcional": ["Optional", "選填"],
+  "Adicione um exemplo ou imagem de inspiração. Estes ficheiros orientam a equipa; não são a arte final para impressão.": [
+    "Add an example or inspiration image. These files guide the team; they are not final artwork for printing.",
+    "新增範例或靈感圖片。這些檔案供團隊參考，並非印刷定稿。"
+  ],
+  "Adicionar referências": ["Add references", "新增參考檔案"],
+  "Até 3 ficheiros · PNG, JPG ou PDF · 8 MB por ficheiro": [
+    "Up to 3 files · PNG, JPG or PDF · 8 MB per file",
+    "最多 3 個檔案 · PNG、JPG 或 PDF · 每個 8 MB"
+  ],
+  "A preparar o carregamento seguro…": [
+    "Preparing secure upload…",
+    "正在準備安全上傳…"
+  ],
+  "A guardar referências…": ["Saving references…", "正在儲存參考檔案…"],
+  "Referência guardada": ["Reference saved", "參考檔案已儲存"],
+  "Remover referência: {0}": ["Remove reference: {0}", "移除參考檔案：{0}"],
+  "Link de referência (opcional)": [
+    "Reference link (optional)",
+    "參考連結（選填）"
+  ],
+  "Referências para orientar o design, não para impressão.": [
+    "References to guide the design, not for printing.",
+    "參考資料用於設計構思，並非印刷檔案。"
+  ],
+  "Abrir referência": ["Open reference", "開啟參考連結"],
+  "Enviar o meu design": ["Upload my design", "上傳我的設計"],
+  "Descrever a minha ideia": ["Describe my idea", "描述我的想法"],
+  "No próximo passo, envie a sua arte e ajuste a posição e o tamanho.": [
+    "Next, upload your artwork and adjust its position and size.",
+    "下一步，請上傳設計並調整位置和大小。"
+  ],
+  "No próximo passo, descreva a sua ideia e adicione referências. A equipa prepara o design para a sua aprovação.": [
+    "Next, describe your idea and add references. The team prepares the design for your approval.",
+    "下一步，請描述想法並新增參考資料。團隊將準備設計供您確認。"
+  ],
+  "Não foi possível preparar o carregamento. Tente novamente.": [
+    "Could not prepare the upload. Please try again.",
+    "無法準備上傳，請重試。"
+  ],
+  "Produto a personalizar": ["Product to personalise", "要個人化的產品"],
+  "Descreva a sua ideia": ["Describe your idea", "描述您的想法"],
+  "Notas para a equipa (opcional)": [
+    "Notes for the team (optional)",
+    "給團隊的備註（選填）"
+  ],
+  "O seu produto": ["Your product", "您的產品"],
+  "A sua ideia será adaptada a este produto. A equipa apresenta a arte para aprovação antes da produção.": [
+    "Your idea will be adapted to this product. The team presents the artwork for approval before production.",
+    "您的想法將應用於此產品。團隊會在生產前提供設計供您確認。"
+  ],
+  "Os ficheiros de referência não são anexados automaticamente à mensagem de cotação.": [
+    "Reference files are not automatically attached to the quotation message.",
+    "參考檔案不會自動附加到報價訊息。"
+  ],
+  "Carregar arte": ["Upload artwork", "上傳設計"],
+  "Substituir arte": ["Replace artwork", "更換設計"],
+  "Remover arte": ["Remove artwork", "移除設計"],
+  "Carregue a sua arte e ajuste o tamanho e a posição. A pré-visualização actualiza automaticamente.": [
+    "Upload your artwork and adjust its size and position. The preview updates automatically.",
+    "上傳設計並調整大小和位置，預覽會自動更新。"
+  ],
+  "A preparar a arte…": ["Preparing artwork…", "正在準備設計…"],
+  "Que textos, cores e estilo pretende? Indique também o que deve aparecer no cartão e no porta-chaves.": [
+    "What text, colours and style would you like? Include what should appear on the card and keychain.",
+    "您想使用哪些文字、顏色和風格？請說明卡片和鑰匙圈應呈現的內容。"
+  ],
+  "Há algum detalhe que a equipa deva saber sobre a sua arte?": [
+    "Is there anything the team should know about your artwork?",
+    "有任何設計細節需要告知團隊嗎？"
+  ],
+  "Adicione até 3 referências.": [
+    "Add up to 3 references.",
+    "最多新增 3 個參考檔案。"
+  ],
+  "Referências inválidas.": ["Invalid references.", "參考資料無效。"],
+  "Use um link HTTPS válido para a referência.": [
+    "Use a valid HTTPS reference link.",
+    "請使用有效的 HTTPS 參考連結。"
+  ],
+  "Use PDF, PNG ou JPG.": ["Use PDF, PNG or JPG.", "請使用 PDF、PNG 或 JPG。"],
+  "Carregue a arte do cartão para continuar.": [
+    "Upload the card artwork to continue.",
+    "請上傳卡片設計以繼續。"
+  ],
+  "Carregue a arte do porta-chaves para continuar.": [
+    "Upload the keychain artwork to continue.",
+    "請上傳鑰匙圈設計以繼續。"
   ]
 }

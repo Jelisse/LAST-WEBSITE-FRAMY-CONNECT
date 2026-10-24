@@ -286,3 +286,24 @@ test('French and Simplified Chinese cover every extended profile message with En
     }
   }
 });
+
+
+test('profile invitation appears only after verified product payment and resumes existing drafts', async () => {
+  const { PaidProfileNext } = (await module('components/paid-profile-next.tsx', {
+    './language-provider': language.url,
+    '@/components/hard-link': moduleURL(`import React from '${pathToFileURL(require.resolve('react')).href}'; export default function Link(props){return React.createElement('a',props);}`),
+  })).exports;
+  const render = (payment) => renderToStaticMarkup(React.createElement(LanguageProvider,{locale:'en'},React.createElement(PaidProfileNext,{payment})));
+  const base={id:'payment-123',kind:'product',status:'paid',profileReady:false,profileExists:false};
+  for(const status of ['pending','creating','failed','review','refunded']) assert.equal(render({...base,status}),'');
+  assert.equal(render({...base,kind:'subscription'}),'');
+  const fresh=render(base);
+  assert.ok(fresh.includes(translator('en')('Continuar: criar e configurar perfil')));
+  assert.ok(fresh.includes('payment-123'));
+  assert.ok(fresh.includes(translator('en')('O perfil Personal é gratuito. Os planos pagos são opcionais e não estão incluídos nesta compra.')));
+  for(const existing of [{profileExists:true},{profileReady:true}]) {
+    const html=render({...base,...existing});
+    assert.ok(html.includes(translator('en')('Continuar a configurar o perfil')));
+    assert.ok(!html.includes(translator('en')('Continuar: criar e configurar perfil')));
+  }
+});

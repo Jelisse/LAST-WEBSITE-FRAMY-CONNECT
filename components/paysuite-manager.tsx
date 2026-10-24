@@ -208,6 +208,34 @@ export function PaySuiteManager() {
                       {c.city} · {c.address} · {c.contact}
                     </p>
                     <p>{c.designInstructions}</p>
+                    {c.designReferences && (
+                      <section>
+                        <h4>{t('Referências de inspiração')}</h4>
+                        <p>
+                          {t(
+                            'Referências para orientar o design, não para impressão.',
+                          )}
+                        </p>
+                        {c.designReferences.assets?.map(
+                          (asset: { assetId: string; fileName: string }) => (
+                            <p key={asset.assetId}>
+                              <a href={'/api/design-assets/' + asset.assetId}>
+                                {asset.fileName}
+                              </a>
+                            </p>
+                          ),
+                        )}
+                        {c.designReferences.url?.startsWith('https://') && (
+                          <a
+                            href={c.designReferences.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {t('Abrir referência')}
+                          </a>
+                        )}
+                      </section>
+                    )}
                     {c.pvcModel && (
                       <p>
                         {t('Modelo PVC + epóxi: ')}

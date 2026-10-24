@@ -1,4 +1,5 @@
 'use client';
+import { PaidProfileNext } from './paid-profile-next';
 import { PurchasePaymentCards } from './purchase-history';
 import { SourceImage } from './source-image';
 import type { PurchasePayment } from '@/lib/purchase-history';
@@ -6,7 +7,7 @@ import { useI18n } from '@/components/language-provider';
 import Link from '@/components/hard-link';
 import { useEffect, useState } from 'react';
 import { checkoutURL } from '@/lib/paysuite';
-import { CheckCircle2, ArrowRight, Clock3, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Clock3, AlertCircle } from 'lucide-react';
 type Payment = PurchasePayment & {
   guest?: boolean;
   id: string;
@@ -19,6 +20,7 @@ type Payment = PurchasePayment & {
   url?: string | null;
   orderStatus?: string | null;
   profileReady?: boolean;
+  profileExists?: boolean;
   receiptStatus?: string | null;
   fulfilment?: {
     mode: string;
@@ -91,7 +93,7 @@ export function PaySuiteStatus() {
         setError('');
         if (id) setPayment(d);
         else setPayments(d.payments);
-      } catch (e) {
+      } catch {
         if (!controller.signal.aborted)
           setError('Não foi possível actualizar o estado. Tente novamente.');
       } finally {
@@ -192,43 +194,7 @@ export function PaySuiteStatus() {
                 {t('Referência: ')}
                 {payment.orderReference || payment.paymentReference}
               </p>
-              {payment.status === 'paid' && payment.kind === 'product' && (
-                <div className="payment-profile-next">
-                  <span className="eyebrow">
-                    {t(' PRÓXIMO PASSO · PERFIL DIGITAL ')}
-                  </span>
-                  <h3>
-                    {t(
-                      payment.profileReady
-                        ? 'O seu perfil já está publicado'
-                        : 'Agora, prepare o seu perfil',
-                    )}
-                  </h3>
-                  <p>
-                    {t(
-                      payment.profileReady
-                        ? 'Pode rever os seus contactos e links. O produto fica associado ao perfil da sua conta.'
-                        : 'Adicione a sua fotografia, os contactos e os links que quer partilhar. Ao publicar, o perfil fica ligado à sua encomenda.',
-                    )}
-                  </p>
-                  <Link
-                    className="btn btn-primary"
-                    href={'/perfil?pagamento=' + encodeURIComponent(payment.id)}
-                  >
-                    {t(
-                      payment.profileReady
-                        ? 'Continuar a configurar o perfil'
-                        : 'Continuar: criar e configurar perfil',
-                    )}{' '}
-                    <ArrowRight size={18} aria-hidden="true" />
-                  </Link>
-                  <p className="payment-next-note">
-                    {t(
-                      ' Pode continuar mais tarde na sua conta. Não precisa de repetir o pagamento. ',
-                    )}
-                  </p>
-                </div>
-              )}
+              <PaidProfileNext payment={payment} />
               {url && payment.status === 'pending' && (
                 <a className="btn btn-primary" href={url}>
                   {t('Continuar pagamento')}

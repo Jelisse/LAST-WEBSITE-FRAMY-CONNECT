@@ -300,6 +300,11 @@ export function OrderTracking() {
                       'A compra está concluída. Pode criar uma conta e associar esta encomenda para configurar o perfil NFC.',
                     )}
                   </p>
+                  <p className="payment-next-note">
+                    {t(
+                      'O perfil Personal é gratuito. Os planos pagos são opcionais e não estão incluídos nesta compra.',
+                    )}
+                  </p>
                   {data.canClaim ? (
                     <button
                       className="btn btn-primary"

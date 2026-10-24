@@ -812,6 +812,7 @@ test('products can be paid before profile creation; only the owner publication a
  const [id,record] = [...f.records][0]; record.status='paid'; await notify(f,id);
  const status = () => checkout.GET(new Request('https://framyconnect.co.mz/api/paysuite/checkout?payment='+body.requestId));
  assert.equal((await (await status()).json()).profileReady,false);
+ assert.equal((await (await status()).json()).profileExists,false);
  const buyer=globalThis.__paysuite.user;
  globalThis.__paysuite.user={userId:'manager',role:'manager'};
  assert.equal((await manager.POST(request({action:'fulfilled',id:body.requestId}))).status,409);
@@ -819,6 +820,10 @@ test('products can be paid before profile creation; only the owner publication a
  assert.equal(config().profileUsername,null);
  f.sql.prepare("INSERT INTO profiles(owner_id,username,draft_json,published_json,updated_at) VALUES('buyer','buyer','{}',NULL,?)").run(new Date().toISOString());
  assert.equal(config().profileUsername,null);
+ globalThis.__paysuite.user=buyer;
+ const draftStatus=await (await status()).json();
+ assert.equal(draftStatus.profileExists,true); assert.equal(draftStatus.profileReady,false);
+ globalThis.__paysuite.user={userId:'manager',role:'manager'};
  f.sql.prepare("UPDATE profiles SET published_json=? WHERE owner_id='buyer'").run(JSON.stringify({username:'buyer',name:'Cliente'}));
  assert.equal(config().profileUsername,'buyer'); assert.equal(config().profileSnapshot.name,'Cliente');
  f.sql.prepare("UPDATE profiles SET published_json=? WHERE owner_id='buyer'").run(JSON.stringify({username:'buyer',name:'Actualizado'}));
@@ -1450,4 +1455,16 @@ test('public references resolve guest tracking and manager search without granti
  assert.equal((await manager.GET(new Request('https://framy.example/api/paysuite/manager?reference='+c.orderReference))).status,403);
  globalThis.__paysuite.user={userId:'buyer',role:'manager'};
  const r=await manager.GET(new Request('https://framy.example/api/paysuite/manager?reference='+c.orderReference));assert.equal(r.status,200,await r.clone().text());assert.equal((await r.json()).payments[0].id,c.paymentId);
+});
+
+
+test('team design references require owned uploads and persist separately from production artwork',async t=>{
+ const f=fixture(t),checkout=await api('app/api/paysuite/checkout/route.ts');
+ const assetId='a'.repeat(36); const body=product({design:'team',designInstructions:'Warm colours and simple lettering',expectedAmount:155000+f.sql.prepare('SELECT team_design FROM checkout_pricing WHERE id=1').get().team_design,designReferences:{assets:[{assetId,fileName:'inspiration.png'}],url:'https://example.invalid/reference'}});
+ f.env.PROFILE_PHOTOS={head:async()=>({customMetadata:{ownerId:'other'},httpMetadata:{contentType:'image/png'}})};
+ const rejected=await checkout.POST(request(body));assert.equal(rejected.status,422);assert.match((await rejected.json()).error,/não está disponível/);assert.equal(f.creates(),0);
+ f.env.PROFILE_PHOTOS={head:async()=>({customMetadata:{ownerId:'buyer'},httpMetadata:{contentType:'image/png'}})};
+ const result=await checkout.POST(request(body));assert.equal(result.status,200,await result.clone().text());
+ const config=JSON.parse(f.sql.prepare('SELECT configuration_json FROM paysuite_product_orders WHERE id=?').get(body.requestId).configuration_json);
+ assert.deepEqual(config.designReferences,body.designReferences);assert.equal(config.cardArtwork,undefined);assert.equal(config.pvcArtwork,undefined);
 });

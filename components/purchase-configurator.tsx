@@ -1,4 +1,9 @@
 'use client';
+import { DesignReferenceUpload } from './design-reference-upload';
+import {
+  validateDesignReferences,
+  type DesignReferences,
+} from '@/lib/design-references';
 import { PurchasePreview } from './purchase-preview';
 import { PurchaseQuotation } from './purchase-quotation';
 import { PurchaseStageProgress } from './purchase-stage-progress';
@@ -187,6 +192,12 @@ export function PurchaseConfigurator({
   const [city, setCity] = useState('');
   const [pickupPoint, setPickupPoint] = useState('');
   const [designInstructions, setDesignInstructions] = useState('');
+  const [designReferences, setDesignReferences] = useState<DesignReferences>({
+    assets: [],
+    url: '',
+  });
+  const [referencesBusy, setReferencesBusy] = useState(false);
+  const [kitEditor, setKitEditor] = useState<'card' | 'keychain'>('card');
   const [draftReady, setDraftReady] = useState(false);
   useEffect(() => {
     let draft: ReturnType<typeof readPurchaseDraft> = null;
@@ -229,6 +240,7 @@ export function PurchaseConfigurator({
         setContact(draft.contact);
         setAddress(draft.address);
         setDesignInstructions(draft.designInstructions);
+        setDesignReferences(draft.designReferences ?? { assets: [], url: '' });
         setFormat(draft.format ?? selection.format);
         setLocality(draft.locality ?? '');
         setBuyerName(accountBuyer?.name ?? draft.buyerName ?? '');
@@ -279,6 +291,7 @@ export function PurchaseConfigurator({
           contact,
           address,
           designInstructions,
+          designReferences,
         }),
       );
     } catch {
@@ -311,6 +324,7 @@ export function PurchaseConfigurator({
     contact,
     address,
     designInstructions,
+    designReferences,
   ]);
   const selected = purchaseFormats.find((item) => item.id === format)!;
   const selectedDesign = designServices.find((item) => item.id === design)!;
@@ -353,7 +367,11 @@ export function PurchaseConfigurator({
         !pvcArtworkValue.assetId) ||
       (isLeather && !leather.assetId));
   const instructionsMissing = design === 'team' && !designInstructions.trim();
-  const uploadBusy = cardBusy || pvcBusy || (isLeather && leatherBusy);
+  const uploadBusy =
+    cardBusy ||
+    pvcBusy ||
+    (isLeather && leatherBusy) ||
+    (design === 'team' && referencesBusy);
   const buyerReady =
     signedIn ||
     (guestReady &&
@@ -423,7 +441,20 @@ export function PurchaseConfigurator({
     moveTo(stage);
   };
   const validConfiguration = (stage: 0 | 1) => {
-    const issue = purchaseConfigurationIssue(
+    if (stage === 1 && design === 'team') {
+      try {
+        validateDesignReferences(designReferences);
+      } catch (e) {
+        setStageError(
+          e instanceof Error ? e.message : 'Referências inválidas.',
+        );
+        requestAnimationFrame(() =>
+          document.getElementById('purchase-stage-error')?.focus(),
+        );
+        return false;
+      }
+    }
+    let issue = purchaseConfigurationIssue(
       {
         materialReady: !!estimate,
         allowQuotation: true,
@@ -433,6 +464,13 @@ export function PurchaseConfigurator({
       },
       stage,
     );
+    if (stage === 1 && artworkMissing && format === 'kit') {
+      const missingCard = !cardArtworkValue.assetId;
+      setKitEditor(missingCard ? 'card' : 'keychain');
+      issue = missingCard
+        ? 'Carregue a arte do cartão para continuar.'
+        : 'Carregue a arte do porta-chaves para continuar.';
+    }
     if (issue) {
       setStageError(issue);
       requestAnimationFrame(() =>
@@ -515,6 +553,21 @@ export function PurchaseConfigurator({
       else moveTo('delivery');
     }
   };
+  const artworkNotes = (
+    <label className="purchase-method artwork-notes">
+      {t('Notas para a equipa (opcional)')}
+      <textarea
+        className="design-brief-textarea"
+        rows={4}
+        maxLength={2000}
+        value={designInstructions}
+        onChange={(event) => setDesignInstructions(event.target.value)}
+        placeholder={t(
+          'Há algum detalhe que a equipa deva saber sobre a sua arte?',
+        )}
+      />
+    </label>
+  );
   const quotationSummary = [
     t(selected.name),
     ...(format !== 'keychain' ? [t('Cartão') + ': ' + t(card)] : []),
@@ -556,6 +609,14 @@ export function PurchaseConfigurator({
       ),
     delivery === 'pickup' && fulfilment?.point
       ? t('Ponto de levantamento') + ': ' + fulfilment.point.name
+      : '',
+    ...(design === 'team'
+      ? designReferences.assets.map(
+          (asset) => t('Referências de inspiração') + ': ' + asset.fileName,
+        )
+      : []),
+    design === 'team' && designReferences.url
+      ? t('Link de referência (opcional)') + ': ' + designReferences.url
       : '',
     t('Contacto') + ': ' + contact,
     buyerName ? t('Nome do comprador') + ': ' + buyerName : '',
@@ -663,6 +724,7 @@ export function PurchaseConfigurator({
   return (
     <div
       className="purchase-configurator"
+      data-purchase-format={format}
       data-purchase-step={paymentStep ? 'review' : activeConfiguration}
     >
       <span id="purchase-stage-anchor" aria-hidden="true" />
@@ -911,8 +973,8 @@ export function PurchaseConfigurator({
                     design === 'standard'
                       ? 'Escolha um dos modelos Framy disponíveis.'
                       : design === 'customer'
-                        ? 'Envie a sua arte. Pode ajustar a posição e o tamanho depois do carregamento.'
-                        : 'Descreva a sua ideia. A equipa prepara o design para a sua aprovação antes da produção.',
+                        ? 'No próximo passo, envie a sua arte e ajuste a posição e o tamanho.'
+                        : 'No próximo passo, descreva a sua ideia e adicione referências. A equipa prepara o design para a sua aprovação.',
                   )}
                 </p>
                 {format === 'kit' && design !== 'standard' && (
@@ -1001,11 +1063,13 @@ export function PurchaseConfigurator({
                 onClick={continueDesign}
               >
                 {t(
-                  design !== 'standard'
-                    ? 'Continuar para personalização'
-                    : canReturnToReview
-                      ? 'Guardar alterações'
-                      : 'Continuar para entrega',
+                  design === 'customer'
+                    ? 'Enviar o meu design'
+                    : design === 'team'
+                      ? 'Descrever a minha ideia'
+                      : canReturnToReview
+                        ? 'Guardar alterações'
+                        : 'Continuar para entrega',
                 )}{' '}
                 →
               </button>
@@ -1017,97 +1081,187 @@ export function PurchaseConfigurator({
             hidden={paymentStep || activeConfiguration !== 'personalise'}
           >
             <legend>{t('Personalize o seu produto')}</legend>
+            {guestError && (
+              <p role="alert" className="flow-inline-error">
+                {t(
+                  'Não foi possível preparar o carregamento. Tente novamente.',
+                )}{' '}
+                <button type="button" onClick={() => void prepareGuest()}>
+                  {t('Tentar novamente')}
+                </button>
+              </p>
+            )}
+            {format === 'kit' && design !== 'standard' && (
+              <fieldset
+                className="purchase-switch-bar kit-editor-tabs"
+                aria-label={t('Produto a personalizar')}
+              >
+                <button
+                  type="button"
+                  aria-pressed={kitEditor === 'card'}
+                  onClick={() => setKitEditor('card')}
+                >
+                  {t('Cartão')}
+                  {cardArtworkValue.assetId ? ' ✓' : ''}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={kitEditor === 'keychain'}
+                  onClick={() => setKitEditor('keychain')}
+                >
+                  {t('Porta-chaves')}
+                  {(isLeather ? leather.assetId : pvcArtworkValue.assetId)
+                    ? ' ✓'
+                    : ''}
+                </button>
+              </fieldset>
+            )}
             <div className="purchase-active-design">
-              {design === 'team' && (
-                <div className="purchase-team-brief">
-                  <h3>{t('Conte-nos a sua ideia')}</h3>
-                  <p>
-                    {t(
-                      'Indique o logótipo, os textos e o estilo pretendidos. A equipa contacta-o para recolher referências e apresentar a proposta.',
-                    )}
-                  </p>
-                  {format === 'kit' && (
+              <div className={design === 'team' ? 'team-design-workspace' : ''}>
+                <div>
+                  {design === 'team' && format === 'kit' && (
                     <p>
                       {t(
                         'Explique o que pretende no cartão e no porta-chaves.',
                       )}
                     </p>
                   )}
-                </div>
-              )}
-              {isLeather && design === 'customer' && (
-                <LeatherConfigurator
-                  value={leather}
-                  onChange={setLeather}
-                  onPreviewChange={setLeatherPreview}
-                  preview={leatherPreview}
-                  design={design}
-                  signedIn={signedIn || guestReady}
-                  onBusy={setLeatherBusy}
-                  dimensions={leatherDimensions}
-                />
-              )}
-              {design === 'customer' && format !== 'keychain' && (
-                <LeatherConfigurator
-                  value={cardArtworkValue}
-                  onChange={setCardArtworkValue}
-                  preview={cardCustomPreview}
-                  onPreviewChange={setCardCustomPreview}
-                  design={design}
-                  signedIn={signedIn || guestReady}
-                  onBusy={setCardBusy}
-                  product={card}
-                  renderPreview={(back) => (
-                    <ProductArtworkPreview
-                      material={card}
-                      value={cardArtworkValue}
-                      preview={cardCustomPreview}
-                      back={back}
+                  {isLeather && design === 'customer' && (
+                    <div
+                      className="kit-editor-pane"
+                      hidden={format === 'kit' && kitEditor !== 'keychain'}
+                    >
+                      <LeatherConfigurator
+                        notes={artworkNotes}
+                        value={leather}
+                        onChange={setLeather}
+                        onPreviewChange={setLeatherPreview}
+                        preview={leatherPreview}
+                        design={design}
+                        signedIn={signedIn || guestReady}
+                        onBusy={setLeatherBusy}
+                        dimensions={leatherDimensions}
+                      />
+                    </div>
+                  )}
+                  {design === 'customer' && format !== 'keychain' && (
+                    <div
+                      className="kit-editor-pane"
+                      hidden={format === 'kit' && kitEditor !== 'card'}
+                    >
+                      <LeatherConfigurator
+                        notes={artworkNotes}
+                        value={cardArtworkValue}
+                        onChange={setCardArtworkValue}
+                        preview={cardCustomPreview}
+                        onPreviewChange={setCardCustomPreview}
+                        design={design}
+                        signedIn={signedIn || guestReady}
+                        onBusy={setCardBusy}
+                        product={card}
+                        renderPreview={(back) => (
+                          <ProductArtworkPreview
+                            material={card}
+                            value={cardArtworkValue}
+                            preview={cardCustomPreview}
+                            back={back}
+                          />
+                        )}
+                      />
+                    </div>
+                  )}
+                  {design === 'customer' &&
+                    format !== 'card' &&
+                    keychain === 'PVC + epóxi' && (
+                      <div
+                        className="kit-editor-pane"
+                        hidden={format === 'kit' && kitEditor !== 'keychain'}
+                      >
+                        <LeatherConfigurator
+                          notes={artworkNotes}
+                          value={pvcArtworkValue}
+                          onChange={setPvcArtworkValue}
+                          preview={pvcCustomPreview}
+                          onPreviewChange={setPvcCustomPreview}
+                          design={design}
+                          signedIn={signedIn || guestReady}
+                          onBusy={setPvcBusy}
+                          product={keychain}
+                          renderPreview={(back) => (
+                            <ProductArtworkPreview
+                              material={keychain}
+                              value={pvcArtworkValue}
+                              preview={pvcCustomPreview}
+                              back={back}
+                            />
+                          )}
+                        />
+                      </div>
+                    )}
+                  {design === 'team' && (
+                    <label className="purchase-method">
+                      {t(
+                        design === 'team'
+                          ? 'Descreva a sua ideia'
+                          : 'Notas para a equipa (opcional)',
+                      )}
+                      <textarea
+                        value={designInstructions}
+                        onChange={(e) => setDesignInstructions(e.target.value)}
+                        maxLength={2000}
+                        rows={5}
+                        className="design-brief-textarea"
+
+                        placeholder={t(
+                          design === 'team'
+                            ? 'Que textos, cores e estilo pretende? Indique também o que deve aparecer no cartão e no porta-chaves.'
+                            : 'Há algum detalhe que a equipa deva saber sobre a sua arte?',
+                        )}
+                      />
+                      <small>
+                        {t(
+                          'A equipa revê as suas instruções e contacta-o para preparar o design. A produção começa após a sua aprovação.',
+                        )}
+                      </small>
+                    </label>
+                  )}
+                  {design === 'team' && (
+                    <DesignReferenceUpload
+                      value={designReferences}
+                      onChange={setDesignReferences}
+                      onBusy={setReferencesBusy}
+                      ready={signedIn || guestReady}
                     />
                   )}
-                />
-              )}
-              {design === 'customer' &&
-                format !== 'card' &&
-                keychain === 'PVC + epóxi' && (
-                  <LeatherConfigurator
-                    value={pvcArtworkValue}
-                    onChange={setPvcArtworkValue}
-                    preview={pvcCustomPreview}
-                    onPreviewChange={setPvcCustomPreview}
-                    design={design}
-                    signedIn={signedIn || guestReady}
-                    onBusy={setPvcBusy}
-                    product={keychain}
-                    renderPreview={(back) => (
-                      <ProductArtworkPreview
-                        material={keychain}
-                        value={pvcArtworkValue}
-                        preview={pvcCustomPreview}
-                        back={back}
-                      />
-                    )}
-                  />
+                </div>
+                {design === 'team' && (
+                  <aside className="team-product-preview">
+                    <h3>{t('O seu produto')}</h3>
+                    <div className="team-reference-surface">
+                      {(format === 'keychain' ||
+                        (format === 'kit' && kitEditor === 'keychain')) &&
+                      isLeather ? (
+                        <LeatherPreview value={leather} design="team" />
+                      ) : (
+                        <ProductArtworkPreview
+                          material={
+                            format === 'keychain' ||
+                            (format === 'kit' && kitEditor === 'keychain')
+                              ? keychain
+                              : card
+                          }
+                          value={defaultLeather}
+                        />
+                      )}
+                    </div>
+                    <p>
+                      {t(
+                        'A sua ideia será adaptada a este produto. A equipa apresenta a arte para aprovação antes da produção.',
+                      )}
+                    </p>
+                  </aside>
                 )}
-              {(design === 'team' || (!isLeather && design === 'customer')) && (
-                <label className="purchase-method">
-                  {t('Instruções para o design')}
-                  <textarea
-                    value={designInstructions}
-                    onChange={(e) => setDesignInstructions(e.target.value)}
-                    maxLength={2000}
-
-                    placeholder={t(
-                      'Descreva o logótipo, os textos e o estilo que pretende.',
-                    )}
-                  />
-                  <small>
-                    {t(
-                      'A equipa revê as suas instruções e contacta-o para preparar o design. A produção começa após a sua aprovação.',
-                    )}
-                  </small>
-                </label>
-              )}
+              </div>
               <div className="purchase-step-actions">
                 <button
                   type="button"
@@ -1485,6 +1639,50 @@ export function PurchaseConfigurator({
                 <p>{designInstructions}</p>
               </details>
             )}
+            {design === 'team' &&
+              (designReferences.assets.length > 0 || designReferences.url) && (
+                <section className="purchase-review-references">
+                  <h3>{t('Referências de inspiração')}</h3>
+                  <p>
+                    {t(
+                      'Referências para orientar o design, não para impressão.',
+                    )}
+                  </p>
+                  <ul className="design-reference-list">
+                    {designReferences.assets.map((asset) => (
+                      <li key={asset.assetId}>
+                        {/\.pdf$/i.test(asset.fileName) ? (
+                          <span>PDF</span>
+                        ) : (
+                          <SourceImage
+                            src={'/api/design-assets/' + asset.assetId}
+                            alt={asset.fileName}
+                            width={100}
+                            height={80}
+                          />
+                        )}
+                        <span>{asset.fileName}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {designReferences.url && (
+                    <a
+                      href={designReferences.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t('Abrir referência')}
+                    </a>
+                  )}
+                  {quotation && (
+                    <p>
+                      {t(
+                        'Os ficheiros de referência não são anexados automaticamente à mensagem de cotação.',
+                      )}
+                    </p>
+                  )}
+                </section>
+              )}
             <div className="purchase-review-edits">
               <button type="button" onClick={() => editStage('materials')}>
                 {t('Editar produto')}
@@ -1642,22 +1840,6 @@ export function PurchaseConfigurator({
               >
                 {t('Voltar ao desconto')}
               </button>
-              {!quotation && (
-                <details className="purchase-next-step">
-                  <summary>{t('Perfil após o pagamento')}</summary>
-                  <p>
-                    {t(
-                      'Após a confirmação, crie o seu perfil ou continue com o que já tem. O cartão e o porta-chaves podem partilhar o mesmo perfil.',
-                    )}
-                  </p>
-                  <small>
-                    {t(
-                      'O perfil Personal é gratuito. Os planos pagos são opcionais e não estão incluídos nesta compra.',
-                    )}
-                  </small>
-                </details>
-              )}
-
               {paymentAvailable && total !== null && !deliveryReady && (
                 <p className="purchase-help">
                   {!buyerReady
@@ -1746,6 +1928,7 @@ export function PurchaseConfigurator({
                     address,
                     designInstructions:
                       design === 'standard' ? '' : designInstructions,
+                    ...(design === 'team' ? { designReferences } : {}),
 
                     ...(design === 'customer' && format !== 'keychain'
                       ? { cardArtwork: cardArtworkValue }

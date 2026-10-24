@@ -117,6 +117,7 @@ export function LeatherConfigurator({
   dimensions,
   product,
   renderPreview,
+  notes,
   onPreviewChange,
   preview,
 }: {
@@ -128,6 +129,7 @@ export function LeatherConfigurator({
   dimensions?: string;
   product?: string;
   renderPreview?: (back: boolean) => ReactNode;
+  notes?: ReactNode;
   onPreviewChange: (preview: string) => void;
   preview: string;
 }) {
@@ -282,7 +284,7 @@ export function LeatherConfigurator({
             design === 'team'
               ? 'Descreva a sua ideia. A equipa prepara o design para a sua aprovação antes da produção.'
               : product
-                ? 'Carregue o logótipo e ajuste o tamanho e a posição. A pré-visualização actualiza automaticamente.'
+                ? 'Carregue a sua arte e ajuste o tamanho e a posição. A pré-visualização actualiza automaticamente.'
                 : ' Escolha a cor, carregue o logótipo e ajuste o tamanho. A imagem e o resumo actualizam automaticamente. ',
           )}
         </p>
@@ -349,23 +351,41 @@ export function LeatherConfigurator({
         )}
         {design === 'customer' && (
           <>
-            <label className="leather-upload">
+            <label className="leather-upload artwork-dropzone">
               <span className="leather-upload-action">
                 <Upload size={20} aria-hidden="true" />
-                {t(preview ? 'Substituir logótipo' : 'Carregar logótipo')}
+                {t(preview ? 'Substituir arte' : 'Carregar arte')}
               </span>
               <span>{t('PDF vectorial, PNG ou JPG · até 8 MB')}</span>
               <input
                 type="file"
                 accept="application/pdf,image/png,image/jpeg"
-                disabled={busy}
+                disabled={busy || !signedIn}
                 onChange={(e) => {
                   void upload(e.target.files?.[0]);
                   e.target.value = '';
                 }}
               />
             </label>
+            {!signedIn && (
+              <output>{t('A preparar o carregamento seguro…')}</output>
+            )}
             {value.fileName && <p className="leather-file">{value.fileName}</p>}
+            {(value.assetId || preview) && (
+              <button
+                type="button"
+                className="purchase-secondary-link"
+                disabled={busy}
+                onClick={() => {
+                  sequence.current++;
+                  setPreview('');
+                  originalRef.current = null;
+                  update({ assetId: undefined, fileName: undefined });
+                }}
+              >
+                {t('Remover arte')}
+              </button>
+            )}
             {value.assetId && <p>{t('Ficheiro guardado para produção.')}</p>}
             {preview && (
               <>
@@ -496,8 +516,9 @@ export function LeatherConfigurator({
             )}
           </>
         )}
-        {busy && <output>{t('A preparar o logótipo…')}</output>}
+        {busy && <output>{t('A preparar a arte…')}</output>}
         {error && <p role="alert">{t(error)}</p>}
+        {notes}
       </div>
       <figure className="leather-preview">
         <div className="leather-face-tabs">

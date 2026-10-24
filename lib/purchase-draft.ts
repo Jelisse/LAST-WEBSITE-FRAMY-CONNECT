@@ -1,4 +1,8 @@
 import {
+  validateDesignReferences,
+  type DesignReferences,
+} from './design-references.ts';
+import {
   purchaseStageKeys,
   type PurchaseEditorStep,
 } from './purchase-journey.ts';
@@ -63,6 +67,10 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
         value.ambassadorCode.length > 100)
     )
       return null;
+    value.designReferences = validateDesignReferences(
+      value.designReferences,
+      true,
+    );
     if (value.pvcModel !== undefined)
       value.pvcModel = pvcModel(value.pvcModel).id;
     for (const field of ['cardArtwork', 'pvcArtwork'])
@@ -78,6 +86,7 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
       );
     return value as {
       step?: PurchaseEditorStep;
+      designReferences?: DesignReferences;
       locality?: string;
       format?: 'card' | 'keychain' | 'kit';
       stage?: number;

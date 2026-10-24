@@ -180,13 +180,13 @@ export function PaySuiteCheckout({
   }
   return (
     <form onSubmit={pay} className="paysuite-checkout">
-      <p>
-        {t(
-          compact
-            ? 'No próximo passo, escolherá o método de pagamento na página segura da PaySuite. Não guardamos PINs nem dados do cartão.'
-            : ' O pagamento é concluído na página segura da PaySuite. Não guardamos dados do cartão nem PINs. ',
-        )}
-      </p>
+      {!compact && (
+        <p>
+          {t(
+            ' O pagamento é concluído na página segura da PaySuite. Não guardamos dados do cartão nem PINs. ',
+          )}
+        </p>
+      )}
       <label className="growth-check">
         <input
           type="checkbox"
