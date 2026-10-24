@@ -8,6 +8,7 @@ import {
   type SetStateAction,
   type ReactNode,
 } from 'react';
+import { PurchasePreview } from './purchase-preview';
 import { Upload, RotateCcw, Ruler, Check, Eraser } from 'lucide-react';
 import { SourceImage } from './source-image';
 import { useI18n } from './language-provider';
@@ -271,40 +272,52 @@ export function LeatherConfigurator({
   return (
     <section className="leather-config">
       <div className="leather-controls">
-        <h3>{product ? t('Personalize o produto') + ' · ' + t(product) : t('Personalize o porta-chaves de couro')}</h3>
+        <h3>
+          {product
+            ? t('Personalize o produto') + ' · ' + t(product)
+            : t('Personalize o porta-chaves de couro')}
+        </h3>
         <p className="leather-live-note">
           {t(
-            product ? 'Carregue o logótipo e ajuste o tamanho e a posição. A pré-visualização actualiza automaticamente.' : ' Escolha a cor, carregue o logótipo e ajuste o tamanho. A imagem e o resumo actualizam automaticamente. ',
+            design === 'team'
+              ? 'Descreva a sua ideia. A equipa prepara o design para a sua aprovação antes da produção.'
+              : product
+                ? 'Carregue o logótipo e ajuste o tamanho e a posição. A pré-visualização actualiza automaticamente.'
+                : ' Escolha a cor, carregue o logótipo e ajuste o tamanho. A imagem e o resumo actualizam automaticamente. ',
           )}
         </p>
-        {!product && <fieldset disabled={busy}>
-          <legend>{t('Cor do couro')}</legend>
-          <div className="leather-swatches">
-            {(['brown', 'black'] as const).map((color) => (
-              <button
-                type="button"
-                key={color}
-                aria-pressed={value.color === color}
-                onClick={() =>
-                  update({
-                    color,
-                    ...(color === 'black' && design === 'standard'
-                      ? { logo: 'symbol' as const }
-                      : {}),
-                  })
-                }
-              >
-                <span
-                  style={{ background: color === 'brown' ? '#975121' : '#222' }}
-                />
-                {t(color === 'brown' ? 'Castanho' : 'Preto')}
-                {value.color === color && (
-                  <Check size={15} aria-hidden="true" />
-                )}
-              </button>
-            ))}
-          </div>
-        </fieldset>}
+        {!product && (
+          <fieldset disabled={busy}>
+            <legend>{t('Cor do couro')}</legend>
+            <div className="leather-swatches">
+              {(['brown', 'black'] as const).map((color) => (
+                <button
+                  type="button"
+                  key={color}
+                  aria-pressed={value.color === color}
+                  onClick={() =>
+                    update({
+                      color,
+                      ...(color === 'black' && design === 'standard'
+                        ? { logo: 'symbol' as const }
+                        : {}),
+                    })
+                  }
+                >
+                  <span
+                    style={{
+                      background: color === 'brown' ? '#975121' : '#222',
+                    }}
+                  />
+                  {t(color === 'brown' ? 'Castanho' : 'Preto')}
+                  {value.color === color && (
+                    <Check size={15} aria-hidden="true" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        )}
         {!product && design === 'standard' && (
           <>
             <fieldset>
@@ -356,19 +369,22 @@ export function LeatherConfigurator({
             {value.assetId && <p>{t('Ficheiro guardado para produção.')}</p>}
             {preview && (
               <>
-                <label>
-                  {t(' Tamanho do logótipo · ')}
-                  {value.scale}%
-                  <input
-                    type="range"
-                    min="25"
-                    max="100"
-                    value={value.scale}
-                    onChange={(e) => update({ scale: Number(e.target.value) })}
-                  />
-                </label>
                 <details className="leather-optional">
-                  <summary>{t('Ajustar posição')}</summary>
+                  <summary>{t('Ajustar posição e tamanho')}</summary>
+                  <label>
+                    {t(' Tamanho do logótipo · ')}
+                    {value.scale}%
+                    <input
+                      type="range"
+                      min="25"
+                      max="100"
+                      value={value.scale}
+                      onChange={(e) =>
+                        update({ scale: Number(e.target.value) })
+                      }
+                    />
+                  </label>
+
                   <label>
                     {t(' Posição horizontal ')}
                     <input
@@ -500,40 +516,49 @@ export function LeatherConfigurator({
             {t(' Verso ')}
           </button>
         </div>
-        {renderPreview ? <div className="product-artwork-stage">{renderPreview(back)}</div> : <div
-          className={`leather-studio ${value.color === 'black' ? 'is-black' : ''}`}
+        <PurchasePreview
+          label={product ? t(product) : t('Porta-chaves de couro')}
         >
-          <div className="leather-studio-stage">
+          {renderPreview ? (
+            <div className="product-artwork-stage">{renderPreview(back)}</div>
+          ) : (
             <div
-              className="leather-studio-object"
-              style={{
-                transform: `rotateY(${back ? 180 : 0}deg)`,
-              }}
+              className={`leather-studio ${value.color === 'black' ? 'is-black' : ''}`}
             >
-              <div className="leather-studio-face" aria-hidden={back}>
-                <LeatherPreview
-                  value={value}
-                  design={design}
-                  preview={preview}
-                />
+              <div className="leather-studio-stage">
+                <div
+                  className="leather-studio-object"
+                  style={{
+                    transform: `rotateY(${back ? 180 : 0}deg)`,
+                  }}
+                >
+                  <div className="leather-studio-face" aria-hidden={back}>
+                    <LeatherPreview
+                      value={value}
+                      design={design}
+                      preview={preview}
+                    />
+                  </div>
+                  <div
+                    className="leather-studio-face leather-studio-reverse"
+                    aria-hidden={!back}
+                  >
+                    <LeatherPreview value={value} design={design} back />
+                  </div>
+                </div>
               </div>
-              <div
-                className="leather-studio-face leather-studio-reverse"
-                aria-hidden={!back}
-              >
-                <LeatherPreview value={value} design={design} back />
+              <div className="leather-studio-caption">
+                <span key={`${value.color}-${t.locale}`} aria-live="polite">
+                  {colorCaption}
+                </span>
               </div>
             </div>
-          </div>
-          <div className="leather-studio-caption">
-            <span key={`${value.color}-${t.locale}`} aria-live="polite">
-              {colorCaption}
-            </span>
-          </div>
-        </div>}
+          )}
+        </PurchasePreview>
         <figcaption>
           {t(back ? 'Verso' : 'Pré-visualização da frente')}
-          {!product && !back &&
+          {!product &&
+            !back &&
             design === 'standard' &&
             value.color === 'black' &&
             value.logo === 'full' && (
@@ -547,7 +572,9 @@ export function LeatherConfigurator({
             <small>
               {t(
                 design === 'customer'
-                  ? product ? 'Pré-visualização do seu logótipo. ' : 'Pré-visualização do seu logótipo sobre a fotografia do produto. '
+                  ? product
+                    ? 'Pré-visualização do seu logótipo. '
+                    : 'Pré-visualização do seu logótipo sobre a fotografia do produto. '
                   : 'Frente disponível para o design da equipa. ',
               )}
               {t(

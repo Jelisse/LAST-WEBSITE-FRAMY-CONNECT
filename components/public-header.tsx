@@ -1,3 +1,4 @@
+import { CircleHelp } from 'lucide-react';
 import { PublicNavigation } from './public-navigation';
 import Image from 'next/image';
 import Link from './hard-link';
@@ -43,8 +44,13 @@ export async function PublicHeader({
         {!hideAccount && <AccountMenu />}
         {!focused && <HomeMobileMenu />}
         {focused && (
-          <Link className="focused-help" href="/ajuda">
-            {t('Centro de ajuda')}
+          <Link
+            className="focused-help"
+            href="/ajuda"
+            aria-label={t('Centro de ajuda')}
+          >
+            <CircleHelp size={18} aria-hidden="true" />
+            <span>{t('Centro de ajuda')}</span>
           </Link>
         )}
       </div>

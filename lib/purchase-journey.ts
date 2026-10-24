@@ -1,19 +1,69 @@
+export const purchaseStageKeys = [
+  'materials',
+  'design',
+  'personalise',
+  'delivery',
+  'buyer',
+  'coupon',
+  'review',
+] as const;
+export type PurchaseStep = (typeof purchaseStageKeys)[number];
+export type PurchaseEditorStep = Exclude<PurchaseStep, 'review'>;
 export const purchaseStages = [
   'Escolha o seu produto NFC',
+  'Escolha o design',
   'Personalize o seu produto',
   'Escolha como receber',
+  'Os seus dados',
+  'O seu desconto',
   'Reveja e confirme',
 ] as const;
+export function purchaseJourney(design: string) {
+  return purchaseStageKeys
+    .filter((key) => key !== 'personalise' || design !== 'standard')
+    .map((key) => ({
+      key,
+      label: purchaseStages[purchaseStageKeys.indexOf(key)],
+    }));
+}
+export function purchaseReceptionIssue(input: {
+  city: string;
+  locality?: string;
+  address: string;
+  delivery: string;
+  fulfilmentReady: boolean;
+  quotation: boolean;
+}) {
+  if (!input.city) return 'Escolha a cidade para continuar.';
+  if (input.city === 'other' && !input.locality?.trim())
+    return 'Indique a cidade ou localidade.';
+  if (input.delivery !== 'pickup' && input.address.trim().length < 8)
+    return 'Indique a morada e um ponto de referência.';
+  if (!input.fulfilmentReady && !input.quotation)
+    return 'Escolha uma forma de recepção disponível.';
+  return '';
+}
+export function purchaseBuyerIssue(input: {
+  buyerReady: boolean;
+  contact: string;
+}) {
+  if (!input.buyerReady)
+    return 'Preencha o nome e um email válido para continuar.';
+  const length = input.contact.replace(/\D/g, '').length;
+  if (length < 7 || length > 15) return 'Indique um número de contacto válido.';
+  return '';
+}
 export function purchaseConfigurationIssue(
   input: {
     materialReady: boolean;
+    allowQuotation?: boolean;
     artworkMissing: boolean;
     instructionsMissing: boolean;
     uploadBusy: boolean;
   },
   stage: 0 | 1,
 ) {
-  if (!input.materialReady)
+  if (!input.materialReady && !input.allowQuotation)
     return 'O preço deste produto precisa de confirmação. Escolha outro material ou contacte a Framy Connect.';
   if (stage === 1) {
     if (input.uploadBusy) return 'Aguarde o fim do carregamento do design.';
@@ -23,4 +73,40 @@ export function purchaseConfigurationIssue(
       return 'Escreva as instruções para a equipa antes de continuar.';
   }
   return null;
+}
+
+export function purchaseMoney(minor: number, locale = 'pt-MZ') {
+  return (
+    new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(minor / 100) + ' MT'
+  );
+}
+
+export function purchaseDeliveryIssue(input: {
+  city: string;
+  locality?: string;
+  buyerReady: boolean;
+  contact: string;
+  address: string;
+  delivery: string;
+  fulfilmentReady: boolean;
+  quotation: boolean;
+}) {
+  if (!input.city) return 'Escolha a cidade para continuar.';
+  if (input.city === 'other' && !input.locality?.trim())
+    return 'Indique a cidade ou localidade.';
+  if (!input.buyerReady)
+    return 'Preencha o nome e um email válido para continuar.';
+  if (
+    input.contact.replace(/\D/g, '').length < 7 ||
+    input.contact.replace(/\D/g, '').length > 15
+  )
+    return 'Indique um número de contacto válido.';
+  if (input.delivery !== 'pickup' && input.address.trim().length < 8)
+    return 'Indique a morada e um ponto de referência.';
+  if (!input.fulfilmentReady && !input.quotation)
+    return 'Escolha uma forma de recepção disponível.';
+  return '';
 }

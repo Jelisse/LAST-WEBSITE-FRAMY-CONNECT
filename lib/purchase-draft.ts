@@ -1,3 +1,7 @@
+import {
+  purchaseStageKeys,
+  type PurchaseEditorStep,
+} from './purchase-journey.ts';
 import { pvcModel, type PvcModel } from './pvc-models.ts';
 import { validateLeather, type LeatherDesign } from './leather-design.ts';
 import { cardMaterials, keychainMaterials } from './purchase-structure.ts';
@@ -6,7 +10,7 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
     const value = JSON.parse(raw || 'null');
     if (
       !value ||
-      value.version !== 2 ||
+      ![2, 3].includes(value.version) ||
       !Number.isFinite(value.expires) ||
       value.expires <= now ||
       value.expires > now + 1800000
@@ -29,11 +33,22 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
       if (typeof value[field] !== 'string' || value[field].length > maximum)
         return null;
     if (
+      value.step !== undefined &&
+      (!purchaseStageKeys.includes(value.step) || value.step === 'review')
+    )
+      return null;
+    if (
+      value.format !== undefined &&
+      !['card', 'keychain', 'kit'].includes(value.format)
+    )
+      return null;
+    if (
       value.stage !== undefined &&
-      (!Number.isInteger(value.stage) || value.stage < 0 || value.stage > 2)
+      (!Number.isInteger(value.stage) || value.stage < 0 || value.stage > 3)
     )
       return null;
     for (const [field, maximum] of [
+      ['locality', 100],
       ['buyerName', 100],
       ['buyerEmail', 254],
     ] as const)
@@ -62,6 +77,9 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
         value.leather.assetId ? 'customer' : 'standard',
       );
     return value as {
+      step?: PurchaseEditorStep;
+      locality?: string;
+      format?: 'card' | 'keychain' | 'kit';
       stage?: number;
       buyerName?: string;
       buyerEmail?: string;

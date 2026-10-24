@@ -183,7 +183,7 @@ export function PaySuiteCheckout({
       <p>
         {t(
           compact
-            ? 'Pagamento seguro na PaySuite. Não guardamos PINs nem dados do cartão.'
+            ? 'No próximo passo, escolherá o método de pagamento na página segura da PaySuite. Não guardamos PINs nem dados do cartão.'
             : ' O pagamento é concluído na página segura da PaySuite. Não guardamos dados do cartão nem PINs. ',
         )}
       </p>
@@ -220,6 +220,12 @@ export function PaySuiteCheckout({
           <Link href={'/acompanhar?referencia=' + publicReference}>
             {t('Acompanhar o pedido')}
           </Link>
+        </p>
+      )}
+      {compact && (
+        <p className="purchase-legal-links">
+          <Link href="/privacidade">{t('Privacidade')}</Link> ·{' '}
+          <Link href="/termos">{t('Termos de utilização')}</Link>
         </p>
       )}
       <button

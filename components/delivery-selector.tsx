@@ -1,9 +1,9 @@
 import { MapPin, Truck, Zap } from 'lucide-react';
 import { useI18n } from '@/components/language-provider';
 import type { FulfilmentSettings } from '@/lib/fulfilment';
-import Link from '@/components/hard-link';
 export function DeliverySelector({
   settings,
+  invalid = false,
   city,
   mode,
   point,
@@ -12,6 +12,7 @@ export function DeliverySelector({
   onPoint,
 }: {
   settings: FulfilmentSettings | null;
+  invalid?: boolean;
   city: string;
   mode: string;
   point: string;
@@ -33,7 +34,12 @@ export function DeliverySelector({
     <>
       <label>
         {t(' Em que cidade pretende receber ou levantar o produto? ')}
-        <select value={city} onChange={(e) => onCity(e.target.value)}>
+        <select
+          aria-invalid={invalid}
+          aria-describedby={invalid ? 'delivery-validation' : undefined}
+          value={city}
+          onChange={(e) => onCity(e.target.value)}
+        >
           <option value="">{t('Seleccionar cidade')}</option>
           {settings?.cities
             .filter((c) => c.active)
@@ -170,7 +176,7 @@ export function DeliverySelector({
               {selected.expressFee === null && (
                 <p>
                   {t(
-                    ' O parceiro confirmará o preço e a disponibilidade. Este serviço ainda não pode ser pago no checkout. ',
+                    'O preço desta entrega será confirmado pela equipa na cotação.',
                   )}
                 </p>
               )}
@@ -181,15 +187,9 @@ export function DeliverySelector({
             (mode === 'express' &&
               (!selected?.expressEnabled || selected.expressFee === null))) && (
             <p>
-              <Link className="home-text-link" href="/contacto">
-                {t(' Solicitar cotação à equipa ↗ ')}
-              </Link>
-              <br />
-              <small>
-                {t(
-                  ' O total será confirmado antes do pagamento. Pode escolher outra forma de recepção. ',
-                )}
-              </small>
+              {t(
+                'Continue para rever o pedido de cotação. A equipa confirmará o preço e a disponibilidade antes do pagamento.',
+              )}
             </p>
           )}
         </>

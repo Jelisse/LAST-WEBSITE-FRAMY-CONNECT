@@ -4865,8 +4865,8 @@
     "我們的團隊為您的形象打造專屬設計。"
   ],
   "Como pretende personalizar?": [
-    "How would you like to personalise?",
-    "您想如何自訂？"
+    "How would you like to personalise it?",
+    "您想如何客製化？"
   ],
   "PDF vectorial": ["Vector PDF", "向量 PDF"],
   "Editor online": ["Online editor", "線上編輯器"],
@@ -10374,7 +10374,7 @@
   "Guardar para depois": ["Save for later", "儲存以稍後繼續"],
   "Limite de links atingido": ["Link limit reached", "已達連結上限"],
   "Escolha o seu produto NFC": ["Choose your NFC product", "選擇您的 NFC 產品"],
-  "Personalize o seu produto": ["Personalise your product", "自訂您的產品"],
+  "Personalize o seu produto": ["Personalise your product", "個人化您的產品"],
   "Escolha como receber": ["Choose how to receive it", "選擇收貨方式"],
   "Reveja e confirme": ["Review and confirm", "檢視並確認"],
   "Cartão, porta-chaves ou kit — para partilhar o seu perfil num toque.": [
@@ -10383,7 +10383,10 @@
   ],
   "Etapa {0} de {1}": ["Step {0} of {1}", "第 {0} 步，共 {1} 步"],
   "Alterar produto": ["Change product", "更換產品"],
-  "Continuar para personalização": ["Continue to personalisation", "繼續自訂"],
+  "Continuar para personalização": [
+    "Continue to personalisation",
+    "繼續個人化設定"
+  ],
   "Continuar para entrega": ["Continue to delivery", "繼續配送設定"],
   "Rever a minha encomenda": ["Review my order", "檢視我的訂單"],
   "A sua encomenda": ["Your order", "您的訂單"],
@@ -10402,5 +10405,240 @@
     "See the front and back of your selected card.",
     "查看所選卡片的正反面。"
   ],
-  "Escolher produto NFC": ["Choose an NFC product", "選擇 NFC 產品"]
+  "Escolher produto NFC": ["Choose an NFC product", "選擇 NFC 產品"],
+  "Ampliar imagem": ["Enlarge image", "放大圖片"],
+  "Imagem ilustrativa. A equipa confirma a arte antes da produção.": [
+    "Illustrative image. The team confirms the artwork before production.",
+    "示意圖片。團隊會在製作前確認設計稿。"
+  ],
+  "Pedido de cotação": ["Quotation request", "報價請求"],
+  "Vamos confirmar a sua cotação": [
+    "Let’s confirm your quotation",
+    "讓我們確認您的報價"
+  ],
+  "Esta configuração precisa de confirmação de preço ou disponibilidade. Não será cobrado nenhum valor agora.": [
+    "This configuration needs price or availability confirmation. You will not be charged now.",
+    "此配置需要確認價格或供貨情況。目前不會收取任何費用。"
+  ],
+  "Ver mensagem preparada": ["Review prepared message", "檢視已準備的訊息"],
+  "Abra a mensagem para rever e enviar à equipa. Os ficheiros não são anexados automaticamente.": [
+    "Open the message to review and send it to the team. Files are not attached automatically.",
+    "開啟訊息以檢查並傳送給團隊。檔案不會自動附加。"
+  ],
+  "Pedir cotação por WhatsApp": [
+    "Request a quote on WhatsApp",
+    "透過 WhatsApp 索取報價"
+  ],
+  "Pedir por email": ["Request by email", "透過電子郵件索取"],
+  "Configure o seu kit NFC": ["Configure your NFC kit", "配置您的 NFC 套組"],
+  "Configure o seu cartão NFC": [
+    "Configure your NFC card",
+    "配置您的 NFC 卡片"
+  ],
+  "Configure o seu porta-chaves NFC": [
+    "Configure your NFC keychain",
+    "配置您的 NFC 鑰匙圈"
+  ],
+  "Escolha a cidade para continuar.": [
+    "Choose a city to continue.",
+    "請選擇城市以繼續。"
+  ],
+  "Preencha o nome e um email válido para continuar.": [
+    "Enter your name and a valid email to continue.",
+    "請輸入姓名和有效的電子郵件地址以繼續。"
+  ],
+  "Indique um número de contacto válido.": [
+    "Enter a valid contact number.",
+    "請輸入有效的聯絡電話。"
+  ],
+  "Indique a morada e um ponto de referência.": [
+    "Enter your address and a nearby landmark.",
+    "請輸入地址和附近的地標。"
+  ],
+  "Escolha uma forma de recepção disponível.": [
+    "Choose an available delivery or collection method.",
+    "請選擇可用的配送或取貨方式。"
+  ],
+  "Escolha o material do cartão e do porta-chaves.": [
+    "Choose the materials for your card and keychain.",
+    "選擇卡片和鑰匙圈的材質。"
+  ],
+  "Escolha o material que combina consigo.": [
+    "Choose the material that suits you.",
+    "選擇適合您的材質。"
+  ],
+  "As escolhas ficam guardadas neste navegador durante 30 minutos após a última alteração.": [
+    "Your choices are saved in this browser for 30 minutes after the last change.",
+    "您的選擇會在此瀏覽器中保留至最後一次修改後的 30 分鐘。"
+  ],
+  "Design Framy": ["Framy design", "Framy 設計"],
+  "O meu design": ["My design", "我的設計"],
+  "Criar com a Framy": ["Create with Framy", "與 Framy 一起設計"],
+  "Escolha um dos modelos Framy disponíveis.": [
+    "Choose one of the available Framy designs.",
+    "選擇一款可用的 Framy 設計。"
+  ],
+  "Envie a sua arte. Pode ajustar a posição e o tamanho depois do carregamento.": [
+    "Upload your artwork. You can adjust its position and size afterwards.",
+    "上傳您的設計稿，之後可調整位置和尺寸。"
+  ],
+  "Descreva a sua ideia. A equipa prepara o design para a sua aprovação antes da produção.": [
+    "Describe your idea. The team prepares a design for your approval before production.",
+    "描述您的想法。團隊會在製作前提供設計稿供您確認。"
+  ],
+  "O valor de design apresentado aplica-se a esta encomenda do kit.": [
+    "The displayed design fee applies to this kit order.",
+    "顯示的設計費適用於此套組訂單。"
+  ],
+  "Não precisa de criar conta para comprar.": [
+    "You do not need an account to buy.",
+    "購買無需建立帳戶。"
+  ],
+  "Rever pedido de cotação": ["Review quotation request", "檢視報價請求"],
+  "Editar entrega": ["Edit delivery", "修改配送資訊"],
+  "Tem um código de embaixador?": [
+    "Have an ambassador code?",
+    "有大使代碼嗎？"
+  ],
+  "O perfil Personal é gratuito. Os planos pagos são opcionais e não estão incluídos nesta compra.": [
+    "The Personal profile is free. Paid plans are optional and are not included in this purchase.",
+    "Personal 個人檔案免費。付費方案可自由選購，且不包含在此次購買中。"
+  ],
+  "As imagens são exemplos de apresentação. O perfil digital é configurado depois da compra; a equipa confirma a arte física antes da produção.": [
+    "Images are presentation examples. Your digital profile is configured after purchase; the team confirms physical artwork before production.",
+    "圖片為展示範例。購買後可設定數位個人檔案；團隊會在製作前確認實體設計稿。"
+  ],
+  "Disponibilidade a confirmar": [
+    "Availability to be confirmed",
+    "供貨情況待確認"
+  ],
+  "Esta escolha requer cotação. Pode continuar a configurar; o preço e a disponibilidade serão confirmados antes de pagar.": [
+    "This choice requires a quotation. Continue configuring; price and availability will be confirmed before payment.",
+    "此選項需要報價。您可以繼續配置；付款前會確認價格和供貨情況。"
+  ],
+  "Acabamento natural": ["Natural finish", "自然質感"],
+  "Presença e resistência": ["Presence and durability", "質感與耐用性"],
+  "Toque clássico": ["Classic feel", "經典觸感"],
+  "Leve e brilhante": ["Light and glossy", "輕巧亮麗"],
+  "Leve para o dia a dia": ["Light for everyday use", "日常輕巧好用"],
+  "Conte-nos a sua ideia": ["Tell us your idea", "告訴我們您的想法"],
+  "Indique o logótipo, os textos e o estilo pretendidos. A equipa contacta-o para recolher referências e apresentar a proposta.": [
+    "Describe the logo, wording and style you want. The team will contact you for references and present a proposal.",
+    "描述您想要的標誌、文字和風格。團隊會聯絡您取得參考資料並提出設計方案。"
+  ],
+  "Explique o que pretende no cartão e no porta-chaves.": [
+    "Explain what you want on the card and keychain.",
+    "說明您希望卡片和鑰匙圈呈現的內容。"
+  ],
+  "Ajustar posição e tamanho": ["Adjust position and size", "調整位置和尺寸"],
+  "No próximo passo, escolherá o método de pagamento na página segura da PaySuite. Não guardamos PINs nem dados do cartão.": [
+    "Next, choose your payment method on PaySuite’s secure page. We do not store PINs or card details.",
+    "下一步將在 PaySuite 安全頁面選擇付款方式。我們不儲存 PIN 碼或卡片資料。"
+  ],
+  "Perfil Personal gratuito · planos pagos opcionais": [
+    "Free Personal profile · optional paid plans",
+    "免費 Personal 個人檔案 · 付費方案可自由選購"
+  ],
+  "Opcional: enviar o seu design.": [
+    "Optional: upload your design.",
+    "選購：上傳您的設計。"
+  ],
+  "Opcional: criação pela equipa Framy.": [
+    "Optional: design by the Framy team.",
+    "選購：由 Framy 團隊設計。"
+  ],
+  "Cidade": ["City", "城市"],
+  "Morada": ["Address", "地址"],
+  "Indique a cidade ou localidade.": [
+    "Enter your city or locality.",
+    "請輸入城市或地區。"
+  ],
+  "O seu pedido de cotação": ["Your quotation request", "您的報價請求"],
+  "Reveja o pedido de cotação": [
+    "Review your quotation request",
+    "檢視您的報價請求"
+  ],
+  "Valores de referência": ["Reference prices", "參考價格"],
+  "Continue para rever o pedido de cotação. A equipa confirmará o preço e a disponibilidade antes do pagamento.": [
+    "Continue to review your quotation request. The team will confirm price and availability before payment.",
+    "繼續檢視報價請求。團隊會在付款前確認價格和供貨情況。"
+  ],
+  "O preço desta entrega será confirmado pela equipa na cotação.": [
+    "The team will confirm this delivery price in your quotation.",
+    "團隊會在報價中確認此配送費用。"
+  ],
+  "O design será preparado pela equipa para a sua aprovação.": [
+    "The team will prepare the design for your approval.",
+    "團隊會準備設計稿供您確認。"
+  ],
+  "O seu desconto": ["Your discount", "您的折扣"],
+  "Tens um cupão?": ["Have a coupon?", "有優惠券嗎？"],
+  "Introduz o código do teu cupão e recebe o teu desconto.": [
+    "Enter your coupon code and get your discount.",
+    "輸入優惠券代碼，即可享有折扣。"
+  ],
+  "Código do cupão": ["Coupon code", "優惠券代碼"],
+  "Introduz o teu código": ["Enter your code", "輸入您的代碼"],
+  "Introduz o código do teu cupão.": [
+    "Enter your coupon code.",
+    "請輸入優惠券代碼。"
+  ],
+  "Aplicar cupão": ["Apply coupon", "套用優惠券"],
+  "A verificar o cupão…": ["Checking your coupon…", "正在驗證優惠券…"],
+  "Não inclui design nem entrega.": [
+    "Excludes design and delivery.",
+    "不包含設計和配送費用。"
+  ],
+  "Não conseguimos validar este cupão. Confirma o código ou continua sem cupão.": [
+    "We could not validate this coupon. Check the code or continue without a coupon.",
+    "無法驗證此優惠券。請確認代碼，或不使用優惠券繼續。"
+  ],
+  "Aguarda um momento antes de tentar novamente. Podes continuar sem cupão.": [
+    "Wait a moment before trying again. You can continue without a coupon.",
+    "請稍候再試，也可以不使用優惠券繼續。"
+  ],
+  "Não foi possível verificar o cupão. Tenta novamente ou continua sem cupão.": [
+    "We could not check your coupon. Try again or continue without a coupon.",
+    "目前無法查詢優惠券。請重試，或不使用優惠券繼續。"
+  ],
+  "Cupão aplicado!": ["Coupon applied!", "已套用優惠券！"],
+  "Vais poupar {0}.": ["You will save {0}.", "您將節省 {0}。"],
+  "Cupão guardado para verificação.": [
+    "Coupon saved for verification.",
+    "優惠券已保留，待確認。"
+  ],
+  "A equipa confirmará a elegibilidade e o desconto na tua cotação.": [
+    "The team will confirm eligibility and the discount in your quotation.",
+    "團隊將在報價中確認適用資格及折扣。"
+  ],
+  "Alterar cupão": ["Change coupon", "更改優惠券"],
+  "Remover cupão": ["Remove coupon", "移除優惠券"],
+  "Continuar com desconto": ["Continue with discount", "套用折扣並繼續"],
+  "Continuar com cupão": ["Continue with coupon", "保留優惠券並繼續"],
+  "Continuar sem cupão": ["Continue without coupon", "不使用優惠券繼續"],
+  "Não tenho cupão — continuar": [
+    "I don’t have a coupon — continue",
+    "沒有優惠券 — 繼續"
+  ],
+  "Continuar para o desconto": ["Continue to your discount", "繼續查看折扣"],
+  "Editar cupão": ["Edit coupon", "編輯優惠券"],
+  "Sem cupão aplicado.": ["No coupon applied.", "未套用優惠券。"],
+  "Desconto do cupão": ["Coupon discount", "優惠券折扣"],
+  "Cupão para verificação": ["Coupon for verification", "待確認的優惠券"],
+  "A confirmar na cotação": ["To be confirmed in quotation", "將於報價中確認"],
+  "Escolha o design": ["Choose your design", "選擇設計"],
+  "Os seus dados": ["Your details", "您的資料"],
+  "Continuar para os dados": ["Continue to your details", "繼續填寫資料"],
+  "Indique os dados para acompanhar a sua encomenda.": [
+    "Enter your details so we can keep you informed about your order.",
+    "請填寫資料，方便我們提供訂單進度。"
+  ],
+  "Editar design": ["Edit design", "編輯設計"],
+  "Editar dados": ["Edit details", "編輯資料"],
+  "Voltar ao desconto": ["Back to discount", "返回折扣"],
+  "Voltar aos dados": ["Back to your details", "返回您的資料"],
+  "Preencha o nome e o email na etapa dos seus dados.": [
+    "Enter your name and email in the Your details step.",
+    "請在「您的資料」步驟填寫姓名及電子郵件。"
+  ]
 }

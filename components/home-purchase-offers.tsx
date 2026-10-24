@@ -166,12 +166,14 @@ export async function HomePurchaseOffers({
                         }).format(estimate.amount / 100) + ' MT'
                       : t('Preço a confirmar')}
                   </strong>
-                  <span>{t('Pagamento único · plano digital à parte')}</span>
+                  <span>
+                    {t('Perfil Personal gratuito · planos pagos opcionais')}
+                  </span>
                 </div>
                 <ul className="home-solution-included">
                   <li>{t('Design FramyConnect incluído.')}</li>
-                  <li>{t('O seu design em PDF vectorial.')}</li>
-                  <li>{t('Design criado pela nossa equipa.')}</li>
+                  <li>{t('Opcional: enviar o seu design.')}</li>
+                  <li>{t('Opcional: criação pela equipa Framy.')}</li>
                 </ul>
                 <Link
                   className={

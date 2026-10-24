@@ -1,4 +1,5 @@
 'use client';
+import { PurchasePreview } from './purchase-preview';
 import { SourceImage } from './source-image';
 import { useI18n } from './language-provider';
 import { pvcModels, pvcModel, pvcPhoto, type PvcModel } from '@/lib/pvc-models';
@@ -79,7 +80,9 @@ export function PvcConfigurator({
             {t('Verso')}
           </button>
         </div>
-        <PvcPreview model={model} back={back} />
+        <PurchasePreview label={t(pvcModel(model).name)}>
+          <PvcPreview model={model} back={back} />
+        </PurchasePreview>
         <figcaption aria-live="polite">
           {t(pvcModel(model).name)} ·{' '}
           {t(back ? 'Verso FramyConnect' : 'Frente')}
