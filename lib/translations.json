@@ -10738,5 +10738,34 @@
   "Carregue a arte do porta-chaves para continuar.": [
     "Upload the keychain artwork to continue.",
     "請上傳鑰匙圈設計以繼續。"
+  ],
+  "Clique num modelo para ver a frente e o verso e confirmar a sua escolha.": [
+    "Click a model to view the front and back and confirm your choice.",
+    "點選款式以查看正反面並確認選擇。"
+  ],
+  "Escolhido": ["Selected", "已選擇"],
+  "Porta-chaves NFC {0}": ["{0} NFC keychain", "{0} NFC 鑰匙圈"],
+  "Veja a frente e o verso deste modelo.": [
+    "View the front and back of this model.",
+    "查看此款式的正反面。"
+  ],
+  "Vista do produto": ["Product view", "產品視圖"],
+  "Voltar aos modelos": ["Back to models", "返回款式"],
+  "Escolher este modelo": ["Choose this model", "選擇此款式"],
+  "Veja o produto deste modelo.": [
+    "View this product model.",
+    "查看此產品款式。"
+  ],
+  "Pré-visualização da sua arte. A equipa confirma a arte antes da produção.": [
+    "Preview of your artwork. The team confirms the artwork before production.",
+    "您的設計預覽。團隊會在生產前確認設計。"
+  ],
+  "Este é o modelo escolhido. O perfil digital é configurado após o pagamento.": [
+    "This is your selected model. Your digital profile is configured after payment.",
+    "這是您選擇的款式。付款後即可設定數位個人檔案。"
+  ],
+  "Pré-visualização da arte personalizada. O perfil digital é configurado depois da compra; a equipa confirma a arte física antes da produção.": [
+    "Custom artwork preview. Your digital profile is configured after purchase; the team confirms physical artwork before production.",
+    "客製化設計預覽。購買後可設定數位個人檔案；團隊會在生產前確認實體設計。"
   ]
 }

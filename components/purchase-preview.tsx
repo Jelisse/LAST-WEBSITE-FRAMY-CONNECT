@@ -11,9 +11,11 @@ import { useI18n } from './language-provider';
 export function PurchasePreview({
   children,
   label,
+  kind = 'artwork',
 }: {
   children: ReactNode;
   label: string;
+  kind?: 'product' | 'artwork';
 }) {
   const [open, setOpen] = useState(false);
   const { t } = useI18n();
@@ -33,7 +35,9 @@ export function PurchasePreview({
           <DialogTitle>{label}</DialogTitle>
           <DialogDescription>
             {t(
-              'Imagem ilustrativa. A equipa confirma a arte antes da produção.',
+              kind === 'product'
+                ? 'Veja o produto deste modelo.'
+                : 'Pré-visualização da sua arte. A equipa confirma a arte antes da produção.',
             )}
           </DialogDescription>
           <div className="purchase-preview-large">{children}</div>

@@ -538,6 +538,7 @@ export function LeatherConfigurator({
           </button>
         </div>
         <PurchasePreview
+          kind={design === 'standard' ? 'product' : 'artwork'}
           label={product ? t(product) : t('Porta-chaves de couro')}
         >
           {renderPreview ? (

@@ -1011,6 +1011,7 @@ export function PurchaseConfigurator({
                       className={card === material ? 'is-selected' : ''}
                     >
                       <PurchasePreview
+                        kind="product"
                         label={t('Cartão') + ' · ' + t(material)}
                       >
                         <CardMaterialImage
@@ -1625,7 +1626,9 @@ export function PurchaseConfigurator({
             </div>
             <p className="purchase-preview-note">
               {t(
-                'As imagens são exemplos de apresentação. O perfil digital é configurado depois da compra; a equipa confirma a arte física antes da produção.',
+                design === 'standard'
+                  ? 'Este é o modelo escolhido. O perfil digital é configurado após o pagamento.'
+                  : 'Pré-visualização da arte personalizada. O perfil digital é configurado depois da compra; a equipa confirma a arte física antes da produção.',
               )}
             </p>
             {design === 'team' && (
