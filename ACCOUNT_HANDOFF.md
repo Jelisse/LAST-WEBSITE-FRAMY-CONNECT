@@ -861,3 +861,13 @@ Purchase labels and prepared quotation name labels now address the person direct
 Browser QA: PVC/Wood/Metal swatches with no branding; wood front/back; closing unconfirmed Wood preserves PVC; confirming Metal commits it; cancel/Escape on PVC preserves Metal. Complete popup fits 320x740 without horizontal overflow and main choices fit 390px. My design opens actual upload controls immediately for cards and keychains; missing artwork still blocks advancement; Create with Framy opens the brief/reference controls directly; standard card continues directly to delivery. Details labels verified in Portuguese and English. Viewport reset and local QA server stopped. No order, payment, upload, message or production data change. Screenshots framy-card-materials-desktop.png and framy-card-popup-mobile.png in the task visualization directory.
 
 Validation: all 299 automated tests, targeted route/resume/guidance suite (15 tests), TypeScript, targeted lint, whitespace checks and local production build passed; logs tmp/purchase-audit/card-*.log. This batch is uncommitted and undeployed; live version remains 29e925e4-2849-4dbd-8029-7321a9bf4fa3.
+
+## 25 October 2026 - Verified material-first card journey release
+
+Application commit e4a2cb3 was pushed to github/main and deployed through the guarded Cloudflare workflow. Live version: e13fe3d3-3edf-4545-8f17-38ef842a449a at https://framyconnect.co.mz.
+
+The initial schema connection failed transiently; existing Cloudflare authentication was verified and the guarded retry passed schema and database relationship checks, a fresh production build, and deployment. Existing validation: all 299 tests, targeted journey checks, TypeScript, lint and local production build passed.
+
+Live verification passed: exact purchase bundle SHA-256 match; card, keychain and kit first stages; public routes 200; private workspace and checkout APIs reject anonymous access with 401. Browser verification confirmed five-stage standard card flow, material popup front/back and cancellation preserving PVC, and My design opening the actual upload tool directly at stage 2 of 6. Screenshot: framy-card-materials-live.png in the session visualization folder.
+
+No pricing, inventory, schema or gateway settings changed. No order, payment, upload or message was submitted. Ready kits retain quotation-only behavior. This release supersedes the uncommitted/undeployed status above.
