@@ -10828,5 +10828,43 @@
   "Abra a mensagem para rever e enviar à equipa.": [
     "Open the message to review and send it to the team.",
     "開啟訊息以檢查並傳送給團隊。"
+  ],
+  "Escolha o material do seu cartão": [
+    "Choose your card material",
+    "選擇您的卡片材質"
+  ],
+  "Superfície branca e acetinada": [
+    "Smooth white satin surface",
+    "白色緞面質感"
+  ],
+  "Veios naturais e acabamento suave": [
+    "Natural grain and a smooth finish",
+    "自然木紋與細緻觸感"
+  ],
+  "Textura escovada e reflexos metálicos": [
+    "Brushed texture and metallic reflections",
+    "拉絲紋理與金屬光澤"
+  ],
+  "O seu cartão NFC": ["Your NFC card", "您的 NFC 卡片"],
+  "Veja a frente e o verso do design Framy. Os dados apresentados são um exemplo de personalização.": [
+    "Explore the front and back of the Framy design. The details shown are an example of personalisation.",
+    "查看 Framy 設計的正反面。所示資料為個人化設計範例。"
+  ],
+  "Voltar aos materiais": ["Back to materials", "返回材質選擇"],
+  "Escolher este cartão": ["Choose this card", "選擇此卡片"],
+  "Como quer o seu design?": [
+    "How would you like your design?",
+    "您想如何設計？"
+  ],
+  "O seu email": ["Your email", "您的電子郵件"],
+  "O seu telefone": ["Your phone number", "您的電話號碼"],
+  "Preço e disponibilidade confirmados na cotação, antes de pagar.": [
+    "Price and availability are confirmed in your quotation before payment.",
+    "價格及供應情況將於付款前在報價中確認。"
+  ],
+  "Escolha o seu cartão NFC": ["Choose your NFC card", "選擇您的 NFC 卡片"],
+  "Escolha o seu porta-chaves NFC": [
+    "Choose your NFC keychain",
+    "選擇您的 NFC 鑰匙圈"
   ]
 }

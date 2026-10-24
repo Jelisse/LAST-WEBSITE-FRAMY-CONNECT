@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   purchaseJourney,
+  purchaseResumeStep,
   purchaseReceptionIssue,
   purchaseBuyerIssue,
   purchaseConfigurationIssue,
@@ -303,4 +304,31 @@ test('kit drafts retain the selected combination and bounded optional landmark',
     ),
     null,
   );
+});
+
+test('card material and design share a stage; custom artwork alone adds personalisation', () => {
+  assert.deepEqual(
+    purchaseJourney('standard', false, true).map((s) => s.key),
+    ['materials', 'delivery', 'buyer', 'coupon', 'review'],
+  );
+  for (const design of ['customer', 'team'])
+    assert.deepEqual(
+      purchaseJourney(design, false, true).map((s) => s.key),
+      ['materials', 'personalise', 'delivery', 'buyer', 'coupon', 'review'],
+    );
+  assert.equal(purchaseResumeStep('card', 'standard', 'design'), 'materials');
+  assert.equal(
+    purchaseResumeStep('card', 'standard', 'personalise'),
+    'materials',
+  );
+  assert.equal(
+    purchaseResumeStep('card', 'customer', 'personalise'),
+    'personalise',
+  );
+  assert.equal(
+    purchaseResumeStep('keychain', 'standard', 'personalise'),
+    'design',
+  );
+  assert.equal(purchaseResumeStep('kit', 'team', 'design'), 'materials');
+  assert.equal(purchaseResumeStep('card', 'standard', 'buyer'), 'buyer');
 });

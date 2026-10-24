@@ -41,7 +41,7 @@ export const guidanceTips = [
   {
     id: 'product-view',
     selector:
-      '.pvc-model-options > button[aria-haspopup="dialog"], .card-design-selection button[aria-haspopup="dialog"], .ready-kit-expand',
+      '.pvc-model-options > button[aria-haspopup="dialog"], .card-material-choices > button[aria-haspopup="dialog"], .ready-kit-expand',
     message:
       'Abra a imagem para ver o produto em detalhe. Nos modelos com duas faces, pode alternar entre frente e verso.',
     global: true,

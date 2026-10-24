@@ -8,9 +8,11 @@ export { cardArtwork } from '@/lib/card-artwork';
 export function CardMaterialImage({
   material,
   back,
+  eager = false,
 }: {
   material: string;
   back: boolean;
+  eager?: boolean;
 }) {
   const { t } = useI18n();
   const sources = cardArtwork[material];
@@ -20,6 +22,7 @@ export function CardMaterialImage({
       <span className="card-material-surface" data-material={material}>
         <SourceImage
           src={sources[back ? 1 : 0]}
+          loading={eager ? 'eager' : 'lazy'}
           alt={`Angela Khossa · ${t(material)} · ${t(back ? 'Verso' : 'Frente')}`}
           width={600}
           height={960}

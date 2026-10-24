@@ -1678,3 +1678,324 @@ body .purchase-configurator .delivery-options label {
     height: 180px;
   }
 }
+/* Material-first card selection; branding is confined to the inspect dialog. */
+.card-material-picker {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+.card-material-picker > legend {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.card-material-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.card-material-choices > button {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 14px;
+  border: 1px solid #ded5cb;
+  border-radius: 15px;
+  background: #fff;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+.card-material-choices > button.is-selected {
+  border-color: #ad461e;
+  box-shadow: inset 0 0 0 1px #ad461e;
+  background: #fffaf5;
+}
+.card-material-choices > button:focus-visible {
+  outline: 3px solid #a7441c;
+  outline-offset: 3px;
+}
+.material-swatch-scene {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  background: radial-gradient(ellipse at 50% 35%, #fff, #f4eee6);
+  overflow: hidden;
+}
+.material-swatch {
+  position: relative;
+  display: block;
+  width: 80px;
+  aspect-ratio: 0.63;
+  border-radius: 8px;
+  transform: rotate(-9deg);
+  box-shadow:
+    1px 2px 0 #d6d0c7,
+    3px 3px 0 #c5beb4,
+    10px 16px 18px #3c302426;
+  overflow: hidden;
+}
+.material-swatch[data-material='PVC'] {
+  background: linear-gradient(
+    120deg,
+    #fff 0%,
+    #fff 35%,
+    #eae9e5 68%,
+    #fff 100%
+  );
+  border: 1px solid #e0ded8;
+}
+.material-swatch[data-material='Madeira'] {
+  background:
+    repeating-linear-gradient(93deg, #bb8a5930 0 1px, transparent 1px 6px),
+    repeating-radial-gradient(
+      ellipse at 115% -25%,
+      #d4b58d 0 4px,
+      #c7a47d 5px,
+      #d8b991 6px 12px,
+      #ccaa7d 13px 17px
+    );
+  border: 1px solid #b88f61;
+  box-shadow:
+    1px 2px 0 #a57b4f,
+    3px 3px 0 #96704c,
+    10px 16px 18px #3c302426;
+}
+.material-swatch[data-material='Metal'] {
+  background:
+    repeating-linear-gradient(0deg, #ffffff10 0 1px, #343c4610 1px 2px),
+    linear-gradient(
+      115deg,
+      #626b75 0%,
+      #b9c0c7 23%,
+      #f6f8f9 40%,
+      #929ba5 56%,
+      #dce1e5 73%,
+      #66717c 100%
+    );
+  border: 1px solid #919ba5;
+  box-shadow:
+    1px 2px 0 #eff2f4,
+    3px 3px 0 #5a6570,
+    10px 16px 18px #3c302438;
+}
+.material-swatch-sheen {
+  position: absolute;
+  inset: -20% -70%;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    #ffffff55 50%,
+    transparent 65%
+  );
+  transform: translateX(-40%);
+  opacity: 0;
+}
+.material-nfc-signal {
+  position: absolute;
+  right: 12px;
+  top: 18px;
+  color: #a7441c;
+  opacity: 0.45;
+}
+.card-material-name {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  font-size: 15px;
+}
+.card-material-texture {
+  font-size: 12px;
+  color: #716458;
+  line-height: 1.5;
+  flex: 1;
+}
+.card-material-choices .material-price {
+  font-size: 13px;
+  color: #9c411c;
+  font-weight: 600;
+}
+.card-material-choices small {
+  font-size: 11px;
+  color: #74665b;
+}
+.card-product-dialog {
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  max-height: 94dvh;
+}
+body:has(.card-product-dialog) [data-slot='dialog-overlay'] {
+  z-index: 200;
+}
+.card-product-dialog [data-slot='dialog-title'] {
+  padding-right: 28px;
+}
+.card-product-dialog .leather-face-tabs {
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  flex-shrink: 0;
+}
+.card-product-full {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  height: min(48dvh, 460px);
+  border-radius: 12px;
+  background: #faf7f2;
+}
+.card-product-full .card-material-art {
+  width: 100%;
+  height: 100% !important;
+  min-height: 0;
+  margin: 0;
+  padding: 10px;
+}
+.card-product-full .card-material-surface {
+  max-height: 100%;
+  max-width: 100%;
+  height: 100%;
+  width: auto;
+  aspect-ratio: 0.63;
+}
+.card-product-full .card-material-surface > img:not(.card-material-qr) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.card-product-price {
+  font-size: 13px;
+  color: #91401e;
+  margin: 0;
+  text-align: center;
+}
+.direct-design-choices {
+  margin: 20px 0 0 !important;
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.direct-design-choices > legend {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.direct-design-choices .purchase-switch-bar {
+  margin: 0;
+}
+.direct-design-choices .purchase-switch-bar button > span {
+  display: grid;
+  gap: 3px;
+}
+.direct-design-choices small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #756458;
+}
+@media (hover: hover) and (pointer: fine) {
+  .card-material-choices > button:hover {
+    border-color: #b34b25;
+    box-shadow: 0 6px 18px #60301612;
+  }
+  .card-material-choices
+    > button:is(:hover, :focus-visible)
+    .material-swatch-sheen {
+    animation: material-glint 0.8s ease-out 1;
+  }
+  .card-material-choices
+    > button:is(:hover, :focus-visible)
+    .material-nfc-signal {
+    animation: material-connect 0.7s ease-in-out 2;
+  }
+}
+@keyframes material-glint {
+  from {
+    transform: translateX(-40%);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.7;
+  }
+  to {
+    transform: translateX(40%);
+    opacity: 0;
+  }
+}
+@keyframes material-connect {
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+@media (max-width: 640px) {
+  .card-material-choices {
+    gap: 8px;
+  }
+  .card-material-choices > button {
+    padding: 9px;
+    gap: 7px;
+  }
+  .material-swatch-scene {
+    height: 125px;
+  }
+  .material-swatch {
+    width: 60px;
+    border-radius: 5px;
+  }
+  .material-nfc-signal {
+    width: 17px;
+    right: 4px;
+    top: 8px;
+  }
+  .card-material-name {
+    font-size: 13px;
+  }
+  .card-material-texture {
+    display: none;
+  }
+  .card-material-choices .material-price {
+    font-size: 12px;
+  }
+  .card-product-dialog {
+    padding: 15px;
+  }
+  .card-product-full {
+    height: min(42dvh, 360px);
+  }
+  .card-product-dialog .pvc-product-dialog-actions {
+    flex-wrap: wrap;
+  }
+  .card-product-dialog .pvc-product-dialog-actions button {
+    flex: 1;
+    font-size: 13px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-material-choices > button {
+    transition: none;
+  }
+  .card-material-choices .material-swatch-sheen,
+  .card-material-choices .material-nfc-signal {
+    animation: none !important;
+  }
+}
+@media (max-width: 640px) {
+  .material-swatch {
+    width: 76%;
+    max-width: 60px;
+  }
+}

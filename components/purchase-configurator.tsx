@@ -1,15 +1,16 @@
 'use client';
+import { CardMaterialPicker } from './card-material-picker';
 import { ReadyKitPicker, readyKits } from './ready-kit-picker';
 import { DesignReferenceUpload } from './design-reference-upload';
 import {
   validateDesignReferences,
   type DesignReferences,
 } from '@/lib/design-references';
-import { PurchasePreview } from './purchase-preview';
 import { PurchaseQuotation } from './purchase-quotation';
 import { PurchaseStageProgress } from './purchase-stage-progress';
 import {
   purchaseJourney,
+  purchaseResumeStep,
   purchaseReceptionIssue,
   purchaseBuyerIssue,
   type PurchaseEditorStep,
@@ -42,7 +43,6 @@ import { useI18n } from './language-provider';
 import {
   purchaseFormats,
   purchaseSelection,
-  cardMaterials,
   keychainMaterials,
   designServices,
 } from '@/lib/purchase-structure';
@@ -265,12 +265,11 @@ export function PurchaseConfigurator({
             Math.min(draft.stage ?? 0, 3)
           ];
         setActiveConfiguration(
-          (draft.format ?? selection.format) === 'kit' &&
-            ['design', 'personalise'].includes(step)
-            ? 'materials'
-            : step === 'personalise' && draft.design === 'standard'
-              ? 'design'
-              : step,
+          purchaseResumeStep(
+            draft.format ?? selection.format,
+            draft.design,
+            step,
+          ),
         );
       }
       setDraftReady(true);
@@ -431,7 +430,7 @@ export function PurchaseConfigurator({
     contact,
   });
   const deliveryReady = !deliveryIssue && !buyerIssue;
-  const route = purchaseJourney(design, readyKit);
+  const route = purchaseJourney(design, readyKit, format === 'card');
   const currentKey = paymentStep ? 'review' : activeConfiguration;
   const currentStage = route.findIndex((item) => item.key === currentKey);
   const stageCount = route.length;
@@ -440,8 +439,8 @@ export function PurchaseConfigurator({
     format === 'kit'
       ? 'Escolha o seu kit NFC'
       : format === 'card'
-        ? 'Configure o seu cartão NFC'
-        : 'Configure o seu porta-chaves NFC';
+        ? 'Escolha o seu cartão NFC'
+        : 'Escolha o seu porta-chaves NFC';
   const focusStage = () =>
     requestAnimationFrame(() =>
       requestAnimationFrame(() => {
@@ -526,7 +525,13 @@ export function PurchaseConfigurator({
   const showSummary = (skipCoupon = false) => {
     if (!validConfiguration(1)) {
       setPaymentStep(false);
-      setActiveConfiguration(design === 'standard' ? 'design' : 'personalise');
+      setActiveConfiguration(
+        design === 'standard'
+          ? format === 'card'
+            ? 'materials'
+            : 'design'
+          : 'personalise',
+      );
       return;
     }
     if (!checkReception() || !checkBuyer()) return;
@@ -559,7 +564,16 @@ export function PurchaseConfigurator({
   const goToDesign = () => {
     if (validConfiguration(0)) {
       if (canReturnToReview) showSummary();
-      else moveTo(readyKit ? 'delivery' : 'design');
+      else
+        moveTo(
+          readyKit
+            ? 'delivery'
+            : format === 'card'
+              ? design === 'standard'
+                ? 'delivery'
+                : 'personalise'
+              : 'design',
+        );
     }
   };
   const continueDesign = () => {
@@ -650,7 +664,7 @@ export function PurchaseConfigurator({
       ? t('Link de referência (opcional)') + ': ' + designReferences.url
       : '',
     t('Contacto') + ': ' + contact,
-    buyerName ? t('Nome do comprador') + ': ' + buyerName : '',
+    buyerName ? t('O seu nome') + ': ' + buyerName : '',
     buyerEmail ? 'Email: ' + buyerEmail : '',
     address && delivery !== 'pickup' ? t('Morada') + ': ' + fullAddress : '',
     design !== 'standard' && designInstructions
@@ -685,6 +699,58 @@ export function PurchaseConfigurator({
     quotation,
     t,
   ]);
+  const designChoices = (
+    <fieldset className="purchase-design-options direct-design-choices">
+      <legend>{t('Como quer o seu design?')}</legend>
+      <div
+        className="purchase-switch-bar"
+        aria-label={t('Como pretende personalizar?')}
+      >
+        {designServices.map((item) => (
+          <button
+            type="button"
+            key={item.id}
+            aria-pressed={design === item.id}
+            onClick={() => {
+              setDesign(item.id);
+              setStageError('');
+              if (item.id !== 'standard') moveTo('personalise');
+            }}
+          >
+            {item.id === 'standard' ? (
+              <BadgeCheck size={18} aria-hidden="true" />
+            ) : item.id === 'customer' ? (
+              <Upload size={18} aria-hidden="true" />
+            ) : (
+              <PenTool size={18} aria-hidden="true" />
+            )}
+            <span>
+              {t(
+                item.id === 'standard'
+                  ? 'Design Framy'
+                  : item.id === 'customer'
+                    ? 'O meu design'
+                    : 'Criar com a Framy',
+              )}
+              <small>
+                {item.id === 'standard'
+                  ? t('Incluído')
+                  : pricing
+                    ? '+ ' +
+                      money(
+                        item.id === 'customer'
+                          ? pricing.customer_design
+                          : pricing.team_design,
+                        t.locale,
+                      )
+                    : t('Sob consulta')}
+              </small>
+            </span>
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
   const materialPresentation = (
     material: string,
     kind: 'card' | 'keychain',
@@ -860,54 +926,17 @@ export function PurchaseConfigurator({
               <ReadyKitPicker value={kitVariant} onChange={setKitVariant} />
             )}
             <div className="purchase-materials" hidden={readyKit}>
-              {format !== 'keychain' && (
-                <fieldset className="material-option-group">
-                  <legend>{t('Cartão')}</legend>
-                  <div
-                    className="card-view-controls"
-                    aria-label={t('Fotografias do produto')}
-                  >
-                    <button
-                      type="button"
-                      aria-pressed={!cardBack}
-                      onClick={() => {
-                        setCardBack(false);
-                      }}
-                    >
-                      {t('Frente')}
-                    </button>
-                    <button
-                      type="button"
-                      aria-pressed={cardBack}
-                      onClick={() => {
-                        setCardBack(true);
-                      }}
-                    >
-                      {t('Verso')}
-                    </button>
-                  </div>
-                  <p className="card-simulation-note">
-                    {t('Simulação ilustrativa')}
-                  </p>
-                  <div className="material-options">
-                    {cardMaterials.map((item) => (
-                      <label
-                        key={item}
-                        className={card === item ? 'is-selected' : ''}
-                      >
-                        <input
-                          type="radio"
-                          name="card-material"
-                          value={item}
-                          checked={card === item}
-                          onChange={() => setCard(item)}
-                        />
-                        <span>{t(item)}</span>
-                        {materialPresentation(item, 'card')}
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
+              {format === 'card' && (
+                <CardMaterialPicker
+                  value={card}
+                  back={cardBack}
+                  onChange={(material, back) => {
+                    setCard(material);
+                    setCardBack(back);
+                  }}
+                  prices={prices}
+                  availability={availability}
+                />
               )}
               {format !== 'card' && (
                 <fieldset className="material-option-group">
@@ -933,10 +962,11 @@ export function PurchaseConfigurator({
                 </fieldset>
               )}
             </div>
+            {format === 'card' && designChoices}
             {!readyKit && quotation && (
               <p className="purchase-quotation-notice">
                 {t(
-                  'Esta escolha requer cotação. Pode continuar a configurar; o preço e a disponibilidade serão confirmados antes de pagar.',
+                  'Preço e disponibilidade confirmados na cotação, antes de pagar.',
                 )}
               </p>
             )}
@@ -966,110 +996,7 @@ export function PurchaseConfigurator({
               <Palette className="purchase-icon" size={20} aria-hidden="true" />
               {t('Design')}
             </legend>
-            <div className="purchase-design-options">
-              <fieldset
-                className="purchase-switch-bar"
-                aria-label={t('Como pretende personalizar?')}
-              >
-                {designServices.map((item) => (
-                  <button
-                    type="button"
-                    key={item.id}
-                    aria-pressed={design === item.id}
-                    onClick={() => {
-                      setDesign(item.id);
-                      setStageError('');
-                    }}
-                  >
-                    {item.id === 'standard' ? (
-                      <BadgeCheck size={18} aria-hidden="true" />
-                    ) : item.id === 'customer' ? (
-                      <Upload size={18} aria-hidden="true" />
-                    ) : (
-                      <PenTool size={18} aria-hidden="true" />
-                    )}
-                    <span>
-                      {t(
-                        item.id === 'standard'
-                          ? 'Design Framy'
-                          : item.id === 'customer'
-                            ? 'O meu design'
-                            : 'Criar com a Framy',
-                      )}
-                    </span>
-                  </button>
-                ))}
-              </fieldset>
-              <div className="purchase-service-description" aria-live="polite">
-                <strong>
-                  {designAmount === 0
-                    ? t('Incluído')
-                    : designAmount === null
-                      ? t('Sob consulta')
-                      : '+ ' + money(designAmount, t.locale)}
-                </strong>
-                <p>
-                  {t(
-                    design === 'standard'
-                      ? 'Escolha um dos modelos Framy disponíveis.'
-                      : design === 'customer'
-                        ? 'No próximo passo, envie a sua arte e ajuste a posição e o tamanho.'
-                        : 'No próximo passo, descreva a sua ideia e adicione referências. A equipa prepara o design para a sua aprovação.',
-                  )}
-                </p>
-                {format === 'kit' && design !== 'standard' && (
-                  <small>
-                    {t(
-                      'O valor de design apresentado aplica-se a esta encomenda do kit.',
-                    )}
-                  </small>
-                )}
-              </div>
-            </div>
-            {format !== 'keychain' && design === 'standard' && (
-              <fieldset className="card-design-selection">
-                <legend>{t('Design do cartão')}</legend>
-                <p>{t('Veja a frente e o verso do cartão que escolheu.')}</p>
-                <div className="card-view-controls">
-                  {[false, true].map((back) => (
-                    <button
-                      type="button"
-                      key={String(back)}
-                      aria-pressed={cardBack === back}
-                      onClick={() => {
-                        setCardBack(back);
-                      }}
-                    >
-                      {t(back ? 'Verso' : 'Frente')}
-                    </button>
-                  ))}
-                </div>
-                <div className="material-options">
-                  {[card].map((material) => (
-                    <div
-                      key={material}
-                      className={card === material ? 'is-selected' : ''}
-                    >
-                      <PurchasePreview
-                        kind="product"
-                        label={t('Cartão') + ' · ' + t(material)}
-                      >
-                        <CardMaterialImage
-                          material={material}
-                          back={cardBack}
-                        />
-                      </PurchasePreview>
-                      <span>
-                        {t(material)}
-                        {material !== 'Madeira' && (
-                          <> · {t(material === 'PVC' ? 'Laranja' : 'Preto')}</>
-                        )}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            )}
+            {designChoices}
             {isPvcStandard && (
               <PvcConfigurator
                 model={pvc}
@@ -1307,7 +1234,9 @@ export function PurchaseConfigurator({
                 <button
                   type="button"
                   className="btn btn-outline"
-                  onClick={() => moveTo('design')}
+                  onClick={() =>
+                    moveTo(format === 'card' ? 'materials' : 'design')
+                  }
                 >
                   {t('Voltar')}
                 </button>
@@ -1409,7 +1338,7 @@ export function PurchaseConfigurator({
                 className="btn btn-outline"
                 onClick={() =>
                   moveTo(
-                    readyKit
+                    readyKit || format === 'card'
                       ? 'materials'
                       : design === 'standard'
                         ? 'design'
@@ -1471,7 +1400,7 @@ export function PurchaseConfigurator({
             )}
             <div className="guest-buyer-fields">
               <label>
-                {t('Nome do comprador')}
+                {t('O seu nome')}
                 <input
                   readOnly={signedIn}
                   autoComplete="name"
@@ -1487,7 +1416,7 @@ export function PurchaseConfigurator({
                 />
               </label>
               <label>
-                {t('Email para a referência e confirmação')}
+                {t('O seu email')}
                 <input
                   readOnly={signedIn}
                   type="email"
@@ -1509,8 +1438,8 @@ export function PurchaseConfigurator({
             </div>
             <label>
               {delivery === 'pickup'
-                ? t('Contacto para o aviso de levantamento')
-                : t('Contacto do destinatário')}
+                ? t('O seu telefone')
+                : t('O seu telefone')}
               <PhoneInput
                 value={contact}
                 aria-invalid={
@@ -1756,7 +1685,12 @@ export function PurchaseConfigurator({
                 {t('Editar produto')}
               </button>
               {!readyKit && (
-                <button type="button" onClick={() => editStage('design')}>
+                <button
+                  type="button"
+                  onClick={() =>
+                    editStage(format === 'card' ? 'materials' : 'design')
+                  }
+                >
                   {t('Editar design')}
                 </button>
               )}
