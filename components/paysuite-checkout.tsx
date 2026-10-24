@@ -230,7 +230,7 @@ export function PaySuiteCheckout({
           busy
             ? 'A preparar pagamento…'
             : compact
-              ? 'Pagar'
+              ? 'Continuar para pagamento'
               : 'Continuar para pagamento',
         )}
       </button>

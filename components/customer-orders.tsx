@@ -102,7 +102,7 @@ export function CustomerOrders({
         <h2>{t('O seu próximo toque começa aqui.')}</h2>
         <p>{t('Depois de submeter o pedido, acompanhe aqui cada etapa.')}</p>
         <Link className="btn btn-primary" href="/produtos">
-          {t('Escolher o meu produto')}
+          {t('Escolher produto NFC')}
         </Link>
       </section>
     );

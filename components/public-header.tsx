@@ -10,11 +10,13 @@ export async function PublicHeader({
   company = false,
   why = false,
   focused = false,
+  hideAccount = false,
 }: {
   company?: boolean;
   why?: boolean;
   help?: boolean;
   focused?: boolean;
+  hideAccount?: boolean;
 }) {
   const t = await getTranslations();
   return (
@@ -38,7 +40,7 @@ export async function PublicHeader({
       {!focused && <PublicNavigation company={company} why={why} />}
       <div className="public-header-actions">
         <LanguageSelector />
-        <AccountMenu />
+        {!hideAccount && <AccountMenu />}
         {!focused && <HomeMobileMenu />}
         {focused && (
           <Link className="focused-help" href="/ajuda">

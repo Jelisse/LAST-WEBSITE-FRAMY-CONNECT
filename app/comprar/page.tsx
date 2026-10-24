@@ -1,3 +1,4 @@
+import '../purchase-focus.css';
 import { env } from 'cloudflare:workers';
 import { paysuiteReady } from '@/lib/server-paysuite';
 import type { CheckoutPricing } from '@/lib/checkout-pricing';
@@ -6,7 +7,6 @@ import { PurchaseConfigurator } from '@/components/purchase-configurator';
 import { getTranslations } from '@/lib/server-i18n';
 import { getProducts } from '@/lib/server-catalog';
 import { hardwarePrices } from '@/lib/hardware-pricing';
-import { purchaseSelection } from '@/lib/purchase-structure';
 import { productPhotos } from '@/lib/product-gallery';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { designImageDefaults, type DesignImage } from '@/lib/design-images';
@@ -23,8 +23,7 @@ export default async function Page({
 }: {
   searchParams: Promise<{ formato?: string }>;
 }) {
-  const [t, query, products, user] = await Promise.all([
-    getTranslations(),
+  const [query, products, user] = await Promise.all([
     searchParams,
     getProducts(),
     getChatGPTUser(),
@@ -34,31 +33,14 @@ export default async function Page({
   )
     .first<CheckoutPricing>()
     .catch(() => null);
-  const format = purchaseSelection(query.formato).format;
   const designImages = await env.DB.prepare('SELECT * FROM design_images')
     .all<DesignImage>()
     .then((result) => result.results)
     .catch(() => designImageDefaults);
-  const title =
-    format === 'keychain'
-      ? 'Configurar porta-chaves'
-      : format === 'card'
-        ? 'Configurar cartão'
-        : 'Configurar kit';
   return (
     <>
-      <SiteHeader focused />
+      <SiteHeader focused hideAccount />
       <main id="main" className="section-wrap purchase-page">
-        <h1>{t(title)}</h1>
-        <p className="page-intro">
-          {t(
-            format === 'kit'
-              ? 'Escolha os materiais do cartão e do porta-chaves e personalize o design do kit.'
-              : format === 'keychain'
-                ? 'Escolha o material e o design do seu porta-chaves.'
-                : 'Escolha o material e o design do seu cartão.',
-          )}
-        </p>
         <PurchaseConfigurator
           key={query.formato ?? 'kit'}
           initial={query.formato}

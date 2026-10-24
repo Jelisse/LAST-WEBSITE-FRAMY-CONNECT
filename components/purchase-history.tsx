@@ -196,7 +196,7 @@ export function PurchaseHistory({
               )}
             </p>
             <Link className="btn btn-primary" href="/produtos">
-              {t('Escolher o meu produto')}
+              {t('Escolher produto NFC')}
             </Link>
           </div>
         </section>

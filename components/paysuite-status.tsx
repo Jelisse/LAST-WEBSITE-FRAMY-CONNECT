@@ -142,7 +142,7 @@ export function PaySuiteStatus() {
               <div>
                 <p>{t('Ainda não tem pagamentos registados.')}</p>
                 <Link className="btn btn-primary" href="/produtos">
-                  {t('Escolher o meu produto')}
+                  {t('Escolher produto NFC')}
                 </Link>
               </div>
             </div>

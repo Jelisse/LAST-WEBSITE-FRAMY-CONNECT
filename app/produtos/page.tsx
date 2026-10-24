@@ -23,7 +23,7 @@ export default async function Page() {
       <SiteHeader />
       <main id="main" className="catalog-page section-wrap">
         <span className="eyebrow">{t('UM FORMATO PARA CADA CONEXÃO')}</span>
-        <h1>{t('Escolha como quer partilhar.')}</h1>
+        <h1>{t('Escolha o seu produto NFC')}</h1>
         <p className="page-intro">
           {t(
             'Escolha cartão, porta-chaves ou o kit completo, ligados ao mesmo perfil digital.',

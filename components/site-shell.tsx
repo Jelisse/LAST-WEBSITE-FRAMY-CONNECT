@@ -4,8 +4,14 @@ import Image from 'next/image';
 import Link from '@/components/hard-link';
 import { Mail, MessageCircle } from 'lucide-react';
 import { AnalyticsPreferencesLink } from './analytics-preferences-link';
-export async function SiteHeader({ focused = false }: { focused?: boolean }) {
-  return <PublicHeader focused={focused} />;
+export async function SiteHeader({
+  focused = false,
+  hideAccount = false,
+}: {
+  focused?: boolean;
+  hideAccount?: boolean;
+}) {
+  return <PublicHeader focused={focused} hideAccount={hideAccount} />;
 }
 export async function SiteFooter() {
   const t = await getTranslations();

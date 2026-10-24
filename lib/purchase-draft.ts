@@ -28,17 +28,43 @@ export function readPurchaseDraft(raw: string | null, now = Date.now()) {
     ] as const)
       if (typeof value[field] !== 'string' || value[field].length > maximum)
         return null;
-    if (value.ambassadorCode !== undefined && (typeof value.ambassadorCode !== 'string' || value.ambassadorCode.length > 100)) return null;
+    if (
+      value.stage !== undefined &&
+      (!Number.isInteger(value.stage) || value.stage < 0 || value.stage > 2)
+    )
+      return null;
+    for (const [field, maximum] of [
+      ['buyerName', 100],
+      ['buyerEmail', 254],
+    ] as const)
+      if (
+        value[field] !== undefined &&
+        (typeof value[field] !== 'string' || value[field].length > maximum)
+      )
+        return null;
+    if (
+      value.ambassadorCode !== undefined &&
+      (typeof value.ambassadorCode !== 'string' ||
+        value.ambassadorCode.length > 100)
+    )
+      return null;
     if (value.pvcModel !== undefined)
       value.pvcModel = pvcModel(value.pvcModel).id;
     for (const field of ['cardArtwork', 'pvcArtwork'])
-      if (value[field]) value[field] = validateLeather(value[field], value[field].assetId ? 'customer' : 'standard');
+      if (value[field])
+        value[field] = validateLeather(
+          value[field],
+          value[field].assetId ? 'customer' : 'standard',
+        );
     if (value.leather)
       value.leather = validateLeather(
         value.leather,
         value.leather.assetId ? 'customer' : 'standard',
       );
     return value as {
+      stage?: number;
+      buyerName?: string;
+      buyerEmail?: string;
       ambassadorCode?: string;
       leather?: LeatherDesign;
       cardArtwork?: LeatherDesign;

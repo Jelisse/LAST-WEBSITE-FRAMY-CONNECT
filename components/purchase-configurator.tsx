@@ -1,7 +1,12 @@
 'use client';
+import { PurchaseStageProgress } from './purchase-stage-progress';
+import {
+  purchaseStages,
+  purchaseConfigurationIssue,
+} from '@/lib/purchase-journey';
 import { PhoneInput } from './phone-input';
 import { ProductArtworkPreview } from './product-artwork-preview';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Layers,
   Palette,
@@ -68,7 +73,9 @@ export function PurchaseConfigurator({
   useEffect(() => {
     const header = document.querySelector<HTMLElement>('.public-header');
     if (!header) return;
-    const journey = document.querySelector<HTMLElement>('.checkout-journey');
+    const journey = document.querySelector<HTMLElement>(
+      '.purchase-stage-progress',
+    );
     const measure = () => {
       document.documentElement.style.setProperty(
         '--site-header-height',
@@ -104,8 +111,7 @@ export function PurchaseConfigurator({
   const [card, setCard] = useState<string>(selection.card);
   const [keychain, setKeychain] = useState<string>(selection.keychain);
   const [design, setDesign] = useState('standard');
-  const [designOptionsOpen, setDesignOptionsOpen] = useState(false);
-  const designControl = useRef<HTMLButtonElement>(null);
+  const [stageError, setStageError] = useState('');
   const [activeConfiguration, setActiveConfiguration] = useState<
     'materials' | 'design' | 'delivery'
   >('materials');
@@ -113,7 +119,7 @@ export function PurchaseConfigurator({
   const [paymentStep, setPaymentStep] = useState(false);
   const [deliveryAttempted, setDeliveryAttempted] = useState(false);
   const [cardBack, setCardBack] = useState(false);
-  const [cardPaused, setCardPaused] = useState(false);
+  const [cardPaused, setCardPaused] = useState(true);
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (cardPaused || design !== 'standard') return;
@@ -204,6 +210,13 @@ export function PurchaseConfigurator({
         setContact(draft.contact);
         setAddress(draft.address);
         setDesignInstructions(draft.designInstructions);
+        setBuyerName(draft.buyerName ?? '');
+        setBuyerEmail(draft.buyerEmail ?? '');
+        setActiveConfiguration(
+          (['materials', 'design', 'delivery'] as const)[
+            Math.min(draft.stage ?? 0, 2)
+          ],
+        );
       }
       setDraftReady(true);
     });
@@ -215,6 +228,15 @@ export function PurchaseConfigurator({
         'framy-checkout:configuration:' + initial,
         JSON.stringify({
           version: 2,
+          stage: paymentStep
+            ? 2
+            : activeConfiguration === 'materials'
+              ? 0
+              : activeConfiguration === 'design'
+                ? 1
+                : 2,
+          buyerName,
+          buyerEmail,
           ambassadorCode:
             ambassadorCode || (!referralReady ? restoredCode : ''),
           pvcModel: pvc,
@@ -242,6 +264,10 @@ export function PurchaseConfigurator({
     }
   }, [
     draftReady,
+    activeConfiguration,
+    paymentStep,
+    buyerName,
+    buyerEmail,
     cardArtworkValue,
     pvcArtworkValue,
     ambassadorCode,
@@ -314,24 +340,76 @@ export function PurchaseConfigurator({
     !!fulfilment &&
     contact.trim().length >= 7 &&
     (delivery === 'pickup' || address.trim().length >= 8);
-  const goToDelivery = () => {
+  const currentStage = paymentStep
+    ? 3
+    : activeConfiguration === 'materials'
+      ? 0
+      : activeConfiguration === 'design'
+        ? 1
+        : 2;
+  const focusStage = () =>
+    requestAnimationFrame(() => {
+      const heading = document.getElementById('purchase-stage-title');
+      heading?.scrollIntoView({ block: 'start', behavior: 'instant' });
+      heading?.focus({ preventScroll: true });
+    });
+  const moveTo = (stage: number) => {
+    setStageError('');
     setPaymentStep(false);
-    setActiveConfiguration('delivery');
-    document.getElementById('delivery-control')?.focus();
+    setActiveConfiguration(
+      (['materials', 'design', 'delivery'] as const)[stage],
+    );
+    focusStage();
+  };
+  const validConfiguration = (stage: 0 | 1) => {
+    const issue = purchaseConfigurationIssue(
+      {
+        materialReady: !!estimate,
+        artworkMissing,
+        instructionsMissing,
+        uploadBusy,
+      },
+      stage,
+    );
+    if (issue) {
+      setStageError(issue);
+      requestAnimationFrame(() =>
+        document.getElementById('purchase-stage-error')?.focus(),
+      );
+      return false;
+    }
+    return true;
+  };
+  const goToDesign = () => {
+    if (validConfiguration(0)) moveTo(1);
+  };
+  const goToDelivery = () => {
+    if (validConfiguration(1)) moveTo(2);
   };
   const showSummary = () => {
+    if (!validConfiguration(1)) return;
     if (!deliveryReady) {
       setDeliveryAttempted(true);
-      document
-        .getElementById('delivery-panel')
-        ?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      requestAnimationFrame(() =>
+        document.getElementById('delivery-validation')?.focus(),
+      );
       return;
     }
+    setStageError('');
     setPaymentStep(true);
-    requestAnimationFrame(() =>
-      document.getElementById('purchase-summary')?.focus(),
-    );
+    focusStage();
   };
+  useEffect(() => {
+    const previous = document.title;
+    document.title =
+      t('Etapa {0} de {1}', [String(currentStage + 1), '4']) +
+      ' · ' +
+      t(purchaseStages[currentStage]) +
+      ' · Framy Connect';
+    return () => {
+      document.title = previous;
+    };
+  }, [currentStage, t]);
   const materialPresentation = (
     material: string,
     kind: 'card' | 'keychain',
@@ -379,52 +457,29 @@ export function PurchaseConfigurator({
       className="purchase-configurator"
       data-purchase-step={paymentStep ? 'review' : activeConfiguration}
     >
-      <ol className="checkout-journey" aria-label={t('Etapas da compra')}>
-        {['Produto', 'Design', 'Entrega', 'Rever e pagar'].map(
-          (label, index) => {
-            const current = paymentStep
-              ? 3
-              : activeConfiguration === 'materials'
-                ? 0
-                : activeConfiguration === 'design'
-                  ? 1
-                  : 2;
-            return (
-              <li
-                key={label}
-                aria-current={current === index ? 'step' : undefined}
-              >
-                <button
-                  type="button"
-                  id={
-                    [
-                      'materials-control',
-                      'design-control',
-                      'delivery-control',
-                      'review-control',
-                    ][index]
-                  }
-                  ref={index === 1 ? designControl : undefined}
-                  disabled={index === 3 && !deliveryReady}
-                  onClick={() => {
-                    if (index === 3) {
-                      showSummary();
-                      return;
-                    }
-                    setPaymentStep(false);
-                    setActiveConfiguration(
-                      (['materials', 'design', 'delivery'] as const)[index],
-                    );
-                  }}
-                >
-                  <span>{index + 1}</span>
-                  <strong>{t(label)}</strong>
-                </button>
-              </li>
-            );
-          },
-        )}
-      </ol>
+      <PurchaseStageProgress step={currentStage} onBackTo={moveTo} />
+      {currentStage === 0 && (
+        <p className="purchase-stage-intro">
+          {t(
+            'Cartão, porta-chaves ou kit — para partilhar o seu perfil num toque.',
+          )}{' '}
+          <strong>{t(selected.name)}</strong> ·{' '}
+          <Link href="/produtos">{t('Alterar produto')}</Link>
+        </p>
+      )}
+      {stageError && (
+        <div
+          className="purchase-stage-error"
+          id="purchase-stage-error"
+          tabIndex={-1}
+          role="alert"
+        >
+          <p>{t(stageError)}</p>
+          <Link href="/contacto?assunto=encomenda">
+            {t('Pedir ajuda para encomendar')}
+          </Link>
+        </div>
+      )}
       {!paymentAvailable && (
         <p className="purchase-availability-note">
           {t(
@@ -535,14 +590,9 @@ export function PurchaseConfigurator({
             <button
               type="button"
               className="btn btn-primary material-continue"
-              onClick={() => {
-                setPaymentStep(false);
-                setActiveConfiguration('design');
-                setDesignOptionsOpen(true);
-                designControl.current?.focus();
-              }}
+              onClick={goToDesign}
             >
-              {t('Seguinte')} →
+              {t('Continuar para personalização')} →
             </button>
           </fieldset>
           <fieldset
@@ -554,10 +604,7 @@ export function PurchaseConfigurator({
               <Palette className="purchase-icon" size={20} aria-hidden="true" />
               {t('Design')}
             </legend>
-            <div
-              className="purchase-design-options"
-              hidden={!designOptionsOpen}
-            >
+            <div className="purchase-design-options">
               <div className="purchase-choices">
                 {designServices.map((item) => (
                   <label
@@ -610,10 +657,6 @@ export function PurchaseConfigurator({
                       name="design"
                       checked={design === item.id}
                       onChange={() => setDesign(item.id)}
-                      onClick={() => {
-                        setDesignOptionsOpen(false);
-                        designControl.current?.focus();
-                      }}
                     />
                     <strong>
                       {item.id === 'standard' ? (
@@ -637,6 +680,19 @@ export function PurchaseConfigurator({
                       )}
                       {t(item.name)}
                     </strong>
+                    <small className="purchase-design-cost">
+                      {pricing
+                        ? item.id === 'standard'
+                          ? t('Incluído')
+                          : '+ ' +
+                            money(
+                              item.id === 'customer'
+                                ? pricing.customer_design
+                                : pricing.team_design,
+                              t.locale,
+                            )
+                        : t('Sob consulta')}
+                    </small>
                     <p>
                       {isLeather && item.id === 'customer'
                         ? t(
@@ -651,11 +707,7 @@ export function PurchaseConfigurator({
             {format !== 'keychain' && design === 'standard' && (
               <fieldset className="card-design-selection">
                 <legend>{t('Design do cartão')}</legend>
-                <p>
-                  {t(
-                    'Escolha o cartão. O material e o preço da configuração acompanham a sua selecção.',
-                  )}
-                </p>
+                <p>{t('Veja a frente e o verso do cartão que escolheu.')}</p>
                 <div className="card-view-controls">
                   {[false, true].map((back) => (
                     <button
@@ -672,19 +724,13 @@ export function PurchaseConfigurator({
                   ))}
                 </div>
                 <div className="material-options">
-                  {cardMaterials.map((material) => (
+                  {[card].map((material) => (
                     <label
                       key={material}
                       className={card === material ? 'is-selected' : ''}
                     >
                       <CardMaterialImage material={material} back={cardBack} />
                       <span>
-                        <input
-                          type="radio"
-                          name="card-design-material"
-                          checked={card === material}
-                          onChange={() => setCard(material)}
-                        />
                         {t(material)}
                         {material !== 'Madeira' && (
                           <> · {t(material === 'PVC' ? 'Laranja' : 'Preto')}</>
@@ -695,7 +741,7 @@ export function PurchaseConfigurator({
                 </div>
               </fieldset>
             )}
-            <div className="purchase-active-design" hidden={designOptionsOpen}>
+            <div className="purchase-active-design">
               {isPvcStandard && (
                 <PvcConfigurator
                   model={pvc}
@@ -777,13 +823,22 @@ export function PurchaseConfigurator({
                   </small>
                 </label>
               )}
-              <button
-                type="button"
-                className="btn btn-primary configuration-next"
-                onClick={goToDelivery}
-              >
-                {t('Seguinte')} →
-              </button>
+              <div className="purchase-step-actions">
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => moveTo(0)}
+                >
+                  {t('Voltar')}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary configuration-next"
+                  onClick={goToDelivery}
+                >
+                  {t('Continuar para entrega')} →
+                </button>
+              </div>
             </div>
           </fieldset>
           <section
@@ -797,7 +852,12 @@ export function PurchaseConfigurator({
               {t('Como pretende receber?')}
             </h2>
             {deliveryAttempted && !deliveryReady && (
-              <p role="alert" className="flow-inline-error">
+              <p
+                id="delivery-validation"
+                tabIndex={-1}
+                role="alert"
+                className="flow-inline-error"
+              >
                 {t(
                   !buyerReady
                     ? 'Indique o seu nome e um email válido.'
@@ -821,6 +881,31 @@ export function PurchaseConfigurator({
               onMode={setDelivery}
               onPoint={setPickupPoint}
             />
+            {!signedIn && (
+              <div className="purchase-guest-note">
+                <p>
+                  {t(
+                    'Compre sem conta. Receberá uma referência para acompanhar a encomenda.',
+                  )}
+                </p>
+                <Link
+                  href={
+                    '/entrar?return_to=' +
+                    encodeURIComponent('/comprar?formato=' + initial)
+                  }
+                >
+                  {t('Já tem conta? Entrar')}
+                </Link>
+                {guestError && (
+                  <p role="alert">
+                    {t('Não foi possível preparar a compra. Tente novamente.')}{' '}
+                    <button type="button" onClick={() => void prepareGuest()}>
+                      {t('Tentar novamente')}
+                    </button>
+                  </p>
+                )}
+              </div>
+            )}
             {!signedIn && (
               <div className="guest-buyer-fields">
                 <label>
@@ -869,354 +954,348 @@ export function PurchaseConfigurator({
                 />
               </label>
             )}
-            <button
-              type="button"
-              className="btn btn-primary configuration-next"
-              onClick={showSummary}
-            >
-              {t('Seguinte')} →
-            </button>
-          </section>
-        </div>
-        <aside
-          id="purchase-summary"
-          tabIndex={-1}
-          className="configuration-summary"
-          aria-label={t(paymentStep ? 'Rever e pagar' : 'A sua configuração')}
-        >
-          <h2>
-            <ClipboardList
-              className="purchase-icon"
-              size={20}
-              aria-hidden="true"
-            />
-            {t(paymentStep ? 'Rever e pagar' : 'A sua configuração')}
-          </h2>
-          {isLeather && (
-            <p className="leather-summary">
-              <span key={`${leather.color}-${t.locale}`}>
-                {t(
-                  leather.color === 'brown'
-                    ? 'Couro · Castanho'
-                    : 'Couro · Preto',
-                )}
-              </span>{' '}
-              ·{' '}
-              {design === 'standard'
-                ? leather.logo === 'full'
-                  ? t('Logo completo')
-                  : t('Símbolo F')
-                : design === 'customer'
-                  ? t('O seu logótipo')
-                  : t('Design pela equipa')}
-            </p>
-          )}
-          {isPvcStandard && (
-            <p className="pvc-selection" aria-live="polite">
-              {t('Modelo')}: {t(pvcModel(pvc).name)}
-            </p>
-          )}
-          <div className="configuration-photos">
-            {preview.map((material) => {
-              const photo = photos.find((item) => item.material === material);
-              return (
-                <figure key={material}>
-                  {design !== 'standard' && cardArtwork[material] ? (
-                    <ProductArtworkPreview
-                      material={material}
-                      value={cardArtworkValue}
-                      preview={cardCustomPreview}
-                      back={false}
-                    />
-                  ) : design !== 'standard' && material === 'PVC + epóxi' ? (
-                    <ProductArtworkPreview
-                      material={material}
-                      value={pvcArtworkValue}
-                      preview={pvcCustomPreview}
-                      back={false}
-                    />
-                  ) : cardArtwork[material] ? (
-                    <CardMaterialImage material={material} back={cardBack} />
-                  ) : isLeather && material === 'Couro' ? (
-                    <LeatherPreview
-                      value={leather}
-                      design={design}
-                      preview={leatherPreview}
-                    />
-                  ) : isPvcStandard && material === 'PVC + epóxi' ? (
-                    <PvcPreview model={pvc} back={pvcBack} />
-                  ) : photo ? (
-                    <SourceImage
-                      src={photo.src}
-                      alt={t(material)}
-                      width={240}
-                      height={240}
-                    />
-                  ) : (
-                    <span>{t('Fotografia do produto em preparação')}</span>
-                  )}
-                  {preview.length > 1 && <figcaption>{t(material)}</figcaption>}
-                </figure>
-              );
-            })}
-          </div>
-          <div
-            aria-live="polite"
-            key={`${format}-${card}-${keychain}-${design}-${t.locale}`}
-          >
-            <h3>{t(selected.name)}</h3>
-            <p>
-              {!isLeather && t(selectedDesign.name)}
-              {design === 'customer' ? ` · ${t(method)}` : ''}
-            </p>
-          </div>
-          <div hidden={!paymentStep} className="purchase-review-details">
-            <section className="purchase-delivery-review">
-              <div>
-                <h3>{t('Entrega')}</h3>
-                <button type="button" onClick={goToDelivery}>
-                  {t('Editar')}
-                </button>
-              </div>
-              <p>
-                {
-                  fulfilmentSettings?.cities.find((item) => item.id === city)
-                    ?.name
-                }
-                {' · '}
-                {t(delivery === 'pickup' ? 'Levantamento' : 'Entrega')}
-              </p>
-              <p>{delivery === 'pickup' ? fulfilment?.point?.name : address}</p>
-              <p>{contact}</p>
-              {!signedIn && (
-                <small>
-                  {buyerName} · {buyerEmail}
-                </small>
-              )}
-            </section>
-
-            <AmbassadorCodeInput
-              initialCode={restoredCode}
-              onChange={changeReferral}
-            />
-            <dl className="purchase-price-breakdown">
-              <div>
-                <dt>{t('Produtos')}</dt>
-                <dd>
-                  {estimate
-                    ? money(estimate.amount, t.locale)
-                    : t('Preço a confirmar')}
-                </dd>
-              </div>
-              {ambassadorCode && estimate && (
-                <div>
-                  <dt>{t('Desconto embaixador (10%)')}</dt>
-                  <dd>−{money(discount, t.locale)}</dd>
-                </div>
-              )}
-              <div>
-                <dt>{t('Design')}</dt>
-                <dd>
-                  {designAmount === null
-                    ? t('Sob consulta')
-                    : money(designAmount, t.locale)}
-                </dd>
-              </div>
-              <div>
-                <dt>{t(delivery === 'pickup' ? 'Levantamento' : 'Entrega')}</dt>
-                <dd>
-                  {fulfilment
-                    ? money(fulfilment.fee, t.locale)
-                    : t('Sob cotação')}
-                </dd>
-              </div>
-            </dl>
-            {delivery === 'pickup' && fulfilment && (
-              <small>{fulfilment.point?.name}</small>
-            )}
-            {!!estimate?.saving && (
-              <small>
-                {t('Poupa {0} face aos produtos separados.', [
-                  money(estimate.saving, t.locale),
-                ])}
-              </small>
-            )}
-          </div>
-          <div className="purchase-total" aria-live="polite">
-            <strong>
-              {totalLabel}: {amountText}
-            </strong>
-            {total === null && (
-              <small>
-                {t(
-                  'Design e entrega apresentados separadamente. O total final depende da configuração e da entrega.',
-                )}
-              </small>
-            )}
-          </div>
-          <div hidden={!paymentStep} className="purchase-payment-stage">
-            <details className="purchase-next-step">
-              <summary>{t('Perfil após o pagamento')}</summary>
-              <p>
-                {t(
-                  'Após a confirmação, crie o seu perfil ou continue com o que já tem. O cartão e o porta-chaves podem partilhar o mesmo perfil.',
-                )}
-              </p>
-              <small>
-                {t(
-                  'O plano Individual é gratuito. A compra do produto não inclui uma subscrição Profissional ou Corporativa.',
-                )}
-              </small>
-            </details>
-            {!signedIn && (
-              <div className="purchase-guest-note">
-                <p>
-                  {t(
-                    'Compre sem conta. Receberá uma referência para acompanhar a encomenda.',
-                  )}
-                </p>
-                <Link
-                  href={
-                    '/entrar?return_to=' +
-                    encodeURIComponent('/comprar?formato=' + initial)
-                  }
-                >
-                  {t('Já tem conta? Entrar')}
-                </Link>
-                {guestError && (
-                  <p role="alert">
-                    {t('Não foi possível preparar a compra. Tente novamente.')}{' '}
-                    <button type="button" onClick={() => void prepareGuest()}>
-                      {t('Tentar novamente')}
-                    </button>
-                  </p>
-                )}
-              </div>
-            )}
-            {paymentAvailable && total !== null && !deliveryReady && (
-              <p className="purchase-help">
-                {!buyerReady
-                  ? t(
-                      'Preencha o nome e o email do comprador na etapa de entrega.',
-                    )
-                  : delivery === 'pickup'
-                    ? t('Indique o contacto para o aviso de levantamento.')
-                    : t('Preencha o contacto e a morada para continuar.')}
-              </p>
-            )}
-            {paymentAvailable && !deliveryReady && (
+            <div className="purchase-step-actions">
               <button
                 type="button"
-                className="btn btn-secondary"
-                onClick={goToDelivery}
+                className="btn btn-outline"
+                onClick={() => moveTo(1)}
               >
-                {t('Completar entrega para pagar')}
+                {t('Voltar')}
               </button>
-            )}
-            {paymentAvailable &&
-              (artworkMissing ||
-                instructionsMissing ||
-                uploadBusy ||
-                !estimate) && (
-                <div className="purchase-help" aria-live="polite">
-                  <p>
-                    {t(
-                      uploadBusy
-                        ? 'Aguarde o fim do carregamento do design.'
-                        : artworkMissing
-                          ? 'Carregue o design de cada produto personalizado antes de pagar.'
-                          : instructionsMissing
-                            ? 'Escreva as instruções para a equipa antes de pagar.'
-                            : 'O preço deste produto precisa de confirmação. Escolha outro material ou contacte a Framy Connect.',
-                    )}
-                  </p>
-                  {(artworkMissing || instructionsMissing) && (
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => {
-                        setActiveConfiguration('design');
-                        setDesignOptionsOpen(false);
-                        setPaymentStep(false);
-                        designControl.current?.focus();
-                      }}
-                    >
-                      {t('Completar design')}
-                    </button>
-                  )}
-                </div>
-              )}
-            <PaySuiteCheckout
-              compact
-
-              disabled={
-                uploadBusy ||
-                artworkMissing ||
-                instructionsMissing ||
-                !referralReady ||
-                !draftReady ||
-                (!signedIn &&
-                  (!guestReady ||
-                    buyerName.trim().length < 2 ||
-                    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail))) ||
-                !paymentAvailable ||
-                total === null ||
-                !deliveryReady
-              }
-              payload={{
-                kind: 'product',
-                ...(!signedIn ? { buyerName, buyerEmail } : {}),
-                ambassadorCode,
-                format,
-                card,
-                keychain,
-                design,
-                delivery,
-                city,
-                pickupPoint,
-                contact,
-                address,
-                designInstructions,
-
-                ...(design === 'customer' && format !== 'keychain'
-                  ? { cardArtwork: cardArtworkValue }
-                  : {}),
-                ...(design === 'customer' &&
-                format !== 'card' &&
-                keychain === 'PVC + epóxi'
-                  ? { pvcArtwork: pvcArtworkValue }
-                  : {}),
-                ...(isPvcStandard ? { pvcModel: pvc } : {}),
-                ...(isLeather ? { leather } : {}),
-
-                expectedAmount: total,
-                pricingVersion: pricing?.version,
-              }}
-            />
-            <Link href="/acompanhar">{t('Acompanhar o pedido')}</Link>
-          </div>
-        </aside>
-      </div>
-      <div className="purchase-mobile-bar">
-        <div>
-          <small>{totalLabel}</small>
-          <strong>{amountText}</strong>
+              <button
+                type="button"
+                className="btn btn-primary configuration-next"
+                onClick={showSummary}
+              >
+                {t('Rever a minha encomenda')} →
+              </button>
+            </div>
+          </section>
         </div>
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={() => {
-            if (activeConfiguration === 'materials') {
-              setPaymentStep(false);
-              setActiveConfiguration('design');
-              setDesignOptionsOpen(true);
-              designControl.current?.focus();
-            } else if (activeConfiguration === 'design') goToDelivery();
-            else showSummary();
-          }}
-        >
-          {t(paymentStep ? 'Rever e pagar' : 'Seguinte')} →
-        </button>
+        {paymentStep && (
+          <section
+            id="purchase-summary"
+            tabIndex={-1}
+            className="configuration-summary"
+            aria-label={t('A sua encomenda')}
+          >
+            <h2>
+              <ClipboardList
+                className="purchase-icon"
+                size={20}
+                aria-hidden="true"
+              />
+              {t('A sua encomenda')}
+            </h2>
+            {isLeather && (
+              <p className="leather-summary">
+                <span key={`${leather.color}-${t.locale}`}>
+                  {t(
+                    leather.color === 'brown'
+                      ? 'Couro · Castanho'
+                      : 'Couro · Preto',
+                  )}
+                </span>{' '}
+                ·{' '}
+                {design === 'standard'
+                  ? leather.logo === 'full'
+                    ? t('Logo completo')
+                    : t('Símbolo F')
+                  : design === 'customer'
+                    ? t('O seu logótipo')
+                    : t('Design pela equipa')}
+              </p>
+            )}
+            {isPvcStandard && (
+              <p className="pvc-selection" aria-live="polite">
+                {t('Modelo')}: {t(pvcModel(pvc).name)}
+              </p>
+            )}
+            <div className="configuration-photos">
+              {preview.map((material) => {
+                const photo = photos.find((item) => item.material === material);
+                return (
+                  <figure key={material}>
+                    {design !== 'standard' && cardArtwork[material] ? (
+                      <ProductArtworkPreview
+                        material={material}
+                        value={cardArtworkValue}
+                        preview={cardCustomPreview}
+                        back={false}
+                      />
+                    ) : design !== 'standard' && material === 'PVC + epóxi' ? (
+                      <ProductArtworkPreview
+                        material={material}
+                        value={pvcArtworkValue}
+                        preview={pvcCustomPreview}
+                        back={false}
+                      />
+                    ) : cardArtwork[material] ? (
+                      <CardMaterialImage material={material} back={cardBack} />
+                    ) : isLeather && material === 'Couro' ? (
+                      <LeatherPreview
+                        value={leather}
+                        design={design}
+                        preview={leatherPreview}
+                      />
+                    ) : isPvcStandard && material === 'PVC + epóxi' ? (
+                      <PvcPreview model={pvc} back={pvcBack} />
+                    ) : photo ? (
+                      <SourceImage
+                        src={photo.src}
+                        alt={t(material)}
+                        width={240}
+                        height={240}
+                      />
+                    ) : (
+                      <span>{t('Fotografia do produto em preparação')}</span>
+                    )}
+                    {preview.length > 1 && (
+                      <figcaption>{t(material)}</figcaption>
+                    )}
+                  </figure>
+                );
+              })}
+            </div>
+            <div
+              aria-live="polite"
+              key={`${format}-${card}-${keychain}-${design}-${t.locale}`}
+            >
+              <h3>{t(selected.name)}</h3>
+              <p>
+                {!isLeather && t(selectedDesign.name)}
+                {design === 'customer' ? ` · ${t(method)}` : ''}
+              </p>
+            </div>
+            <div className="purchase-review-edits">
+              <button type="button" onClick={() => moveTo(0)}>
+                {t('Editar produto')}
+              </button>
+              <button type="button" onClick={() => moveTo(1)}>
+                {t('Editar personalização')}
+              </button>
+            </div>
+            <div hidden={!paymentStep} className="purchase-review-details">
+              <section className="purchase-delivery-review">
+                <div>
+                  <h3>{t('Entrega')}</h3>
+                  <button type="button" onClick={goToDelivery}>
+                    {t('Editar')}
+                  </button>
+                </div>
+                <p>
+                  {
+                    fulfilmentSettings?.cities.find((item) => item.id === city)
+                      ?.name
+                  }
+                  {' · '}
+                  {t(delivery === 'pickup' ? 'Levantamento' : 'Entrega')}
+                </p>
+                <p>
+                  {delivery === 'pickup' ? fulfilment?.point?.name : address}
+                </p>
+                <p>{contact}</p>
+                {!signedIn && (
+                  <small>
+                    {buyerName} · {buyerEmail}
+                  </small>
+                )}
+              </section>
+
+              <AmbassadorCodeInput
+                initialCode={restoredCode}
+                onChange={changeReferral}
+              />
+              <dl className="purchase-price-breakdown">
+                <div>
+                  <dt>{t('Produtos')}</dt>
+                  <dd>
+                    {estimate
+                      ? money(estimate.amount, t.locale)
+                      : t('Preço a confirmar')}
+                  </dd>
+                </div>
+                {ambassadorCode && estimate && (
+                  <div>
+                    <dt>{t('Desconto embaixador (10%)')}</dt>
+                    <dd>−{money(discount, t.locale)}</dd>
+                  </div>
+                )}
+                <div>
+                  <dt>{t('Design')}</dt>
+                  <dd>
+                    {designAmount === null
+                      ? t('Sob consulta')
+                      : money(designAmount, t.locale)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>
+                    {t(delivery === 'pickup' ? 'Levantamento' : 'Entrega')}
+                  </dt>
+                  <dd>
+                    {fulfilment
+                      ? money(fulfilment.fee, t.locale)
+                      : t('Sob cotação')}
+                  </dd>
+                </div>
+              </dl>
+              {delivery === 'pickup' && fulfilment && (
+                <small>{fulfilment.point?.name}</small>
+              )}
+              {!!estimate?.saving && (
+                <small>
+                  {t('Poupa {0} face aos produtos separados.', [
+                    money(estimate.saving, t.locale),
+                  ])}
+                </small>
+              )}
+            </div>
+            <div className="purchase-total" aria-live="polite">
+              <strong>
+                {totalLabel}: {amountText}
+              </strong>
+              {total === null && (
+                <small>
+                  {t(
+                    'Design e entrega apresentados separadamente. O total final depende da configuração e da entrega.',
+                  )}
+                </small>
+              )}
+            </div>
+            <div hidden={!paymentStep} className="purchase-payment-stage">
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => moveTo(2)}
+              >
+                {t('Voltar à entrega')}
+              </button>
+              <details className="purchase-next-step">
+                <summary>{t('Perfil após o pagamento')}</summary>
+                <p>
+                  {t(
+                    'Após a confirmação, crie o seu perfil ou continue com o que já tem. O cartão e o porta-chaves podem partilhar o mesmo perfil.',
+                  )}
+                </p>
+                <small>
+                  {t(
+                    'O plano Individual é gratuito. A compra do produto não inclui uma subscrição Profissional ou Corporativa.',
+                  )}
+                </small>
+              </details>
+
+              {paymentAvailable && total !== null && !deliveryReady && (
+                <p className="purchase-help">
+                  {!buyerReady
+                    ? t(
+                        'Preencha o nome e o email do comprador na etapa de entrega.',
+                      )
+                    : delivery === 'pickup'
+                      ? t('Indique o contacto para o aviso de levantamento.')
+                      : t('Preencha o contacto e a morada para continuar.')}
+                </p>
+              )}
+              {paymentAvailable && !deliveryReady && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={goToDelivery}
+                >
+                  {t('Completar entrega para pagar')}
+                </button>
+              )}
+              {paymentAvailable &&
+                (artworkMissing ||
+                  instructionsMissing ||
+                  uploadBusy ||
+                  !estimate) && (
+                  <div className="purchase-help" aria-live="polite">
+                    <p>
+                      {t(
+                        uploadBusy
+                          ? 'Aguarde o fim do carregamento do design.'
+                          : artworkMissing
+                            ? 'Carregue o design de cada produto personalizado antes de pagar.'
+                            : instructionsMissing
+                              ? 'Escreva as instruções para a equipa antes de pagar.'
+                              : 'O preço deste produto precisa de confirmação. Escolha outro material ou contacte a Framy Connect.',
+                      )}
+                    </p>
+                    {(artworkMissing || instructionsMissing) && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => {
+                          moveTo(1);
+                        }}
+                      >
+                        {t('Completar design')}
+                      </button>
+                    )}
+                  </div>
+                )}
+              {paymentAvailable ? (
+                <PaySuiteCheckout
+                  compact
+
+                  disabled={
+                    uploadBusy ||
+                    artworkMissing ||
+                    instructionsMissing ||
+                    !referralReady ||
+                    !draftReady ||
+                    (!signedIn &&
+                      (!guestReady ||
+                        buyerName.trim().length < 2 ||
+                        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail))) ||
+                    !paymentAvailable ||
+                    total === null ||
+                    !deliveryReady
+                  }
+                  payload={{
+                    kind: 'product',
+                    ...(!signedIn ? { buyerName, buyerEmail } : {}),
+                    ambassadorCode,
+                    format,
+                    card,
+                    keychain,
+                    design,
+                    delivery,
+                    city,
+                    pickupPoint,
+                    contact,
+                    address,
+                    designInstructions,
+
+                    ...(design === 'customer' && format !== 'keychain'
+                      ? { cardArtwork: cardArtworkValue }
+                      : {}),
+                    ...(design === 'customer' &&
+                    format !== 'card' &&
+                    keychain === 'PVC + epóxi'
+                      ? { pvcArtwork: pvcArtworkValue }
+                      : {}),
+                    ...(isPvcStandard ? { pvcModel: pvc } : {}),
+                    ...(isLeather ? { leather } : {}),
+
+                    expectedAmount: total,
+                    pricingVersion: pricing?.version,
+                  }}
+                />
+              ) : (
+                <p className="purchase-help">
+                  {t(
+                    'Compras temporariamente indisponíveis. Pode consultar os produtos e simular a configuração.',
+                  )}{' '}
+                  <Link href="/contacto?assunto=encomenda">
+                    {t('Pedir ajuda para encomendar')}
+                  </Link>
+                </p>
+              )}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

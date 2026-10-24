@@ -1,0 +1,214 @@
+body .purchase-page {
+  max-width: 960px;
+  padding-top: 24px;
+  padding-bottom: 48px;
+}
+.purchase-stage-progress {
+  position: sticky;
+  top: var(--site-header-height, 76px);
+  z-index: 25;
+  background: #fbf9f6;
+  padding: 16px 8px 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e9e0d6;
+}
+.purchase-stage-progress .purchase-step-count {
+  font-size: 12px;
+  color: #776a60;
+  margin: 0 0 8px;
+}
+.purchase-stage-progress h1 {
+  font-size: clamp(25px, 3vw, 36px);
+  line-height: 1.25;
+  margin: 0 0 8px;
+  scroll-margin-top: calc(var(--site-header-height, 76px) + 20px);
+}
+.purchase-stage-progress h1:focus {
+  outline: none;
+}
+.purchase-stage-progress ol {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 0;
+}
+.purchase-stage-progress li {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+.purchase-stage-progress button {
+  width: 44px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.purchase-stage-progress button:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.purchase-stage-progress button span {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border: 1px solid #9b9289;
+  border-radius: 20px;
+  background: transparent;
+  transition:
+    width 200ms ease,
+    background-color 200ms ease;
+}
+.purchase-stage-progress button[data-state='complete'] span {
+  background: #a7441c;
+  border-color: #a7441c;
+}
+.purchase-stage-progress button[data-state='current'] span {
+  width: 32px;
+  background: #b6491e;
+  border-color: #b6491e;
+}
+.purchase-stage-progress button:focus-visible {
+  outline: 2px solid #a7441c;
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+.purchase-stage-intro {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 8px 22px;
+}
+.purchase-stage-intro strong {
+  margin-left: 6px;
+}
+.purchase-stage-intro a,
+.purchase-review-edits button {
+  color: #9b3c16;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+body .purchase-configurator .purchase-layout {
+  display: block;
+  max-width: 860px;
+  margin: 0 auto;
+}
+body .purchase-configurator .configuration-panel[hidden] {
+  display: none !important;
+}
+body .purchase-configurator .configuration-summary {
+  position: static;
+  width: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 28px;
+  overflow: visible;
+}
+body .purchase-configurator .purchase-section {
+  padding: 28px;
+  margin-top: 0;
+}
+body .purchase-configurator .configuration-panel {
+  scroll-margin-top: calc(var(--site-header-height, 76px) + 160px);
+}
+body .purchase-configurator .configuration-next,
+body .purchase-configurator .material-continue {
+  display: inline-flex;
+  width: auto;
+  margin: 0;
+}
+.purchase-step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #e9e0d6;
+  margin-top: 24px;
+  padding-top: 20px;
+}
+.purchase-stage-error {
+  border-left: 3px solid #a7441c;
+  background: #fff0e6;
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin: 16px 0;
+  scroll-margin-top: calc(var(--site-header-height, 76px) + 160px);
+}
+.purchase-stage-error p {
+  margin: 0 0 6px;
+}
+.purchase-stage-error a {
+  text-decoration: underline;
+}
+.purchase-review-edits {
+  display: flex;
+  gap: 18px;
+  margin: 16px 0 24px;
+}
+.purchase-review-edits button {
+  border: 0;
+  background: transparent;
+  padding: 6px 0;
+  font: inherit;
+  cursor: pointer;
+}
+.purchase-design-cost {
+  display: block;
+  font-weight: 600;
+  color: #9b3c16;
+  margin: 8px 0;
+}
+.purchase-guest-note {
+  padding: 14px 16px;
+  background: #f9f5ef;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+.purchase-configurator .purchase-design-options {
+  margin-bottom: 24px;
+}
+.purchase-configurator .purchase-design-options .purchase-choices {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.purchase-configurator .purchase-design-choice {
+  min-width: 0;
+}
+.purchase-configurator .purchase-design-choice strong {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  body .purchase-page {
+    padding: 12px 12px 24px;
+  }
+  .purchase-stage-progress {
+    padding: 10px 4px 8px;
+    margin-bottom: 18px;
+  }
+  body .purchase-configurator .purchase-section,
+  body .purchase-configurator .configuration-summary {
+    padding: 20px 16px;
+  }
+  .purchase-step-actions .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  body .purchase-configurator .material-continue {
+    width: 100%;
+    justify-content: center;
+  }
+  .purchase-configurator .purchase-design-options .purchase-choices {
+    grid-template-columns: 1fr;
+  }
+  .purchase-configurator .purchase-design-image {
+    max-height: 180px;
+    object-fit: contain;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .purchase-stage-progress button span {
+    transition: none;
+  }
+}

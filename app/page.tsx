@@ -115,7 +115,7 @@ export default async function Home() {
                 className="public-button public-button-outline"
                 href="#produtos"
               >
-                {t('Escolher o meu produto')}
+                {t('Escolher produto NFC')}
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>
               <Link className="public-company-link" href="/para-empresas">

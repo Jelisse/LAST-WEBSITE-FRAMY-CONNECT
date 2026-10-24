@@ -10372,5 +10372,35 @@
   "Guardar e sair": ["Save and leave", "儲存並離開"],
   "Saltar por agora": ["Skip for now", "暫時略過"],
   "Guardar para depois": ["Save for later", "儲存以稍後繼續"],
-  "Limite de links atingido": ["Link limit reached", "已達連結上限"]
+  "Limite de links atingido": ["Link limit reached", "已達連結上限"],
+  "Escolha o seu produto NFC": ["Choose your NFC product", "選擇您的 NFC 產品"],
+  "Personalize o seu produto": ["Personalise your product", "自訂您的產品"],
+  "Escolha como receber": ["Choose how to receive it", "選擇收貨方式"],
+  "Reveja e confirme": ["Review and confirm", "檢視並確認"],
+  "Cartão, porta-chaves ou kit — para partilhar o seu perfil num toque.": [
+    "Card, keychain or kit — share your profile with a tap.",
+    "卡片、鑰匙圈或套組，一觸即可分享個人檔案。"
+  ],
+  "Etapa {0} de {1}": ["Step {0} of {1}", "第 {0} 步，共 {1} 步"],
+  "Alterar produto": ["Change product", "更換產品"],
+  "Continuar para personalização": ["Continue to personalisation", "繼續自訂"],
+  "Continuar para entrega": ["Continue to delivery", "繼續配送設定"],
+  "Rever a minha encomenda": ["Review my order", "檢視我的訂單"],
+  "A sua encomenda": ["Your order", "您的訂單"],
+  "Editar produto": ["Edit product", "編輯產品"],
+  "Editar personalização": ["Edit personalisation", "編輯自訂內容"],
+  "Voltar à entrega": ["Back to delivery", "返回配送設定"],
+  "Carregue o design de cada produto personalizado antes de continuar.": [
+    "Upload the artwork for each customised product before continuing.",
+    "繼續前，請上傳每件自訂產品的設計。"
+  ],
+  "Escreva as instruções para a equipa antes de continuar.": [
+    "Add instructions for the team before continuing.",
+    "繼續前，請填寫提供給團隊的說明。"
+  ],
+  "Veja a frente e o verso do cartão que escolheu.": [
+    "See the front and back of your selected card.",
+    "查看所選卡片的正反面。"
+  ],
+  "Escolher produto NFC": ["Choose an NFC product", "選擇 NFC 產品"]
 }
