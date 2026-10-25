@@ -11,7 +11,7 @@ export async function ProblemPaths({ details = false }: { details?: boolean }) {
           {t('DO SEU DIA A DIA PARA A PRÓXIMA CONEXÃO')}
         </span>
         <h2>{t('O que está a tentar resolver?')}</h2>
-        <p>{t('Encontre a solução que acompanha o seu próximo passo.')}</p>
+        <p>{t('Escolha a situação que reconhece no seu dia a dia.')}</p>
       </div>
       <SolutionCards paths={solutionPaths} t={t} legacyAnchors={details} />
       <p className="solution-photo-note">

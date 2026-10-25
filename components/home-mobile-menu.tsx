@@ -61,7 +61,12 @@ export function HomeMobileMenu() {
                         width={90}
                         height={60}
                       />
-                      <span>{t(path.title)}</span>
+                      <span className="mobile-solution-copy">
+                        <span className="solution-card-category">
+                          {t(path.audience)}
+                        </span>
+                        <span>{t(path.discoveryTitle)}</span>
+                      </span>
                     </Link>
                   ))}
                 </div>

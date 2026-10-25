@@ -161,9 +161,69 @@ const presentation = [
   },
 ] as const;
 
+const discovery = [
+  {
+    audience: 'PROFISSIONAIS INDEPENDENTES',
+    discoveryTitle:
+      'Ficam com o meu contacto, mas não conhecem o meu trabalho.',
+    discoverySummary:
+      'Depois da reunião, os seus projectos e serviços ficam espalhados por mensagens e páginas diferentes.',
+    heroTitle: 'Ficam com o seu contacto, mas não conhecem o seu trabalho?',
+    heroSummary:
+      'Reúna contactos, projectos e serviços num perfil que pode continuar a partilhar depois da reunião.',
+  },
+  {
+    audience: 'CRIADORES DE CONTEÚDO',
+    discoveryTitle:
+      'Conhecem-me pessoalmente, mas não encontram os meus canais.',
+    discoverySummary:
+      'Ditar nomes de utilizador e indicar várias redes pode interromper uma boa conversa.',
+    heroTitle: 'Conhecem-no pessoalmente, mas não encontram os seus canais?',
+    heroSummary:
+      'Reúna os seus canais num perfil e deixe cada pessoa escolher onde o seguir, sem precisar de ditar vários nomes de utilizador.',
+  },
+  {
+    audience: 'PROFISSIONAIS DE SAÚDE',
+    discoveryTitle:
+      'Para saberem como marcar, precisam de trocar várias mensagens.',
+    discoverySummary:
+      'Contactos, localização e horários estão dispersos, tornando uma pergunta simples mais demorada.',
+    heroTitle: 'Precisam de várias mensagens só para saber como marcar?',
+    heroSummary:
+      'Apresente o contacto de marcação, a localização e o horário do consultório num perfil fácil de partilhar.',
+  },
+  {
+    audience: 'EQUIPAS EM EVENTOS',
+    discoveryTitle: 'O evento termina e os contactos ficam dispersos.',
+    discoverySummary:
+      'Entre cartões, notas e mensagens, torna-se difícil preparar o seguimento.',
+    heroTitle: 'O evento terminou e os contactos ficaram dispersos?',
+    heroSummary:
+      'Reúna os contactos enviados com consentimento nas campanhas da sua equipa e prepare o seguimento num só espaço.',
+  },
+  {
+    audience: 'GESTORES DE EQUIPAS',
+    discoveryTitle: 'Cada pessoa guarda contactos. A equipa perde o contexto.',
+    discoverySummary:
+      'A informação das campanhas e dos pedidos recebidos fica dividida entre colaboradores.',
+    heroTitle: 'Cada pessoa guarda contactos e a equipa perde o contexto?',
+    heroSummary:
+      'Organize colaboradores, permissões e contactos recebidos nas campanhas num espaço da empresa, acessível aos responsáveis autorizados.',
+  },
+  {
+    audience: 'PESSOAS E PROFISSIONAIS',
+    discoveryTitle: 'Mudo os contactos e o cartão fica desactualizado.',
+    discoverySummary: 'Quem recebeu o cartão continua com a informação antiga.',
+    heroTitle: 'Mudou os contactos e o cartão ficou desactualizado?',
+    heroSummary:
+      'Actualize o perfil mantendo o mesmo endereço. Um link, QR ou produto NFC ligado a esse endereço continua a abrir a informação publicada.',
+  },
+] as const;
+
 export const solutionPaths = stories.map((story, index) => ({
   ...story,
   ...presentation[index],
+  ...discovery[index],
   href: `/solucoes/${presentation[index].slug}`,
 }));
 export type SolutionPath = (typeof solutionPaths)[number];

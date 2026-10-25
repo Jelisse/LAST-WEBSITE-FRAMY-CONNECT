@@ -7,7 +7,7 @@ export const publicNavigation = [
       {
         label: 'Soluções',
         links: solutionPaths.map((path) => ({
-          label: path.title,
+          label: path.discoveryTitle,
           href: path.href,
         })),
       },

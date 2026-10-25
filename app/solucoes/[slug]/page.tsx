@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: Props) {
     return { title: 'Framy Connect', robots: { index: false, follow: false } };
   const t = await getTranslations();
   return {
-    title: t(path.title),
-    description: t(path.summary),
+    title: t(path.heroTitle),
+    description: t(path.heroSummary),
     robots: publicPageRobots(),
   };
 }
@@ -105,8 +105,8 @@ export default async function SolutionPage({ params }: Props) {
               {t('Todas as soluções')}
             </Link>
             <span className="public-eyebrow">{t(path.tag)}</span>
-            <h1>{t(path.title)}</h1>
-            <p>{t(path.summary)}</p>
+            <h1>{t(path.heroTitle)}</h1>
+            <p>{t(path.heroSummary)}</p>
             <div className="public-actions">
               {action}
               <Link className="public-text-link" href="#demonstracao">
@@ -250,7 +250,13 @@ export default async function SolutionPage({ params }: Props) {
         </section>
         <section className="solution-section solution-closing">
           <h2>{t('A sua próxima conexão já tem por onde continuar.')}</h2>
-          <div className="public-actions">{action}<Link className="public-text-link" href="/#problemas">{t('Todas as soluções')}<ArrowUpRight size={16} aria-hidden="true" /></Link></div>
+          <div className="public-actions">
+            {action}
+            <Link className="public-text-link" href="/#problemas">
+              {t('Todas as soluções')}
+              <ArrowUpRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
         </section>
         <section className="solution-section solution-related">
           <h2>{t('Também pode fazer sentido para si')}</h2>

@@ -16,7 +16,7 @@
   color: #35312d;
   text-decoration: none;
   border-radius: 16px;
-  outline-offset: 6px;
+  padding-bottom: 2px;
 }
 .solution-card-photo {
   display: block;
@@ -54,21 +54,13 @@
   margin: 0;
   color: #766b61;
 }
-.solution-card-action {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #a83c13;
-  margin-top: auto;
-  padding-top: 8px;
-}
 .solution-card-line {
   display: block;
-  height: 2px;
+  height: 5px;
+  border-radius: 999px;
   background: #e9e0d6;
-  margin-top: 6px;
+  margin-top: auto;
+  flex-shrink: 0;
   position: relative;
   overflow: hidden;
 }
@@ -81,24 +73,36 @@
   transform-origin: left;
   transition: transform 220ms ease;
 }
-.solution-card:focus-visible {
-  outline: 2px solid #9d3d18;
+.solution-card h3 {
+  transition: color 220ms ease;
+}
+.solution-card:focus-visible h3 {
+  color: #a53b12;
+}
+a.solution-card[href]:hover,
+a.solution-card[href]:focus-visible,
+a.solution-card[href]:hover * {
+  text-decoration: none;
+}
+a.solution-card[href]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+a.solution-card[href]:focus-visible h3 {
+  font-weight: 700;
 }
 .solution-card:focus-visible .solution-card-line::after {
   transform: scaleX(1);
 }
 @media (hover: hover) and (pointer: fine) {
+  .solution-card:hover h3 {
+    color: #a53b12;
+  }
   .solution-card:hover .solution-card-photo img {
     transform: scale(1.025);
   }
   .solution-card:hover .solution-card-line::after {
     transform: scaleX(1);
-  }
-  .solution-cards:has(.solution-card:hover)
-    .solution-card:not(:hover)
-    .solution-card-photo
-    img {
-    opacity: 0.78;
   }
 }
 .solution-photo-note {
@@ -115,8 +119,14 @@
   overflow-y: auto;
 }
 @keyframes solution-menu-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .solution-cards-menu {
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -132,7 +142,8 @@
   background: transparent;
   color: #35312d;
 }
-.solution-cards-menu h3, .solution-cards-menu p {
+.solution-cards-menu h3,
+.solution-cards-menu p {
   white-space: normal;
   overflow-wrap: break-word;
 }
@@ -419,12 +430,43 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .public-mega-menu.public-solutions-menu { animation: none; }
+  .public-mega-menu.public-solutions-menu {
+    animation: none;
+  }
+  .solution-card h3,
   .solution-card-photo img,
   .solution-card-line::after {
     transition: none;
   }
   .solution-card:hover .solution-card-photo img {
     transform: none;
+  }
+}
+
+.mobile-solution-links a,
+.home-mobile-panel .mobile-solution-links a[href]:hover {
+  text-decoration: none;
+}
+
+.solution-cards-menu .solution-card-category {
+  font-size: 9px;
+  line-height: 1.5;
+  letter-spacing: 0.045em;
+}
+.mobile-solution-copy {
+  display: grid;
+  gap: 5px;
+}
+.mobile-solution-copy .solution-card-category {
+  display: block;
+  font-size: 9px;
+  line-height: 1.4;
+  color: #9c421d;
+  font-weight: 600;
+  letter-spacing: 0.045em;
+}
+@media (forced-colors: active) {
+  a.solution-card[href]:focus-visible .solution-card-line {
+    background: Highlight;
   }
 }

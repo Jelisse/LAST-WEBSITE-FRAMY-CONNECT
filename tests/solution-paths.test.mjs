@@ -13,7 +13,7 @@ test('six solution stories have unique destinations, retained legacy anchors and
    assert.equal(path.href,'/solucoes/'+path.slug);
    assert.ok(existsSync(new URL('../public'+path.image,import.meta.url)));
    assert.ok(existsSync(new URL('../public'+path.image.replace('.webp','-small.webp'),import.meta.url)));
-   for(const key of [path.title,path.summary,path.tag,path.imageAlt,path.pain,path.solution,path.moment,path.plan,...path.benefits]) assert.ok(messages[key],key);
+   for(const key of [path.title,path.summary,path.audience,path.discoveryTitle,path.discoverySummary,path.heroTitle,path.heroSummary,path.tag,path.imageAlt,path.pain,path.solution,path.moment,path.plan,...path.benefits]) assert.ok(messages[key],key);
  }
  assert.equal(solutionBySlug('unknown'),undefined);
 });

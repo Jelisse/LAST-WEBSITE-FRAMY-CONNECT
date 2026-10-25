@@ -1,6 +1,5 @@
 import Link from './hard-link';
 import { SourceImage } from './source-image';
-import { ArrowUpRight } from 'lucide-react';
 import type { SolutionPath } from '@/lib/solution-paths';
 export function SolutionCards({
   paths,
@@ -34,17 +33,9 @@ export function SolutionCards({
                 height={800}
               />
             </span>
-            {!compact && (
-              <span className="solution-card-category">{t(path.tag)}</span>
-            )}
-            <h3>{t(path.title)}</h3>
-            <p>{t(path.summary)}</p>
-            {!compact && (
-              <span className="solution-card-action">
-                {t('Encontrar o meu caminho')}
-                <ArrowUpRight size={16} aria-hidden="true" />
-              </span>
-            )}
+            <span className="solution-card-category">{t(path.audience)}</span>
+            <h3>{t(path.discoveryTitle)}</h3>
+            <p>{t(path.discoverySummary)}</p>
             <span className="solution-card-line" aria-hidden="true" />
           </Link>
         </article>
