@@ -4,6 +4,8 @@ import { ChevronDown, ArrowUpRight } from 'lucide-react';
 import Link from './hard-link';
 import { useI18n } from './language-provider';
 import { publicNavigation } from '@/lib/public-navigation';
+import { solutionPaths } from '@/lib/solution-paths';
+import { SolutionCards } from './solution-cards';
 export function PublicNavigation({
   company = false,
   why = false,
@@ -50,7 +52,7 @@ export function PublicNavigation({
         </button>
         {active === id && (
           <div
-            className="public-mega-menu"
+            className={`public-mega-menu ${id === 'solutions' ? 'public-solutions-menu' : ''}`}
             id={'public-menu-' + id}
             onBlur={(e) => {
               if (
@@ -60,35 +62,46 @@ export function PublicNavigation({
                 setActive(null);
             }}
           >
-            <div className="public-menu-columns">
-              {section.groups.map((group) => (
-                <div key={group.label}>
-                  <h2>{t(group.label)}</h2>
-                  {group.links.map((link) => (
-                    <Link
-                      key={link.label}
-                      href={link.href}
-                      onClick={() => setActive(null)}
-                    >
-                      {t(link.label)}
-                    </Link>
+            {id === 'solutions' ? (
+              <SolutionCards
+                paths={solutionPaths}
+                t={t}
+                compact
+                onNavigate={() => setActive(null)}
+              />
+            ) : (
+              <>
+                <div className="public-menu-columns">
+                  {section.groups.map((group) => (
+                    <div key={group.label}>
+                      <h2>{t(group.label)}</h2>
+                      {group.links.map((link) => (
+                        <Link
+                          key={link.label}
+                          href={link.href}
+                          onClick={() => setActive(null)}
+                        >
+                          {t(link.label)}
+                        </Link>
+                      ))}
+                    </div>
                   ))}
                 </div>
-              ))}
-            </div>
-            <div className="public-menu-feature">
-              <span>{t('O SEU MUNDO, NUM TOQUE')}</span>
-              <h2>{t('Uma apresentação que abre portas.')}</h2>
-              <p>
-                {t(
-                  'Reúna contactos, redes e trabalho num perfil que acompanha o seu crescimento.',
-                )}
-              </p>
-              <Link href="/exemplo" onClick={() => setActive(null)}>
-                {t('Ver exemplo')}
-                <ArrowUpRight size={17} />
-              </Link>
-            </div>
+                <div className="public-menu-feature">
+                  <span>{t('O SEU MUNDO, NUM TOQUE')}</span>
+                  <h2>{t('Uma apresentação que abre portas.')}</h2>
+                  <p>
+                    {t(
+                      'Reúna contactos, redes e trabalho num perfil que acompanha o seu crescimento.',
+                    )}
+                  </p>
+                  <Link href="/exemplo" onClick={() => setActive(null)}>
+                    {t('Ver exemplo')}
+                    <ArrowUpRight size={17} />
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

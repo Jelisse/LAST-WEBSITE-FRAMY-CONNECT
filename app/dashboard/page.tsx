@@ -14,10 +14,22 @@ export async function generateMetadata() {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ compra?: string; pagamento?: string }>;
+  searchParams: Promise<{
+    compra?: string;
+    pagamento?: string;
+    billing?: string;
+    onboarding?: string;
+    plan?: string;
+  }>;
 }) {
-  const user = await requireChatGPTUser('/dashboard');
   const query = await searchParams;
+  const returnPath =
+    query.billing === '1'
+      ? '/perfil?billing=1'
+      : query.onboarding === '1' && query.plan === 'professional-v2'
+        ? '/perfil?onboarding=1&plan=professional-v2'
+        : '/dashboard';
+  const user = await requireChatGPTUser(returnPath);
   const t = await getTranslations();
   const paidProduct =
     query.pagamento && /^[a-zA-Z0-9-]{1,80}$/.test(query.pagamento)

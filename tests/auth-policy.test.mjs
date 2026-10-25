@@ -47,3 +47,16 @@ test('guest tracking returns to the exact reference after login without permitti
 test('branded tracking references survive login but additional redirects remain blocked',()=>{
  for(const code of ['OR','PY']) { const path='/acompanhar?referencia=FC-'+code+'-26-5827-4193'; assert.equal(loginDestination('customer',path),path);assert.equal(loginDestination('customer',path+'&next=https://evil.invalid'),'/dashboard'); }
 });
+
+
+test('plan-specific entry preserves Professional billing and corporate offers through authentication', () => {
+  assert.equal(loginDestination('customer', '/perfil?billing=1'), '/perfil?billing=1');
+  assert.equal(accountDestination('customer', '/perfil?billing=1', true), '/perfil?onboarding=1&plan=professional-v2');
+  assert.equal(accountDestination('customer', '/perfil?billing=1', false), '/perfil?billing=1');
+  for (const offer of ['business', 'enterprise']) {
+    const path = '/corporativo/configurar?offer=' + offer;
+    assert.equal(accountDestination('customer', path, true), path);
+  }
+  for (const path of ['/perfil?billing=1&next=https://evil.test', '/perfil?onboarding=1&plan=admin'])
+    assert.equal(loginDestination('customer', path), '/dashboard');
+});

@@ -8,10 +8,12 @@ export function LoginForm({
   initialRegister = false,
   purchaseReturn,
   corporateReturn = false,
+  profilePlan,
 }: {
   initialRegister?: boolean;
   purchaseReturn?: string;
   corporateReturn?: boolean;
+  profilePlan?: 'Personal' | 'Professional';
 }) {
   const { t } = useI18n();
   const emailInput = useRef<HTMLInputElement>(null);
@@ -45,9 +47,13 @@ export function LoginForm({
         <p>
           {purchaseReturn
             ? t('Após entrar, voltará à sua encomenda.')
-            : register
-              ? t('Guarde o seu perfil e acompanhe os seus pedidos.')
-              : t('Entre para abrir o seu painel.')}
+            : profilePlan === 'Professional'
+              ? t(
+                  'Crie a sua conta ou entre para continuar com Professional. Confirme o plano antes de pagar.',
+                )
+              : register
+                ? t('Guarde o seu perfil e acompanhe os seus pedidos.')
+                : t('Entre para abrir o seu painel.')}
         </p>
         <form
           aria-busy={busy}
@@ -68,7 +74,11 @@ export function LoginForm({
                   name: data.get('name'),
                   returnTo:
                     register && plan === 'corporate'
-                      ? '/corporativo/configurar'
+                      ? new URLSearchParams(location.search)
+                          .get('return_to')
+                          ?.startsWith('/corporativo/configurar')
+                        ? new URLSearchParams(location.search).get('return_to')
+                        : '/corporativo/configurar'
                       : register && corporateReturn && plan === 'personal'
                         ? '/dashboard'
                         : new URLSearchParams(location.search).get('return_to'),
@@ -128,7 +138,7 @@ export function LoginForm({
               {t('Esqueci-me da palavra-passe')}
             </Link>
           )}
-          {register && !purchaseReturn && (
+          {register && !purchaseReturn && !corporateReturn && !profilePlan && (
             <label>
               {t('Tipo de conta')}
               <select

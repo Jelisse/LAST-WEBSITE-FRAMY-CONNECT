@@ -26,6 +26,8 @@ import './public-marketing.css';
 import { PublicHeader } from '@/components/public-header';
 import { PublicSolutions, PublicTrust } from '@/components/public-solutions';
 import { ConnectionDemo } from '@/components/connection-demo';
+import { ProfileStart } from '@/components/profile-start';
+import './profile-start.css';
 
 const questions = [
   [
@@ -107,19 +109,12 @@ export default async function Home() {
               )}
             </p>
             <div className="public-actions">
-              <Link className="public-button" href="/perfil?plans=1">
-                {t('Criar o meu perfil gratuito')}
-                <ArrowUpRight size={18} aria-hidden="true" />
-              </Link>
+              <ProfileStart />
               <Link
                 className="public-button public-button-outline"
                 href="#produtos"
               >
                 {t('Escolher produto NFC')}
-                <ArrowUpRight size={18} aria-hidden="true" />
-              </Link>
-              <Link className="public-company-link" href="/para-empresas">
-                {t('Para a minha empresa')}
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>
             </div>
@@ -213,10 +208,7 @@ export default async function Home() {
               'Crie o seu perfil gratuito ou descubra como organizar as conexões da sua equipa.',
             )}
           </p>
-          <Link className="home-primary" href="/perfil?plans=1">
-            {t('Criar o meu perfil gratuito')}
-            <ArrowUpRight size={18} />
-          </Link>
+          <ProfileStart className="home-primary" />
         </section>
         <SiteFooter />
       </div>

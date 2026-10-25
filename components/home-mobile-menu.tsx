@@ -5,6 +5,8 @@ import { Menu } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import Link from './hard-link';
 import { LanguageSelector, useI18n } from './language-provider';
+import { solutionPaths } from '@/lib/solution-paths';
+import { SourceImage } from './source-image';
 
 export function HomeMobileMenu() {
   const { t } = useI18n();
@@ -49,16 +51,32 @@ export function HomeMobileMenu() {
           {publicNavigation.map((section) => (
             <details className="mobile-nav-group" key={section.id}>
               <summary>{t(section.label)}</summary>
-              {section.groups.map((group) => (
-                <div key={group.label}>
-                  <strong>{t(group.label)}</strong>
-                  {group.links.map((link) => (
-                    <Link key={link.label} href={link.href} onClick={close}>
-                      {t(link.label)}
+              {section.id === 'solutions' ? (
+                <div className="mobile-solution-links">
+                  {solutionPaths.map((path) => (
+                    <Link key={path.id} href={path.href} onClick={close}>
+                      <SourceImage
+                        src={path.image.replace('.webp', '-small.webp')}
+                        alt=""
+                        width={90}
+                        height={60}
+                      />
+                      <span>{t(path.title)}</span>
                     </Link>
                   ))}
                 </div>
-              ))}
+              ) : (
+                section.groups.map((group) => (
+                  <div key={group.label}>
+                    <strong>{t(group.label)}</strong>
+                    {group.links.map((link) => (
+                      <Link key={link.label} href={link.href} onClick={close}>
+                        {t(link.label)}
+                      </Link>
+                    ))}
+                  </div>
+                ))
+              )}
             </details>
           ))}
         </nav>

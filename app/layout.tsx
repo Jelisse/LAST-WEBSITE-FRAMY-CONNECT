@@ -33,6 +33,7 @@ import './company-launch.css';
 import './company-tools.css';
 import './public-marketing.css';
 import './experience-harmony.css';
+import './solutions.css';
 import './ajuda/style.css';
 import './support-experience.css';
 import { DashboardRefreshFeedback } from '@/components/dashboard-refresh-feedback';

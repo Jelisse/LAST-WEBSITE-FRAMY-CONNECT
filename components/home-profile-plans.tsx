@@ -226,9 +226,9 @@ export function HomeProfilePlans({
                     company
                       ? `/corporativo/configurar?offer=${offer.id}`
                       : free
-                        ? '/perfil?plans=1'
+                        ? '/perfil'
                         : canBuy
-                          ? '/perfil?plans=1'
+                          ? '/perfil?billing=1'
                           : '/contacto'
                   }
                 >

@@ -10,12 +10,14 @@ export function ProfileOnboarding({
   ready,
   error,
   onStart,
+  professional = false,
 }: {
   phase: string;
   name: string;
   ready: boolean;
   error: string;
   onStart: () => void;
+  professional?: boolean;
 }) {
   const { t } = useI18n();
   const content = useRef<HTMLElement>(null);
@@ -70,9 +72,17 @@ export function ProfileOnboarding({
             </p>
             <button
               className="btn"
-              onClick={() => location.assign('/dashboard')}
+              onClick={() =>
+                location.assign(
+                  professional ? '/perfil?billing=1' : '/dashboard',
+                )
+              }
             >
-              {t('Explorar o meu painel')}
+              {t(
+                professional
+                  ? 'Continuar com Professional'
+                  : 'Explorar o meu painel',
+              )}
             </button>
           </section>
         ) : (

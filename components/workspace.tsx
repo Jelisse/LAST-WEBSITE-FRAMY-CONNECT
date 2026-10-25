@@ -701,6 +701,7 @@ export function Workspace({ displayName }: { displayName: string }) {
     return (
       <ProfileOnboarding
         phase={onboarding}
+        professional={query?.get('plan') === 'professional-v2'}
         name={displayName}
         ready={!!data}
         error={error}

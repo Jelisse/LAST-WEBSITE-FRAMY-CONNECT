@@ -17,7 +17,16 @@ export default async function Page({
     <LoginForm
       initialRegister={params.mode === 'register'}
       purchaseReturn={purchaseReturn}
-      corporateReturn={params.return_to==='/corporativo/configurar'}
+      corporateReturn={/^\/corporativo\/configurar(?:\?offer=(?:business|enterprise))?$/.test(
+        params.return_to ?? '',
+      )}
+      profilePlan={
+        params.return_to === '/perfil?billing=1'
+          ? 'Professional'
+          : params.return_to === '/dashboard' || params.return_to === '/perfil'
+            ? 'Personal'
+            : undefined
+      }
     />
   );
 }

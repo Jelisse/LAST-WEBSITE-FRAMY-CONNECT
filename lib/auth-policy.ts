@@ -13,6 +13,8 @@ export function accountDestination(
   registering = false,
 ) {
   const destination = loginDestination(role, requested);
+  if (registering && role === 'customer' && destination === '/perfil?billing=1')
+    return '/perfil?onboarding=1&plan=professional-v2';
   if (
     registering &&
     role === 'customer' &&
@@ -78,6 +80,8 @@ export function loginDestination(role: AccountRole, requested: string) {
       '/perfil',
       '/perfil?tools=1',
       '/perfil?plans=1',
+      '/perfil?billing=1',
+      '/perfil?onboarding=1&plan=professional-v2',
       '/dashboard',
       '/aplicar',
     ].includes(requested)
