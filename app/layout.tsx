@@ -1,3 +1,4 @@
+import './about.css';
 import './order-tracking.css';
 import './profile-growth.css';
 import { getTranslations } from '@/lib/server-i18n';

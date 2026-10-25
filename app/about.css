@@ -1,0 +1,177 @@
+.about-framy {
+  color: var(--foreground, #393735);
+}
+.about-framy h1 {
+  font-size: clamp(2.3rem, 4.5vw, 4.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+  margin: 1.2rem 0 1.5rem;
+}
+.about-framy h2 {
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  margin: 0.8rem 0 1.3rem;
+}
+.about-framy h3 {
+  font-size: 1.18rem;
+  line-height: 1.45;
+  margin: 1rem 0 0.65rem;
+}
+.about-framy p {
+  line-height: 1.85;
+  color: #625c56;
+}
+.about-framy .eyebrow {
+  color: #a8401b;
+}
+.about-hero {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+  padding-block: 4.5rem;
+}
+.about-hero figure {
+  margin: 0;
+}
+.about-hero img,
+.about-local img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3/2;
+  object-fit: cover;
+  border-radius: 24px;
+}
+.about-hero figcaption {
+  font-size: 0.72rem;
+  color: #79716a;
+  margin-top: 0.6rem;
+}
+.about-story {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 3rem;
+  border-top: 1px solid #e5dcd3;
+  padding-block: 4rem;
+  scroll-margin-top: 110px;
+}
+.about-story p {
+  max-width: 70ch;
+}
+.about-offer,
+.about-principles {
+  padding-block: 3.5rem;
+}
+.about-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+.about-pillars article {
+  border-top: 1px solid #dfd4c9;
+  padding-top: 1.5rem;
+}
+.about-pillars svg {
+  color: #b7471d;
+}
+.about-local {
+  background: #f2e9de;
+  margin-block: 2rem;
+}
+.about-local-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  padding-block: 3.5rem;
+}
+.about-next {
+  text-align: center;
+  padding-block: 3.5rem 5rem;
+  border-top: 1px solid #e5dcd3;
+}
+.about-next p {
+  max-width: 65ch;
+  margin: 0 auto 1.5rem;
+}
+.about-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+@media (max-width: 760px) {
+  .about-hero,
+  .about-story,
+  .about-local-inner {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding-block: 2.5rem;
+  }
+  .about-pillars {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .about-offer,
+  .about-principles {
+    padding-block: 2rem;
+  }
+  .about-next {
+    padding-block: 2.5rem;
+  }
+  .about-actions {
+    flex-direction: column;
+  }
+  .about-actions .btn {
+    width: 100%;
+  }
+}
+.about-institution,
+.about-policies {
+  padding-block: 3.5rem;
+  scroll-margin-top: 110px;
+}
+.about-purpose-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem 3rem;
+  margin-top: 2rem;
+}
+.about-purpose-grid article {
+  border-top: 1px solid #dfd4c9;
+  padding-block: 1.5rem;
+}
+.about-section-number {
+  color: #a8401b;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+}
+.about-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem 2rem;
+}
+.about-values article {
+  border-top: 1px solid #dfd4c9;
+  padding-top: 0.75rem;
+}
+.about-policy-intro {
+  max-width: 65ch;
+}
+.about-policies {
+  background: #f5eee6;
+}
+@media (max-width: 760px) {
+  .about-purpose-grid,
+  .about-values {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .about-institution,
+  .about-policies {
+    padding-block: 2.5rem;
+  }
+}

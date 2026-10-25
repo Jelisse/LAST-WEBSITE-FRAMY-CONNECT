@@ -1,3 +1,4 @@
+import { AboutPage } from '@/components/about-page';
 import { publishedProfile } from '@/lib/server-profile-access';
 import { getTranslations } from '@/lib/server-i18n';
 import { activeProfileSQL } from '@/lib/entitlement';
@@ -19,26 +20,6 @@ const pages: Record<
     blocks: { title: string; text: string }[];
   }
 > = {
-  sobre: {
-    title: 'Conectar começa por si.',
-    eyebrow: 'QUEM SOMOS',
-    intro:
-      'A Framy Connect nasce para tornar a identidade simples, acessível e pronta para ser partilhada.',
-    blocks: [
-      {
-        title: 'A nossa visão',
-        text: 'Fazer do toque a linguagem universal da identidade, para cada pessoa e cada instituição à qual pertence.',
-      },
-      {
-        title: 'A nossa missão',
-        text: 'Ligar pessoas ao que as representa: os seus contactos, o seu trabalho e as suas conquistas. Um perfil que pode actualizar, ligado aos produtos que o acompanham.',
-      },
-      {
-        title: 'Moçambique primeiro',
-        text: 'Desenhamos uma experiência em português, inglês e chinês tradicional, orientada às pessoas, aos criadores e às organizações do nosso mercado.',
-      },
-    ],
-  },
   privacidade: {
     title: 'Privacidade e utilização dos dados',
     eyebrow: 'PRIVACIDADE',
@@ -136,8 +117,21 @@ export async function generateMetadata({
   const { slug } = await params;
   const t = await getTranslations();
   return {
-    title: t(pages[slug]?.title ?? 'Identidade digital'),
-    robots: pages[slug] ? publicPageRobots() : { index: false, follow: false },
+    title: t(
+      slug === 'sobre'
+        ? 'Sobre a Framy Connect'
+        : (pages[slug]?.title ?? 'Identidade digital'),
+    ),
+    description:
+      slug === 'sobre'
+        ? t(
+            'Conheça a Framy Connect: perfis digitais, produtos NFC opcionais e ferramentas para pessoas e equipas em Moçambique.',
+          )
+        : undefined,
+    robots:
+      slug === 'sobre' || pages[slug]
+        ? publicPageRobots()
+        : { index: false, follow: false },
   };
 }
 export default async function Page({
@@ -147,6 +141,7 @@ export default async function Page({
 }) {
   const t = await getTranslations();
   const { slug } = await params;
+  if (slug === 'sobre') return <AboutPage />;
   const page = pages[slug];
   if (page)
     return (
