@@ -303,7 +303,11 @@ test('scheduled retention removes old analytics without touching recent events o
     f.sql.prepare('INSERT INTO corporate_card_metrics VALUES(?,?,?,?)').run('card',now,'view',3);
     f.sql.prepare('INSERT INTO corporate_leads VALUES(?,?)').run('old-corporate',old);
     f.sql.prepare('INSERT INTO corporate_leads VALUES(?,?)').run('new-corporate',now);
-    f.sql.exec("INSERT INTO auth_accounts VALUES('profile-owner')");
+    f.sql.exec("ALTER TABLE auth_accounts ADD COLUMN active INTEGER DEFAULT 1; ALTER TABLE auth_accounts ADD COLUMN version INTEGER DEFAULT 1; CREATE TABLE demo_accounts(account_id TEXT,expires_at INTEGER); CREATE TABLE visitor_books(id TEXT,retention_days INTEGER); CREATE TABLE visitor_entries(id TEXT,book_id TEXT,created_at INTEGER,expires_at INTEGER); INSERT INTO auth_accounts(id) VALUES('profile-owner'); INSERT INTO auth_accounts(id) VALUES('expired-demo');");
+    f.sql.prepare('INSERT INTO demo_accounts VALUES(?,?)').run('expired-demo',old);
+    f.sql.exec("INSERT INTO visitor_books VALUES('book',30)");
+    f.sql.prepare('INSERT INTO visitor_entries VALUES(?,?,?,?)').run('old-visitor','book',old,now+86400000);
+    f.sql.prepare('INSERT INTO visitor_entries VALUES(?,?,?,?)').run('new-visitor','book',now,now+86400000);
     f.sql.prepare('INSERT INTO profile_click_totals VALUES(?,?,?,?,?)').run('profile-owner', old, 'contact', 'Contact', 2);
     f.sql.prepare('INSERT INTO profile_click_totals VALUES(?,?,?,?,?)').run('profile-owner', now, 'contact', 'Contact', 3);
     f.sql.exec("INSERT INTO profile_click_lifetime VALUES('profile-owner',5)");
@@ -367,6 +371,10 @@ test('scheduled retention removes old analytics without touching recent events o
       },
     );
     await Promise.all(pending);
+    assert.equal(f.sql.prepare("SELECT active FROM auth_accounts WHERE id='expired-demo'").get().active,0);
+    assert.equal(f.sql.prepare("SELECT active FROM auth_accounts WHERE id='profile-owner'").get().active,1);
+    assert.equal(f.sql.prepare("SELECT COUNT(*) AS n FROM visitor_entries WHERE id='old-visitor'").get().n,0);
+    assert.equal(f.sql.prepare("SELECT COUNT(*) AS n FROM visitor_entries WHERE id='new-visitor'").get().n,1);
     assert.equal(f.sql.prepare('SELECT SUM(count) AS n FROM corporate_card_metrics').get().n,3);
     assert.deepEqual(f.sql.prepare('SELECT id FROM corporate_leads').all().map(r=>r.id),['new-corporate']);
     assert.equal(f.sql.prepare('SELECT SUM(count) n FROM profile_click_totals').get().n, 3);

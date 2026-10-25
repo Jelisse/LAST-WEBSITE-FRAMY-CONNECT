@@ -19,6 +19,8 @@ const worker = {
     env: Cloudflare.Env,
     ctx: ExecutionContext,
   ) {
+    ctx.waitUntil(env.DB.prepare('UPDATE auth_accounts SET active=0,version=version+1 WHERE active=1 AND id IN (SELECT account_id FROM demo_accounts WHERE expires_at<=?)').bind(Date.now()).run());
+    ctx.waitUntil(env.DB.prepare('DELETE FROM visitor_entries WHERE id IN (SELECT e.id FROM visitor_entries e JOIN visitor_books b ON b.id=e.book_id WHERE e.expires_at<=? OR e.created_at<=?-b.retention_days*86400000 LIMIT 1000)').bind(Date.now(),Date.now()).run());
     ctx.waitUntil(env.DB.prepare('DELETE FROM corporate_leads WHERE id IN (SELECT id FROM corporate_leads WHERE created_at<? LIMIT 1000)').bind(Date.now()-90*86400000).run());
     ctx.waitUntil(env.DB.prepare('DELETE FROM corporate_card_metrics WHERE day<?').bind(Date.now()-90*86400000).run());
     ctx.waitUntil(guestOrderEmails().catch(()=>{}));

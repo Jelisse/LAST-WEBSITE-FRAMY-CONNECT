@@ -1,0 +1,19 @@
+# Digital visitor book
+
+Organisation workspace: `/corporativo/visitas`. Each reception has a random public `/visita/{token}` URL shared by QR and an NFC desk tag. No visitor account or app is required. NFC hardware must be encoded and physically tested separately; no scanner integration, invented hardware pricing or stock is added.
+
+Active corporate organisations (Business/Enterprise or approved existing contracts) can use the book. Leaders configure books, delegate read-only reception access to accepted active members and export. Ordinary members cannot view books unless explicitly assigned, cannot configure them and cannot export. Membership suspension, organisation access loss and expiry stop access. Every SQL record query rechecks current scoped membership. Public pages never query or return visitor lists.
+
+Public registration requires name, international phone number and explicit consent. Email is optional. Company and position appear only for company representatives. Positions use a short selectable list plus Other/free text. Name autocomplete is a static, curated set of given names/surnames used in Mozambique, not a population ranking, identity check or visitor lookup; unrestricted names and compound names remain valid. Purpose and department lists are optional, bounded and chosen by a leader; no employee directory is exposed.
+
+Each record snapshots consent version/time and expiry. Retention defaults to 90 days, with 30/60/90 choices. Shortening also shortens existing expiry; extending never resurrects expired records. Read queries hide expired records immediately; the existing 15-minute cron deletes them in bounded batches. Records are separate from campaign leads/marketing and do not trigger email or host notification. The company logo saved in company-card settings appears only when explicitly enabled for the reception book.
+
+Public POST uses same-origin checks, bounded input, server validation, rate limits, random retry IDs and transaction-time book/version/public-token/organisation checks. Closing or rotating a book stops its old URL. Rotation is explained behind an explicit advanced action because printed QR/NFC stands must be updated. Leaders can download PNG QR, copy the canonical link or preview the form. CSV is formula-safe, filtered in Maputo time and bounded to 1,000 records; private lists paginate by 50.
+
+Additive migrations: `0039_visitor_books.sql`, `0040_demo_accounts.sql`. Follow `CLOUDFLARE.md`: inspect the pending migration plan, privately back up, apply only missing migrations and run guarded deployment. Never reset production or replay seeds.
+
+## Demonstration accounts
+
+The user explicitly requested live Professional, Business and Enterprise test accounts. `scripts/prepare-visitor-demo.mjs` prepares four separate fictional customer identities (three plans plus a reception member), hashed passwords, 30-day test entitlements, two fictional organisations and empty reception books. It does not apply SQL. It refuses to overwrite an existing private credential file. Provision SQL and credentials live under Git-ignored `outputs/visitor-demo/`; never commit or publish them. Test entitlements are clearly labelled/audited grants, not invoices, receipts or payment evidence. No commercial price records are changed. The receptionist only reads its delegated Business book. Accounts expire after 30 days; sessions deny expired demos and cron deactivates them. A visible account banner reminds testers to use fictional data and that actual emails/payments on the live website are real.
+
+Local QA uses isolated `.wrangler/visitor-qa` state (`FRAMY_VISITOR_QA=true`), never the production database. Integration tests cover privacy, consent, validation, duplicate retries, tenant isolation, delegation/export restrictions, closing/rotation, suspension and retention. Physical NFC, real payment settlement and email delivery are not verified by these tests.

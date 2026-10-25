@@ -1,3 +1,5 @@
+import { DemoAccountNotice } from '@/components/demo-account-notice';
+import './visitor-book.css';
 import './about.css';
 import './order-tracking.css';
 import './profile-growth.css';
@@ -89,6 +91,7 @@ export default async function RootLayout({
       <body className={poppins.variable}>
         <LanguageProvider locale={locale}>
           <SkipToContentLink />
+          <DemoAccountNotice />
           <InternalPageChrome header={<SiteHeader focused />}>
             {children}
           </InternalPageChrome>

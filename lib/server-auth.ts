@@ -22,7 +22,7 @@ export async function sessionAccount() {
   if (!token || !/^[a-f0-9]{64}$/.test(token)) return null;
   const account = await database()
     .prepare(
-      'SELECT a.* FROM auth_accounts a JOIN auth_sessions s ON s.account_id=a.id WHERE s.token_hash=? AND s.expires_at>? AND a.active=1',
+      "SELECT a.* FROM auth_accounts a JOIN auth_sessions s ON s.account_id=a.id WHERE s.token_hash=? AND s.expires_at>? AND a.active=1 AND NOT EXISTS(SELECT 1 FROM demo_accounts d WHERE d.account_id=a.id AND d.expires_at<=CAST(strftime('%s','now') AS INTEGER)*1000)",
     )
     .bind(await tokenHash(token), Date.now())
     .first<Account>();

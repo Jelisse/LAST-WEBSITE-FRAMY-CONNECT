@@ -54,6 +54,7 @@ export default defineConfig(async () => {
     plugins: [
       vinext(),
       cloudflare({
+        ...(process.env.FRAMY_VISITOR_QA === 'true' ? { persistState: { path: '.wrangler/visitor-qa' } } : {}),
         ...(process.env.FRAMY_QA === 'true'
           ? { persistState: { path: '.wrangler/launch-qa' } }
           : {}),

@@ -78,6 +78,8 @@ test('database repair identifies missing post-auth migrations without replaying 
     '0036_company_experience.sql',
       '0037_company_tools.sql',
       '0038_public_references.sql',
+      '0039_visitor_books.sql',
+      '0040_demo_accounts.sql',
   ]);
 });
 test('database repair is a no-op when schema and inventory migration are applied', () => {

@@ -29,6 +29,7 @@ const icons = {
   team: Users,
   campaigns: Megaphone,
   contacts: ContactRound,
+  visitors: BookUser,
   guide: CircleHelp,
 };
 export function CorporateSidebar({

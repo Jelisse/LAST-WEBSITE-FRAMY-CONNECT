@@ -26,6 +26,7 @@ const pages: Record<
     intro:
       'Conheça os dados utilizados para gerir a sua conta, publicar o seu perfil e acompanhar as suas encomendas.',
     blocks: [
+      { title: 'Livro de visitas digital', text: 'Ao registar uma visita, autoriza o envio do nome, contacto e dados opcionais à organização indicada para gerir a visita. Não é uma subscrição de marketing. O prazo é apresentado no formulário: 30, 60 ou 90 dias. Os responsáveis e os membros de recepção autorizados podem consultar os registos; a exportação é reservada aos responsáveis. Os registos expirados deixam de estar disponíveis e são eliminados nas limpezas periódicas. Para correcção ou eliminação, contacte a organização ou o apoio Framy. As sugestões de nomes usam uma lista estática, nunca dados de visitantes anteriores.' },
       {
         title: 'Compras sem conta',
         text: 'Pode comprar produtos físicos sem criar conta. Guardamos o nome, email, contacto e dados de entrega para gerir a encomenda. Um cookie necessário, inacessível a scripts e válido por 30 dias, permite recuperar a compra neste navegador. A referência recente fica no dispositivo e a tentativa de pagamento neste separador. A referência pública mostra apenas o progresso. Dados pessoais e recuperação do pagamento exigem o navegador da compra, a conta associada ou um link enviado ao email do comprador, válido por 30 minutos.',

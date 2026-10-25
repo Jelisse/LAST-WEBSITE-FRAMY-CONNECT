@@ -1,4 +1,5 @@
 'use client';
+import { VisitorBooks } from './visitor-books';
 import { refreshDashboard } from '@/lib/dashboard-refresh';
 import { CompanyTools, type CompanyToolView } from './company-tools';
 import { CompanyCards } from './company-cards';
@@ -123,7 +124,7 @@ export function CorporateDashboard({
     setNow(Date.now());
     if (!organisation && body.organisations.length)
       setOrganisation(body.organisations[0].id);
-    if (organisation && view !== 'reports' && view !== 'guide' && !isTool) {
+    if (organisation && view !== 'reports' && view !== 'guide' && view !== 'visitors' && !isTool) {
       const r = await fetch(
         '/api/corporate?' + new URLSearchParams({ organisation, days }),
         { cache: 'no-store' },
@@ -385,6 +386,7 @@ export function CorporateDashboard({
                 initialCampaign={initialCampaign}
               />
             )}
+            {view === 'visitors' && organisation && <VisitorBooks key={organisation} organisation={organisation} />}
             {view === 'guide' && <CorporateGuide organisation={organisation} />}
             {view === 'cards' && organisation && (
               <CompanyCards key={organisation} organisation={organisation} />
@@ -396,7 +398,7 @@ export function CorporateDashboard({
                 view={view as CompanyToolView}
               />
             )}
-            {detail && view !== 'reports' && view !== 'guide' && !isTool && (
+            {detail && view !== 'reports' && view !== 'guide' && view !== 'visitors' && !isTool && (
               <>
                 <h2>{detail.organisation.name}</h2>
                 {detail.organisation.analytics === false && (

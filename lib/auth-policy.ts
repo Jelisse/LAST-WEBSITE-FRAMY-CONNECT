@@ -52,6 +52,7 @@ export function loginDestination(role: AccountRole, requested: string) {
       '/corporativo/integracoes',
       '/corporativo/campanhas',
       '/corporativo/contactos',
+      '/corporativo/visitas',
       '/corporativo/guia',
     ].includes(requested)
   )

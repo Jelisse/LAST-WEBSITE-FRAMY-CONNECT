@@ -1,4 +1,5 @@
 export const corporateSections = [
+  { id: 'visitors', path: '/corporativo/visitas', label: 'Livro de visitas', title: 'Livro de Visitas Digital' },
   {
     id: 'cards',
     path: '/corporativo/cartoes',

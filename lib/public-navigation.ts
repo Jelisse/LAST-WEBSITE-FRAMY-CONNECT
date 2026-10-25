@@ -1,4 +1,4 @@
-import { solutionPaths } from './solution-paths';
+import { solutionPaths } from './solution-paths.ts';
 export const publicNavigation = [
   {
     id: 'solutions',
